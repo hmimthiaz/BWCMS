@@ -3,17 +3,26 @@
 namespace Bellwether\BWCMSBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-class DefaultController extends Controller
+
+/**
+ * Account controller.
+ *
+ * @Route("/admin/dashboard")
+ */
+class DashboardController extends Controller
 {
     /**
-     * @Route("/hello/{name}")
+     * @Route("/index")
      * @Template()
      */
-    public function indexAction($name)
+    public function indexAction()
     {
-        return array('name' => $name);
+        return array(// ...
+        );
     }
+
 }
