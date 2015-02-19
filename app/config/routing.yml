@@ -1,4 +1,5 @@
 bwcms:
-    resource: "@BWCMSBundle/Resources/config/routing.php"
+    resource: "@BWCMSBundle/Controller/"
+    type:     annotation
     prefix:   /
 
