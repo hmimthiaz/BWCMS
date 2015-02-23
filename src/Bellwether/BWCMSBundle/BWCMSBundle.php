@@ -2,8 +2,9 @@
 
 namespace Bellwether\BWCMSBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Bellwether\BWCMSBundle\Classes\BWCMSBaseBundle;
 
-class BWCMSBundle extends Bundle
+class BWCMSBundle extends BWCMSBaseBundle
 {
+
 }
