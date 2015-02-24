@@ -6,6 +6,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BWCMSBaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Account controller.
@@ -37,10 +38,12 @@ class MediaController extends BWCMSBaseController
     public function uploadAction()
     {
 
-        $this->media()->handleUpload();
-
-
-        exit();
+        try {
+            $this->media()->handleUpload();
+        } catch (\Exception $e) {
+            return new Response($e->getMessage(), 500);
+        }
+        return new Response('Ok', 200);
     }
 
 

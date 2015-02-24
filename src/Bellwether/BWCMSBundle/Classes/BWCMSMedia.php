@@ -37,28 +37,18 @@ class BWCMSMedia extends BWCMSBaseService
 
     public function handleUpload()
     {
-
-        $this->dump($this->uploadFolder);
-
         /**
          * @var \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile
          */
         $uploadedFile = $this->getRequest()->files->get('file');
         if (null !== $uploadedFile && $uploadedFile->isValid()) {
-
             $uploadFolder = $this->getUploadDir();
             if(!$this->fs->exists($uploadFolder)){
                 $this->fs->mkdir($uploadFolder);
             }
             $filename = $this->generateFileName($uploadedFile);
             $uploadedFile->move($uploadFolder,$filename);
-
-
         }
-
-
-        $this->dump($uploadedFile);
-
     }
 
 
