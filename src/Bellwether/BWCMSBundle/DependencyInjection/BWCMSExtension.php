@@ -22,7 +22,14 @@ class BWCMSExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.xml');
+        $container->setParameter('media.path', $config['media']['path']);
+        $container->setParameter('media.maxUploadSize', $config['media']['maxUploadSize']);
+        $container->setParameter('media.blockedExtension', $config['media']['blockedExtension']);
+
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.yml');
+
+
+
     }
 }

@@ -20,9 +20,18 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('bwcms');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode->children()
+            ->arrayNode('media')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->scalarNode('path')->defaultValue('media')->end()
+                    ->integerNode('maxUploadSize')->defaultValue(1000)->end()
+                    ->scalarNode('blockedExtension')->defaultValue('dll,exe,sh,php')->end()
+                ->end()
+            ->end()
+        ->end();
+
+
 
         return $treeBuilder;
     }

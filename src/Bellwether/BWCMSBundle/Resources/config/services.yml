@@ -1,0 +1,4 @@
+services:
+  BWCMS.Media:
+    class: Bellwether\BWCMSBundle\Classes\BWCMSMedia
+    arguments: [@service_container,@request_stack]

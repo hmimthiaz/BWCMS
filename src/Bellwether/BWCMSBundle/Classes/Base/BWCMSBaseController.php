@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes;
+namespace Bellwether\BWCMSBundle\Classes\Base;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -24,5 +24,20 @@ class BWCMSBaseController extends Controller
     {
         return $this->container->get('doctrine')->getManager();
     }
+
+
+    /**
+     * @return BWCMSMedia
+     */
+    public function media(){
+        return $this->container->get('BWCMS.Media');
+    }
+
+    public function dump($var, $maxDepth = 2, $stripTags = true){
+        print '<pre>';
+        \Doctrine\Common\Util\Debug::dump($var, $maxDepth, $stripTags);
+        print '</pre>';
+    }
+
 
 }

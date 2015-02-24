@@ -80,3 +80,4 @@ fos_user:
     from_email:
         address:        iris@dxb.io
         sender_name:    Iris
+
