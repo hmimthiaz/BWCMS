@@ -23,10 +23,6 @@ class MediaController extends BWCMSBaseController
 
         $config = $this->container->getParameter('media.path');
 
-//        var_dump($config);
-        $this->dump($this->media());
-
-        exit();
 
         return array(// ...
         );

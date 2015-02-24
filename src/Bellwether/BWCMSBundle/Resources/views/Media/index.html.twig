@@ -12,6 +12,12 @@
     <h1>Media</h1>
 
     <form action="{{ url('media_upload') }}" class="dropzone"></form>
+
+    {#<form action="{{ url('media_upload') }}" method="post" enctype="multipart/form-data">#}
+        {#<input type="file" name="file" />#}
+        {#<input type="submit">#}
+    {#</form>#}
+
 {% endblock %}
 
 {% block javascripts %}
