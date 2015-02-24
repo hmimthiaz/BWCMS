@@ -1,0 +1,21 @@
+{% extends "BWCMSBundle::skeleton.html.twig" %}
+
+
+{% block title %}BWCMSBundle:Media:index{% endblock %}
+
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/dropzone/dropzone.min.css') }}" />
+{% endblock %}
+
+{% block body %}
+    <h1>Media</h1>
+
+    <form action="{{ url('media_upload') }}" class="dropzone"></form>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('bundles/bwcms/dropzone/dropzone.min.js') }}"></script>
+{% endblock %}
+
+
