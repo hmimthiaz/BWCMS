@@ -1,17 +1,105 @@
 <?xml version="1.0"?>
-<skipper version="3.1.0.1176" name="Brand.imthi.net" mvc="Symfony2" orm="Doctrine2" uuid="1513945c-dd34-4119-938d-a1e0515c9384">
-  <module name="Bellwether\BWCMSBundle\Entity" import-format="Doctrine2Php" import-path="src/Bellwether/BWCMSBundle/Entity" uuid="13f1d2fc-cc0d-41b5-9662-612704ef7646">
-    <entity name="User" uuid="852878e6-87bc-4dab-9c63-482fd917e5e0">
-      <field name="id" type="integer" required="true" primary="true" uuid="ddf2815d-b577-459c-9204-acd0d98d1750">
+<skipper version="3.1.0.1176" name="Brand.imthi.net" mvc="Symfony2" orm="Doctrine2" uuid="110238dc-9700-4e6b-85ba-7b7e22b4e3c7">
+  <module name="Bellwether\BWCMSBundle\Entity" import-format="Doctrine2Php" import-path="src/Bellwether/BWCMSBundle/Entity" uuid="4f6b5617-e1fc-46f5-98ab-1e9bf5f3152d">
+    <entity name="User" uuid="d3e9e04a-01e0-4b0b-91ec-a43d6ff788c0">
+      <field name="id" type="integer" required="true" primary="true" uuid="ae5e9866-8e10-4133-81a8-fd2475191c1b">
         <orm-attributes>
           <attribute name="generator">
             <attribute name="strategy">AUTO</attribute>
           </attribute>
         </orm-attributes>
       </field>
+      <field name="username" type="string" size="255" uuid="800f3af1-3923-425b-bb12-8d1d4486aa16">
+        <orm-attributes>
+          <attribute name="column">username</attribute>
+        </orm-attributes>
+      </field>
+      <field name="usernameCanonical" type="string" size="255" unique="true" uuid="65996479-53f8-43f8-84a4-4d899edb1e29">
+        <orm-attributes>
+          <attribute name="column">username_canonical</attribute>
+        </orm-attributes>
+      </field>
+      <field name="email" type="string" size="255" uuid="91ddc66f-a32d-40af-aa01-2b414bc5c0e6">
+        <orm-attributes>
+          <attribute name="column">email</attribute>
+        </orm-attributes>
+      </field>
+      <field name="emailCanonical" type="string" size="255" unique="true" uuid="6faf63ce-898c-4453-983b-fbd6847fa00a">
+        <orm-attributes>
+          <attribute name="column">email_canonical</attribute>
+        </orm-attributes>
+      </field>
+      <field name="enabled" type="boolean" uuid="4af59c1e-321f-4feb-86f4-5480355d5d81">
+        <orm-attributes>
+          <attribute name="column">enabled</attribute>
+        </orm-attributes>
+      </field>
+      <field name="salt" type="string" uuid="1344fe50-5441-43ac-907a-a71af7693c84">
+        <orm-attributes>
+          <attribute name="column">salt</attribute>
+        </orm-attributes>
+      </field>
+      <field name="password" type="string" uuid="f2a0b41d-a299-4a76-9c7b-e10fefcdabb3">
+        <orm-attributes>
+          <attribute name="column">password</attribute>
+        </orm-attributes>
+      </field>
+      <field name="lastLogin" type="datetime" uuid="a65cf599-f298-450f-b625-22d5b34ace29">
+        <orm-attributes>
+          <attribute name="column">last_login</attribute>
+        </orm-attributes>
+      </field>
+      <field name="locked" type="boolean" uuid="8f4aeeea-359c-4c1b-b89e-14fc4cc9d352">
+        <orm-attributes>
+          <attribute name="column">locked</attribute>
+        </orm-attributes>
+      </field>
+      <field name="expired" type="boolean" uuid="2491c2d6-2e8d-4b77-80e1-8512f4e5e8dd">
+        <orm-attributes>
+          <attribute name="column">expired</attribute>
+        </orm-attributes>
+      </field>
+      <field name="expiresAt" type="datetime" uuid="d0505230-38b0-4dd5-87a1-3de8d208f06a">
+        <orm-attributes>
+          <attribute name="column">expires_at</attribute>
+        </orm-attributes>
+      </field>
+      <field name="confirmationToken" type="string" uuid="799da652-b250-442c-9ee6-67e3cf88a34d">
+        <orm-attributes>
+          <attribute name="column">confirmation_token</attribute>
+        </orm-attributes>
+      </field>
+      <field name="passwordRequestedAt" type="datetime" uuid="a22356bc-5d2c-4356-b8da-2d25f6cb8385">
+        <orm-attributes>
+          <attribute name="column">password_requested_at</attribute>
+        </orm-attributes>
+      </field>
+      <field name="roles" type="array" uuid="2ccd2291-5e55-4df1-bfc7-914585916b80">
+        <orm-attributes>
+          <attribute name="column">roles</attribute>
+        </orm-attributes>
+      </field>
+      <field name="credentialsExpired" type="boolean" uuid="8fd8b299-616c-451f-a4ef-c861b55a6809">
+        <orm-attributes>
+          <attribute name="column">credentials_expired</attribute>
+        </orm-attributes>
+      </field>
+      <field name="credentialsExpireAt" type="datetime" uuid="b1c60a7a-db32-4b9d-8365-d546bdb2a197">
+        <orm-attributes>
+          <attribute name="column">credentials_expire_at</attribute>
+        </orm-attributes>
+      </field>
+      <inheritance-parent type="MAPPED_SUPERCLASS" uuid="8601d62c-c8b1-413a-846a-0c488e1d75a1"/>
       <orm-attributes>
         <attribute name="table">BWUsers</attribute>
-        <attribute name="export-file-name">User.php</attribute>
+        <attribute name="export-file-name">User.orm.xml</attribute>
+      </orm-attributes>
+    </entity>
+    <entity name="Site" uuid="e7906115-e51c-4b94-a818-1fa9e2d841f8">
+      <field name="id" type="integer" required="true" unique="true" primary="true" auto-increment="true" uuid="26c5d84d-9b5d-4ed8-a903-1439b8433b1a"/>
+      <orm-attributes>
+        <attribute name="export-file-name">Site.orm.xml</attribute>
+        <attribute name="table">BWSites</attribute>
       </orm-attributes>
     </entity>
     <orm-attributes>
@@ -19,8 +107,9 @@
     </orm-attributes>
   </module>
   <visual-data>
-    <module uuid="13f1d2fc-cc0d-41b5-9662-612704ef7646" bg-color="4293391335" position-x="50" position-y="50" size-x="0" size-x2="107" size-y="0" size-y2="100"/>
-    <project uuid="1513945c-dd34-4119-938d-a1e0515c9384" size-x="0" size-x2="207" size-y="0" size-y2="200"/>
-    <entity uuid="852878e6-87bc-4dab-9c63-482fd917e5e0" bg-color="4294967295" hdr-color="4292006610" position-x="19" position-y="39" size-x="0" size-x2="67" size-y="0" size-y2="31"/>
+    <project uuid="110238dc-9700-4e6b-85ba-7b7e22b4e3c7" size-x="0" size-x2="642" size-y="0" size-y2="496"/>
+    <module uuid="4f6b5617-e1fc-46f5-98ab-1e9bf5f3152d" bg-color="4294900968" position-x="50" position-y="50" size-x="0" size-x2="496" size-y="0" size-y2="396"/>
+    <entity uuid="d3e9e04a-01e0-4b0b-91ec-a43d6ff788c0" bg-color="4294967295" hdr-color="4292006610" position-x="20" position-y="40" size-x="0" size-x2="157" size-y="0" size-y2="255"/>
+    <entity uuid="e7906115-e51c-4b94-a818-1fa9e2d841f8" bg-color="4294967295" hdr-color="4292006610" position-x="192" position-y="38" size-x="0" size-x2="67" size-y="0" size-y2="31"/>
   </visual-data>
 </skipper>
