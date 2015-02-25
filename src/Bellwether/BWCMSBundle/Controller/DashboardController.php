@@ -41,9 +41,31 @@ class DashboardController extends BWCMSBaseController
     {
         $siteEntity = new Site();
         $siteEntity->setName('Main');
-
         $this->em()->persist($siteEntity);
+
+        $contentEntity = new Content();
+        $contentEntity->setTitle('hello '. date('dMY') );
+        $contentEntity->setSite($siteEntity);
+        $contentEntity->setAuthor($this->getUser());
+        $this->em()->persist($contentEntity);
+
+        $contentEntity1 = new Content();
+        $contentEntity1->setTitle('hello '. date('dMY') );
+        $contentEntity1->setSite($siteEntity);
+        $contentEntity1->setAuthor($this->getUser());
+        $contentEntity1->setParent($contentEntity);
+        $this->em()->persist($contentEntity1);
+
+
+        $contentEntity2 = new Content();
+        $contentEntity2->setTitle('hello '. date('dMY') );
+        $contentEntity2->setSite($siteEntity);
+        $contentEntity2->setAuthor($this->getUser());
+        $contentEntity2->setParent($contentEntity1);
+        $this->em()->persist($contentEntity2);
+
         $this->em()->flush();
+
 
 
 
