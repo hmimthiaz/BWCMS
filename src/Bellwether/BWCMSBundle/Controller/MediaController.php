@@ -42,8 +42,10 @@ class MediaController extends BWCMSBaseController
             $this->media()->handleUpload();
         } catch (\Exception $e) {
             return new Response($e->getMessage(), 500);
+        } finally{
+            return new Response('Ok', 200);
         }
-        return new Response('Ok', 200);
+
     }
 
 

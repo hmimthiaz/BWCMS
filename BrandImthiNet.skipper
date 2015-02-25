@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<skipper version="3.1.0.1176" name="Brand.imthi.net" mvc="Symfony2" orm="Doctrine2" uuid="1513945c-dd34-4119-938d-a1e0515c9384">
+  <module name="Bellwether\BWCMSBundle\Entity" import-format="Doctrine2Php" import-path="src/Bellwether/BWCMSBundle/Entity" uuid="13f1d2fc-cc0d-41b5-9662-612704ef7646">
+    <entity name="User" uuid="852878e6-87bc-4dab-9c63-482fd917e5e0">
+      <field name="id" type="integer" required="true" primary="true" uuid="ddf2815d-b577-459c-9204-acd0d98d1750">
+        <orm-attributes>
+          <attribute name="generator">
+            <attribute name="strategy">AUTO</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <orm-attributes>
+        <attribute name="table">BWUsers</attribute>
+        <attribute name="export-file-name">User.php</attribute>
+      </orm-attributes>
+    </entity>
+    <orm-attributes>
+      <attribute name="namespace">Bellwether\BWCMSBundle\Entity</attribute>
+    </orm-attributes>
+  </module>
+  <visual-data>
+    <module uuid="13f1d2fc-cc0d-41b5-9662-612704ef7646" bg-color="4293391335" position-x="50" position-y="50" size-x="0" size-x2="107" size-y="0" size-y2="100"/>
+    <project uuid="1513945c-dd34-4119-938d-a1e0515c9384" size-x="0" size-x2="207" size-y="0" size-y2="200"/>
+    <entity uuid="852878e6-87bc-4dab-9c63-482fd917e5e0" bg-color="4294967295" hdr-color="4292006610" position-x="19" position-y="39" size-x="0" size-x2="67" size-y="0" size-y2="31"/>
+  </visual-data>
+</skipper>
