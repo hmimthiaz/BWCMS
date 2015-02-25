@@ -7,14 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="BWUsers")
+ * @ORM\Table(name="BWUser")
  */
 class User extends BaseUser
 {
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="guid")
+     * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $id;
 

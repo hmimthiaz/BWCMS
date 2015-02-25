@@ -6,7 +6,10 @@ use Bellwether\BWCMSBundle\Classes\Base\BWCMSBaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Response;
 
+use Bellwether\BWCMSBundle\Entity\Site;
+use Bellwether\BWCMSBundle\Entity\Content;
 
 /**
  * Account controller.
@@ -28,5 +31,26 @@ class DashboardController extends BWCMSBaseController
         return array(// ...
         );
     }
+
+
+    /**
+     * @Route("/setup",name="dashboard_setup")
+     * @Template()
+     */
+    public function setupAction()
+    {
+        $siteEntity = new Site();
+        $siteEntity->setName('Main');
+
+        $this->em()->persist($siteEntity);
+        $this->em()->flush();
+
+
+
+        return new Response('Ok', 200);
+    }
+
+
+
 
 }

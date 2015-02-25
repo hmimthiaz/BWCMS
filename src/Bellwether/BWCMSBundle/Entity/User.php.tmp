@@ -4,19 +4,19 @@ use Doctrine\ORM\Mapping AS ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="BWUsers")
+ * @ORM\Table(name="BWUser")
  */
 class User
 {
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="guid")
+     * @ORM\GeneratedValue(strategy="UUID")
      */
     private $id;
 
     /**
-     * @ORM\OneToMany(targetEntity="Bellwether\BWCMSBundle\Entity\Content", mappedBy="user")
+     * 
      */
     private $content;
 }
