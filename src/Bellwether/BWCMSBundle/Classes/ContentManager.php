@@ -10,7 +10,7 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 
 
-class Content extends BaseService
+class ContentManager extends BaseService
 {
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)

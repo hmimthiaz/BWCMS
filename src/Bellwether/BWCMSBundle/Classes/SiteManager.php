@@ -10,7 +10,7 @@ use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 
-class Site extends BaseService
+class SiteManager extends BaseService
 {
 
     private $currentSite;
