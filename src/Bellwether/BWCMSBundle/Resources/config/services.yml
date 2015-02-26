@@ -8,6 +8,6 @@ services:
   BWCMS.Media:
     class: Bellwether\BWCMSBundle\Classes\MediaManager
     arguments: [@service_container,@request_stack]
-BWCMS.AdminMenu:
-    class: Bellwether\BWCMSBundle\Classes\AdminMenuManager
-    arguments: [@service_container,@request_stack]
+  BWCMS.AdminMenu:
+      class: Bellwether\BWCMSBundle\Classes\AdminMenuManager
+      arguments: [@service_container,@request_stack]
