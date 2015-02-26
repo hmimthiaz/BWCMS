@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}BWCMS!{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url('_assetic_bootstrap_css') }}" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/css/style.css') }}" />
+    {% include 'BraincraftedBootstrapBundle::ie8-support.html.twig' %}
+    {% block header %}{% endblock %}
+</head>
+<body>
+    {% block bodyContainer %}{% endblock %}
+    <script src="{{ url('_assetic_jquery') }}"></script>
+    <script src="{{ url('_assetic_bootstrap_js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/js/script.js') }}"></script>
+    {% block footer %}{% endblock %}
+</body>
+</html>
+

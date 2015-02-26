@@ -1,10 +1,10 @@
-{% extends "BWCMSBundle::skeleton.html.twig" %}
+{% extends "BWCMSBundle:Common:default.html.twig" %}
 
 
 {% block title %}BWCMSBundle:Media:index{% endblock %}
 
 
-{% block stylesheets %}
+{% block header %}
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/dropzone/dropzone.min.css') }}" />
 {% endblock %}
 
@@ -20,7 +20,7 @@
 
 {% endblock %}
 
-{% block javascripts %}
+{% block footer %}
     <script src="{{ asset('bundles/bwcms/dropzone/dropzone.min.js') }}"></script>
 {% endblock %}
 
