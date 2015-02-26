@@ -2,11 +2,11 @@
 
 namespace Bellwether\BWCMSBundle\Controller;
 
-use Bellwether\BWCMSBundle\Classes\Base\BWCMSBaseController;
+use Bellwether\BWCMSBundle\Classes\Base\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-class HomeController extends BWCMSBaseController
+class HomeController extends BaseController
 {
     /**
      * @Route("/")

@@ -88,7 +88,7 @@ swiftmailer:
 fos_user:
     db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main
-    user_class: Bellwether\BWCMSBundle\Entity\User
+    user_class: Bellwether\BWCMSBundle\Entity\UserEntity
     from_email:
         address:        iris@dxb.io
         sender_name:    Iris

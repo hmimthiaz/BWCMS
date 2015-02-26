@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="BWCMS.Media" class="Bellwether\BWCMSBundle\Classes\BWCMSMedia">
+        <service id="BWCMS.Media" class="Bellwether\BWCMSBundle\Classes\Media">
             <argument type="service" id="service_container" />
             <argument type="service" id="service_container" />
         </service>

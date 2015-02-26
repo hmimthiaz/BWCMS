@@ -8,12 +8,12 @@ use Doctrine\ORM\EntityManager;
 
 use Bellwether\BWCMSBundle\Entity\UserEntity;
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
-use Bellwether\BWCMSBundle\Classes\BWCMSSite;
-use Bellwether\BWCMSBundle\Classes\BWCMSContent;
-use Bellwether\BWCMSBundle\Classes\BWCMSMedia;
+use Bellwether\BWCMSBundle\Classes\Site;
+use Bellwether\BWCMSBundle\Classes\Content;
+use Bellwether\BWCMSBundle\Classes\Media;
 
 
-class BWCMSBaseController extends Controller
+class BaseController extends Controller
 {
 
     /**
@@ -41,7 +41,7 @@ class BWCMSBaseController extends Controller
     }
 
     /**
-     * @return BWCMSSite
+     * @return Site
      */
     public function sm()
     {
@@ -49,7 +49,7 @@ class BWCMSBaseController extends Controller
     }
 
     /**
-     * @return BWCMSContent
+     * @return Content
      */
     public function cm()
     {
@@ -57,7 +57,7 @@ class BWCMSBaseController extends Controller
     }
 
     /**
-     * @return BWCMSMedia
+     * @return Media
      */
     public function mm()
     {

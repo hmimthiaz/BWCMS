@@ -4,7 +4,7 @@ namespace Bellwether\BWCMSBundle\Classes\Base;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class BWCMSBaseBundle extends Bundle
+class BaseBundle extends Bundle
 {
 
     public function boot(){

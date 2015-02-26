@@ -2,9 +2,9 @@
 
 namespace Bellwether\BWCMSBundle;
 
-use Bellwether\BWCMSBundle\Classes\Base\BWCMSBaseBundle;
+use Bellwether\BWCMSBundle\Classes\Base\BaseBundle;
 
-class BWCMSBundle extends BWCMSBaseBundle
+class BWCMSBundle extends BaseBundle
 {
 
 

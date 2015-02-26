@@ -2,7 +2,7 @@
 
 namespace Bellwether\BWCMSBundle\Controller;
 
-use Bellwether\BWCMSBundle\Classes\Base\BWCMSBaseController;
+use Bellwether\BWCMSBundle\Classes\Base\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @Route("/admin/media")
  */
-class MediaController extends BWCMSBaseController
+class MediaController extends BaseController
 {
     /**
      * @Route("/index",name="media_home")
@@ -39,7 +39,7 @@ class MediaController extends BWCMSBaseController
     {
 
         try {
-            $this->media()->handleUpload();
+            $this->mm()->handleUpload();
         } catch (\Exception $e) {
             return new Response($e->getMessage(), 500);
         } finally{

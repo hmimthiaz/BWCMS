@@ -4,12 +4,12 @@ namespace Bellwether\BWCMSBundle\Classes;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Bellwether\BWCMSBundle\Classes\Base\BWCMSBaseService;
+use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
-class BWCMSMedia extends BWCMSBaseService
+class Media extends BaseService
 {
 
     private $uploadFolder;

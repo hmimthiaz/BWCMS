@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
 
 
-class BWCMSBaseService  extends ContainerAware
+class BaseService  extends ContainerAware
 {
 
     /**

@@ -4,13 +4,13 @@ namespace Bellwether\BWCMSBundle\Classes;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Bellwether\BWCMSBundle\Classes\Base\BWCMSBaseService;
+use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 
-class BWCMSSite extends BWCMSBaseService
+class Site extends BaseService
 {
 
     private $currentSite;

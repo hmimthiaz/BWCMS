@@ -2,7 +2,7 @@
 
 namespace Bellwether\BWCMSBundle\Controller;
 
-use Bellwether\BWCMSBundle\Classes\Base\BWCMSBaseController;
+use Bellwether\BWCMSBundle\Classes\Base\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -16,7 +16,7 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
  *
  * @Route("/admin/dashboard")
  */
-class DashboardController extends BWCMSBaseController
+class DashboardController extends BaseController
 {
     /**
      * @Route("/index",name="dashboard_home")
