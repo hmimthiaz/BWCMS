@@ -13,28 +13,45 @@ use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 class SiteManager extends BaseService
 {
 
-    private $currentSite;
+    private $currentSite = null;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
-
-
     }
 
-    private function initSite(){
-//        $this->em()->find()
-
-
+    /**
+     * @return SiteManager
+     */
+    public function getManager()
+    {
+        return $this;
     }
-
 
     /**
      * @return SiteEntity
      */
     public function getCurrentSite()
     {
+        if ($this->currentSite == null) {
+            $criteria = array(
+                'isDefault' => true
+            );
+            $this->currentSite = $this->em()->getRepository('BWCMSBundle:SiteEntity')->findOneBy($criteria);
+            if($this->currentSite == null){
+                $siteEntity = new SiteEntity();
+                $siteEntity->setName('Default');
+                $siteEntity->setLocale('en');
+                $siteEntity->setDirection('ltr');
+                $siteEntity->setSlug('en');
+                $siteEntity->setDomain($this->getRequest()->getHost());
+                $siteEntity->setIsDefault(true);
+                $this->em()->persist($siteEntity);
+                $this->em()->flush();
+                $this->currentSite = $siteEntity;
+            }
+        }
         return $this->currentSite;
     }
 

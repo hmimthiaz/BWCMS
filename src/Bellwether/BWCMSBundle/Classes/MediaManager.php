@@ -25,6 +25,14 @@ class MediaManager extends BaseService
         $this->initMedia();
     }
 
+    /**
+     * @return MediaManager
+     */
+    public function getManager()
+    {
+        return $this;
+    }
+
     private function initMedia()
     {
         $rootDirectory = $this->getKernel()->getRootDir();

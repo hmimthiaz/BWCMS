@@ -45,7 +45,7 @@ class BaseController extends Controller
      */
     public function sm()
     {
-        return $this->container->get('BWCMS.Site');
+        return $this->container->get('BWCMS.Site')->getManager();
     }
 
     /**
@@ -53,7 +53,7 @@ class BaseController extends Controller
      */
     public function cm()
     {
-        return $this->container->get('BWCMS.Content');
+        return $this->container->get('BWCMS.Content')->getManager();
     }
 
     /**
@@ -61,7 +61,7 @@ class BaseController extends Controller
      */
     public function mm()
     {
-        return $this->container->get('BWCMS.Media');
+        return $this->container->get('BWCMS.Media')->getManager();
     }
 
 

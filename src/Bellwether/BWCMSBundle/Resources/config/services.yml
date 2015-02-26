@@ -1,10 +1,10 @@
 services:
   BWCMS.Site:
-    class: Bellwether\BWCMSBundle\Classes\Site
+    class: Bellwether\BWCMSBundle\Classes\SiteManager
     arguments: [@service_container,@request_stack]
   BWCMS.Content:
-    class: Bellwether\BWCMSBundle\Classes\Content
+    class: Bellwether\BWCMSBundle\Classes\ContentManager
     arguments: [@service_container,@request_stack]
   BWCMS.Media:
-    class: Bellwether\BWCMSBundle\Classes\Media
+    class: Bellwether\BWCMSBundle\Classes\MediaManager
     arguments: [@service_container,@request_stack]

@@ -19,4 +19,12 @@ class ContentManager extends BaseService
         $this->setRequestStack($request_stack);
     }
 
+    /**
+     * @return ContentManager
+     */
+    public function getManager()
+    {
+        return $this;
+    }
+
 }

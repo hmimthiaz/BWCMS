@@ -56,14 +56,14 @@ class ContentEntity
     private $treeLeft;
 
     /**
-     * @ORM\OneToMany(targetEntity="Bellwether\BWCMSBundle\Entity\Content", mappedBy="treeParent")
+     * @ORM\OneToMany(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", mappedBy="treeParent")
      * @ORM\OrderBy({"lft"="ASC"})
      */
     private $children;
 
     /**
      * @Gedmo\TreeParent
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\Content", inversedBy="children")
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="children")
      * @ORM\JoinColumn(name="treeParentId", referencedColumnName="id", onDelete="CASCADE")
      */
     private $treeParent;
@@ -124,13 +124,13 @@ class ContentEntity
     private $createdDate;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\User")
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\UserEntity")
      * @ORM\JoinColumn(name="author", referencedColumnName="id", nullable=false)
      */
     private $author;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\Site")
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity")
      * @ORM\JoinColumn(name="site", referencedColumnName="id", nullable=false)
      */
     private $site;

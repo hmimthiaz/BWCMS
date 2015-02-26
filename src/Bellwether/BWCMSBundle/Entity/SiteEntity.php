@@ -43,7 +43,7 @@ class SiteEntity
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $default;
+    private $isDefault;
 
     /**
      * @return mixed
@@ -144,21 +144,18 @@ class SiteEntity
     /**
      * @return mixed
      */
-    public function getDefault()
+    public function getIsDefault()
     {
-        return $this->default;
+        return $this->isDefault;
     }
 
     /**
-     * @param mixed $default
+     * @param mixed $isDefault
      */
-    public function setDefault($default)
+    public function setIsDefault($isDefault)
     {
-        $this->default = $default;
+        $this->isDefault = $isDefault;
     }
-
-
-
 
 
 }
