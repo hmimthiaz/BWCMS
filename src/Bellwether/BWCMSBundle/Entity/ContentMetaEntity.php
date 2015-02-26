@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\ContentMetaRepository")
  * @ORM\Table(name="BWContentMeta")
  */
-class ContentMeta
+class ContentMetaEntity
 {
     /**
      * @var integer

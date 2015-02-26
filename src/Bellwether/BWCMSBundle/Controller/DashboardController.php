@@ -9,7 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
 
 use Bellwether\BWCMSBundle\Entity\Site;
-use Bellwether\BWCMSBundle\Entity\Content;
+use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
 /**
  * Account controller.
@@ -43,25 +43,25 @@ class DashboardController extends BWCMSBaseController
         $siteEntity->setName('Main');
         $this->em()->persist($siteEntity);
 
-        $contentEntity = new Content();
+        $contentEntity = new ContentEntity();
         $contentEntity->setTitle('hello '. date('dMY') );
         $contentEntity->setSite($siteEntity);
         $contentEntity->setAuthor($this->getUser());
         $this->em()->persist($contentEntity);
 
-        $contentEntity1 = new Content();
+        $contentEntity1 = new ContentEntity();
         $contentEntity1->setTitle('hello '. date('dMY') );
         $contentEntity1->setSite($siteEntity);
         $contentEntity1->setAuthor($this->getUser());
-        $contentEntity1->setParent($contentEntity);
+        $contentEntity1->setTreeParent($contentEntity);
         $this->em()->persist($contentEntity1);
 
 
-        $contentEntity2 = new Content();
+        $contentEntity2 = new ContentEntity();
         $contentEntity2->setTitle('hello '. date('dMY') );
         $contentEntity2->setSite($siteEntity);
         $contentEntity2->setAuthor($this->getUser());
-        $contentEntity2->setParent($contentEntity1);
+        $contentEntity2->setTreeParent($contentEntity1);
         $this->em()->persist($contentEntity2);
 
         $this->em()->flush();

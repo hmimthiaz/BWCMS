@@ -9,28 +9,28 @@
           </attribute>
         </orm-attributes>
       </field>
-      <field name="lft" type="guid" uuid="2d88a84a-d903-4fb3-a058-a9e3b74d81f8">
+      <field name="treeLeft" type="integer" uuid="2d88a84a-d903-4fb3-a058-a9e3b74d81f8">
         <orm-attributes>
-          <attribute name="column">lft</attribute>
+          <attribute name="column">treeLeft</attribute>
         </orm-attributes>
       </field>
-      <field name="lvl" type="integer" uuid="45d5ca60-ef85-4359-9a66-f84c2f6270c2">
+      <field name="treeLevel" type="integer" uuid="45d5ca60-ef85-4359-9a66-f84c2f6270c2">
         <orm-attributes>
-          <attribute name="column">lvl</attribute>
+          <attribute name="column">treeLevel</attribute>
         </orm-attributes>
       </field>
-      <field name="rgt" type="guid" uuid="6000a8f3-4320-458d-8e45-d7600ff401a5">
+      <field name="treeRight" type="integer" uuid="6000a8f3-4320-458d-8e45-d7600ff401a5">
         <orm-attributes>
-          <attribute name="column">rgt</attribute>
+          <attribute name="column">treeRight</attribute>
         </orm-attributes>
       </field>
-      <field name="root" type="guid" uuid="e143c826-935f-4e3f-86e0-740afbf40248">
+      <field name="treeRoot" type="guid" uuid="e143c826-935f-4e3f-86e0-740afbf40248">
         <orm-attributes>
-          <attribute name="column">root</attribute>
+          <attribute name="column">treeRoot</attribute>
         </orm-attributes>
       </field>
-      <field name="publish_date" type="datetime" uuid="d512dfed-238a-428b-8059-d405361fb622"/>
-      <field name="expire_date" type="datetime" uuid="e70738a5-1db5-4d98-8c90-2bfc5f504a8d"/>
+      <field name="publishDate" type="datetime" uuid="d512dfed-238a-428b-8059-d405361fb622"/>
+      <field name="expireDate" type="datetime" uuid="e70738a5-1db5-4d98-8c90-2bfc5f504a8d"/>
       <field name="title" type="string" size="255" uuid="b70e5f65-77b7-4fcb-b6c6-3e232b704753"/>
       <field name="summary" type="text" uuid="860801cc-ff7a-4f99-a9c7-fe533ee20d59"/>
       <field name="content" type="text" uuid="2b7dc696-7f46-4423-b8a3-cba993b3f903"/>
@@ -40,9 +40,9 @@
       <field name="size" type="bigint" uuid="00c1b6a7-15f2-4ab9-9516-3729bd1d919b"/>
       <field name="height" type="integer" uuid="4ea4aced-593a-4b8d-a5b7-46c11bb8f087"/>
       <field name="width" type="integer" uuid="9e724889-4c80-44da-9802-1317431b90aa"/>
-      <field name="created_date" type="datetime" uuid="e58fe9e2-5f5c-42ab-810a-d5b1c73f7fd8"/>
-      <field name="modified_date" type="datetime" uuid="8d5720b1-090d-4deb-b5f4-000deda388bb"/>
-      <field name="parent_id" uuid="9174da38-5bdc-4117-a7c7-d896a5cf798e"/>
+      <field name="createdDate" type="datetime" uuid="e58fe9e2-5f5c-42ab-810a-d5b1c73f7fd8"/>
+      <field name="modifiedDate" type="datetime" uuid="8d5720b1-090d-4deb-b5f4-000deda388bb"/>
+      <field name="treeParentId" uuid="9174da38-5bdc-4117-a7c7-d896a5cf798e"/>
       <field name="author" required="true" uuid="0664b565-407f-4029-8e6a-271a36ce79b0"/>
       <field name="site" required="true" uuid="b983f549-9546-4c96-93fb-17e6f2ecc729"/>
       <orm-attributes>
@@ -51,8 +51,8 @@
         <attribute name="export-file-name">Content.php</attribute>
       </orm-attributes>
     </entity>
-    <association from="Content" to="Content" owner-alias="children" inverse-alias="parent" many-owner="true" many-inverse="false" uuid="a2def23a-42a2-4cf1-aa19-499dbca758f4">
-      <association-field from="parent_id" to="id"/>
+    <association from="Content" to="Content" owner-alias="children" inverse-alias="treeParent" many-owner="true" many-inverse="false" uuid="a2def23a-42a2-4cf1-aa19-499dbca758f4">
+      <association-field from="treeParentId" to="id"/>
       <orm-attributes>
         <attribute name="on-delete">CASCADE</attribute>
         <attribute name="side-owning"/>
@@ -103,10 +103,12 @@
           </attribute>
         </orm-attributes>
       </field>
-      <field name="name" type="string" size="255" uuid="b61f96ae-8330-461d-b764-bb8fb9ce1133"/>
-      <field name="locale" type="string" size="50" uuid="f98c4dcc-ec15-4d2c-8435-3117bfb2ab70"/>
-      <field name="direction" type="string" size="50" uuid="10e872a8-dea1-4137-b70a-a436ddcee2c5"/>
-      <field name="domain" type="string" size="255" unique="true" uuid="5b67fd79-830d-4e51-9992-c6a6de74d4f0"/>
+      <field name="name" type="string" size="100" required="true" uuid="b61f96ae-8330-461d-b764-bb8fb9ce1133"/>
+      <field name="locale" type="string" size="10" required="true" uuid="f98c4dcc-ec15-4d2c-8435-3117bfb2ab70"/>
+      <field name="direction" type="string" size="10" required="true" uuid="10e872a8-dea1-4137-b70a-a436ddcee2c5"/>
+      <field name="slug" type="string" size="10" required="true" uuid="bfc98c6b-4dd3-47d8-92fb-7716f6df31fa"/>
+      <field name="domain" type="string" size="100" required="true" unique="true" uuid="5b67fd79-830d-4e51-9992-c6a6de74d4f0"/>
+      <field name="default" type="boolean" uuid="e676fdae-8e09-4c95-84e5-5903805401fa"/>
       <orm-attributes>
         <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\SiteRepository</attribute>
         <attribute name="table">BWSite</attribute>

@@ -2,9 +2,10 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Base;
 
-use \Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\EntityManager;
 
 
 class BWCMSBaseService  extends ContainerAware
@@ -36,6 +37,13 @@ class BWCMSBaseService  extends ContainerAware
         return $this->container->get( 'kernel' );
     }
 
+    /**
+     * @return EntityManager
+     */
+    public function em()
+    {
+        return $this->container->get('doctrine')->getManager();
+    }
 
 
     public function dump($var, $maxDepth = 2, $stripTags = true){

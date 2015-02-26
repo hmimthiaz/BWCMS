@@ -2,14 +2,14 @@
 
 namespace Bellwether\BWCMSBundle\Entity;
 
-use FOS\UserBundle\Entity\User as BaseUser;
+use FOS\UserBundle\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="BWUser")
  */
-class User extends BaseUser
+class UserEntity extends User
 {
     /**
      * @ORM\Id

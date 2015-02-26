@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping AS ORM;
  * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\SiteRepository")
  * @ORM\Table(name="BWSite")
  */
-class Site
+class SiteEntity
 {
     /**
      * @ORM\Id
@@ -16,24 +16,34 @@ class Site
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=100, nullable=false)
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=10, nullable=false)
      */
     private $locale;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=10, nullable=false)
      */
     private $direction;
 
     /**
-     * @ORM\Column(type="string", unique=true, length=255, nullable=true)
+     * @ORM\Column(type="string", length=10, nullable=false)
+     */
+    private $slug;
+
+    /**
+     * @ORM\Column(type="string", unique=true, length=100, nullable=false)
      */
     private $domain;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $default;
 
     /**
      * @return mixed
@@ -102,6 +112,22 @@ class Site
     /**
      * @return mixed
      */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * @param mixed $slug
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getDomain()
     {
         return $this->domain;
@@ -114,6 +140,24 @@ class Site
     {
         $this->domain = $domain;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getDefault()
+    {
+        return $this->default;
+    }
+
+    /**
+     * @param mixed $default
+     */
+    public function setDefault($default)
+    {
+        $this->default = $default;
+    }
+
+
 
 
 

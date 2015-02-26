@@ -11,7 +11,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\ContentRepository")
  * @ORM\Table(name="BWContent")
  */
-class Content
+class ContentEntity
 {
 
     /**
@@ -22,51 +22,51 @@ class Content
     private $id;
 
     /**
-     * @Gedmo\TreeLeft
-     * @ORM\Column(type="integer", nullable=true, name="lft")
+     * @ORM\Column(type="datetime", nullable=true)
      */
-    private $lft;
+    private $expireDate;
 
     /**
-     * @Gedmo\TreeLevel
-     * @ORM\Column(type="integer", nullable=true, name="lvl")
+     * @ORM\Column(type="datetime", nullable=true)
      */
-    private $lvl;
-
-    /**
-     * @Gedmo\TreeRight
-     * @ORM\Column(type="integer", nullable=true, name="rgt")
-     */
-    private $rgt;
+    private $publishDate;
 
     /**
      * @Gedmo\TreeRoot
-     * @ORM\Column(type="string", length=255, nullable=true, name="root")
+     * @ORM\Column(type="guid", nullable=true, name="treeRoot")
      */
-    private $root;
+    private $treeRoot;
 
     /**
-     * @Gedmo\TreeParent
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\Content", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
+     * @Gedmo\TreeRight
+     * @ORM\Column(type="integer", nullable=true, name="treeRight")
      */
-    private $parent;
+    private $treeRight;
 
     /**
-     * @ORM\OneToMany(targetEntity="Bellwether\BWCMSBundle\Entity\Content", mappedBy="parent")
+     * @Gedmo\TreeLevel
+     * @ORM\Column(type="integer", nullable=true, name="treeLevel")
+     */
+    private $treeLevel;
+
+    /**
+     * @Gedmo\TreeLeft
+     * @ORM\Column(type="integer", nullable=true, name="treeLeft")
+     */
+    private $treeLeft;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Bellwether\BWCMSBundle\Entity\Content", mappedBy="treeParent")
      * @ORM\OrderBy({"lft"="ASC"})
      */
     private $children;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @Gedmo\TreeParent
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\Content", inversedBy="children")
+     * @ORM\JoinColumn(name="treeParentId", referencedColumnName="id", onDelete="CASCADE")
      */
-    private $publish_date;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $expire_date;
+    private $treeParent;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -116,12 +116,12 @@ class Content
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $created_date;
+    private $modifiedDate;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $modified_date;
+    private $createdDate;
 
     /**
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\User")
@@ -134,6 +134,7 @@ class Content
      * @ORM\JoinColumn(name="site", referencedColumnName="id", nullable=false)
      */
     private $site;
+
 
     /**
      * @return mixed
@@ -154,81 +155,97 @@ class Content
     /**
      * @return mixed
      */
-    public function getLft()
+    public function getExpireDate()
     {
-        return $this->lft;
+        return $this->expireDate;
     }
 
     /**
-     * @param mixed $lft
+     * @param mixed $expireDate
      */
-    public function setLft($lft)
+    public function setExpireDate($expireDate)
     {
-        $this->lft = $lft;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLvl()
-    {
-        return $this->lvl;
-    }
-
-    /**
-     * @param mixed $lvl
-     */
-    public function setLvl($lvl)
-    {
-        $this->lvl = $lvl;
+        $this->expireDate = $expireDate;
     }
 
     /**
      * @return mixed
      */
-    public function getRgt()
+    public function getPublishDate()
     {
-        return $this->rgt;
+        return $this->publishDate;
     }
 
     /**
-     * @param mixed $rgt
+     * @param mixed $publishDate
      */
-    public function setRgt($rgt)
+    public function setPublishDate($publishDate)
     {
-        $this->rgt = $rgt;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRoot()
-    {
-        return $this->root;
-    }
-
-    /**
-     * @param mixed $root
-     */
-    public function setRoot($root)
-    {
-        $this->root = $root;
+        $this->publishDate = $publishDate;
     }
 
     /**
      * @return mixed
      */
-    public function getParent()
+    public function getTreeRoot()
     {
-        return $this->parent;
+        return $this->treeRoot;
     }
 
     /**
-     * @param mixed $parent
+     * @param mixed $treeRoot
      */
-    public function setParent($parent)
+    public function setTreeRoot($treeRoot)
     {
-        $this->parent = $parent;
+        $this->treeRoot = $treeRoot;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTreeRight()
+    {
+        return $this->treeRight;
+    }
+
+    /**
+     * @param mixed $treeRight
+     */
+    public function setTreeRight($treeRight)
+    {
+        $this->treeRight = $treeRight;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTreeLevel()
+    {
+        return $this->treeLevel;
+    }
+
+    /**
+     * @param mixed $treeLevel
+     */
+    public function setTreeLevel($treeLevel)
+    {
+        $this->treeLevel = $treeLevel;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTreeLeft()
+    {
+        return $this->treeLeft;
+    }
+
+    /**
+     * @param mixed $treeLeft
+     */
+    public function setTreeLeft($treeLeft)
+    {
+        $this->treeLeft = $treeLeft;
     }
 
     /**
@@ -250,33 +267,17 @@ class Content
     /**
      * @return mixed
      */
-    public function getPublishDate()
+    public function getTreeParent()
     {
-        return $this->publish_date;
+        return $this->treeParent;
     }
 
     /**
-     * @param mixed $publish_date
+     * @param mixed $treeParent
      */
-    public function setPublishDate($publish_date)
+    public function setTreeParent($treeParent)
     {
-        $this->publish_date = $publish_date;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getExpireDate()
-    {
-        return $this->expire_date;
-    }
-
-    /**
-     * @param mixed $expire_date
-     */
-    public function setExpireDate($expire_date)
-    {
-        $this->expire_date = $expire_date;
+        $this->treeParent = $treeParent;
     }
 
     /**
@@ -426,33 +427,33 @@ class Content
     /**
      * @return mixed
      */
-    public function getCreatedDate()
+    public function getModifiedDate()
     {
-        return $this->created_date;
+        return $this->modifiedDate;
     }
 
     /**
-     * @param mixed $created_date
+     * @param mixed $modifiedDate
      */
-    public function setCreatedDate($created_date)
+    public function setModifiedDate($modifiedDate)
     {
-        $this->created_date = $created_date;
+        $this->modifiedDate = $modifiedDate;
     }
 
     /**
      * @return mixed
      */
-    public function getModifiedDate()
+    public function getCreatedDate()
     {
-        return $this->modified_date;
+        return $this->createdDate;
     }
 
     /**
-     * @param mixed $modified_date
+     * @param mixed $createdDate
      */
-    public function setModifiedDate($modified_date)
+    public function setCreatedDate($createdDate)
     {
-        $this->modified_date = $modified_date;
+        $this->createdDate = $createdDate;
     }
 
     /**
