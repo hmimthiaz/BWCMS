@@ -1,15 +1,67 @@
 {% extends "BWCMSBundle:Common:default.html.twig" %}
 
 
-{% block title %}BWCMSBundle:Media:index{% endblock %}
-
+{% block title %}Media{% endblock %}
+{% block pageTitle %}Media{% endblock %}
 
 {% block header %}
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/dropzone/dropzone.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/datatable/css/jquery.dataTables.min.css') }}" />
 {% endblock %}
 
 {% block body %}
-    <h1>Media</h1>
+
+
+    <div class="row">
+        <div class="col-md-3 taskLeft">
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">Tasks Groups</div>
+                <div class="panel-body">
+                    <div id="jstree_div"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9 taskRight">
+            <div class="panel panel-default">
+                {#<div class="panel-heading"> Tasks </div>#}
+                <!-- Table -->
+                <div class="panel-body">
+                    <table id="mediaTable" class="table" border="0">
+                        <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Filename</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script language="JavaScript">
+        $(document).ready(function() {
+            $('#mediaTable').DataTable(
+                {
+                    "ordering": false,
+                    "processing": true,
+                    "serverSide": true,
+                    ajax: {
+                        url: "{{ url('media_home_data') }}",
+                        type: 'GET'
+                    },
+                    "columns": [
+                        { "data": "id" },
+                        { "data": "title" },
+                        { "data": "name" },
+                    ]
+                }
+            );
+        });
+    </script>
+
 
     <form action="{{ url('media_upload') }}" class="dropzone"></form>
 
@@ -22,6 +74,7 @@
 
 {% block footer %}
     <script src="{{ asset('bundles/bwcms/dropzone/dropzone.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/datatable/js/jquery.dataTables.min.js') }}"></script>
 {% endblock %}
 
 

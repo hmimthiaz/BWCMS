@@ -11,11 +11,12 @@ use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Classes\SiteManager;
 use Bellwether\BWCMSBundle\Classes\ContentManager;
 use Bellwether\BWCMSBundle\Classes\MediaManager;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class BaseController extends Controller
 {
-
     /**
      * @return UserEntity
      */
@@ -64,6 +65,20 @@ class BaseController extends Controller
         return $this->container->get('BWCMS.Media')->getManager();
     }
 
+    /**
+     * @param Request $request
+     * @param Array $jsonArray
+     * @return Response
+     */
+    public function returnJsonReponse(Request $request,$jsonArray){
+        $serializer = $this->container->get('serializer');
+        $serializedReturn = $serializer->serialize($jsonArray, 'json');
+        if($request->query->has('callback')){
+            $callback = $request->query->get('callback');
+            $serializedReturn = $callback . '(' . $serializedReturn . ')';
+        }
+        return new Response($serializedReturn, 200, array('Content-Type' => 'application/json'));
+    }
 
     public function dump($var, $maxDepth = 2, $stripTags = true)
     {
