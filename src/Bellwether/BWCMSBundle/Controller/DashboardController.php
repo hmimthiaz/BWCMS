@@ -26,7 +26,7 @@ class DashboardController extends BaseController
     {
         $x=10;
 
-        $this->dump($this->sm()->getCurrentSite());
+        //$this->dump($this->sm()->getCurrentSite());
 
         //throw new Exception('Division by zero.');
 

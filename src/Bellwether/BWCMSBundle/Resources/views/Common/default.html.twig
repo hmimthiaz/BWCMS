@@ -2,9 +2,19 @@
 
 {% block bodyContainer %}
 
-    {#{{ include("BWCMSBundle:Common:navigation.html.twig")  }}#}
+    {{ include("BWCMSBundle:Common:navigation.html.twig")  }}
 
-    <div class="container-fluid">
+    <div class="container-fluid" style="padding-left: 10px;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header">
+                    <h1>{% block pageTitle %}BWCMS!{% endblock %}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid" style="padding-left: 10px;">
         {% block body '' %}
     </div>
 {% endblock %}

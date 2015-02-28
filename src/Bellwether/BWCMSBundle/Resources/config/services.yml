@@ -10,7 +10,23 @@ services:
     arguments: [@service_container,@request_stack]
   BWCMS.AdminMenu:
       class: Bellwether\BWCMSBundle\Classes\AdminMenuManager
-      arguments: [@service_container,@request_stack]
+      arguments: ["@knp_menu.factory",@service_container,@request_stack]
+  BWCMS.AdminMenu.Left:
+      class: Knp\Menu\MenuItem
+      factory_service: BWCMS.AdminMenu
+      factory_method: buildLeftMainMenu
+      arguments: ["@request"]
+      scope: request
+      tags:
+          - { name: knp_menu.menu, alias: AdminMenu.Left }
+  BWCMS.AdminMenu.Right:
+      class: Knp\Menu\MenuItem
+      factory_service: BWCMS.AdminMenu
+      factory_method: buildRightMainMenu
+      arguments: ["@request"]
+      scope: request
+      tags:
+          - { name: knp_menu.menu, alias: AdminMenu.Right }
   BWCMS.KernelEventListener:
         class: Bellwether\BWCMSBundle\EventListener\KernelEventListener
         arguments: [@service_container,@request_stack]

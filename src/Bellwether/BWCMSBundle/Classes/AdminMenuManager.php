@@ -2,18 +2,27 @@
 
 namespace Bellwether\BWCMSBundle\Classes;
 
+use Knp\Menu\FactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
+use Symfony\Component\HttpFoundation\Request;
+
 
 
 class AdminMenuManager extends BaseService
 {
+    private $factory;
+    private $currentUser;
+    private $securityContext;
 
-    function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
+    function __construct(FactoryInterface $factory = null, ContainerInterface $container = null, RequestStack $request_stack = null)
     {
+        $this->setFactory($factory);
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
+        $this->securityContext = $this->container->get('security.context');
+        $this->currentUser = $this->securityContext->getToken()->getUser();
     }
 
     /**
@@ -22,6 +31,42 @@ class AdminMenuManager extends BaseService
     public function getManager()
     {
         return $this;
+    }
+
+    public function buildRightMainMenu(Request $request){
+        $menu = $this->factory->createItem('root');
+
+        $menu->addChild('Profile', array('uri' => '#','label' => $this->currentUser->getEmail() ))->setAttribute('dropdown', true);
+        $menu['Profile']->addChild('Profile', array('uri' => '#'));
+        if($this->securityContext->isGranted('ROLE_PREVIOUS_ADMIN')){
+            $menu['Profile']->addChild('Exit User', array(
+                'route' => 'Homepage',
+                'routeParameters' => array('_switch_user' =>  '_exit')
+            ));
+        }
+        $menu['Profile']->addChild('Logout', array('route' => 'fos_user_security_logout'));
+
+        return $menu;
+    }
+
+    public function buildLeftMainMenu(Request $request){
+        $menu = $this->factory->createItem('root');
+        $menu->addChild('Dashboard', array('route' => 'dashboard_home' ));
+
+        $menu->addChild('Manage', array('uri' => '#', 'label' => 'Manage' ))->setAttribute('dropdown', true);
+        $menu['Manage']->addChild('Media', array('route' => 'media_home'));
+
+
+        return $menu;
+    }
+
+
+    /**
+     * @param FactoryInterface $factory
+     */
+    public function setFactory(FactoryInterface $factory)
+    {
+        $this->factory = $factory;
     }
 
 }
