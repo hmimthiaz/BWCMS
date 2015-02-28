@@ -43,20 +43,32 @@ class MediaManager extends BaseService
     }
 
 
+    /**
+     * @return array
+     */
     public function handleUpload()
     {
+        $data = array();
         /**
          * @var \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile
          */
         $uploadedFile = $this->getRequest()->files->get('file');
         if (null !== $uploadedFile && $uploadedFile->isValid()) {
+            $this->dump($uploadedFile);
+
             $uploadFolder = $this->getUploadDir();
             if(!$this->fs->exists($uploadFolder)){
                 $this->fs->mkdir($uploadFolder);
             }
             $filename = $this->generateFileName($uploadedFile);
             $uploadedFile->move($uploadFolder,$filename);
+
+            $data['originalName'] = $uploadedFile->getClientOriginalName();
+            $data['mimeType'] = $uploadedFile->getClientMimeType();
+            $data['size'] = $uploadedFile->getClientSize();
+            $data['filename'] = $filename;
         }
+        return $data;
     }
 
 

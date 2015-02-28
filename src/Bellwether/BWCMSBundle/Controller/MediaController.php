@@ -8,6 +8,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
 
+use Bellwether\BWCMSBundle\Entity\ContentEntity;
+
 /**
  * Account controller.
  *
@@ -39,13 +41,25 @@ class MediaController extends BaseController
     {
 
         try {
-            $this->mm()->handleUpload();
+            $mediaInfo = $this->mm()->handleUpload();
         } catch (\Exception $e) {
             return new Response($e->getMessage(), 500);
-        } finally{
-            return new Response('Ok', 200);
         }
+        if (!empty($mediaInfo)) {
+            $content = new ContentEntity();
 
+            $content->setType('Media');
+            $content->setSite($this->getSite());
+
+            $content->setTitle($mediaInfo['originalName']);
+            $content->setMime($mediaInfo['mimeType']);
+            $content->setName($mediaInfo['filename']);
+            $content->setSize($mediaInfo['size']);
+
+            $this->cm()->save($content);
+
+        }
+        return new Response('Ok', 200);
     }
 
 

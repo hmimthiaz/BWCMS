@@ -27,4 +27,27 @@ class ContentManager extends BaseService
         return $this;
     }
 
+    /**
+     * @param ContentEntity $content
+     * @return ContentEntity|void
+     */
+    public function save(ContentEntity $content = null)
+    {
+        if (null === $content) {
+            return;
+        }
+
+        $content->setCreatedDate(new \DateTime());
+        $content->setModifiedDate(new \DateTime());
+
+        if ($content->getAuthor() == null) {
+            $content->setAuthor($this->getUser());
+        }
+
+        $this->em()->persist($content);
+        $this->em()->flush();
+        return $content;
+    }
+
+
 }

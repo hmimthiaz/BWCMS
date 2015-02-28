@@ -13,16 +13,12 @@ use Symfony\Component\HttpFoundation\Request;
 class AdminMenuManager extends BaseService
 {
     private $factory;
-    private $currentUser;
-    private $securityContext;
 
     function __construct(FactoryInterface $factory = null, ContainerInterface $container = null, RequestStack $request_stack = null)
     {
         $this->setFactory($factory);
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
-        $this->securityContext = $this->container->get('security.context');
-        $this->currentUser = $this->securityContext->getToken()->getUser();
     }
 
     /**
@@ -36,9 +32,9 @@ class AdminMenuManager extends BaseService
     public function buildRightMainMenu(Request $request){
         $menu = $this->factory->createItem('root');
 
-        $menu->addChild('Profile', array('uri' => '#','label' => $this->currentUser->getEmail() ))->setAttribute('dropdown', true);
+        $menu->addChild('Profile', array('uri' => '#','label' => $this->getUser()->getEmail() ))->setAttribute('dropdown', true);
         $menu['Profile']->addChild('Profile', array('uri' => '#'));
-        if($this->securityContext->isGranted('ROLE_PREVIOUS_ADMIN')){
+        if($this->getSecurityContext()->isGranted('ROLE_PREVIOUS_ADMIN')){
             $menu['Profile']->addChild('Exit User', array(
                 'route' => 'Homepage',
                 'routeParameters' => array('_switch_user' =>  '_exit')
@@ -55,8 +51,6 @@ class AdminMenuManager extends BaseService
 
         $menu->addChild('Manage', array('uri' => '#', 'label' => 'Manage' ))->setAttribute('dropdown', true);
         $menu['Manage']->addChild('Media', array('route' => 'media_home'));
-
-
         return $menu;
     }
 

@@ -6,6 +6,8 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Security\Core\SecurityContext;
+use Bellwether\BWCMSBundle\Entity\UserEntity;
 
 
 class BaseService  extends ContainerAware
@@ -43,6 +45,20 @@ class BaseService  extends ContainerAware
     public function em()
     {
         return $this->container->get('doctrine')->getManager();
+    }
+
+    /**
+     * @return SecurityContext
+     */
+    public function getSecurityContext(){
+        return $this->container->get('security.context');
+    }
+
+    /**
+     * @return UserEntity
+     */
+    public function getUser(){
+        return $this->getSecurityContext()->getToken()->getUser();
     }
 
 
