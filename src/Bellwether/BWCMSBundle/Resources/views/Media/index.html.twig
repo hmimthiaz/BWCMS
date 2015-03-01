@@ -1,6 +1,5 @@
 {% extends "BWCMSBundle:Common:default.html.twig" %}
 
-
 {% block title %}Media{% endblock %}
 {% block pageTitle %}
     <h1>Media
@@ -46,7 +45,6 @@
             </div>
         </div>
     </div>
-
     <div class="row">
         <div class="col-md-3 taskLeft">
             <div class="panel panel-default">
@@ -58,6 +56,7 @@
         <div class="col-md-9 taskRight">
             <div class="panel panel-default">
                 <div class="panel-body">
+                    <input type="hidden" id="selectedContentFolderId" value="Root">
                     <table id="mediaTable" class="table" border="0">
                         <thead>
                         <tr>
@@ -78,22 +77,24 @@
             previewNode.id = "";
             var previewTemplate = previewNode.parentNode.innerHTML;
             previewNode.parentNode.removeChild(previewNode);
-            var mediaTable = $('#mediaTable').DataTable(
-                    {
-                        "ordering": false,
-                        "processing": true,
-                        "serverSide": true,
-                        ajax: {
-                            url: "{{ url('media_home_data') }}",
-                            type: 'GET'
-                        },
-                        "columns": [
-                            {"data": "thumbnail"},
-                            {"data": "title"},
-                            {"data": "name"},
-                        ]
+            var mediaTable = $('#mediaTable').DataTable({
+                "ordering": false,
+                "processing": true,
+                "serverSide": true,
+                ajax: {
+                    url: "{{ url('media_home_data') }}",
+                    type: 'GET',
+                    'data': function (params) {
+                        params.parent = $("#selectedContentFolderId").val();
+                        return params;
                     }
-            );
+                },
+                "columns": [
+                    {"data": "thumbnail"},
+                    {"data": "title"},
+                    {"data": "name"},
+                ]
+            });
 
             var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
                 url: "{{ url('media_upload') }}", // Set the url
@@ -105,22 +106,16 @@
                 previewsContainer: "#fileUploaderPreviews", // Define the container to display the previews
                 clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
             });
-            myDropzone.on("addedfile", function (file) {
-                // Hookup the start button
-            });
-            myDropzone.on("complete", function(file) {
+            myDropzone.on("complete", function (file) {
                 myDropzone.removeFile(file);
             });
-            // Update the total progress bar
             myDropzone.on("totaluploadprogress", function (progress) {
                 document.querySelector("#total-progress .progress-bar").style.width = progress + "%";
             });
-            myDropzone.on("sending", function (file,xhr,formdata) {
-                console.log(xhr);
-                console.log(formdata);
+            myDropzone.on("sending", function (file, xhr, formData) {
+                formData.append('parent', $("#selectedContentFolderId").val());
                 $('#total-progress').show();
             });
-            // Hide the total progress bar when nothing's uploading anymore
             myDropzone.on("queuecomplete", function (progress) {
                 $('#total-progress').hide();
                 mediaTable.ajax.reload();
@@ -155,31 +150,34 @@
                                     })
                                     $('#folderModel').modal();
                                 }
-                            },
-                            "Rename": {
-                                "separator_before": false,
-                                "separator_after": false,
-                                "label": "Rename",
-                                "icon": "glyphicon glyphicon-pencil",
-                                "action": function (obj) {
-                                    var inst = $.jstree.reference(obj.reference);
-                                    var data = inst.get_node(obj.reference);
-                                    $('#folderModelId').val(data.id);
-                                    $('#folderModelName').val(data.text);
-                                    $('#folderModelMode').val('rename_node');
-                                    $('#folderModelParent').val('');
-                                    $('#folderModel').on('shown.bs.modal', function () {
-                                        $('#folderModelName').focus();
-                                    })
-                                    $('#folderModel').modal();
-                                }
                             }
+//                            ,"Rename": {
+//                                "separator_before": false,
+//                                "separator_after": false,
+//                                "label": "Rename",
+//                                "icon": "glyphicon glyphicon-pencil",
+//                                "action": function (obj) {
+//                                    var inst = $.jstree.reference(obj.reference);
+//                                    var data = inst.get_node(obj.reference);
+//                                    $('#folderModelId').val(data.id);
+//                                    $('#folderModelName').val(data.text);
+//                                    $('#folderModelMode').val('rename_node');
+//                                    $('#folderModelParent').val('');
+//                                    $('#folderModel').on('shown.bs.modal', function () {
+//                                        $('#folderModelName').focus();
+//                                    })
+//                                    $('#folderModel').modal();
+//                                }
+//                            }
                         }
                     }
                 },
                 'plugins': ['contextmenu']
             });
-
+            $('#jstree_div').on('select_node.jstree', function (node, selected, event) {
+                $("#selectedContentFolderId").val(selected.node.id);
+                mediaTable.ajax.reload();
+            });
             $('#folderModelButtonSave').click(function () {
                 var jqxhr = $.post("{{ url('media_folder_save') }}", {
                     id: $('#folderModelId').val(),
@@ -189,19 +187,15 @@
                 });
                 jqxhr.done(function (data) {
                     var parent = $('#jstree_div').jstree('get_selected');
-                    var newNode = {id: data.id, text: data.text, icon: data.icon};
-                    if (data.mode == 'rename') {
-                        $('#jstree_div').jstree("rename_node", parent, data.text);
-                    } else {
-                        $('#jstree_div').jstree("create_node", parent, newNode, 'last', false, false);
-                    }
-                    $('#jstree_div').jstree("open_node", parent);
+                    $('#jstree_div').jstree(true).refresh_node(parent);
                     $('#folderModel').modal('hide');
                 });
                 jqxhr.fail(function () {
                     alert("error");
                 });
             });
+
+
         });
     </script>
     {#<form action="{{ url('media_upload') }}" method="post" enctype="multipart/form-data">#}
@@ -220,9 +214,9 @@
                     <div class="form-group">
                         <label for="exampleInputEmail1">Folder Name</label>
                         <input type="text" class="form-control" id="folderModelName" placeholder="">
-                        <input type="text" id="folderModelId" placeholder="">
-                        <input type="text" id="folderModelParent" placeholder="">
-                        <input type="text" id="folderModelMode" placeholder="">
+                        <input type="hidden" id="folderModelId" placeholder="">
+                        <input type="hidden" id="folderModelParent" placeholder="">
+                        <input type="hidden" id="folderModelMode" placeholder="">
                     </div>
                 </div>
                 <div class="modal-footer">

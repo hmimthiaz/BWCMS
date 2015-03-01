@@ -60,10 +60,11 @@ class MediaController extends BaseController
      */
     public function indexDataAction(Request $request)
     {
-
         $draw = $request->get('draw', 0);
         $start = $request->get('start', 10);
         $length = $request->get('length', 10);
+        $parentId = $request->get('parent','Root');
+
         $search = $request->get('search');
         if ($search != null && isset($search['value']) && !empty($search['value'])) {
             $searchString = $search['value'];
@@ -125,7 +126,7 @@ class MediaController extends BaseController
                 'state' => array(
                     'opened' => true,
                     'disabled' => false,
-                    'selected' => true
+                    'selected' => false
                 ));
         } else {
             /**
@@ -227,19 +228,32 @@ class MediaController extends BaseController
      * @Route("/upload.php",name="media_upload")
      * @Method({"POST"})
      */
-    public function uploadAction()
+    public function uploadAction(Request $request)
     {
-
+        $parentId = $request->get('parent','Root');
         try {
             $mediaInfo = $this->mm()->handleUpload();
         } catch (\Exception $e) {
             return new Response($e->getMessage(), 500);
         }
         if (!empty($mediaInfo)) {
+
+            /**
+             * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+             * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+             */
+            $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
             $content = new ContentEntity();
 
             $content->setType('Media');
             $content->setSite($this->getSite());
+
+            if($parentId=='Root'){
+                $content->setTreeParent(null);
+            }else{
+                $parentEntity = $contentRepository->find($parentId);
+                $content->setTreeParent($parentEntity);
+            }
 
             $content->setTitle($mediaInfo['originalName']);
             $content->setMime($mediaInfo['mimeType']);
