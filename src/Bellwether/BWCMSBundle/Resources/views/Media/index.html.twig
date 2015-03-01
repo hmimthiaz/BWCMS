@@ -2,7 +2,14 @@
 
 
 {% block title %}Media{% endblock %}
-{% block pageTitle %}Media{% endblock %}
+{% block pageTitle %}
+    <h1>Media
+    <span class="btn btn-success fileinput-button dz-clickable">
+        <i class="glyphicon glyphicon-plus"></i><span>Add files...</span>
+    </span>
+
+    </h1>
+{% endblock %}
 
 {% block header %}
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/dropzone/dropzone.min.css') }}"/>
@@ -11,13 +18,40 @@
 {% endblock %}
 
 {% block body %}
+    <div id="total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0"
+         aria-valuemax="100" aria-valuenow="0" style="display: none;margin-right: 10px;">
+        <div class="progress-bar progress-bar-success" style="width: 100%;" data-dz-uploadprogress=""></div>
+    </div>
+    <div class="row files" id="fileUploaderPreviews">
+        <div class="col-md-3" id="fileUploaderTemplate">
+            <div class="thumbnail">
+                <img data-dz-thumbnail/>
 
+                <div class="caption">
+                    <h3 class="name" data-dz-name></h3>
+                    Size: <span class="size" data-dz-size></span>
+
+                    <div class="progress progress-striped active" role="progressbar" aria-valuemin="0"
+                         aria-valuemax="100" aria-valuenow="0">
+                        <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress></div>
+                    </div>
+                    <strong class="error text-danger" data-dz-errormessage></strong>
+                    <button data-dz-remove class="btn btn-warning cancel">
+                        <i class="glyphicon glyphicon-ban-circle"></i>
+                    </button>
+                    <button data-dz-remove class="btn btn-danger delete">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-3 taskLeft">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <div id="jstree_div">ddd</div>
+                    <div id="jstree_div"></div>
                 </div>
             </div>
         </div>
@@ -40,7 +74,11 @@
 
     <script language="JavaScript">
         $(document).ready(function () {
-            $('#mediaTable').DataTable(
+            var previewNode = document.querySelector("#fileUploaderTemplate");
+            previewNode.id = "";
+            var previewTemplate = previewNode.parentNode.innerHTML;
+            previewNode.parentNode.removeChild(previewNode);
+            var mediaTable = $('#mediaTable').DataTable(
                     {
                         "ordering": false,
                         "processing": true,
@@ -56,6 +94,37 @@
                         ]
                     }
             );
+
+            var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
+                url: "{{ url('media_upload') }}", // Set the url
+                thumbnailWidth: 100,
+                thumbnailHeight: 100,
+                parallelUploads: 5,
+                previewTemplate: previewTemplate,
+                autoQueue: true, // Make sure the files aren't queued until manually added
+                previewsContainer: "#fileUploaderPreviews", // Define the container to display the previews
+                clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
+            });
+            myDropzone.on("addedfile", function (file) {
+                // Hookup the start button
+            });
+            myDropzone.on("complete", function(file) {
+                myDropzone.removeFile(file);
+            });
+            // Update the total progress bar
+            myDropzone.on("totaluploadprogress", function (progress) {
+                document.querySelector("#total-progress .progress-bar").style.width = progress + "%";
+            });
+            myDropzone.on("sending", function (file,xhr,formdata) {
+                console.log(xhr);
+                console.log(formdata);
+                $('#total-progress').show();
+            });
+            // Hide the total progress bar when nothing's uploading anymore
+            myDropzone.on("queuecomplete", function (progress) {
+                $('#total-progress').hide();
+                mediaTable.ajax.reload();
+            });
             $('#jstree_div').jstree({
                 'core': {
                     'data': {
@@ -135,15 +204,10 @@
             });
         });
     </script>
-
-
-    <form action="{{ url('media_upload') }}" class="dropzone"></form>
-
-    <form action="{{ url('media_upload') }}" method="post" enctype="multipart/form-data">
-        <input type="file" name="file"/>
-        <input type="submit">
-    </form>
-
+    {#<form action="{{ url('media_upload') }}" method="post" enctype="multipart/form-data">#}
+    {#<input type="file" name="file"/>#}
+    {#<input type="submit">#}
+    {#</form>#}
     <div id="folderModel" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -166,12 +230,8 @@
                     <button type="button" id="folderModelButtonSave" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
-            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-
-
+    </div>
 {% endblock %}
 
 {% block footer %}

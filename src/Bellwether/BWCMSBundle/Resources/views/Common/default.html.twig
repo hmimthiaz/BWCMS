@@ -4,17 +4,17 @@
 
     {{ include("BWCMSBundle:Common:navigation.html.twig")  }}
 
-    <div class="container-fluid" style="padding-left: 10px;padding-right: 10px;">
+    <div class="container-fluid" style="padding-left: 10px;padding-right: ">
         <div class="row">
             <div class="col-md-12">
                 <div class="page-header">
-                    <h1>{% block pageTitle %}BWCMS!{% endblock %}</h1>
+                    {% block pageTitle %}<h1>BWCMS!</h1>{% endblock %}
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container-fluid" style="padding-left: 10px;padding-right: 10px;">
+    <div class="container-fluid" style="padding-left: 10px;">
         {% block body '' %}
     </div>
 
