@@ -270,7 +270,7 @@ class ContentEntity
     }
 
     /**
-     * @return mixed
+     * @return ContentEntity
      */
     public function getTreeParent()
     {

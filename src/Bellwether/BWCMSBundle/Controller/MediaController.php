@@ -24,8 +24,32 @@ class MediaController extends BaseController
      */
     public function indexAction()
     {
-        $config = $this->container->getParameter('media.path');
-        return array(// ...
+
+        /**
+         * Get All the root folders
+         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+         */
+        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+        $qb = $contentRepository->getRootNodesQueryBuilder();
+        $qb->andWhere(" node.type = 'Media' ");
+        $rootFolders = $qb->getQuery()->getResult();
+
+        $jsNodes = array(array('id' => 0, 'text' => 'Folders', 'parent' => '#'));
+        if (!empty($rootFolders)) {
+            /** @var ContentEntity $content */
+            foreach ($rootFolders as $content) {
+                $jsNode = array();
+                $jsNode['id'] = $content->getId();
+                $jsNode['text'] = $content->getTitle();
+                $jsNode['icon'] = 'glyphicon glyphicon-folder-open';
+                $jsNode['data']['type'] = $content->getType();
+                $jsNode['parent'] = '0';
+                $jsNodes[] = $jsNode;
+            }
+        }
+
+        return array(
+            'jsNodes' => json_encode($jsNodes),
         );
     }
 
@@ -86,25 +110,116 @@ class MediaController extends BaseController
      * @Route("/index/folders.php",name="media_folders")
      * @Method({"GET"})
      */
-    public function getFolders(){
+    public function getFolders(Request $request)
+    {
+
+        $id = $request->get('id', '#');
+        $jsNodes = array();
+
+        if ($id == '#') {
+            $jsNodes[] = array('id' => 'Root',
+                'icon' => 'glyphicon glyphicon-folder-close',
+                'text' => 'Folders',
+                'parent' => '#',
+                'children' => true,
+                'state' => array(
+                    'opened' => true,
+                    'disabled' => false,
+                    'selected' => true
+                ));
+        } else {
+            /**
+             * Get All the root folders
+             * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+             */
+            $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+            if ($id == 'Root') {
+                $qb = $contentRepository->getRootNodesQueryBuilder();
+                $qb->andWhere(" node.type = 'Folder' ");
+                $rootFolders = $qb->getQuery()->getResult();
+            } else {
+                $parentFolder = $contentRepository->find($id);
+                $qb = $contentRepository->getChildrenQueryBuilder($parentFolder, true);
+                $qb->andWhere(" node.type = 'Folder' ");
+                $rootFolders = $qb->getQuery()->getResult();
+            }
+
+            if (!empty($rootFolders)) {
+                /** @var ContentEntity $content */
+                foreach ($rootFolders as $content) {
+                    $jsNode = array();
+                    $jsNode['id'] = $content->getId();
+                    $jsNode['text'] = $content->getTitle();
+                    $jsNode['icon'] = 'glyphicon glyphicon-folder-close';
+                    $jsNode['data']['type'] = $content->getType();
+                    if ($content->getTreeParent() != null) {
+                        $jsNode['parent'] = $content->getTreeParent()->getId();
+                    } else {
+                        $jsNode['parent'] = 'Root';
+                    }
+                    $jsNode['children'] = true;
+                    $jsNode['state'] = array(
+                        'opened' => false,
+                        'disabled' => false,
+                        'selected' => false
+                    );
+                    $jsNodes[] = $jsNode;
+                }
+            }
+        }
+        return $this->returnJsonReponse($request, $jsNodes);
+    }
+
+    /**
+     * @Route("/index/folder-save.php",name="media_folder_save")
+     * @Method({"POST"})
+     */
+    public function saveFolder(Request $request)
+    {
+        $mode = $request->get('mode');
+        $contentId = $request->get('id');
+        $parent = $request->get('parent');
+        $title = $request->get('title');
 
         /**
          * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $contentEntity
          */
         $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
-        $qb = $contentRepository->getRootNodesQueryBuilder();
-        $qb->andWhere( " node.type = 'Folder' " );
-
-
-        $this->dump($qb->getQuery()->getDQL(),3);
-        $this->dump($qb->getQuery()->getSQL(),3);
-        $this->dump($qb,3);
-
-
-
-//        $jobTasks = $this->em()->getRepository('BWCMSBundle:ContentEntity')->getChildren(null);
-//        $this->dump($jobTasks);
-        exit();
+        $contentEntity = null;
+        if ($mode == 'create_node') {
+            $contentEntity = new ContentEntity();
+            $contentEntity->setTreeParent(null);
+            if (!empty($parent)) {
+                /** @var Task $parentEntity */
+                $parentEntity = $contentRepository->find($parent);
+                $contentEntity->setTreeParent($parentEntity);
+            }
+            $contentEntity->setType('Folder');
+            $contentEntity->setSite($this->getSite());
+        } elseif ($mode == 'rename_node') {
+            $contentEntity = $contentRepository->find($contentId);
+            $contentEntity->setModifiedDate(new \DateTime());
+        }
+        $contentEntity->setTitle($title);
+        $contentEntity = $this->cm()->save($contentEntity);
+        $return = array();
+        $return['id'] = $contentEntity->getId();
+        if ($contentEntity->getTreeParent() != null) {
+            $return['parent'] = $contentEntity->getTreeParent()->getId();
+        } else {
+            $return['parent'] = 'Root';
+        }
+        $return['text'] = $contentEntity->getTitle();
+        $return['mode'] = $mode;
+        $return['icon'] = 'glyphicon glyphicon-folder-close';
+        $return['children'] = true;
+        $return['state'] = array(
+            'opened' => false,
+            'disabled' => false,
+            'selected' => false
+        );
+        return $this->returnJsonReponse($request, $return);
     }
 
 
