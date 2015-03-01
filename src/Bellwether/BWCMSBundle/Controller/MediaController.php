@@ -50,25 +50,34 @@ class MediaController extends BaseController
          * @var \Doctrine\DBAL\Query\QueryBuilder $queryBuilder
          */
         $queryBuilder = $repository->createQueryBuilder('c')
-            ->select('c.id,c.title,c.name')
+            ->select('c.id,c.title,c.name,c.mime,c.extension')
             ->setFirstResult($start)
             ->setMaxResults($length)
+            ->andWhere(" c.type = 'Media' ")
             ->add('orderBy', 'c.createdDate DESC');
 
-        if(!empty($searchString)){
-            $queryBuilder->andWhere(" c.title LIKE :query1 OR c.name LIKE :query2 " );
-            $queryBuilder->setParameter('query1', '%'.$searchString.'%');
-            $queryBuilder->setParameter('query2', '%'.$searchString.'%');
+        if (!empty($searchString)) {
+            $queryBuilder->andWhere(" c.title LIKE :query1 OR c.name LIKE :query2 ");
+            $queryBuilder->setParameter('query1', '%' . $searchString . '%');
+            $queryBuilder->setParameter('query2', '%' . $searchString . '%');
         }
 
         $result = $queryBuilder->getQuery()->getArrayResult();
         $totalCount = $queryBuilder->select('COUNT(c)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
-
         $data = array();
         $data['draw'] = $draw;
         $data['recordsFiltered'] = $totalCount;
         $data['recordsTotal'] = $totalCount;
-        $data['data'] = $result;
+        $data['data'] = array();
+
+        if (!empty($result)) {
+            foreach ($result as $content) {
+                $content['DT_RowId'] = $content['id'];
+                $content['thumbnail'] = $this->mm()->getThumbURL($content['name'], $content['mime'], $content['extension'], 64, 64);
+                $content['thumbnail'] = '<img src="' . $content['thumbnail'] . '"/>';
+                $data['data'][] = $content;
+            }
+        }
         return $this->returnJsonReponse($request, $data);
     }
 
@@ -95,6 +104,8 @@ class MediaController extends BaseController
             $content->setMime($mediaInfo['mimeType']);
             $content->setName($mediaInfo['filename']);
             $content->setSize($mediaInfo['size']);
+            $content->setExtension($mediaInfo['extension']);
+
 
             $this->cm()->save($content);
 

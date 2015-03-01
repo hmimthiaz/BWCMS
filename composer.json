@@ -41,7 +41,8 @@
         "braincrafted/bootstrap-bundle": "2.1.*",
         "twbs/bootstrap": "3.0.*",
         "jquery/jquery":  "1.11.*",
-        "knplabs/knp-paginator-bundle": "~2.4"
+        "knplabs/knp-paginator-bundle": "~2.4",
+        "gregwar/image-bundle": "dev-master"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3"

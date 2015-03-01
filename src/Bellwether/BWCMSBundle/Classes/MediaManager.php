@@ -8,11 +8,14 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Gregwar\Image\Image;
 
 class MediaManager extends BaseService
 {
 
     private $uploadFolder;
+    private $webPath;
+    private $mimeIconsExtension = null;
     /**
      * @var \Symfony\Component\Filesystem\Filesystem $fs
      */
@@ -37,8 +40,8 @@ class MediaManager extends BaseService
     {
         $rootDirectory = $this->getKernel()->getRootDir();
         $webRoot = realpath($rootDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'web');
-        $this->uploadFolder = $webRoot . DIRECTORY_SEPARATOR . $this->container->getParameter('media.path');
-
+        $this->webPath = $this->container->getParameter('media.path');
+        $this->uploadFolder = $webRoot . DIRECTORY_SEPARATOR . $this->webPath;
         $this->fs = new Filesystem();
     }
 
@@ -57,25 +60,91 @@ class MediaManager extends BaseService
             $this->dump($uploadedFile);
 
             $uploadFolder = $this->getUploadDir();
-            if(!$this->fs->exists($uploadFolder)){
+            if (!$this->fs->exists($uploadFolder)) {
                 $this->fs->mkdir($uploadFolder);
             }
             $filename = $this->generateFileName($uploadedFile);
-            $uploadedFile->move($uploadFolder,$filename);
+            $uploadedFile->move($uploadFolder, $filename);
 
             $data['originalName'] = $uploadedFile->getClientOriginalName();
             $data['mimeType'] = $uploadedFile->getClientMimeType();
             $data['size'] = $uploadedFile->getClientSize();
+            $data['extension'] = $uploadedFile->getClientOriginalExtension();
+            if (empty($data['extension'])) {
+                $data['extension'] = $uploadedFile->guessClientExtension();
+            }
             $data['filename'] = $filename;
         }
         return $data;
+    }
+
+    public function getThumbURL($filename, $mime, $extension , $width, $height)
+    {
+        if ($this->isImage($filename, $mime)) {
+            $publicFilename = $this->getFilePublicPath($filename);
+            $thumbURL = $this->getThumbService()->open($publicFilename)->resize($width, $height)->cacheFile('guess');
+        } else {
+            $thumbURL = $this->getThumbService()->open($this->getMimeResourceImage($extension))->resize($width, $height)->cacheFile('guess');
+        }
+        return $thumbURL;
+    }
+
+    /**
+     * @param $filename
+     * @param $mime
+     * @return bool
+     */
+    public function isImage($filename, $mime)
+    {
+        $ext = preg_match('/\.([^.]+)$/', $filename, $matches) ? strtolower($matches[1]) : false;
+        $imageExtension = array('jpg', 'jpeg', 'jpe', 'gif', 'png');
+        if ('image/' == substr($mime, 0, 6) || in_array($ext, $imageExtension)) {
+            return true;
+        }
+        return false;
+    }
+
+    private function getMimeResourceImage($extension)
+    {
+        if (in_array($extension, $this->getMimeIconsExtensions())) {
+            return '@BWCMSBundle/Resources/mime/'.$extension.'.png';
+        }
+        return '@BWCMSBundle/Resources/mime/unknown.png';
+    }
+
+    private function getMimeIconsExtensions()
+    {
+        if ($this->mimeIconsExtension == null) {
+            $this->mimeIconsExtension = array();
+            /**
+             * @var \Symfony\Component\HttpKernel\Config\FileLocator $fileLocator
+             * @var \Symfony\Component\Finder\SplFileInfo $file
+             */
+            $fileLocator = $this->container->get('file_locator');
+            $mimeLocation = $fileLocator->locate('@BWCMSBundle/Resources/mime');
+            $finder = new \Symfony\Component\Finder\Finder();
+            $finder->files()->in($mimeLocation);
+            foreach ($finder as $file) {
+                $this->mimeIconsExtension[] = $file->getBasename('.' . $file->getExtension());
+            }
+        }
+        return $this->mimeIconsExtension;
+    }
+
+    /**
+     * @return Image
+     */
+    public function getThumbService()
+    {
+
+        return $this->container->get('image.handling');
     }
 
 
     private function generateFileName(UploadedFile $file)
     {
         $filename = $this->sanitizeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-        $extension =  $file->getClientOriginalExtension();
+        $extension = $file->getClientOriginalExtension();
 
         $currentYear = ( string )gmdate('Y', time());
         $currentMonth = ( string )gmdate('m', time());
@@ -84,11 +153,11 @@ class MediaManager extends BaseService
 
         $uploadFolder = $this->getUploadDir();
 
-        $finalFileName =  $filenameWithDate . ((! empty ( $extension ) ) ? '.' : '') . $extension;
+        $finalFileName = $filenameWithDate . ((!empty ($extension)) ? '.' : '') . $extension;
         $check = 1;
-        while ( file_exists ( $uploadFolder . $finalFileName ) ) {
-            $finalFileName = $filenameWithDate . '_' . $check  . ((! empty ( $extension ) ) ? '.' : '') . $extension;
-            $check ++;
+        while (file_exists($uploadFolder . $finalFileName)) {
+            $finalFileName = $filenameWithDate . '_' . $check . ((!empty ($extension)) ? '.' : '') . $extension;
+            $check++;
         }
 
         return $finalFileName;
@@ -102,6 +171,27 @@ class MediaManager extends BaseService
         $currentMonth = ( string )gmdate('m', time());
         $currentDay = ( string )gmdate('d', time());
         return $uploadFolder . DIRECTORY_SEPARATOR . $currentYear . DIRECTORY_SEPARATOR . $currentMonth . DIRECTORY_SEPARATOR . $currentDay . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * @param $filename
+     * @return bool|string
+     */
+    public function getFilePublicPath($filename)
+    {
+        if (empty ($filename)) {
+            return false;
+        }
+        if (preg_match("/^([0-9]{4})([0-9]{2})([0-9]{2})_/", $filename, $regs)) {
+            $publicPath = $this->webPath . DIRECTORY_SEPARATOR .
+                $regs [1] . DIRECTORY_SEPARATOR .
+                $regs [2] . DIRECTORY_SEPARATOR .
+                $regs [3] . DIRECTORY_SEPARATOR .
+                $filename;
+            return $publicPath;
+        } else {
+            return false;
+        }
     }
 
     private function sanitizeFilename($filename)

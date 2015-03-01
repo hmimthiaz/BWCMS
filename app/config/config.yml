@@ -108,3 +108,7 @@ fos_user:
         address:        iris@dxb.io
         sender_name:    Iris
 
+gregwar_image:
+    cache_dir:  media/thumb
+    web_dir: "%kernel.root_dir%/../web"
+

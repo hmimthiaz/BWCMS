@@ -99,6 +99,11 @@ class ContentEntity
     private $mime;
 
     /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $extension;
+
+    /**
      * @ORM\Column(type="bigint", nullable=true)
      */
     private $size;
@@ -374,6 +379,22 @@ class ContentEntity
     public function setMime($mime)
     {
         $this->mime = $mime;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExtension()
+    {
+        return $this->extension;
+    }
+
+    /**
+     * @param mixed $extension
+     */
+    public function setExtension($extension)
+    {
+        $this->extension = $extension;
     }
 
     /**
