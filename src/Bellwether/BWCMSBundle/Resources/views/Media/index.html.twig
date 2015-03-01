@@ -7,6 +7,7 @@
 {% block header %}
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/dropzone/dropzone.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/datatable/css/jquery.dataTables.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/jstree/themes/default/style.min.css') }}" />
 {% endblock %}
 
 {% block body %}
@@ -16,9 +17,9 @@
         <div class="col-md-3 taskLeft">
             <div class="panel panel-default">
                 <!-- Default panel contents -->
-                <div class="panel-heading">Tasks Groups</div>
+                <div class="panel-heading">Folder</div>
                 <div class="panel-body">
-                    <div id="jstree_div"></div>
+                    <div id="jstree_div">ddd</div>
                 </div>
             </div>
         </div>
@@ -59,6 +60,16 @@
                     ]
                 }
             );
+            $('#jstree_div').jstree({
+                'core' : {
+                    'data' : [
+                        { "text" : "Root node", "children" : [
+                            { "text" : "Child node 1" },
+                            { "text" : "Child node 2" }
+                        ]}
+                    ]
+                }
+            });
         });
     </script>
 
@@ -75,6 +86,7 @@
 {% block footer %}
     <script src="{{ asset('bundles/bwcms/dropzone/dropzone.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/datatable/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/jstree/jstree.min.js') }}"></script>
 {% endblock %}
 
 

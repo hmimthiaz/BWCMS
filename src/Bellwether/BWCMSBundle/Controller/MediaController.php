@@ -83,6 +83,32 @@ class MediaController extends BaseController
 
 
     /**
+     * @Route("/index/folders.php",name="media_folders")
+     * @Method({"GET"})
+     */
+    public function getFolders(){
+
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+         */
+        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+        $qb = $contentRepository->getRootNodesQueryBuilder();
+        $qb->andWhere( " node.type = 'Folder' " );
+
+
+        $this->dump($qb->getQuery()->getDQL(),3);
+        $this->dump($qb->getQuery()->getSQL(),3);
+        $this->dump($qb,3);
+
+
+
+//        $jobTasks = $this->em()->getRepository('BWCMSBundle:ContentEntity')->getChildren(null);
+//        $this->dump($jobTasks);
+        exit();
+    }
+
+
+    /**
      * @Route("/upload.php",name="media_upload")
      * @Method({"POST"})
      */

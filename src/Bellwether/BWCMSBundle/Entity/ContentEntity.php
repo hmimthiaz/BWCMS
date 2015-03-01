@@ -57,7 +57,7 @@ class ContentEntity
 
     /**
      * @ORM\OneToMany(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", mappedBy="treeParent")
-     * @ORM\OrderBy({"lft"="ASC"})
+     * @ORM\OrderBy({"treeLeft"="ASC"})
      */
     private $children;
 
