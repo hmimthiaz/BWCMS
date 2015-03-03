@@ -25,32 +25,8 @@ class MediaController extends BaseController
     public function indexAction()
     {
 
-        /**
-         * Get All the root folders
-         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
-         */
-        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
-        $qb = $contentRepository->getRootNodesQueryBuilder();
-        $qb->andWhere(" node.type = 'Media' ");
-        $rootFolders = $qb->getQuery()->getResult();
 
-        $jsNodes = array(array('id' => 0, 'text' => 'Folders', 'parent' => '#'));
-        if (!empty($rootFolders)) {
-            /** @var ContentEntity $content */
-            foreach ($rootFolders as $content) {
-                $jsNode = array();
-                $jsNode['id'] = $content->getId();
-                $jsNode['text'] = $content->getTitle();
-                $jsNode['icon'] = 'glyphicon glyphicon-folder-open';
-                $jsNode['data']['type'] = $content->getType();
-                $jsNode['parent'] = '0';
-                $jsNodes[] = $jsNode;
-            }
-        }
-
-        return array(
-            'jsNodes' => json_encode($jsNodes),
-        );
+        return array();
     }
 
 
@@ -63,32 +39,38 @@ class MediaController extends BaseController
         $draw = $request->get('draw', 0);
         $start = $request->get('start', 10);
         $length = $request->get('length', 10);
-        $parentId = $request->get('parent','Root');
+        $parentId = $request->get('parent', 'Root');
 
         $search = $request->get('search');
         if ($search != null && isset($search['value']) && !empty($search['value'])) {
             $searchString = $search['value'];
         }
 
-        $repository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
-        /*
-         * @var \Doctrine\DBAL\Query\QueryBuilder $queryBuilder
+        /**
+         * Get All the root folders
+         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
          */
-        $queryBuilder = $repository->createQueryBuilder('c')
-            ->select('c.id,c.title,c.name,c.mime,c.extension')
-            ->setFirstResult($start)
-            ->setMaxResults($length)
-            ->andWhere(" c.type = 'Media' ")
-            ->add('orderBy', 'c.createdDate DESC');
+        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+        if ($parentId == 'Root') {
+            $qb = $contentRepository->getChildrenQueryBuilder(null, false);
+        } else {
+            $parentFolder = $contentRepository->find($parentId);
+            $qb = $contentRepository->getChildrenQueryBuilder($parentFolder, true);
+        }
+        $qb->andWhere(" node.type = 'Media' ");
+        $qb->setFirstResult($start);
+        $qb->setMaxResults($length);
+        $qb->add('orderBy', 'node.createdDate DESC');
 
         if (!empty($searchString)) {
-            $queryBuilder->andWhere(" c.title LIKE :query1 OR c.name LIKE :query2 ");
-            $queryBuilder->setParameter('query1', '%' . $searchString . '%');
-            $queryBuilder->setParameter('query2', '%' . $searchString . '%');
+            $qb->andWhere(" node.title LIKE :query1 OR node.name LIKE :query2 ");
+            $qb->setParameter('query1', '%' . $searchString . '%');
+            $qb->setParameter('query2', '%' . $searchString . '%');
         }
 
-        $result = $queryBuilder->getQuery()->getArrayResult();
-        $totalCount = $queryBuilder->select('COUNT(c)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+        $result = $qb->getQuery()->getResult();
+        $totalCount = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
         $data = array();
         $data['draw'] = $draw;
         $data['recordsFiltered'] = $totalCount;
@@ -97,10 +79,13 @@ class MediaController extends BaseController
 
         if (!empty($result)) {
             foreach ($result as $content) {
-                $content['DT_RowId'] = $content['id'];
-                $content['thumbnail'] = $this->mm()->getThumbURL($content['name'], $content['mime'], $content['extension'], 64, 64);
-                $content['thumbnail'] = '<img src="' . $content['thumbnail'] . '"/>';
-                $data['data'][] = $content;
+                $ca = array();
+                $ca['DT_RowId'] = $content->getId();
+                $ca['title'] = $content->getTitle();
+                $ca['name'] = $content->getName();
+                $ca['thumbnail'] = $this->mm()->getThumbURL($content->getName(), $content->getMime(), $content->getExtension(), 64, 64);
+                $ca['thumbnail'] = '<img src="' . $ca['thumbnail'] . '"/>';
+                $data['data'][] = $ca;
             }
         }
         return $this->returnJsonReponse($request, $data);
@@ -230,7 +215,7 @@ class MediaController extends BaseController
      */
     public function uploadAction(Request $request)
     {
-        $parentId = $request->get('parent','Root');
+        $parentId = $request->get('parent', 'Root');
         try {
             $mediaInfo = $this->mm()->handleUpload();
         } catch (\Exception $e) {
@@ -248,9 +233,9 @@ class MediaController extends BaseController
             $content->setType('Media');
             $content->setSite($this->getSite());
 
-            if($parentId=='Root'){
+            if ($parentId == 'Root') {
                 $content->setTreeParent(null);
-            }else{
+            } else {
                 $parentEntity = $contentRepository->find($parentId);
                 $content->setTreeParent($parentEntity);
             }
