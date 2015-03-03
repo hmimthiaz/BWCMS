@@ -62,7 +62,8 @@
                         <tr>
                             <th>Image</th>
                             <th>Filename</th>
-                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
                         </tr>
                         </thead>
                     </table>
@@ -81,6 +82,7 @@
                 "ordering": false,
                 "processing": true,
                 "serverSide": true,
+                "pageLength": 5,
                 ajax: {
                     url: "{{ url('media_home_data') }}",
                     type: 'GET',
@@ -92,7 +94,12 @@
                 "columns": [
                     {"data": "thumbnail"},
                     {"data": "title"},
-                    {"data": "name"},
+                    {"data": "createdDate"},
+                    {
+                        data: null,
+                        className: "center",
+                        defaultContent: '<a href="#" class="editor_remove">Delete</a>'
+                    }
                 ]
             });
 

@@ -121,6 +121,7 @@ class MediaController extends BaseController
                 $ca['DT_RowId'] = $content->getId();
                 $ca['title'] = $content->getTitle();
                 $ca['name'] = $content->getName();
+                $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');;
                 $ca['thumbnail'] = $this->mm()->getThumbURL($content->getName(), $content->getMime(), $content->getExtension(), 64, 64);
                 $ca['thumbnail'] = '<img src="' . $ca['thumbnail'] . '"/>';
                 $data['data'][] = $ca;

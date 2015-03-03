@@ -446,7 +446,7 @@ class ContentEntity
     }
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getModifiedDate()
     {
@@ -462,7 +462,7 @@ class ContentEntity
     }
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getCreatedDate()
     {
