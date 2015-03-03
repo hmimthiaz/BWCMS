@@ -49,8 +49,8 @@ assetic:
     #java: /usr/bin/java
     filters:
         less:
-            node: /usr/local/bin/node
-            node_paths: [/usr/local/lib/node_modules]
+            node: /usr/bin/node
+            node_paths: [/usr/lib/node_modules]
             apply_to: "\.less$"
         cssrewrite: ~
         #closure:
