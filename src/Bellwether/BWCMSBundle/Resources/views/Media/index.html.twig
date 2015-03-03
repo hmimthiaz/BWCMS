@@ -22,7 +22,7 @@
         <div class="progress-bar progress-bar-success" style="width: 100%;" data-dz-uploadprogress=""></div>
     </div>
     <div class="row files" id="fileUploaderPreviews">
-        <div class="col-md-3" id="fileUploaderTemplate">
+        <div class="col-md-2" id="fileUploaderTemplate">
             <div class="thumbnail">
                 <img data-dz-thumbnail/>
 
@@ -107,7 +107,9 @@
                 clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
             });
             myDropzone.on("complete", function (file) {
-                myDropzone.removeFile(file);
+                setTimeout(function () {
+                    myDropzone.removeFile(file);
+                }, 1000);
             });
             myDropzone.on("totaluploadprogress", function (progress) {
                 document.querySelector("#total-progress .progress-bar").style.width = progress + "%";
@@ -121,15 +123,19 @@
                 mediaTable.ajax.reload();
             });
             $('#jstree_div').jstree({
+                {#'core': {#}
+                {#'data': {#}
+                {#'url': '{{ url('media_folders') }}',#}
+                {#'data': function (node) {#}
+                {#return {'id': node.id};#}
+                {#}#}
+                {#}#}
+                {#}#}
                 'core': {
-                    'data': {
-                        'url': '{{ url('media_folders') }}',
-                        'data': function (node) {
-                            return {'id': node.id};
-                        }
-                    }
-                },
-                'contextmenu': {
+                    'data': {{ jsNodes|raw }},
+                    'check_callback': true
+                }
+                , 'contextmenu': {
                     'items': function (node, treeObj) {
                         return {
                             "Create": {
@@ -151,24 +157,24 @@
                                     $('#folderModel').modal();
                                 }
                             }
-//                            ,"Rename": {
-//                                "separator_before": false,
-//                                "separator_after": false,
-//                                "label": "Rename",
-//                                "icon": "glyphicon glyphicon-pencil",
-//                                "action": function (obj) {
-//                                    var inst = $.jstree.reference(obj.reference);
-//                                    var data = inst.get_node(obj.reference);
-//                                    $('#folderModelId').val(data.id);
-//                                    $('#folderModelName').val(data.text);
-//                                    $('#folderModelMode').val('rename_node');
-//                                    $('#folderModelParent').val('');
-//                                    $('#folderModel').on('shown.bs.modal', function () {
-//                                        $('#folderModelName').focus();
-//                                    })
-//                                    $('#folderModel').modal();
-//                                }
-//                            }
+                            , "Rename": {
+                                "separator_before": false,
+                                "separator_after": false,
+                                "label": "Rename",
+                                "icon": "glyphicon glyphicon-pencil",
+                                "action": function (obj) {
+                                    var inst = $.jstree.reference(obj.reference);
+                                    var data = inst.get_node(obj.reference);
+                                    $('#folderModelId').val(data.id);
+                                    $('#folderModelName').val(data.text);
+                                    $('#folderModelMode').val('rename_node');
+                                    $('#folderModelParent').val('');
+                                    $('#folderModel').on('shown.bs.modal', function () {
+                                        $('#folderModelName').focus();
+                                    })
+                                    $('#folderModel').modal();
+                                }
+                            }
                         }
                     }
                 },
@@ -186,8 +192,23 @@
                     title: $('#folderModelName').val()
                 });
                 jqxhr.done(function (data) {
+//                    var parent = $('#jstree_div').jstree('get_selected');
+//                    $('#jstree_div').jstree(true).refresh_node(parent);
+
                     var parent = $('#jstree_div').jstree('get_selected');
-                    $('#jstree_div').jstree(true).refresh_node(parent);
+                    var newNode = {
+                        state: "open",
+                        id: data.id,
+                        text: data.text,
+                        icon: data.icon,
+                        data: {type: data.data.type}
+                    };
+                    if (data.mode == 'rename') {
+                        $('#jstree_div').jstree("rename_node", parent, data.text);
+                    } else {
+                        $('#jstree_div').jstree("create_node", parent, newNode, 'last', false, false);
+                    }
+                    $('#jstree_div').jstree("open_node", parent);
                     $('#folderModel').modal('hide');
                 });
                 jqxhr.fail(function () {

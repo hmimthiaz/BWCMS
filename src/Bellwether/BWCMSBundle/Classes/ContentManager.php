@@ -37,13 +37,13 @@ class ContentManager extends BaseService
             return;
         }
 
-        $content->setCreatedDate(new \DateTime());
+        if($content->getId()==null){
+            $content->setCreatedDate(new \DateTime());
+        }
         $content->setModifiedDate(new \DateTime());
-
         if ($content->getAuthor() == null) {
             $content->setAuthor($this->getUser());
         }
-
         $this->em()->persist($content);
         $this->em()->flush();
         return $content;
