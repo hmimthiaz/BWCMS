@@ -8,6 +8,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
@@ -222,11 +224,60 @@ class MediaController extends BaseController
 
     /**
      * @Route("/delete.php",name="media_delete")
-     * @Method({"POST"})
+     * @Method({"GET", "POST"})
      */
-    public function deleteAction(){
-
+    public function deleteAction(Request $request)
+    {
+        $contentId = $request->get('contentId');
+        if ($contentId == null) {
+            return new Response('Invalid Params', 500);
+        }
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         */
+        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+        $content = $contentRepository->find($contentId);
+        if ($content == null) {
+            return new Response('Content not available', 500);
+        }
+        if ($this->mm()->deleteMedia($content->getName()) == true) {
+            $this->em()->remove($content);
+            $this->em()->flush();
+        } else {
+            return new Response('Media deletion error', 500);
+        }
+        return $this->returnJsonReponse($request, array('contentId' => $contentId));
     }
 
+
+    /**
+     * @Route("/download.php",name="media_download")
+     * @Method({"GET"})
+     */
+    public function downloadAction(Request $request)
+    {
+        $contentId = $request->get('contentId');
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         */
+        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+        $content = $contentRepository->find($contentId);
+        if ($content == null) {
+            return new Response('Content not available', 500);
+        }
+        $downloadFile = $this->mm()->getFilePath($content->getName(), true);
+
+        $response = new BinaryFileResponse($downloadFile);
+        $response->trustXSendfileTypeHeader();
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $content->getName(),
+            iconv('UTF-8', 'ASCII//TRANSLIT', $content->getName())
+        );
+
+        return $response;
+    }
 
 }

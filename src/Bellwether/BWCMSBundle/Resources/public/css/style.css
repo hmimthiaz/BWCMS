@@ -8,12 +8,12 @@ body {
 }
 
 div.mediaPageLeft{
-    min-height: 500px;
+    min-height: 600px;
     background-color: #f1f0f0;
 }
 
 div.mediaPageRight {
-    min-height: 500px;
+    min-height: 600px;
 }
 
 table.dataTable tr.odd {

@@ -92,25 +92,34 @@
                     {
                         data: null,
                         className: "center",
-                        defaultContent: '<a href="#" class="editor_remove">Delete</a>'
+                        render: function ( data, type, full, meta ){
+                            var ret = '<button type="button" class="btn btn-primary download"><i class="glyphicon glyphicon-download-alt"></i></button>';
+                            ret = ret + ' <button type="button" class="btn btn-danger remove"><i class="glyphicon glyphicon-remove"></i></a>';
+                            return ret;
+                        }
                     }
                 ],
-                fnDrawCallback: function(oSettings){
-                    $('#mediaTable a.editor_remove').click(function(e){
-                        bootbox.confirm("Do you want to delete the selected item?", function(result) {
-
+                fnDrawCallback: function (oSettings) {
+                    $('#mediaTable button.download').click(function (e) {
+                        var downloadURL = '{{ url('media_download') }}';
+                        var contentId = $(this).parents('tr').attr('id');
+                        window.open( downloadURL + '?contentId=' + contentId,'_blank');
+                        return false;
+                    });
+                    $('#mediaTable button.remove').click(function (e) {
+                        var contentId = $(this).parents('tr').attr('id');
+                        bootbox.confirm("Do you want to delete the selected item?", function (result) {
+                            console.log(contentId);
+                            var request = $.post("{{ url('media_delete') }}", {
+                                contentId: contentId
+                            });
+                            request.done(function (data) {
+                                mediaTable.ajax.reload(null,false);
+                            });
+                            request.fail(function () {
+                                alert('Unable to delete media');
+                            });
                         });
-
-
-                        {#var jqxhr = $.post("{{ url('media_delete') }}", {#}
-                            {#contentId: $(this).parents('tr').attr('id'),#}
-                        {#});#}
-                        {#jqxhr.done(function (data) {#}
-                        {#});#}
-                        {#jqxhr.fail(function () {#}
-                        {#});#}
-                        {#$('#'+mediaId).remove();#}
-                        {#console.log(mediaId);#}
                     });
                 }
             });
@@ -157,7 +166,6 @@
                                 "action": function (obj) {
                                     var inst = $.jstree.reference(obj.reference);
                                     var data = inst.get_node(obj.reference);
-                                    console.log(data);
                                     $('#folderModelId').val('');
                                     $('#folderModelName').val('');
                                     $('#folderModelMode').val('create_node');
@@ -196,13 +204,13 @@
                 mediaTable.ajax.reload();
             });
             $('#folderModelButtonSave').click(function () {
-                var jqxhr = $.post("{{ url('media_folder_save') }}", {
+                var request = $.post("{{ url('media_folder_save') }}", {
                     id: $('#folderModelId').val(),
                     parent: $('#folderModelParent').val(),
                     mode: $('#folderModelMode').val(),
                     title: $('#folderModelName').val()
                 });
-                jqxhr.done(function (data) {
+                request.done(function (data) {
 //                    var parent = $('#jstree_div').jstree('get_selected');
 //                    $('#jstree_div').jstree(true).refresh_node(parent);
 
@@ -222,7 +230,7 @@
                     $('#jstree_div').jstree("open_node", parent);
                     $('#folderModel').modal('hide');
                 });
-                jqxhr.fail(function () {
+                request.fail(function () {
                     alert("error");
                 });
             });

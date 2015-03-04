@@ -78,10 +78,10 @@ class MediaManager extends BaseService
         return $data;
     }
 
-    public function getThumbURL($filename, $mime, $extension , $width, $height)
+    public function getThumbURL($filename, $mime, $extension, $width, $height)
     {
         if ($this->isImage($filename, $mime)) {
-            $publicFilename = $this->getFilePublicPath($filename);
+            $publicFilename = $this->getFilePath($filename);
             $thumbURL = $this->getThumbService()->open($publicFilename)->resize($width, $height)->cacheFile('guess');
         } else {
             $thumbURL = $this->getThumbService()->open($this->getMimeResourceImage($extension))->resize($width, $height)->cacheFile('guess');
@@ -104,10 +104,21 @@ class MediaManager extends BaseService
         return false;
     }
 
+    public function deleteMedia($filename)
+    {
+        $filePath = $this->getFilePath($filename, true);
+        try {
+            $this->fs->remove($filePath);
+        } catch (\Exception $e) {
+            return false;
+        }
+        return true;
+    }
+
     private function getMimeResourceImage($extension)
     {
         if (in_array($extension, $this->getMimeIconsExtensions())) {
-            return '@BWCMSBundle/Resources/mime/'.$extension.'.png';
+            return '@BWCMSBundle/Resources/mime/' . $extension . '.png';
         }
         return '@BWCMSBundle/Resources/mime/unknown.png';
     }
@@ -130,6 +141,7 @@ class MediaManager extends BaseService
         }
         return $this->mimeIconsExtension;
     }
+
 
     /**
      * @return Image
@@ -177,18 +189,19 @@ class MediaManager extends BaseService
      * @param $filename
      * @return bool|string
      */
-    public function getFilePublicPath($filename)
+    public function getFilePath($filename, $fullPath = false)
     {
         if (empty ($filename)) {
             return false;
         }
         if (preg_match("/^([0-9]{4})([0-9]{2})([0-9]{2})_/", $filename, $regs)) {
-            $publicPath = $this->webPath . DIRECTORY_SEPARATOR .
-                $regs [1] . DIRECTORY_SEPARATOR .
+            $filePath = $regs [1] . DIRECTORY_SEPARATOR .
                 $regs [2] . DIRECTORY_SEPARATOR .
-                $regs [3] . DIRECTORY_SEPARATOR .
-                $filename;
-            return $publicPath;
+                $regs [3] . DIRECTORY_SEPARATOR . $filename;
+            if ($fullPath) {
+                return $this->uploadFolder . DIRECTORY_SEPARATOR . $filePath;
+            }
+            return $this->webPath . DIRECTORY_SEPARATOR . $filePath;
         } else {
             return false;
         }
