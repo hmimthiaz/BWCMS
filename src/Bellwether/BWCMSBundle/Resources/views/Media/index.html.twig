@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/dropzone/dropzone.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/datatable/css/jquery.dataTables.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/jstree/themes/default/style.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/lightbox/ekko-lightbox.min.css') }}"/>
 {% endblock %}
 
 {% block body %}
@@ -100,6 +101,10 @@
                     }
                 ],
                 fnDrawCallback: function (oSettings) {
+                    $('#mediaTable a.lightBox').click(function (e) {
+                        e.preventDefault();
+                        $(this).ekkoLightbox();
+                    });
                     $('#mediaTable button.download').click(function (e) {
                         var downloadURL = '{{ url('media_download') }}';
                         var contentId = $(this).parents('tr').attr('id');
@@ -109,7 +114,6 @@
                     $('#mediaTable button.remove').click(function (e) {
                         var contentId = $(this).parents('tr').attr('id');
                         bootbox.confirm("Do you want to delete the selected item?", function (result) {
-                            console.log(contentId);
                             var request = $.post("{{ url('media_delete') }}", {
                                 contentId: contentId
                             });
@@ -263,6 +267,7 @@
     <script src="{{ asset('bundles/bwcms/dropzone/dropzone.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/datatable/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/jstree/jstree.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/lightbox/ekko-lightbox.min.js') }}"></script>
 {% endblock %}
 
 

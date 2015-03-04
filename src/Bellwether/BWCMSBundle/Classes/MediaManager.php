@@ -78,7 +78,7 @@ class MediaManager extends BaseService
         return $data;
     }
 
-    public function getThumbURL($filename, $mime, $extension, $width, $height)
+    public function getSystemThumbURL($filename, $mime, $extension, $width, $height)
     {
         if ($this->isImage($filename, $mime)) {
             $publicFilename = $this->getFilePath($filename);

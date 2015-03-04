@@ -124,12 +124,23 @@ class MediaController extends BaseController
                 $ca['title'] = $content->getTitle();
                 $ca['name'] = $content->getName();
                 $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');;
-                $ca['thumbnail'] = $this->mm()->getThumbURL($content->getName(), $content->getMime(), $content->getExtension(), 64, 64);
+                $ca['thumbnail'] = $this->mm()->getSystemThumbURL($content->getName(), $content->getMime(), $content->getExtension(), 64, 64);
                 $ca['thumbnail'] = '<img src="' . $ca['thumbnail'] . '"/>';
+                if ($this->mm()->isImage($content->getName(), $content->getMime())) {
+                    $imageThumb = $this->getImageThumbURL($content->getName(),800,800);
+                    $ca['thumbnail'] = '<a href="'.$imageThumb.'" data-title="'.$content->getTitle().'" class="lightBox">' . $ca['thumbnail'] . '</a>';
+                }
                 $data['data'][] = $ca;
             }
         }
         return $this->returnJsonReponse($request, $data);
+    }
+
+    public function getImageThumbURL($filename, $width, $height)
+    {
+        $publicFilename = $this->mm()->getFilePath($filename);
+        $thumbURL = $this->mm()->getThumbService()->open($publicFilename)->cropResize($width, $height)->cacheFile('guess');
+        return $thumbURL;
     }
 
     /**
