@@ -65,11 +65,7 @@ class DashboardController extends BaseController
         $contentEntity2->setAuthor($this->getUser());
         $contentEntity2->setTreeParent($contentEntity1);
         $this->em()->persist($contentEntity2);
-
         $this->em()->flush();
-
-
-
 
         return new Response('Ok', 200);
     }

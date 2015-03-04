@@ -1,1 +1,25 @@
-body { padding-top: 30px; }
+body {
+    padding-top: 30px;
+}
+
+.row {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+div.mediaPageLeft{
+    min-height: 500px;
+    background-color: #f1f0f0;
+}
+
+div.mediaPageRight {
+    min-height: 500px;
+}
+
+table.dataTable tr.odd {
+    background-color: #F9F9F9;
+}
+
+table.dataTable tr.even {
+    background-color: #FFFFFF;
+}

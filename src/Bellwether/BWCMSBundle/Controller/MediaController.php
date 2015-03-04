@@ -19,7 +19,7 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 class MediaController extends BaseController
 {
     /**
-     * @Route("/index",name="media_home")
+     * @Route("/",name="media_home")
      * @Template()
      */
     public function indexAction()
@@ -69,7 +69,7 @@ class MediaController extends BaseController
 
 
     /**
-     * @Route("/index/data.php",name="media_home_data")
+     * @Route("/data.php",name="media_home_data")
      * @Method({"GET"})
      */
     public function indexDataAction(Request $request)
@@ -131,7 +131,7 @@ class MediaController extends BaseController
     }
 
     /**
-     * @Route("/index/folder-save.php",name="media_folder_save")
+     * @Route("/folder.php",name="media_folder_save")
      * @Method({"POST"})
      */
     public function saveFolder(Request $request)
@@ -140,7 +140,6 @@ class MediaController extends BaseController
         $contentId = $request->get('id');
         $parent = $request->get('parent');
         $title = $request->get('title');
-
         /**
          * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
          * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $contentEntity
@@ -197,35 +196,36 @@ class MediaController extends BaseController
             return new Response($e->getMessage(), 500);
         }
         if (!empty($mediaInfo)) {
-
             /**
              * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
              * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
              */
             $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
             $content = new ContentEntity();
-
             $content->setType('Media');
             $content->setSite($this->getSite());
-
             if ($parentId == 'Root') {
                 $content->setTreeParent(null);
             } else {
                 $parentEntity = $contentRepository->find($parentId);
                 $content->setTreeParent($parentEntity);
             }
-
             $content->setTitle($mediaInfo['originalName']);
             $content->setMime($mediaInfo['mimeType']);
             $content->setName($mediaInfo['filename']);
             $content->setSize($mediaInfo['size']);
             $content->setExtension($mediaInfo['extension']);
-
-
             $this->cm()->save($content);
-
         }
         return new Response('Ok', 200);
+    }
+
+    /**
+     * @Route("/delete.php",name="media_delete")
+     * @Method({"POST"})
+     */
+    public function deleteAction(){
+
     }
 
 

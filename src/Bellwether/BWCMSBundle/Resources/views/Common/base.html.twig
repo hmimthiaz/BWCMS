@@ -4,15 +4,16 @@
     <meta charset="UTF-8" />
     <title>{% block title %}BWCMS!{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/include/js/jquery.js"></script>
     <link href="/include/css/bootstrap.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/css/style.css') }}" />
-    <script src="/include/js/jquery.js"></script>
     {% include 'BraincraftedBootstrapBundle::ie8-support.html.twig' %}
     {% block header %}{% endblock %}
 </head>
 <body>
     {% block bodyContainer %}{% endblock %}
     <script src="/include/js/bootstrap.js"></script>
+    <script src="{{ asset('bundles/bwcms/js/bootbox.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/js/script.js') }}"></script>
     {% block footer %}{% endblock %}
 </body>
