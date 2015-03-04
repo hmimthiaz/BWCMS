@@ -103,7 +103,7 @@
                     $('#mediaTable button.download').click(function (e) {
                         var downloadURL = '{{ url('media_download') }}';
                         var contentId = $(this).parents('tr').attr('id');
-                        window.open( downloadURL + '?contentId=' + contentId,'_blank');
+                        window.location = downloadURL + '?contentId=' + contentId;
                         return false;
                     });
                     $('#mediaTable button.remove').click(function (e) {
@@ -211,9 +211,6 @@
                     title: $('#folderModelName').val()
                 });
                 request.done(function (data) {
-//                    var parent = $('#jstree_div').jstree('get_selected');
-//                    $('#jstree_div').jstree(true).refresh_node(parent);
-
                     var parent = $('#jstree_div').jstree('get_selected');
                     var newNode = {
                         state: "open",
@@ -236,10 +233,6 @@
             });
         });
     </script>
-    {#<form action="{{ url('media_upload') }}" method="post" enctype="multipart/form-data">#}
-    {#<input type="file" name="file"/>#}
-    {#<input type="submit">#}
-    {#</form>#}
     <div id="folderModel" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
