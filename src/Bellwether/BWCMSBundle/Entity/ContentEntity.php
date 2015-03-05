@@ -89,9 +89,14 @@ class ContentEntity
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=100, nullable=true)
+     * @ORM\Column(type="string", length=100, nullable=false)
      */
-    private $type;
+    private $type = 'Folder';
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=false)
+     */
+    private $schema = "Default";
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
@@ -331,6 +336,22 @@ class ContentEntity
     public function setContent($content)
     {
         $this->content = $content;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSchema()
+    {
+        return $this->schema;
+    }
+
+    /**
+     * @param mixed $schema
+     */
+    public function setSchema($schema)
+    {
+        $this->schema = $schema;
     }
 
     /**
