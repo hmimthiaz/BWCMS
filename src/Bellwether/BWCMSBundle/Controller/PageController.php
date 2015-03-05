@@ -90,7 +90,7 @@ class PageController extends BaseController
          */
         $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
         if ($parentId == 'Root') {
-            $qb = $contentRepository->getChildrenQueryBuilder(null, false);
+            $qb = $contentRepository->getChildrenQueryBuilder(null, true);
         } else {
             $parentFolder = $contentRepository->find($parentId);
             $qb = $contentRepository->getChildrenQueryBuilder($parentFolder, true);
@@ -122,7 +122,8 @@ class PageController extends BaseController
                 $ca['name'] = $content->getName();
                 $ca['type'] = $content->getType();
                 $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');;
-                $ca['thumbnail'] = '';
+                $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content->getType(),32,32);
+                $ca['thumbnail'] = '<img src="' . $ca['thumbnail'] . '"/>';
                 $data['data'][] = $ca;
             }
         }

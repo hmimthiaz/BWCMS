@@ -15,7 +15,7 @@ class MediaManager extends BaseService
 
     private $uploadFolder;
     private $webPath;
-    private $mimeIconsExtension = null;
+    private $extensionMimeIcons = null;
     /**
      * @var \Symfony\Component\Filesystem\Filesystem $fs
      */
@@ -118,28 +118,28 @@ class MediaManager extends BaseService
     private function getMimeResourceImage($extension)
     {
         if (in_array($extension, $this->getMimeIconsExtensions())) {
-            return '@BWCMSBundle/Resources/mime/' . $extension . '.png';
+            return '@BWCMSBundle/Resources/icons/mime/' . $extension . '.png';
         }
-        return '@BWCMSBundle/Resources/mime/unknown.png';
+        return '@BWCMSBundle/Resources/icons/mime/unknown.png';
     }
 
     private function getMimeIconsExtensions()
     {
-        if ($this->mimeIconsExtension == null) {
-            $this->mimeIconsExtension = array();
+        if ($this->extensionMimeIcons == null) {
+            $this->extensionMimeIcons = array();
             /**
              * @var \Symfony\Component\HttpKernel\Config\FileLocator $fileLocator
              * @var \Symfony\Component\Finder\SplFileInfo $file
              */
             $fileLocator = $this->container->get('file_locator');
-            $mimeLocation = $fileLocator->locate('@BWCMSBundle/Resources/mime');
+            $mimeLocation = $fileLocator->locate('@BWCMSBundle/Resources/icons/mime');
             $finder = new \Symfony\Component\Finder\Finder();
             $finder->files()->in($mimeLocation);
             foreach ($finder as $file) {
-                $this->mimeIconsExtension[] = $file->getBasename('.' . $file->getExtension());
+                $this->extensionMimeIcons[] = $file->getBasename('.' . $file->getExtension());
             }
         }
-        return $this->mimeIconsExtension;
+        return $this->extensionMimeIcons;
     }
 
 
@@ -148,7 +148,6 @@ class MediaManager extends BaseService
      */
     public function getThumbService()
     {
-
         return $this->container->get('image.handling');
     }
 

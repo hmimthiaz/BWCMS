@@ -21,10 +21,10 @@
             <table id="mediaTable" class="table" border="0">
                 <thead>
                 <tr>
-                    <th>Icon</th>
+                    <th width="32">Icon</th>
                     <th>Filename</th>
-                    <th>Date</th>
-                    <th>Action</th>
+                    <th width="200">Date</th>
+                    <th width="100">Action</th>
                 </tr>
                 </thead>
             </table>
@@ -62,6 +62,7 @@
                     }
                 ],
                 fnDrawCallback: function (oSettings) {
+
                 }
             });
 
@@ -71,6 +72,10 @@
                     'check_callback': true
                 },
                 'plugins': ['contextmenu']
+            });
+            $('#jstree_div').on('select_node.jstree', function (node, selected, event) {
+                $("#selectedContentFolderId").val(selected.node.id);
+                mediaTable.ajax.reload();
             });
         });
     </script>

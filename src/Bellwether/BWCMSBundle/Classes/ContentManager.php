@@ -13,6 +13,8 @@ use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 class ContentManager extends BaseService
 {
 
+    private $contentTypeIcons = null;
+
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
         $this->setContainer($container);
@@ -37,7 +39,7 @@ class ContentManager extends BaseService
             return;
         }
 
-        if($content->getId()==null){
+        if ($content->getId() == null) {
             $content->setCreatedDate(new \DateTime());
         }
         $content->setModifiedDate(new \DateTime());
@@ -47,6 +49,49 @@ class ContentManager extends BaseService
         $this->em()->persist($content);
         $this->em()->flush();
         return $content;
+    }
+
+
+    /**
+     * @return Image
+     */
+    public function getThumbService()
+    {
+        return $this->container->get('image.handling');
+    }
+
+
+    public function getSystemThumbURL($type, $width, $height)
+    {
+        $thumbURL = $this->getThumbService()->open($this->getContentTypeResourceImage($type))->resize($width, $height)->cacheFile('guess');
+        return $thumbURL;
+    }
+
+    private function getContentTypeResourceImage($type)
+    {
+        if (in_array($type, $this->getContentTypeIcons())) {
+            return '@BWCMSBundle/Resources/icons/content/' . $type . '.png';
+        }
+        return '@BWCMSBundle/Resources/icons/content/Unknown.png';
+    }
+
+    private function getContentTypeIcons()
+    {
+        if ($this->contentTypeIcons == null) {
+            $this->contentTypeIcons = array();
+            /**
+             * @var \Symfony\Component\HttpKernel\Config\FileLocator $fileLocator
+             * @var \Symfony\Component\Finder\SplFileInfo $file
+             */
+            $fileLocator = $this->container->get('file_locator');
+            $iconLocation = $fileLocator->locate('@BWCMSBundle/Resources/icons/content');
+            $finder = new \Symfony\Component\Finder\Finder();
+            $finder->files()->in($iconLocation);
+            foreach ($finder as $file) {
+                $this->contentTypeIcons[] = $file->getBasename('.' . $file->getExtension());
+            }
+        }
+        return $this->contentTypeIcons;
     }
 
 
