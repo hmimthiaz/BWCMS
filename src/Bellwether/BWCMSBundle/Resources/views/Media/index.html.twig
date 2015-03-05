@@ -1,8 +1,8 @@
 {% extends "BWCMSBundle:Common:default.html.twig" %}
 
-{% block title %}Media{% endblock %}
+{% block title %}Media Manager{% endblock %}
 {% block pageTitle %}
-    <h1>Media
+    <h1>Media Manager
     <span class="btn btn-success fileinput-button dz-clickable">
         <i class="glyphicon glyphicon-plus"></i><span>Add files...</span>
     </span>
@@ -79,7 +79,7 @@
                 drag: true,
                 select: true,
                 ajax: {
-                    url: "{{ url('media_home_data') }}",
+                    url: "{{ url('media_table_data') }}",
                     type: 'GET',
                     'data': function (params) {
                         params.parent = $("#selectedContentFolderId").val();

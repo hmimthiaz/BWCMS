@@ -1,0 +1,82 @@
+{% extends "BWCMSBundle:Common:default.html.twig" %}
+
+{% block title %}Page Manager{% endblock %}
+{% block pageTitle %}
+    <h1>Page Manager</h1>
+{% endblock %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/datatable/css/jquery.dataTables.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/jstree/themes/default/style.min.css') }}"/>
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-3 mediaPageLeft">
+            <div id="jstree_div"></div>
+        </div>
+        <div class="col-md-9 mediaPageRight">
+            <input type="hidden" id="selectedContentFolderId" value="Root">
+            <table id="mediaTable" class="table" border="0">
+                <thead>
+                <tr>
+                    <th>Icon</th>
+                    <th>Filename</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+    <script language="JavaScript">
+        $(document).ready(function () {
+            var mediaTable = $('#mediaTable').DataTable({
+                ordering: false,
+                processing: true,
+                serverSide: true,
+                drag: true,
+                select: true,
+                ajax: {
+                    url: "{{ url('post_table_data') }}",
+                    type: 'GET',
+                    'data': function (params) {
+                        params.parent = $("#selectedContentFolderId").val();
+                        return params;
+                    }
+                },
+                columns: [
+                    {data: "thumbnail"},
+                    {data: "title"},
+                    {data: "createdDate"},
+                    {
+                        data: null,
+                        className: "center",
+                        render: function ( data, type, full, meta ){
+                            var ret = '<button type="button" class="btn btn-primary download"><i class="glyphicon glyphicon-download-alt"></i></button>';
+                            ret = ret + ' <button type="button" class="btn btn-danger remove"><i class="glyphicon glyphicon-remove"></i></a>';
+                            return ret;
+                        }
+                    }
+                ],
+                fnDrawCallback: function (oSettings) {
+                }
+            });
+
+            $('#jstree_div').jstree({
+                'core': {
+                    'data': {{ jsNodes|raw }},
+                    'check_callback': true
+                },
+                'plugins': ['contextmenu']
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block footer %}
+    <script src="{{ asset('bundles/bwcms/datatable/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/jstree/jstree.min.js') }}"></script>
+{% endblock %}

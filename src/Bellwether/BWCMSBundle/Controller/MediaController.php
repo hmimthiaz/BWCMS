@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
 /**
- * Account controller.
+ * Media controller.
  *
  * @Route("/admin/media")
  */
@@ -71,7 +71,7 @@ class MediaController extends BaseController
 
 
     /**
-     * @Route("/data.php",name="media_home_data")
+     * @Route("/data.php",name="media_table_data")
      * @Method({"GET"})
      */
     public function indexDataAction(Request $request)

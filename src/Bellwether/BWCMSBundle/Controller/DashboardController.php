@@ -12,7 +12,7 @@ use Bellwether\BWCMSBundle\Entity\Site;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
 /**
- * Account controller.
+ * Dashboard controller.
  *
  * @Route("/admin/dashboard")
  */
