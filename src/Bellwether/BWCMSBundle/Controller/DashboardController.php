@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Bellwether\BWCMSBundle\Entity\Site;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Symfony\Component\Form\Form;
 
 /**
  * Dashboard controller.
@@ -26,11 +27,12 @@ class DashboardController extends BaseController
     {
 
 
-        //$this->createForm(null)->add();
+        $class = $this->cm()->getContentClass('Page');
+        $form = $class->getForm();
 
 
-
-        return array(// ...
+        return array(
+            'form' => $form->createView()
         );
     }
 

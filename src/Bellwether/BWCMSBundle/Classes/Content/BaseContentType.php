@@ -4,6 +4,7 @@ namespace Bellwether\BWCMSBundle\Classes\Content;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Bellwether\BWCMSBundle\Classes\Content\Form\ContentEmptyForm;
 
 abstract class BaseContentType implements ContentTypeInterface
 {
@@ -35,12 +36,12 @@ abstract class BaseContentType implements ContentTypeInterface
 
     public function getType()
     {
-
+        return "Page";
     }
 
     public function getSchema()
     {
-
+        return "Default";
     }
 
     abstract protected function buildForm();
@@ -48,10 +49,11 @@ abstract class BaseContentType implements ContentTypeInterface
     /**
      * @return Form
      */
-    public function getForm()
+    final public function getForm()
     {
         if ($this->form == null) {
             $this->buildForm();
+            $this->setDefaultFormFields();
             $this->form = $this->fb()->getForm();
         }
         return $this->form;
@@ -60,12 +62,24 @@ abstract class BaseContentType implements ContentTypeInterface
     /**
      * @return FormBuilder
      */
-    public function fb()
+    final public function fb()
     {
         if ($this->formBuilder == null) {
-            $this->formBuilder = $this->container->get('form.factory')->createBuilder(array());
+            $contentEmptyForm = new ContentEmptyForm();
+            $this->formBuilder = $this->container->get('form.factory')->createBuilder($contentEmptyForm);
         }
         return $this->formBuilder;
+    }
+
+    private function setDefaultFormFields()
+    {
+        $this->fb()->add('type', 'hidden', array(
+            'data' => $this->getType(),
+        ));
+
+        $this->fb()->add('schema', 'hidden', array(
+            'data' => $this->getSchema(),
+        ));
     }
 
     /**

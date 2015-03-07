@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class DefaultPageForm extends AbstractType
+class ContentEmptyForm extends AbstractType
 {
     function __construct()
     {
@@ -19,10 +19,7 @@ class DefaultPageForm extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('title')
-            ->add('summary')
-            ->add('content');
+
     }
 
     /**
@@ -38,6 +35,6 @@ class DefaultPageForm extends AbstractType
      */
     public function getName()
     {
-        return 'Content_Page_Default';
+        return 'BWCMSBundle_Empty_Content';
     }
 }

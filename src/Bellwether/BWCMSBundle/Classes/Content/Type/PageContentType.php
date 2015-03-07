@@ -6,6 +6,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Bellwether\BWCMSBundle\Classes\Content\BaseContentType;
+
 
 class PageContentType Extends BaseContentType
 {

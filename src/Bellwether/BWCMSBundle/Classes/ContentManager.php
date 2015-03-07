@@ -59,6 +59,19 @@ class ContentManager extends BaseService
     }
 
     /**
+     * @param $contentType
+     * @return ContentTypeInterface
+     */
+    public function getContentClass($contentType)
+    {
+        if (!isset($this->contentType[$contentType])) {
+            throw new \InvalidArgumentException("ContentType: `{$contentType}` does not exists.");
+        }
+        return $this->contentType[$contentType];
+    }
+
+
+    /**
      * @param ContentEntity $content
      * @return ContentEntity|void
      */
