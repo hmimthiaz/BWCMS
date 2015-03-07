@@ -39,13 +39,13 @@ class ContentManager extends BaseService
     private function addDefaultContentTypes()
     {
 
-        $defaultFolderContentType = new FolderContentType();
+        $defaultFolderContentType = new FolderContentType($this->container, $this->requestStack);
         $this->registerContentType($defaultFolderContentType);
 
-        $defaultMediaContentType = new MediaContentType();
+        $defaultMediaContentType = new MediaContentType($this->container, $this->requestStack);
         $this->registerContentType($defaultMediaContentType);
 
-        $defaultPageContentType = new PageContentType();
+        $defaultPageContentType = new PageContentType($this->container, $this->requestStack);
         $this->registerContentType($defaultPageContentType);
 
     }
