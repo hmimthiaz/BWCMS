@@ -2,9 +2,21 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Content;
 
-class BaseContentType implements ContentTypeInterface
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
+
+abstract class BaseContentType implements ContentTypeInterface
 {
 
+
+    /**
+     * @var FormBuilder
+     */
+    private $formBuilder = null;
+
+    /**
+     * @var Form
+     */
     private $form = null;
 
     /**
@@ -31,13 +43,27 @@ class BaseContentType implements ContentTypeInterface
 
     }
 
+    /**
+     * @return Form
+     */
     public function getForm()
     {
         if ($this->form == null) {
-            $this->form = new ContentEntityForm();
-        }
 
-        // $this->container->get('form.factory')->create($type, $data, $options);
+
+        }
+        return $this->form;
+    }
+
+    /**
+     * @return FormBuilder
+     */
+    public function fb()
+    {
+        if ($this->formBuilder == null) {
+            $this->formBuilder = $this->container->get('form.factory')->createBuilder(array());
+        }
+        return $this->formBuilder;
     }
 
     /**

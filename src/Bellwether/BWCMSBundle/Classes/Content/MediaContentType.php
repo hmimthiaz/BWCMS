@@ -2,6 +2,12 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Content;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
+
+
 class MediaContentType Extends BaseContentType
 {
 
