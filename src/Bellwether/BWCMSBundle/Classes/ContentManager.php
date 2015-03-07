@@ -55,19 +55,21 @@ class ContentManager extends BaseService
      */
     public function registerContentType(ContentTypeInterface $classInstance)
     {
-        $this->contentType[$classInstance->getType()] = $classInstance;
+        $slug = $classInstance->getType() . '.' . $classInstance->getSchema();
+        $this->contentType[$slug] = $classInstance;
     }
 
     /**
      * @param $contentType
      * @return ContentTypeInterface
      */
-    public function getContentClass($contentType)
+    public function getContentClass($type, $schema = 'Default')
     {
-        if (!isset($this->contentType[$contentType])) {
-            throw new \InvalidArgumentException("ContentType: `{$contentType}` does not exists.");
+        $slug = $type . '.' . $schema;
+        if (!isset($this->contentType[$slug])) {
+            throw new \InvalidArgumentException("ContentType: `{$slug}` does not exists.");
         }
-        return $this->contentType[$contentType];
+        return $this->contentType[$slug];
     }
 
 
