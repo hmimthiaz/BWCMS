@@ -14,6 +14,9 @@ class HomeController extends BaseController
      */
     public function indexAction()
     {
+
+        $this->createForm()
+
         return array(// ...
         );
     }

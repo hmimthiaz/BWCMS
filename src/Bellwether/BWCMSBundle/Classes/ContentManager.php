@@ -6,6 +6,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
+use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
+use Bellwether\BWCMSBundle\Classes\Content\FolderContentType;
+use Bellwether\BWCMSBundle\Classes\Content\MediaContentType;
+use Bellwether\BWCMSBundle\Classes\Content\PageContentType;
+
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 
@@ -13,12 +18,14 @@ use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 class ContentManager extends BaseService
 {
 
+    private $contentType = array();
     private $contentTypeIcons = null;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
+        $this->addDefaultContentTypes();
     }
 
     /**
@@ -27,6 +34,28 @@ class ContentManager extends BaseService
     public function getManager()
     {
         return $this;
+    }
+
+    private function addDefaultContentTypes()
+    {
+
+        $defaultFolderContentType = new FolderContentType();
+        $this->registerContentType($defaultFolderContentType);
+
+        $defaultMediaContentType = new MediaContentType();
+        $this->registerContentType($defaultMediaContentType);
+
+        $defaultPageContentType = new PageContentType();
+        $this->registerContentType($defaultPageContentType);
+
+    }
+
+    /**
+     * @param ContentTypeInterface $classInstance
+     */
+    public function registerContentType(ContentTypeInterface $classInstance)
+    {
+        $this->contentType[$classInstance->getType()] = $classInstance;
     }
 
     /**
