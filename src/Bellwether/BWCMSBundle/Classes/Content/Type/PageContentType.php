@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes\Content;
+namespace Bellwether\BWCMSBundle\Classes\Content\Type;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -14,6 +14,13 @@ class PageContentType Extends BaseContentType
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
+    }
+
+    public function buildForm()
+    {
+        $this->fb()->add('title');
+        $this->fb()->add('summary');
+        $this->fb()->add('content');
     }
 
     public function getType()

@@ -7,9 +7,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
-use Bellwether\BWCMSBundle\Classes\Content\FolderContentType;
-use Bellwether\BWCMSBundle\Classes\Content\MediaContentType;
-use Bellwether\BWCMSBundle\Classes\Content\PageContentType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\FolderContentType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\MediaContentType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\PageContentType;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;

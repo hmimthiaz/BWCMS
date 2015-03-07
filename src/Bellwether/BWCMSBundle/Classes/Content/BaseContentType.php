@@ -43,14 +43,16 @@ abstract class BaseContentType implements ContentTypeInterface
 
     }
 
+    abstract protected function buildForm();
+
     /**
      * @return Form
      */
     public function getForm()
     {
         if ($this->form == null) {
-
-
+            $this->buildForm();
+            $this->form = $this->fb()->getForm();
         }
         return $this->form;
     }
