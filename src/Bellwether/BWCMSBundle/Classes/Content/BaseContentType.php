@@ -78,6 +78,9 @@ abstract class BaseContentType implements ContentTypeInterface
 
     final public function getFields()
     {
+        if (!isset($this->fields['id'])) {
+            $this->addField('id', ContentFieldType::String);
+        }
         if (!isset($this->fields['type'])) {
             $this->addField('type', ContentFieldType::String);
         }
@@ -101,6 +104,10 @@ abstract class BaseContentType implements ContentTypeInterface
 
     private function setDefaultFormFields()
     {
+        $this->fb()->add('id', 'hidden', array(
+            'data' => '',
+        ));
+
         $this->fb()->add('type', 'hidden', array(
             'data' => $this->getType(),
         ));
