@@ -5,6 +5,9 @@ namespace Bellwether\BWCMSBundle\Classes\Content;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Content\Form\ContentEmptyForm;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Bellwether\BWCMSBundle\Classes\Content\ContentFieldType;
+
 
 abstract class BaseContentType implements ContentTypeInterface
 {
@@ -34,6 +37,8 @@ abstract class BaseContentType implements ContentTypeInterface
      */
     protected $requestStack;
 
+    private $fields = array();
+
     public function getType()
     {
         return "Page";
@@ -43,6 +48,16 @@ abstract class BaseContentType implements ContentTypeInterface
     {
         return "Default";
     }
+
+    final public function addField($fieldName, ContentFieldType $type)
+    {
+        $this->fields[$fieldName] = array(
+            'name' => $fieldName,
+            'type' => $type
+        );
+    }
+
+    abstract protected function buildFields();
 
     abstract protected function buildForm();
 
@@ -54,6 +69,8 @@ abstract class BaseContentType implements ContentTypeInterface
         if ($this->form == null) {
             $this->buildForm();
             $this->setDefaultFormFields();
+            $this->fb()->setAction($this->generateUrl('post_save'));
+            $this->fb()->setMethod('POST');
             $this->form = $this->fb()->getForm();
         }
         return $this->form;
@@ -80,6 +97,25 @@ abstract class BaseContentType implements ContentTypeInterface
         $this->fb()->add('schema', 'hidden', array(
             'data' => $this->getSchema(),
         ));
+        $this->fb()->add('save', 'submit', array(
+            'attr' => array('class' => 'save'),
+        ));
+    }
+
+    /**
+     * Generates a URL from the given parameters.
+     *
+     * @param string $route The name of the route
+     * @param mixed $parameters An array of parameters
+     * @param bool|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     *
+     * @return string The generated URL
+     *
+     * @see UrlGeneratorInterface
+     */
+    public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
 
     /**

@@ -68,6 +68,45 @@ class PageController extends BaseController
 
 
     /**
+     * @Route("/create.php",name="post_create")
+     * @Template("BWCMSBundle:Page:save.html.twig")
+     */
+    public function createAction(Request $request)
+    {
+
+        $class = $this->cm()->getContentClass('Page');
+        $form = $class->getForm();
+
+
+        return array(
+            'form' => $form->createView()
+        );
+    }
+
+
+    /**
+     * @Route("/save.php",name="post_save")
+     * @Template("BWCMSBundle:Page:save.html.twig")
+     */
+    public function saveAction(Request $request)
+    {
+
+        $class = $this->cm()->getContentClass('Page');
+        $form = $class->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $this->dump($form->getData());
+        }
+
+        return array(
+            'form' => $form->createView()
+        );
+    }
+
+
+    /**
      * @Route("/data.php",name="post_table_data")
      * @Method({"GET"})
      */
@@ -122,7 +161,7 @@ class PageController extends BaseController
                 $ca['name'] = $content->getName();
                 $ca['type'] = $content->getType();
                 $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');;
-                $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content->getType(),32,32);
+                $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content->getType(), 32, 32);
                 $ca['thumbnail'] = '<img src="' . $ca['thumbnail'] . '"/>';
                 $data['data'][] = $ca;
             }

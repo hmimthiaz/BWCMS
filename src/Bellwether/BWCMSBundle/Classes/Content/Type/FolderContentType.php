@@ -18,6 +18,11 @@ class FolderContentType Extends BaseContentType
         $this->setRequestStack($request_stack);
     }
 
+    public function buildFields()
+    {
+
+    }
+
     public function buildForm()
     {
         $this->fb()->add('title');

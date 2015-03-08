@@ -17,6 +17,8 @@
             <div id="jstree_div"></div>
         </div>
         <div class="col-md-9 mediaPageRight">
+
+            <a href="{{ url('post_create', {'type':'Page','schema':'Default'}) }}">New</a>
             <input type="hidden" id="selectedContentFolderId" value="Root">
             <table id="mediaTable" class="table" border="0">
                 <thead>
@@ -54,7 +56,7 @@
                     {
                         data: null,
                         className: "center",
-                        render: function ( data, type, full, meta ){
+                        render: function (data, type, full, meta) {
                             var ret = '<button type="button" class="btn btn-primary download"><i class="glyphicon glyphicon-download-alt"></i></button>';
                             ret = ret + ' <button type="button" class="btn btn-danger remove"><i class="glyphicon glyphicon-remove"></i></a>';
                             return ret;

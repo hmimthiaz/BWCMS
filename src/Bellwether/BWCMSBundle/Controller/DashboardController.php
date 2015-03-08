@@ -26,14 +26,9 @@ class DashboardController extends BaseController
     public function indexAction()
     {
 
-
-        $class = $this->cm()->getContentClass('Page');
-        $form = $class->getForm();
-
-
         return array(
-            'form' => $form->createView()
         );
+
     }
 
 
