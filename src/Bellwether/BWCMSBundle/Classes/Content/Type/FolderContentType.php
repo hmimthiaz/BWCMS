@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Content\BaseContentType;
+use Bellwether\BWCMSBundle\Classes\Content\ContentFieldType;
 
 
 class FolderContentType Extends BaseContentType
@@ -20,8 +21,11 @@ class FolderContentType Extends BaseContentType
 
     public function buildFields()
     {
-
+        $this->addField('title', ContentFieldType::String);
+        $this->addField('summary', ContentFieldType::String);
+        $this->addField('content', ContentFieldType::String);
     }
+
 
     public function buildForm()
     {

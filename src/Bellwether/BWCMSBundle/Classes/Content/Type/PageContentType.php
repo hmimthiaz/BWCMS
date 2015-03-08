@@ -2,7 +2,6 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Content\Type;
 
-use Bellwether\BWCMSBundle\Classes\Content\ContentFieldType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\Form;

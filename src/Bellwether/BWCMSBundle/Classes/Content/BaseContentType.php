@@ -76,6 +76,17 @@ abstract class BaseContentType implements ContentTypeInterface
         return $this->form;
     }
 
+    final public function getFields()
+    {
+        if (!isset($this->fields['type'])) {
+            $this->addField('type', ContentFieldType::String);
+        }
+        if (!isset($this->fields['schema'])) {
+            $this->addField('schema', ContentFieldType::String);
+        }
+        return $this->fields;
+    }
+
     /**
      * @return FormBuilder
      */
