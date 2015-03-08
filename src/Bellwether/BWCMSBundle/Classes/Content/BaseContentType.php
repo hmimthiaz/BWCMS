@@ -73,7 +73,7 @@ abstract class BaseContentType implements ContentTypeInterface
         if ($this->form == null) {
             $this->buildForm();
             $this->setDefaultFormFields();
-            $this->fb()->setAction($this->generateUrl('post_save'));
+            $this->fb()->setAction($this->generateUrl('content_save'));
             $this->fb()->setMethod('POST');
             $this->form = $this->fb()->getForm();
         }

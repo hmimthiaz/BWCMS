@@ -11,6 +11,7 @@
 {% endblock %}
 
 {% block body %}
+    {{ dump(contentTypes) }}
 
     <div class="row">
         <div class="col-md-3 mediaPageLeft">
@@ -34,6 +35,7 @@
     </div>
 
     <script language="JavaScript">
+        var createURL = '{{ url('content_create') }}';
         $(document).ready(function () {
             var contentTable = $('#contentTable').DataTable({
                 ordering: false,
@@ -77,6 +79,30 @@
                 'core': {
                     'data': {{ jsNodes|raw }},
                     'check_callback': true
+                },
+                'contextmenu': {
+                    'items': function (node, treeObj) {
+                        return {
+                            "Create": {
+                                "separator_before": false,
+                                "separator_after": false,
+                                "label": "Create",
+                                "icon": "glyphicon glyphicon-file",
+                                "submenu": {
+                                    {% for typeKey,type in contentTypes %}
+                                    "{{ typeKey }}": {
+                                        "label": "{{ type.name }}",
+                                        "icon": "glyphicon glyphicon-plus",
+                                        "action": function () {
+                                            window.location = createURL + '?type=' + '{{ type.type }}' + '&schema=' + '{{ type.schema }}';
+                                            return false;
+                                        }
+                                    },
+                                    {% endfor %}
+                                }
+                            }
+                        }
+                    }
                 },
                 'plugins': ['contextmenu']
             });

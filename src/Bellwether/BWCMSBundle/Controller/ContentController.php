@@ -62,6 +62,7 @@ class ContentController extends BaseController
         }
 
         return array(
+            'contentTypes' => $this->cm()->getRegisteredContent(),
             'jsNodes' => json_encode($jsNodes),
         );
     }
@@ -69,12 +70,15 @@ class ContentController extends BaseController
 
     /**
      * @Route("/create.php",name="content_create")
-     * @Template("BWCMSBundle:Page:save.html.twig")
+     * @Template("BWCMSBundle:Content:save.html.twig")
      */
     public function createAction(Request $request)
     {
 
-        $class = $this->cm()->getContentClass('Page');
+        $type = $request->get('type', 'Page');
+        $schema = $request->get('schema', 'Default');
+
+        $class = $this->cm()->getContentClass($type, $schema);
         $form = $class->getForm();
 
 
@@ -85,7 +89,7 @@ class ContentController extends BaseController
 
     /**
      * @Route("/edit.php",name="content_edit")
-     * @Template("BWCMSBundle:Page:save.html.twig")
+     * @Template("BWCMSBundle:Content:save.html.twig")
      */
     public function editAction(Request $request)
     {
@@ -94,10 +98,14 @@ class ContentController extends BaseController
             return $this->returnErrorResponse();
         }
 
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         */
         $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
         $content = $contentRepository->find($contentId);
 
-        $class = $this->cm()->getContentClass('Page');
+        $class = $this->cm()->getContentClass($content->getType(), $content->getSchema());
         $form = $class->getForm();
 
         $form = $this->cm()->loadFormData($content, $form, $class->getFields());
@@ -111,7 +119,7 @@ class ContentController extends BaseController
 
     /**
      * @Route("/save.php",name="content_save")
-     * @Template("BWCMSBundle:Page:save.html.twig")
+     * @Template("BWCMSBundle:Content:save.html.twig")
      */
     public function saveAction(Request $request)
     {
@@ -121,10 +129,10 @@ class ContentController extends BaseController
         if ($form->isValid()) {
 
             $contentId = $form->get('id')->getData();
-            if(empty($contentId)){
+            if (empty($contentId)) {
                 $contentEntity = new ContentEntity();
                 $contentEntity->setSite($this->getSite());
-            }else{
+            } else {
                 $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
                 $contentEntity = $contentRepository->find($contentId);
             }
@@ -133,7 +141,7 @@ class ContentController extends BaseController
 
             $this->cm()->save($contentEntity);
 
-            return $this->redirect($this->generateUrl('page_home'));
+            return $this->redirect($this->generateUrl('content_home'));
         }
 
         return array(
