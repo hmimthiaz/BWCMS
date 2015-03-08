@@ -48,6 +48,11 @@ abstract class BaseContentType implements ContentTypeInterface
         return "Default";
     }
 
+    public function getName()
+    {
+        return "Page";
+    }
+
     final public function addField($fieldName, $type)
     {
         $this->fields[$fieldName] = array(

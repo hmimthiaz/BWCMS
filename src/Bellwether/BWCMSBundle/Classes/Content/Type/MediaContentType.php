@@ -44,4 +44,9 @@ class MediaContentType Extends BaseContentType
         return "Default";
     }
 
+    public function getName()
+    {
+        return "Media";
+    }
+
 }

@@ -44,4 +44,9 @@ class FolderContentType Extends BaseContentType
         return "Default";
     }
 
+    public function getName()
+    {
+        return "Folder";
+    }
+
 }

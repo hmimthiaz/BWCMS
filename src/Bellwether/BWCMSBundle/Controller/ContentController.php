@@ -13,12 +13,12 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 /**
  * Page controller.
  *
- * @Route("/admin/page")
+ * @Route("/admin/content")
  */
-class PageController extends BaseController
+class ContentController extends BaseController
 {
     /**
-     * @Route("/",name="page_home")
+     * @Route("/",name="content_home")
      * @Template()
      */
     public function indexAction()
@@ -68,7 +68,7 @@ class PageController extends BaseController
 
 
     /**
-     * @Route("/create.php",name="post_create")
+     * @Route("/create.php",name="content_create")
      * @Template("BWCMSBundle:Page:save.html.twig")
      */
     public function createAction(Request $request)
@@ -84,7 +84,7 @@ class PageController extends BaseController
     }
 
     /**
-     * @Route("/edit.php",name="post_edit")
+     * @Route("/edit.php",name="content_edit")
      * @Template("BWCMSBundle:Page:save.html.twig")
      */
     public function editAction(Request $request)
@@ -110,7 +110,7 @@ class PageController extends BaseController
 
 
     /**
-     * @Route("/save.php",name="post_save")
+     * @Route("/save.php",name="content_save")
      * @Template("BWCMSBundle:Page:save.html.twig")
      */
     public function saveAction(Request $request)
@@ -143,7 +143,7 @@ class PageController extends BaseController
 
 
     /**
-     * @Route("/data.php",name="post_table_data")
+     * @Route("/data.php",name="content_table_data")
      * @Method({"GET"})
      */
     public function indexDataAction(Request $request)

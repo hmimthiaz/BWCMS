@@ -62,7 +62,27 @@ class ContentManager extends BaseService
     }
 
     /**
-     * @param $contentType
+     * @return array
+     */
+    public function getRegisteredContent()
+    {
+        $retVal = array();
+        /**
+         * @var ContentTypeInterface $class
+         */
+        foreach ($this->contentType as $key => $class) {
+            $retVal[$key] = array(
+                'name' => $class->getName(),
+                'type' => $class->getType(),
+                'schema' => $class->getSchema()
+            );
+        }
+        return $retVal;
+    }
+
+    /**
+     * @param string $type
+     * @param string $schema
      * @return ContentTypeInterface
      */
     public function getContentClass($type, $schema = 'Default')

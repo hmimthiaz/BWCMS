@@ -63,4 +63,9 @@ class PageContentType Extends BaseContentType
         return "Default";
     }
 
+    public function getName()
+    {
+        return "Page";
+    }
+
 }

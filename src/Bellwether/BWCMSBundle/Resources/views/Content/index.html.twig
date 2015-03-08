@@ -1,8 +1,8 @@
 {% extends "BWCMSBundle:Common:default.html.twig" %}
 
-{% block title %}Page Manager{% endblock %}
+{% block title %}Content Manager{% endblock %}
 {% block pageTitle %}
-    <h1>Page Manager</h1>
+    <h1>Content Manager</h1>
 {% endblock %}
 
 {% block header %}
@@ -18,7 +18,7 @@
         </div>
         <div class="col-md-9 mediaPageRight">
 
-            <a href="{{ url('post_create', {'type':'Page','schema':'Default'}) }}">New</a>
+            <a href="{{ url('content_create', {'type':'Page','schema':'Default'}) }}">New</a>
             <input type="hidden" id="selectedContentFolderId" value="Root">
             <table id="contentTable" class="table" border="0">
                 <thead>
@@ -42,7 +42,7 @@
                 drag: true,
                 select: true,
                 ajax: {
-                    url: "{{ url('post_table_data') }}",
+                    url: "{{ url('content_table_data') }}",
                     type: 'GET',
                     'data': function (params) {
                         params.parent = $("#selectedContentFolderId").val();
@@ -65,7 +65,7 @@
                 ],
                 fnDrawCallback: function (oSettings) {
                     $('#contentTable button.edit').click(function (e) {
-                        var editURL = '{{ url('post_edit') }}';
+                        var editURL = '{{ url('content_edit') }}';
                         var contentId = $(this).parents('tr').attr('id');
                         window.location = editURL + '?contentId=' + contentId;
                         e.preventDefault();

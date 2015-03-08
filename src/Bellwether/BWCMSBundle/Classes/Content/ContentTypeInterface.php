@@ -27,4 +27,9 @@ interface ContentTypeInterface
      * @return Array
      */
     public function getFields();
+
+    /**
+     * @return string
+     */
+    public function getName();
 }
