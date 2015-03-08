@@ -70,14 +70,23 @@ class BaseController extends Controller
      * @param Array $jsonArray
      * @return Response
      */
-    public function returnJsonReponse(Request $request,$jsonArray){
+    public function returnJsonReponse(Request $request, $jsonArray)
+    {
         $serializer = $this->container->get('serializer');
         $serializedReturn = $serializer->serialize($jsonArray, 'json');
-        if($request->query->has('callback')){
+        if ($request->query->has('callback')) {
             $callback = $request->query->get('callback');
             $serializedReturn = $callback . '(' . $serializedReturn . ')';
         }
         return new Response($serializedReturn, 200, array('Content-Type' => 'application/json'));
+    }
+
+    public function returnErrorResponse($message = 'Unknown error occurred.')
+    {
+        $response = new Response();
+        $response->setStatusCode(500);
+        $response->setContent($message);
+        return $response;
     }
 
     public function dump($var, $maxDepth = 2, $stripTags = true)

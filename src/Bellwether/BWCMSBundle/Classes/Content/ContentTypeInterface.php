@@ -22,4 +22,9 @@ interface ContentTypeInterface
      * @return Form
      */
     public function getForm();
+
+    /**
+     * @return Array
+     */
+    public function getFields();
 }

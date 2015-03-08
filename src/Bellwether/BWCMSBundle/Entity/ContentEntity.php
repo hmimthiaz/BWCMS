@@ -94,7 +94,7 @@ class ContentEntity
     private $type = 'Folder';
 
     /**
-     * @ORM\Column(type="string", length=100, nullable=false)
+     * @ORM\Column(name="schemaType",type="string", length=100, nullable=false)
      */
     private $schema = "Default";
 

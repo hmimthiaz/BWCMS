@@ -83,6 +83,31 @@ class PageController extends BaseController
         );
     }
 
+    /**
+     * @Route("/edit.php",name="post_edit")
+     * @Template("BWCMSBundle:Page:save.html.twig")
+     */
+    public function editAction(Request $request)
+    {
+        $contentId = $request->get('contentId');
+        if ($contentId == null) {
+            return $this->returnErrorResponse();
+        }
+
+        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+        $content = $contentRepository->find($contentId);
+
+        $class = $this->cm()->getContentClass('Page');
+        $form = $class->getForm();
+
+        $form = $this->cm()->loadFormData($content, $form, $class->getFields());
+
+
+        return array(
+            'form' => $form->createView()
+        );
+    }
+
 
     /**
      * @Route("/save.php",name="post_save")
@@ -90,14 +115,25 @@ class PageController extends BaseController
      */
     public function saveAction(Request $request)
     {
-
         $class = $this->cm()->getContentClass('Page');
         $form = $class->getForm();
-
         $form->handleRequest($request);
-
         if ($form->isValid()) {
-            $this->dump($form->getData());
+
+            $contentId = $form->get('id')->getData();
+            if(empty($contentId)){
+                $contentEntity = new ContentEntity();
+                $contentEntity->setSite($this->getSite());
+            }else{
+                $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+                $contentEntity = $contentRepository->find($contentId);
+            }
+
+            $contentEntity = $this->cm()->prepareEntity($contentEntity, $form->getData(), $class->getFields());
+
+            $this->cm()->save($contentEntity);
+
+            return $this->redirect($this->generateUrl('page_home'));
         }
 
         return array(

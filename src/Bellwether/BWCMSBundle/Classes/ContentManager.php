@@ -13,6 +13,8 @@ use Bellwether\BWCMSBundle\Classes\Content\Type\PageContentType;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 
 
 class ContentManager extends BaseService
@@ -70,6 +72,70 @@ class ContentManager extends BaseService
             throw new \InvalidArgumentException("ContentType: `{$slug}` does not exists.");
         }
         return $this->contentType[$slug];
+    }
+
+    /**
+     * @param ContentEntity $content
+     * @param Form $form
+     * @param array $fields
+     * @return Form|void
+     */
+    public function loadFormData(ContentEntity $content = null, Form $form = null, $fields = array())
+    {
+        if (null === $content) {
+            return;
+        }
+        if (null === $form) {
+            return;
+        }
+        if (empty($fields)) {
+            return;
+        }
+
+        $form->get('id')->setData($content->getId());
+        $form->get('type')->setData($content->getType());
+        $form->get('schema')->setData($content->getSchema());
+        $form->get('title')->setData($content->getTitle());
+        $form->get('summary')->setData($content->getSummary());
+        $form->get('content')->setData($content->getContent());
+
+        return $form;
+    }
+
+
+    public function prepareEntity(ContentEntity $content = null, $data = array(), $fields = array())
+    {
+        if (null === $content) {
+            return;
+        }
+        if (empty($data)) {
+            return;
+        }
+        if (empty($fields)) {
+            return;
+        }
+
+        foreach ($fields as $fieldName => $fieldInfo) {
+            if (!isset($data[$fieldName]) || empty($data[$fieldName])) {
+                continue;
+            }
+            if ($fieldName == 'type') {
+                $content->setType($data['type']);
+            }
+            if ($fieldName == 'schema') {
+                $content->setSchema($data['schema']);
+            }
+            if ($fieldName == 'title') {
+                $content->setTitle($data['title']);
+            }
+            if ($fieldName == 'summary') {
+                $content->setSummary($data['summary']);
+            }
+            if ($fieldName == 'content') {
+                $content->setContent($data['content']);
+            }
+        }
+        return $content;
     }
 
 

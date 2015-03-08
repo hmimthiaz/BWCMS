@@ -20,7 +20,7 @@
 
             <a href="{{ url('post_create', {'type':'Page','schema':'Default'}) }}">New</a>
             <input type="hidden" id="selectedContentFolderId" value="Root">
-            <table id="mediaTable" class="table" border="0">
+            <table id="contentTable" class="table" border="0">
                 <thead>
                 <tr>
                     <th width="32">Icon</th>
@@ -35,7 +35,7 @@
 
     <script language="JavaScript">
         $(document).ready(function () {
-            var mediaTable = $('#mediaTable').DataTable({
+            var contentTable = $('#contentTable').DataTable({
                 ordering: false,
                 processing: true,
                 serverSide: true,
@@ -57,17 +57,22 @@
                         data: null,
                         className: "center",
                         render: function (data, type, full, meta) {
-                            var ret = '<button type="button" class="btn btn-primary download"><i class="glyphicon glyphicon-download-alt"></i></button>';
+                            var ret = '<button type="button" class="btn btn-primary edit"><i class="glyphicon glyphicon-pencil"></i></button>';
                             ret = ret + ' <button type="button" class="btn btn-danger remove"><i class="glyphicon glyphicon-remove"></i></a>';
                             return ret;
                         }
                     }
                 ],
                 fnDrawCallback: function (oSettings) {
-
+                    $('#contentTable button.edit').click(function (e) {
+                        var editURL = '{{ url('post_edit') }}';
+                        var contentId = $(this).parents('tr').attr('id');
+                        window.location = editURL + '?contentId=' + contentId;
+                        e.preventDefault();
+                        return false;
+                    });
                 }
             });
-
             $('#jstree_div').jstree({
                 'core': {
                     'data': {{ jsNodes|raw }},
@@ -77,7 +82,7 @@
             });
             $('#jstree_div').on('select_node.jstree', function (node, selected, event) {
                 $("#selectedContentFolderId").val(selected.node.id);
-                mediaTable.ajax.reload();
+                contentTable.ajax.reload();
             });
         });
     </script>

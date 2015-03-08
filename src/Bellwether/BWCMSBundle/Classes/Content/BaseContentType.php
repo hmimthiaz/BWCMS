@@ -6,7 +6,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Content\Form\ContentEmptyForm;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Bellwether\BWCMSBundle\Classes\Content\ContentFieldType;
 
 
 abstract class BaseContentType implements ContentTypeInterface
@@ -49,7 +48,7 @@ abstract class BaseContentType implements ContentTypeInterface
         return "Default";
     }
 
-    final public function addField($fieldName, ContentFieldType $type)
+    final public function addField($fieldName, $type)
     {
         $this->fields[$fieldName] = array(
             'name' => $fieldName,
@@ -87,6 +86,7 @@ abstract class BaseContentType implements ContentTypeInterface
         if (!isset($this->fields['schema'])) {
             $this->addField('schema', ContentFieldType::String);
         }
+        $this->buildFields();
         return $this->fields;
     }
 
@@ -104,9 +104,7 @@ abstract class BaseContentType implements ContentTypeInterface
 
     private function setDefaultFormFields()
     {
-        $this->fb()->add('id', 'hidden', array(
-            'data' => '',
-        ));
+        $this->fb()->add('id', 'hidden');
 
         $this->fb()->add('type', 'hidden', array(
             'data' => $this->getType(),
