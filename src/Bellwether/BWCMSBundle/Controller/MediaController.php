@@ -228,6 +228,7 @@ class MediaController extends BaseController
             $content->setMime($mediaInfo['mimeType']);
             $content->setFile($mediaInfo['filename']);
             $content->setSize($mediaInfo['size']);
+            $content->setStatus('Publish');
             $content->setExtension($mediaInfo['extension']);
             $this->cm()->save($content);
         }
