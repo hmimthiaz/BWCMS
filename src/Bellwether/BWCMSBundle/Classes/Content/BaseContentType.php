@@ -3,6 +3,9 @@
 namespace Bellwether\BWCMSBundle\Classes\Content;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Content\Form\ContentEmptyForm;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -36,6 +39,8 @@ abstract class BaseContentType implements ContentTypeInterface
      */
     protected $requestStack;
 
+    private $parentId = '';
+
     private $fields = array();
 
     public function getType()
@@ -51,6 +56,11 @@ abstract class BaseContentType implements ContentTypeInterface
     public function getName()
     {
         return "Page";
+    }
+
+    public function setParent($contentId = null)
+    {
+        $this->parentId = $contentId;
     }
 
     final public function addField($fieldName, $type)
@@ -72,6 +82,7 @@ abstract class BaseContentType implements ContentTypeInterface
     {
         if ($this->form == null) {
             $this->buildForm();
+            $this->fb()->setAttribute('novalidate', 'novalidate');
             $this->setDefaultFormFields();
             $this->fb()->setAction($this->generateUrl('content_save'));
             $this->fb()->setMethod('POST');
@@ -91,6 +102,9 @@ abstract class BaseContentType implements ContentTypeInterface
         if (!isset($this->fields['schema'])) {
             $this->addField('schema', ContentFieldType::String);
         }
+        if (!isset($this->fields['parent'])) {
+            $this->addField('parent', ContentFieldType::String);
+        }
         $this->buildFields();
         return $this->fields;
     }
@@ -103,13 +117,27 @@ abstract class BaseContentType implements ContentTypeInterface
         if ($this->formBuilder == null) {
             $contentEmptyForm = new ContentEmptyForm();
             $this->formBuilder = $this->container->get('form.factory')->createBuilder($contentEmptyForm);
+            $this->formBuilder->addEventListener(FormEvents::POST_SUBMIT, array(&$this, 'formEventPost'));
         }
         return $this->formBuilder;
+    }
+
+    public function formEventPost(FormEvent $event)
+    {
+        $form = $event->getForm();
+        $data = $event->getData();
+
+        $form->get('title')->addError(new FormError('Empty Title'));
+
     }
 
     private function setDefaultFormFields()
     {
         $this->fb()->add('id', 'hidden');
+
+        $this->fb()->add('parent', 'hidden', array(
+            'data' => $this->parentId,
+        ));
 
         $this->fb()->add('type', 'hidden', array(
             'data' => $this->getType(),

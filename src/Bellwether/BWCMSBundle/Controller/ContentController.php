@@ -77,8 +77,12 @@ class ContentController extends BaseController
 
         $type = $request->get('type', 'Page');
         $schema = $request->get('schema', 'Default');
+        $parent = $request->get('parent', 'Root');
 
         $class = $this->cm()->getContentClass($type, $schema);
+        if ($parent != 'Root') {
+            $class->setParent($parent);
+        }
         $form = $class->getForm();
 
 
@@ -106,11 +110,12 @@ class ContentController extends BaseController
         $content = $contentRepository->find($contentId);
 
         $class = $this->cm()->getContentClass($content->getType(), $content->getSchema());
+        if ($content->getTreeParent() != null) {
+            $class->setParent($content->getTreeParent()->getId());
+        }
         $form = $class->getForm();
 
         $form = $this->cm()->loadFormData($content, $form, $class->getFields());
-
-
         return array(
             'form' => $form->createView()
         );
@@ -139,9 +144,9 @@ class ContentController extends BaseController
 
             $contentEntity = $this->cm()->prepareEntity($contentEntity, $form->getData(), $class->getFields());
 
-            $this->cm()->save($contentEntity);
-
-            return $this->redirect($this->generateUrl('content_home'));
+//            $this->cm()->save($contentEntity);
+//
+//            return $this->redirect($this->generateUrl('content_home'));
         }
 
         return array(

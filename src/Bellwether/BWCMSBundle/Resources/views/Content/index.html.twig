@@ -11,8 +11,6 @@
 {% endblock %}
 
 {% block body %}
-    {{ dump(contentTypes) }}
-
     <div class="row">
         <div class="col-md-3 mediaPageLeft">
             <div id="jstree_div"></div>
@@ -94,7 +92,7 @@
                                         "label": "{{ type.name }}",
                                         "icon": "glyphicon glyphicon-plus",
                                         "action": function () {
-                                            window.location = createURL + '?type=' + '{{ type.type }}' + '&schema=' + '{{ type.schema }}';
+                                            window.location = createURL + '?parent=' + node.id  + '&type={{ type.type }}&schema={{ type.schema }}';
                                             return false;
                                         }
                                     },

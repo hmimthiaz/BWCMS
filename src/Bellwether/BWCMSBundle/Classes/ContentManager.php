@@ -135,9 +135,19 @@ class ContentManager extends BaseService
             return;
         }
 
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+         */
+        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+
+
         foreach ($fields as $fieldName => $fieldInfo) {
             if (!isset($data[$fieldName]) || empty($data[$fieldName])) {
                 continue;
+            }
+            if ($fieldName == 'parent') {
+                $parentContent = $contentRepository->find($data['parent']);
+                $content->setTreeParent($parentContent);
             }
             if ($fieldName == 'type') {
                 $content->setType($data['type']);

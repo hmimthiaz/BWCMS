@@ -32,4 +32,10 @@ interface ContentTypeInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * @param string $contentId
+     * @return mixed
+     */
+    public function setParent($contentId);
 }
