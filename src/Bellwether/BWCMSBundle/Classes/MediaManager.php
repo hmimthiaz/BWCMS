@@ -45,19 +45,14 @@ class MediaManager extends BaseService
         $this->fs = new Filesystem();
     }
 
-
     /**
+     * @param UploadedFile $uploadedFile
      * @return array
      */
-    public function handleUpload()
+    public function handleUpload(UploadedFile $uploadedFile)
     {
         $data = array();
-        /**
-         * @var \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile
-         */
-        $uploadedFile = $this->getRequest()->files->get('file');
         if (null !== $uploadedFile && $uploadedFile->isValid()) {
-            $this->dump($uploadedFile);
 
             $uploadFolder = $this->getUploadDir();
             if (!$this->fs->exists($uploadFolder)) {

@@ -28,9 +28,21 @@ class MediaContentType Extends BaseContentType
 
     public function buildForm()
     {
-        $this->fb()->add('title');
-        $this->fb()->add('summary');
-        $this->fb()->add('content');
+        $this->fb()->add('summary', 'textarea',
+            array(
+                'max_length' => 100,
+                'required' => false,
+                'label' => 'Summary'
+            )
+        );
+
+        $this->fb()->add('content', 'textarea',
+            array(
+                'max_length' => 100,
+                'required' => false,
+                'label' => 'Content'
+            )
+        );
     }
 
 

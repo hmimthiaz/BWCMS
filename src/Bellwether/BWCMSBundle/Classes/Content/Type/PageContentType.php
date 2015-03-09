@@ -28,14 +28,6 @@ class PageContentType Extends BaseContentType
 
     public function buildForm()
     {
-        $this->fb()->add('title', 'text',
-            array(
-                'max_length' => 100,
-                'required' => true,
-                'label' => 'Title'
-            )
-        );
-
         $this->fb()->add('summary', 'textarea',
             array(
                 'max_length' => 100,

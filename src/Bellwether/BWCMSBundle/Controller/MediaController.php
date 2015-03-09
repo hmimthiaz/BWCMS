@@ -204,7 +204,8 @@ class MediaController extends BaseController
     {
         $parentId = $request->get('parent', 'Root');
         try {
-            $mediaInfo = $this->mm()->handleUpload();
+            $uploadedFile = $request->files->get('file');
+            $mediaInfo = $this->mm()->handleUpload($uploadedFile);
         } catch (\Exception $e) {
             return new Response($e->getMessage(), 500);
         }

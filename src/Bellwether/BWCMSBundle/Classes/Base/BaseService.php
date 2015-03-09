@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\SecurityContext;
 use Bellwether\BWCMSBundle\Entity\UserEntity;
+use Bellwether\BWCMSBundle\Classes\SiteManager;
+use Bellwether\BWCMSBundle\Classes\ContentManager;
+use Bellwether\BWCMSBundle\Classes\MediaManager;
 
 
 class BaseService  extends ContainerAware
@@ -45,6 +48,30 @@ class BaseService  extends ContainerAware
     public function em()
     {
         return $this->container->get('doctrine')->getManager();
+    }
+
+    /**
+     * @return SiteManager
+     */
+    public function sm()
+    {
+        return $this->container->get('BWCMS.Site')->getManager();
+    }
+
+    /**
+     * @return ContentManager
+     */
+    public function cm()
+    {
+        return $this->container->get('BWCMS.Content')->getManager();
+    }
+
+    /**
+     * @return MediaManager
+     */
+    public function mm()
+    {
+        return $this->container->get('BWCMS.Media')->getManager();
     }
 
     /**

@@ -18,7 +18,7 @@
         <div class="col-md-9 mediaPageRight">
 
             <a href="{{ url('content_create', {'type':'Page','schema':'Default'}) }}">New</a>
-            <input type="hidden" id="selectedContentFolderId" value="Root">
+            <input type="hidden" id="selectedContentFolderId" value="{{ parentId }}">
             <table id="contentTable" class="table" border="0">
                 <thead>
                 <tr>

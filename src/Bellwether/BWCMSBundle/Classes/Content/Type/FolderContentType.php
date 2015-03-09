@@ -18,6 +18,7 @@ class FolderContentType Extends BaseContentType
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
+        $this->setIsUploadEnabled(true);
     }
 
     public function buildFields()
@@ -30,18 +31,6 @@ class FolderContentType Extends BaseContentType
 
     public function buildForm()
     {
-        $this->fb()->add('title', 'text',
-            array(
-                'max_length' => 100,
-                'required' => true,
-                'label' => 'Title',
-                'constraints' => array(
-                    new NotBlank(),
-                    new Length(array('min' => 3))
-                )
-            )
-        );
-
         $this->fb()->add('summary', 'textarea',
             array(
                 'max_length' => 100,

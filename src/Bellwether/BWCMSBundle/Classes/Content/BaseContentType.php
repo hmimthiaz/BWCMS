@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Content\Form\ContentEmptyForm;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 
 abstract class BaseContentType implements ContentTypeInterface
@@ -41,7 +42,12 @@ abstract class BaseContentType implements ContentTypeInterface
 
     private $parentId = '';
 
-    private $fields = array();
+    private $fields = null;
+
+    /**
+     * @var bool
+     */
+    private $isUploadEnabled = false;
 
     public function getType()
     {
@@ -81,9 +87,9 @@ abstract class BaseContentType implements ContentTypeInterface
     final public function getForm()
     {
         if ($this->form == null) {
-            $this->buildForm();
-            $this->fb()->setAttribute('novalidate', 'novalidate');
             $this->setDefaultFormFields();
+            $this->buildForm();
+            $this->setDefaultHiddenFormFields();
             $this->fb()->setAction($this->generateUrl('content_save'));
             $this->fb()->setMethod('POST');
             $this->form = $this->fb()->getForm();
@@ -93,19 +99,15 @@ abstract class BaseContentType implements ContentTypeInterface
 
     final public function getFields()
     {
-        if (!isset($this->fields['id'])) {
+        if ($this->fields == null) {
+            $this->fields = array();
             $this->addField('id', ContentFieldType::String);
-        }
-        if (!isset($this->fields['type'])) {
+            $this->addField('title', ContentFieldType::String);
             $this->addField('type', ContentFieldType::String);
-        }
-        if (!isset($this->fields['schema'])) {
             $this->addField('schema', ContentFieldType::String);
-        }
-        if (!isset($this->fields['parent'])) {
             $this->addField('parent', ContentFieldType::String);
+            $this->buildFields();
         }
-        $this->buildFields();
         return $this->fields;
     }
 
@@ -127,12 +129,48 @@ abstract class BaseContentType implements ContentTypeInterface
         $form = $event->getForm();
         $data = $event->getData();
 
-        $form->get('title')->addError(new FormError('Empty Title'));
+        var_dump($data);
 
+        if (empty($data['title'])) {
+            $form->get('title')->addError(new FormError('Title cannot be empty!'));
+        }
+
+        if ($this->isUploadEnabled) {
+            if (!($data['attachment'] instanceof UploadedFile)) {
+                $form->get('attachment')->addError(new FormError('Attachment cannot be empty'));
+            }
+            if ($data['attachment'] instanceof UploadedFile) {
+                if (!($data['attachment']->isValid())) {
+                    $form->get('attachment')->addError(new FormError($data['attachment']->getErrorMessage()));
+                }
+            }
+        }
     }
 
     private function setDefaultFormFields()
     {
+        $this->fb()->add('title', 'text',
+            array(
+                'max_length' => 100,
+                'required' => true,
+                'label' => 'Title'
+            )
+        );
+    }
+
+
+    private function setDefaultHiddenFormFields()
+    {
+
+        if ($this->isUploadEnabled) {
+            $this->fb()->add('attachment', 'file',
+                array(
+                    'required' => true,
+                    'label' => 'Attachment'
+                )
+            );
+        }
+
         $this->fb()->add('id', 'hidden');
 
         $this->fb()->add('parent', 'hidden', array(
@@ -197,6 +235,22 @@ abstract class BaseContentType implements ContentTypeInterface
     public function setRequestStack($requestStack)
     {
         $this->requestStack = $requestStack;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIsUploadEnabled()
+    {
+        return $this->isUploadEnabled;
+    }
+
+    /**
+     * @param boolean $isUploadEnabled
+     */
+    public function setIsUploadEnabled($isUploadEnabled)
+    {
+        $this->isUploadEnabled = $isUploadEnabled;
     }
 
 

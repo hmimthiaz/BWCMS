@@ -21,8 +21,11 @@ class ContentController extends BaseController
      * @Route("/",name="content_home")
      * @Template()
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
+
+        $parentId = $request->get('parent', 'Root');
+
         /**
          * Get All the root folders
          * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
@@ -40,8 +43,7 @@ class ContentController extends BaseController
                 'parent' => '#',
                 'state' => array(
                     'opened' => true,
-                    'disabled' => false,
-                    'selected' => true
+                    'selected' => ($parentId == 'Root')
                 )
             )
         );
@@ -57,11 +59,18 @@ class ContentController extends BaseController
                 } else {
                     $jsNode['parent'] = 'Root';
                 }
+                if ($parentId == $content->getId()) {
+                    $jsNode['state'] = array(
+                        'opened' => true,
+                        'selected' => true
+                    );
+                }
                 $jsNodes[] = $jsNode;
             }
         }
 
         return array(
+            'parentId' => $parentId,
             'contentTypes' => $this->cm()->getRegisteredContent(),
             'jsNodes' => json_encode($jsNodes),
         );
@@ -124,13 +133,24 @@ class ContentController extends BaseController
 
     /**
      * @Route("/save.php",name="content_save")
+     * @Method({"POST"})
      * @Template("BWCMSBundle:Content:save.html.twig")
      */
     public function saveAction(Request $request)
     {
-        $class = $this->cm()->getContentClass('Page');
+
+        $contentFormData = $request->request->get('BWCMSBundle_Content');
+        $type = $contentFormData['type'];
+        $schema = $contentFormData['schema'];
+
+        if ($type == null || $schema == null) {
+            return $this->returnErrorResponse();
+        }
+
+        $class = $this->cm()->getContentClass($type, $schema);
         $form = $class->getForm();
         $form->handleRequest($request);
+
         if ($form->isValid()) {
 
             $contentId = $form->get('id')->getData();
@@ -143,10 +163,13 @@ class ContentController extends BaseController
             }
 
             $contentEntity = $this->cm()->prepareEntity($contentEntity, $form->getData(), $class->getFields());
+            $this->cm()->save($contentEntity);
 
-//            $this->cm()->save($contentEntity);
-//
-//            return $this->redirect($this->generateUrl('content_home'));
+            $parentId = 'Root';
+            if ($contentEntity->getTreeParent() != null) {
+                $parentId = $contentEntity->getTreeParent()->getId();
+            }
+            return $this->redirect($this->generateUrl('content_home', array('parent' => $parentId)));
         }
 
         return array(

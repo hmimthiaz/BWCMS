@@ -164,6 +164,15 @@ class ContentManager extends BaseService
             if ($fieldName == 'content') {
                 $content->setContent($data['content']);
             }
+            if ($fieldName == 'attachment') {
+                $uploadedFile = $this->getRequest()->files->get('attachment');
+                $mediaInfo = $this->mm()->handleUpload($uploadedFile);
+                $content->setMime($mediaInfo['mimeType']);
+                $content->setName($mediaInfo['filename']);
+                $content->setSize($mediaInfo['size']);
+                $content->setExtension($mediaInfo['extension']);
+            }
+
         }
         return $content;
     }
