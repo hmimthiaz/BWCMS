@@ -115,10 +115,11 @@ class ContentManager extends BaseService
         $form->get('id')->setData($content->getId());
         $form->get('type')->setData($content->getType());
         $form->get('schema')->setData($content->getSchema());
+        $form->get('status')->setData($content->getStatus());
+
         $form->get('title')->setData($content->getTitle());
         $form->get('summary')->setData($content->getSummary());
         $form->get('content')->setData($content->getContent());
-
         return $form;
     }
 
@@ -155,6 +156,10 @@ class ContentManager extends BaseService
             if ($fieldName == 'schema') {
                 $content->setSchema($data['schema']);
             }
+            if ($fieldName == 'status') {
+                $content->setStatus($data['status']);
+            }
+
             if ($fieldName == 'title') {
                 $content->setTitle($data['title']);
             }

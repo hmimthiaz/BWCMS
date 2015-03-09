@@ -109,6 +109,7 @@ abstract class BaseContentType implements ContentTypeInterface
             if ($this->isUploadEnabled) {
                 $this->addField('attachment', ContentFieldType::String);
             }
+            $this->addField('status', ContentFieldType::String);
             $this->buildFields();
         }
         return $this->fields;
@@ -132,14 +133,12 @@ abstract class BaseContentType implements ContentTypeInterface
         $form = $event->getForm();
         $data = $event->getData();
 
-        var_dump($data);
-
         if (empty($data['title'])) {
             $form->get('title')->addError(new FormError('Title cannot be empty!'));
         }
 
         if ($this->isUploadEnabled) {
-            if (!($data['attachment'] instanceof UploadedFile)) {
+            if (!($data['attachment'] instanceof UploadedFile) && empty($data['id'])) {
                 $form->get('attachment')->addError(new FormError('Attachment cannot be empty'));
             }
             if ($data['attachment'] instanceof UploadedFile) {
@@ -168,11 +167,20 @@ abstract class BaseContentType implements ContentTypeInterface
         if ($this->isUploadEnabled) {
             $this->fb()->add('attachment', 'file',
                 array(
-                    'required' => true,
                     'label' => 'Attachment'
                 )
             );
         }
+
+        $this->fb()->add('status', 'choice',
+            array(
+                'label' => 'Status',
+                'choices' => array(
+                    'Draft' => 'Draft',
+                    'Publish' => 'Publish'
+                )
+            )
+        );
 
         $this->fb()->add('id', 'hidden');
 
