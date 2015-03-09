@@ -10,6 +10,11 @@ use Bellwether\BWCMSBundle\Classes\Content\BaseContentType;
 use Bellwether\BWCMSBundle\Classes\Content\ContentFieldType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Form\FormEvent;
+
+use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
+
 
 class FolderContentType Extends BaseContentType
 {
@@ -46,6 +51,21 @@ class FolderContentType Extends BaseContentType
                 'label' => 'Content'
             )
         );
+    }
+
+    public function validateForm(FormEvent $event)
+    {
+
+    }
+
+    public function loadFormData(ContentEntity $content = null, Form $form = null)
+    {
+        return $form;
+    }
+
+    public function prepareEntity(ContentEntity $content = null, $data = array())
+    {
+        return $content;
     }
 
     public function getType()

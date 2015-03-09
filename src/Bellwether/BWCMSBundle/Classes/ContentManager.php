@@ -97,18 +97,15 @@ class ContentManager extends BaseService
     /**
      * @param ContentEntity $content
      * @param Form $form
-     * @param array $fields
+     * @param ContentTypeInterface $classInstance
      * @return Form|void
      */
-    public function loadFormData(ContentEntity $content = null, Form $form = null, $fields = array())
+    final public function loadFormData(ContentEntity $content = null, Form $form = null, ContentTypeInterface $classInstance)
     {
         if (null === $content) {
             return;
         }
         if (null === $form) {
-            return;
-        }
-        if (empty($fields)) {
             return;
         }
 
@@ -120,11 +117,18 @@ class ContentManager extends BaseService
         $form->get('title')->setData($content->getTitle());
         $form->get('summary')->setData($content->getSummary());
         $form->get('content')->setData($content->getContent());
+
+        $form = $classInstance->loadFormData($content, $form);
         return $form;
     }
 
-
-    public function prepareEntity(ContentEntity $content = null, $data = array(), $fields = array())
+    /**
+     * @param ContentEntity $content
+     * @param array $data
+     * @param ContentTypeInterface $classInstance
+     * @return ContentEntity|void
+     */
+    final public function prepareEntity(ContentEntity $content = null, $data = array(), ContentTypeInterface $classInstance)
     {
         if (null === $content) {
             return;
@@ -132,10 +136,8 @@ class ContentManager extends BaseService
         if (empty($data)) {
             return;
         }
-        if (empty($fields)) {
-            return;
-        }
 
+        $fields = $classInstance->getFields();
         /**
          * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
          */
@@ -178,6 +180,7 @@ class ContentManager extends BaseService
             }
 
         }
+        $content = $classInstance->prepareEntity($content, $data);
         return $content;
     }
 

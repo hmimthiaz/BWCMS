@@ -124,7 +124,7 @@ class ContentController extends BaseController
         }
         $form = $class->getForm();
 
-        $form = $this->cm()->loadFormData($content, $form, $class->getFields());
+        $form = $this->cm()->loadFormData($content, $form, $class);
         return array(
             'form' => $form->createView()
         );
@@ -162,7 +162,7 @@ class ContentController extends BaseController
                 $contentEntity = $contentRepository->find($contentId);
             }
 
-            $contentEntity = $this->cm()->prepareEntity($contentEntity, $form->getData(), $class->getFields());
+            $contentEntity = $this->cm()->prepareEntity($contentEntity, $form->getData(), $class);
             $this->cm()->save($contentEntity);
 
             $parentId = 'Root';

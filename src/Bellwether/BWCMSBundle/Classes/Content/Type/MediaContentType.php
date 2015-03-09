@@ -8,6 +8,10 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Content\BaseContentType;
 use Bellwether\BWCMSBundle\Classes\Content\ContentFieldType;
+use Symfony\Component\Form\FormEvent;
+
+use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 
 
 class MediaContentType Extends BaseContentType
@@ -44,6 +48,21 @@ class MediaContentType Extends BaseContentType
                 'label' => 'Content'
             )
         );
+    }
+
+    public function validateForm(FormEvent $event)
+    {
+
+    }
+
+    public function loadFormData(ContentEntity $content = null, Form $form = null)
+    {
+        return $form;
+    }
+
+    public function prepareEntity(ContentEntity $content = null, $data = array())
+    {
+        return $content;
     }
 
 

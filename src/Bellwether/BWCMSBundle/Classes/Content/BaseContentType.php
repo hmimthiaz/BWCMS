@@ -11,6 +11,9 @@ use Bellwether\BWCMSBundle\Classes\Content\Form\ContentEmptyForm;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+use Bellwether\BWCMSBundle\Entity\ContentEntity;
+
+
 
 abstract class BaseContentType implements ContentTypeInterface
 {
@@ -147,7 +150,15 @@ abstract class BaseContentType implements ContentTypeInterface
                 }
             }
         }
+        $this->validateForm($event);
     }
+
+    abstract function validateForm(FormEvent $event);
+
+    abstract public function loadFormData(ContentEntity $content = null, Form $form = null);
+
+    abstract public function prepareEntity(ContentEntity $content = null, $data = array());
+
 
     private function setDefaultFormFields()
     {
@@ -163,7 +174,6 @@ abstract class BaseContentType implements ContentTypeInterface
 
     private function setDefaultHiddenFormFields()
     {
-
         if ($this->isUploadEnabled) {
             $this->fb()->add('attachment', 'file',
                 array(
