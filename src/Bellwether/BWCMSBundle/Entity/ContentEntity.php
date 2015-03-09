@@ -161,6 +161,19 @@ class ContentEntity
     private $site;
 
 
+    public function __construct()
+    {
+        $this->meta = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getMeta()
+    {
+        return $this->meta;
+    }
+
     /**
      * @return mixed
      */
@@ -576,5 +589,26 @@ class ContentEntity
     {
         $this->site = $site;
     }
+
+    /**
+     * @param ContentMetaEntity $meta
+     * @return $this
+     */
+    public function addMeta(\Bellwether\BWCMSBundle\Entity\ContentMetaEntity $meta)
+    {
+        $this->meta->add($meta);
+        return $this;
+    }
+
+    /**
+     * @param ContentMetaEntity $meta
+     * @return $this
+     */
+    public function removeMeta(\Bellwether\BWCMSBundle\Entity\ContentMetaEntity $meta)
+    {
+        $this->meta->removeElement($meta);
+        return $this;
+    }
+
 
 }

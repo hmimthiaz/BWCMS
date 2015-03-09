@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
 
-
 abstract class BaseContentType implements ContentTypeInterface
 {
 
@@ -46,6 +45,16 @@ abstract class BaseContentType implements ContentTypeInterface
     private $parentId = '';
 
     private $fields = null;
+
+    /**
+     * @var bool
+     */
+    private $isSummaryEnabled = true;
+
+    /**
+     * @var bool
+     */
+    private $isContentEnabled = true;
 
     /**
      * @var bool
@@ -104,15 +113,24 @@ abstract class BaseContentType implements ContentTypeInterface
     {
         if ($this->fields == null) {
             $this->fields = array();
-            $this->addField('id', ContentFieldType::String);
-            $this->addField('title', ContentFieldType::String);
-            $this->addField('type', ContentFieldType::String);
-            $this->addField('schema', ContentFieldType::String);
-            $this->addField('parent', ContentFieldType::String);
-            if ($this->isUploadEnabled) {
-                $this->addField('attachment', ContentFieldType::String);
+
+            $this->addField('id', ContentFieldType::Internal);
+            $this->addField('type', ContentFieldType::Internal);
+            $this->addField('schema', ContentFieldType::Internal);
+            $this->addField('parent', ContentFieldType::Internal);
+
+            $this->addField('title', ContentFieldType::Internal);
+            if ($this->isSummaryEnabled) {
+                $this->addField('summary', ContentFieldType::Internal);
             }
-            $this->addField('status', ContentFieldType::String);
+            if ($this->isContentEnabled) {
+                $this->addField('content', ContentFieldType::Internal);
+            }
+            if ($this->isUploadEnabled) {
+                $this->addField('attachment', ContentFieldType::Internal);
+            }
+
+            $this->addField('status', ContentFieldType::Internal);
             $this->buildFields();
         }
         return $this->fields;
@@ -169,11 +187,27 @@ abstract class BaseContentType implements ContentTypeInterface
                 'label' => 'Title'
             )
         );
-    }
 
+        if ($this->isSummaryEnabled) {
+            $this->fb()->add('summary', 'textarea',
+                array(
+                    'max_length' => 100,
+                    'required' => false,
+                    'label' => 'Summary'
+                )
+            );
+        }
 
-    private function setDefaultHiddenFormFields()
-    {
+        if ($this->isContentEnabled) {
+            $this->fb()->add('content', 'textarea',
+                array(
+                    'max_length' => 100,
+                    'required' => false,
+                    'label' => 'Content'
+                )
+            );
+        }
+
         if ($this->isUploadEnabled) {
             $this->fb()->add('attachment', 'file',
                 array(
@@ -181,6 +215,12 @@ abstract class BaseContentType implements ContentTypeInterface
                 )
             );
         }
+
+    }
+
+
+    private function setDefaultHiddenFormFields()
+    {
 
         $this->fb()->add('status', 'choice',
             array(
@@ -256,6 +296,38 @@ abstract class BaseContentType implements ContentTypeInterface
     public function setRequestStack($requestStack)
     {
         $this->requestStack = $requestStack;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIsSummaryEnabled()
+    {
+        return $this->isSummaryEnabled;
+    }
+
+    /**
+     * @param boolean $isSummaryEnabled
+     */
+    public function setIsSummaryEnabled($isSummaryEnabled)
+    {
+        $this->isSummaryEnabled = $isSummaryEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIsContentEnabled()
+    {
+        return $this->isContentEnabled;
+    }
+
+    /**
+     * @param boolean $isContentEnabled
+     */
+    public function setIsContentEnabled($isContentEnabled)
+    {
+        $this->isContentEnabled = $isContentEnabled;
     }
 
     /**

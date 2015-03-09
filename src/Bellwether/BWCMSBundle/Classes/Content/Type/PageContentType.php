@@ -21,33 +21,20 @@ class PageContentType Extends BaseContentType
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
+
+        $this->setIsSummaryEnabled(true);
+        $this->setIsContentEnabled(true);
         $this->setIsUploadEnabled(false);
     }
 
     public function buildFields()
     {
-        $this->addField('title', ContentFieldType::String);
-        $this->addField('summary', ContentFieldType::String);
-        $this->addField('content', ContentFieldType::String);
+
     }
 
     public function buildForm()
     {
-        $this->fb()->add('summary', 'textarea',
-            array(
-                'max_length' => 100,
-                'required' => false,
-                'label' => 'Summary'
-            )
-        );
 
-        $this->fb()->add('content', 'textarea',
-            array(
-                'max_length' => 100,
-                'required' => false,
-                'label' => 'Content'
-            )
-        );
     }
 
     public function validateForm(FormEvent $event)

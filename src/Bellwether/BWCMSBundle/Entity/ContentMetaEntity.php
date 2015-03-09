@@ -16,9 +16,9 @@ class ContentMetaEntity
     /**
      * @var integer
      *
-     * @ORM\Column(type="integer", name="id")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="guid",name="id")
+     * @ORM\GeneratedValue(strategy="UUID")
      */
     private $id;
 
