@@ -97,12 +97,19 @@
           </attribute>
         </orm-attributes>
       </field>
+      <field name="content_id" type="guid" required="true" uuid="ca91a387-9db7-43b0-92dc-b022d179b27d"/>
+      <field name="type" type="string" size="100" uuid="af7b0dbc-5c5c-4a19-ba5d-68d2861e84d6"/>
+      <field name="key" type="string" size="100" uuid="de5b88c3-e2dd-4912-8841-a5abf941001d"/>
+      <field name="value" type="text" uuid="5ba4d441-5769-4c53-84e5-cb0f22e1e930"/>
       <orm-attributes>
         <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\ContentMetaRepository</attribute>
         <attribute name="table">BWContentMeta</attribute>
         <attribute name="export-file-name">ContentMetaEntity.php</attribute>
       </orm-attributes>
     </entity>
+    <association from="ContentMetaEntity" to="ContentEntity" caption="ContentEntity ContentMetaEntity" owner-alias="meta" inverse-alias="content" many-owner="true" many-inverse="false" parent-required="true" uuid="d06b2788-0add-48c0-95c9-70e94569c55b">
+      <association-field from="content_id" to="id"/>
+    </association>
     <entity name="SiteEntity" uuid="bbb0e04f-8e17-4f3e-a139-17ba3f538b9c">
       <field name="id" type="guid" required="true" primary="true" uuid="e57a3753-c7fa-4e61-a333-f3c3db380cfb">
         <orm-attributes>
@@ -133,7 +140,7 @@
       </field>
       <orm-attributes>
         <attribute name="table">BWUser</attribute>
-        <attribute name="export-file-name">UserEntity.php.txt</attribute>
+        <attribute name="export-file-name">User.php.tmp</attribute>
       </orm-attributes>
     </entity>
     <orm-attributes>
@@ -142,13 +149,14 @@
   </module>
   <visual-data>
     <entity uuid="00eb7804-fa45-46a5-a9a9-d0a86b636183" bg-color="4294967295" hdr-color="4292006610" position-x="20" position-y="40" size-x="0" size-x2="120" size-y="0" size-y2="367"/>
-    <entity uuid="09bfbb4d-9ea8-4757-a41e-5a1824eb243a" bg-color="4294967295" hdr-color="4292006610" position-x="291" position-y="272" size-x="0" size-x2="87" size-y="0" size-y2="31"/>
+    <entity uuid="09bfbb4d-9ea8-4757-a41e-5a1824eb243a" bg-color="4294967295" hdr-color="4292006610" position-x="278" position-y="293" size-x="0" size-x2="91" size-y="0" size-y2="45"/>
     <association uuid="0c78a8fe-02ea-4028-98b5-9d19d39ac761" color="4291261615"/>
     <association uuid="22a51fa0-cf7c-4f2e-896f-d0b9bc9e9e65" color="4287255714"/>
     <association uuid="7be8f73c-d842-4a0b-a93b-609f10e02ae7" color="4281230255"/>
     <module uuid="9801686c-50de-4543-a58d-731a3dcd58b6" bg-color="4293391869" position-x="50" position-y="50" size-x="0" size-x2="480" size-y="0" size-y2="834"/>
     <entity uuid="b2e6c12f-6c0a-4913-a89e-9899b60fc12f" bg-color="4294967295" hdr-color="4292006610" position-x="52" position-y="447" size-x="0" size-x2="56" size-y="0" size-y2="31"/>
     <entity uuid="bbb0e04f-8e17-4f3e-a139-17ba3f538b9c" bg-color="4294967295" hdr-color="4292006610" position-x="347" position-y="40" size-x="0" size-x2="105" size-y="0" size-y2="115"/>
+    <association uuid="d06b2788-0add-48c0-95c9-70e94569c55b" caption1-position-x="0" caption1-position-y="0" center-position-x="0" center-position-y="0" color="4288059030"/>
     <project uuid="edcf90d8-59c3-4500-b0be-c704d6120487" size-x="0" size-x2="580" size-y="0" size-y2="934"/>
   </visual-data>
 </skipper>

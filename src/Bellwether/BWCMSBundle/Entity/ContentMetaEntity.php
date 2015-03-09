@@ -22,14 +22,25 @@ class ContentMetaEntity
      */
     private $id;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $value;
 
     /**
-     * Get id
-     *
-     * @return integer 
+     * @ORM\Column(type="string", length=100, nullable=true)
      */
-    public function getId()
-    {
-        return $this->id;
-    }
+    private $key;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $type;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="meta")
+     * @ORM\JoinColumn(name="content_id", referencedColumnName="id", nullable=false)
+     */
+    private $content;
+
 }

@@ -62,6 +62,11 @@ class ContentEntity
     private $children;
 
     /**
+     * @ORM\OneToMany(targetEntity="Bellwether\BWCMSBundle\Entity\ContentMetaEntity", mappedBy="content")
+     */
+    private $meta;
+
+    /**
      * @Gedmo\TreeParent
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="children")
      * @ORM\JoinColumn(name="treeParentId", referencedColumnName="id", onDelete="CASCADE")
@@ -99,7 +104,7 @@ class ContentEntity
     private $type = 'Folder';
 
     /**
-     * @ORM\Column(name="schemaType",type="string", length=100, nullable=false)
+     * @ORM\Column(type="string", length=100, nullable=false, name="schemaType")
      */
     private $schema = "Default";
 
