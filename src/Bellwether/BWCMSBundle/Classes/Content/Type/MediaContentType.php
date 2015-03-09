@@ -17,6 +17,7 @@ class MediaContentType Extends BaseContentType
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
+        $this->setIsUploadEnabled(true);
     }
 
     public function buildFields()

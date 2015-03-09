@@ -122,12 +122,12 @@ class MediaController extends BaseController
                 $ca = array();
                 $ca['DT_RowId'] = $content->getId();
                 $ca['title'] = $content->getTitle();
-                $ca['name'] = $content->getName();
+                $ca['name'] = $content->getFile();
                 $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');;
-                $ca['thumbnail'] = $this->mm()->getSystemThumbURL($content->getName(), $content->getMime(), $content->getExtension(), 64, 64);
+                $ca['thumbnail'] = $this->mm()->getSystemThumbURL($content->getFile(), $content->getMime(), $content->getExtension(), 64, 64);
                 $ca['thumbnail'] = '<img src="' . $ca['thumbnail'] . '"/>';
-                if ($this->mm()->isImage($content->getName(), $content->getMime())) {
-                    $imageThumb = $this->getImageThumbURL($content->getName(),800,800);
+                if ($this->mm()->isImage($content->getFile(), $content->getMime())) {
+                    $imageThumb = $this->getImageThumbURL($content->getFile(),800,800);
                     $ca['thumbnail'] = '<a href="'.$imageThumb.'" data-title="'.$content->getTitle().'" class="lightBox">' . $ca['thumbnail'] . '</a>';
                 }
                 $data['data'][] = $ca;
@@ -226,7 +226,7 @@ class MediaController extends BaseController
             }
             $content->setTitle($mediaInfo['originalName']);
             $content->setMime($mediaInfo['mimeType']);
-            $content->setName($mediaInfo['filename']);
+            $content->setFile($mediaInfo['filename']);
             $content->setSize($mediaInfo['size']);
             $content->setExtension($mediaInfo['extension']);
             $this->cm()->save($content);
@@ -253,7 +253,7 @@ class MediaController extends BaseController
         if ($content == null) {
             return new Response('Content not available', 500);
         }
-        if ($this->mm()->deleteMedia($content->getName()) == true) {
+        if ($this->mm()->deleteMedia($content->getFile()) == true) {
             $this->em()->remove($content);
             $this->em()->flush();
         } else {
@@ -279,14 +279,14 @@ class MediaController extends BaseController
         if ($content == null) {
             return new Response('Content not available', 500);
         }
-        $downloadFile = $this->mm()->getFilePath($content->getName(), true);
+        $downloadFile = $this->mm()->getFilePath($content->getFile(), true);
 
         $response = new BinaryFileResponse($downloadFile);
         $response->trustXSendfileTypeHeader();
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $content->getName(),
-            iconv('UTF-8', 'ASCII//TRANSLIT', $content->getName())
+            $content->getFile(),
+            iconv('UTF-8', 'ASCII//TRANSLIT', $content->getFile())
         );
 
         return $response;

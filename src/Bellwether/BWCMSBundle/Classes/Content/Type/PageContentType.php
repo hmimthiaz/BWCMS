@@ -17,6 +17,7 @@ class PageContentType Extends BaseContentType
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
+        $this->setIsUploadEnabled(false);
     }
 
     public function buildFields()

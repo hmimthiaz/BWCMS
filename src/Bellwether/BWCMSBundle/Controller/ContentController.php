@@ -206,7 +206,7 @@ class ContentController extends BaseController
             $parentFolder = $contentRepository->find($parentId);
             $qb = $contentRepository->getChildrenQueryBuilder($parentFolder, true);
         }
-        $qb->andWhere(" node.type = 'Page' OR  node.type = 'Folder' ");
+        //$qb->andWhere(" node.type = 'Page' OR  node.type = 'Folder' ");
         $qb->setFirstResult($start);
         $qb->setMaxResults($length);
         $qb->add('orderBy', 'node.createdDate ASC');
@@ -230,10 +230,10 @@ class ContentController extends BaseController
                 $ca = array();
                 $ca['DT_RowId'] = $content->getId();
                 $ca['title'] = $content->getTitle();
-                $ca['name'] = $content->getName();
+                $ca['name'] = $content->getFile();
                 $ca['type'] = $content->getType();
                 $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');;
-                $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content->getType(), 32, 32);
+                $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content, 32, 32);
                 $ca['thumbnail'] = '<img src="' . $ca['thumbnail'] . '"/>';
                 $data['data'][] = $ca;
             }

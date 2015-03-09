@@ -106,6 +106,9 @@ abstract class BaseContentType implements ContentTypeInterface
             $this->addField('type', ContentFieldType::String);
             $this->addField('schema', ContentFieldType::String);
             $this->addField('parent', ContentFieldType::String);
+            if ($this->isUploadEnabled) {
+                $this->addField('attachment', ContentFieldType::String);
+            }
             $this->buildFields();
         }
         return $this->fields;

@@ -165,10 +165,9 @@ class ContentManager extends BaseService
                 $content->setContent($data['content']);
             }
             if ($fieldName == 'attachment') {
-                $uploadedFile = $this->getRequest()->files->get('attachment');
-                $mediaInfo = $this->mm()->handleUpload($uploadedFile);
+                $mediaInfo = $this->mm()->handleUpload($data['attachment']);
                 $content->setMime($mediaInfo['mimeType']);
-                $content->setName($mediaInfo['filename']);
+                $content->setFile($mediaInfo['filename']);
                 $content->setSize($mediaInfo['size']);
                 $content->setExtension($mediaInfo['extension']);
             }
@@ -210,10 +209,16 @@ class ContentManager extends BaseService
     }
 
 
-    public function getSystemThumbURL($type, $width, $height)
+    public function getSystemThumbURL(ContentEntity $content = null, $width, $height)
     {
-        $thumbURL = $this->getThumbService()->open($this->getContentTypeResourceImage($type))->resize($width, $height)->cacheFile('guess');
-        return $thumbURL;
+        if ($content->getFile() == null) {
+            $thumbURL = $this->getThumbService()
+                ->open($this->getContentTypeResourceImage($content->getType()))
+                ->resize($width, $height)
+                ->cacheFile('guess');
+            return $thumbURL;
+        }
+        return $this->mm()->getSystemThumbURL($content->getFile(), $content->getMime(), $content->getExtension(), $width, $height);
     }
 
     private function getContentTypeResourceImage($type)

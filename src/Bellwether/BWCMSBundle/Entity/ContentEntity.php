@@ -86,7 +86,12 @@ class ContentEntity
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
      */
-    private $name;
+    private $slug;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $file;
 
     /**
      * @ORM\Column(type="string", length=100, nullable=false)
@@ -132,6 +137,11 @@ class ContentEntity
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $createdDate;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=false)
+     */
+    private $status = 'Draft';
 
     /**
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\UserEntity")
@@ -357,17 +367,33 @@ class ContentEntity
     /**
      * @return mixed
      */
-    public function getName()
+    public function getSlug()
     {
-        return $this->name;
+        return $this->slug;
     }
 
     /**
-     * @param mixed $name
+     * @param mixed $slug
      */
-    public function setName($name)
+    public function setSlug($slug)
     {
-        $this->name = $name;
+        $this->slug = $slug;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param mixed $file
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
     }
 
     /**
@@ -496,6 +522,22 @@ class ContentEntity
     public function setCreatedDate($createdDate)
     {
         $this->createdDate = $createdDate;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param mixed $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
     }
 
     /**

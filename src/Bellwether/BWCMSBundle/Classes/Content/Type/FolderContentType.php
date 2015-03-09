@@ -18,7 +18,7 @@ class FolderContentType Extends BaseContentType
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
-        $this->setIsUploadEnabled(true);
+        $this->setIsUploadEnabled(false);
     }
 
     public function buildFields()
