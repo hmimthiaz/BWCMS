@@ -69,6 +69,15 @@ class MediaManager extends BaseService
                 $data['extension'] = $uploadedFile->guessClientExtension();
             }
             $data['filename'] = $filename;
+            $data['width'] = 0;
+            $data['height'] = 0;
+            if ($this->isImage($uploadedFile->getClientOriginalExtension(), $uploadedFile->getClientMimeType())) {
+                $imageInfo = getimagesize($uploadFolder . DIRECTORY_SEPARATOR . $filename);
+                if (!empty($imageInfo)) {
+                    $data['width'] = $imageInfo[0];
+                    $data['height'] = $imageInfo[1];
+                }
+            }
         }
         return $data;
     }

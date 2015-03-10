@@ -5,6 +5,7 @@ namespace Bellwether\BWCMSBundle\Classes;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
+use Bellwether\BWCMSBundle\Classes\Content\BaseContentType;
 
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Content\Type\FolderContentType;
@@ -53,7 +54,7 @@ class ContentManager extends BaseService
     }
 
     /**
-     * @param ContentTypeInterface $classInstance
+     * @param ContentTypeInterface|BaseContentType $classInstance
      */
     public function registerContentType(ContentTypeInterface $classInstance)
     {
@@ -97,7 +98,7 @@ class ContentManager extends BaseService
     /**
      * @param ContentEntity $content
      * @param Form $form
-     * @param ContentTypeInterface $classInstance
+     * @param ContentTypeInterface|BaseContentType $classInstance
      * @return Form|void
      */
     final public function loadFormData(ContentEntity $content = null, Form $form = null, ContentTypeInterface $classInstance)
@@ -109,14 +110,22 @@ class ContentManager extends BaseService
             return;
         }
 
+
         $form->get('id')->setData($content->getId());
         $form->get('type')->setData($content->getType());
         $form->get('schema')->setData($content->getSchema());
         $form->get('status')->setData($content->getStatus());
-
         $form->get('title')->setData($content->getTitle());
-        $form->get('summary')->setData($content->getSummary());
-        $form->get('content')->setData($content->getContent());
+
+        if ($classInstance->isIsSummaryEnabled()) {
+            $form->get('summary')->setData($content->getSummary());
+        }
+        if ($classInstance->isIsContentEnabled()) {
+            $form->get('content')->setData($content->getContent());
+        }
+        if ($classInstance->isIsSlugEnabled()) {
+            $form->get('slug')->setData($content->getSlug());
+        }
 
         $form = $classInstance->loadFormData($content, $form);
         return $form;
@@ -125,7 +134,7 @@ class ContentManager extends BaseService
     /**
      * @param ContentEntity $content
      * @param array $data
-     * @param ContentTypeInterface $classInstance
+     * @param ContentTypeInterface|BaseContentType $classInstance
      * @return ContentEntity|void
      */
     final public function prepareEntity(ContentEntity $content = null, $data = array(), ContentTypeInterface $classInstance)
@@ -138,18 +147,13 @@ class ContentManager extends BaseService
         }
 
         $fields = $classInstance->getFields();
-        /**
-         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
-         */
-        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
-
 
         foreach ($fields as $fieldName => $fieldInfo) {
             if (!isset($data[$fieldName]) || empty($data[$fieldName])) {
                 continue;
             }
             if ($fieldName == 'parent') {
-                $parentContent = $contentRepository->find($data['parent']);
+                $parentContent = $this->getContentRepository()->find($data['parent']);
                 $content->setTreeParent($parentContent);
             }
             if ($fieldName == 'type') {
@@ -160,6 +164,9 @@ class ContentManager extends BaseService
             }
             if ($fieldName == 'status') {
                 $content->setStatus($data['status']);
+            }
+            if ($fieldName == 'slug') {
+                $content->setSlug($data['slug']);
             }
 
             if ($fieldName == 'title') {
@@ -177,8 +184,16 @@ class ContentManager extends BaseService
                 $content->setFile($mediaInfo['filename']);
                 $content->setSize($mediaInfo['size']);
                 $content->setExtension($mediaInfo['extension']);
+                $content->setWidth($mediaInfo['width']);
+                $content->setHeight($mediaInfo['height']);
             }
-
+        }
+        if (empty($content->getSlug())) {
+            $parentId = null;
+            if ($content->getTreeParent() != null) {
+                $parentId = $content->getTreeParent()->getId();
+            }
+            $content->setSlug($this->generateSlug($content->getTitle(), $content->getType(), $parentId, $content->getId()));
         }
         $content = $classInstance->prepareEntity($content, $data);
         return $content;
@@ -207,6 +222,36 @@ class ContentManager extends BaseService
         return $content;
     }
 
+    public function generateSlug($title, $type = 'Page', $parentId = null, $contentId = null)
+    {
+        $slug = $this->sanitizeTitle($title);
+        while ($this->checkSlugExists($slug, $type, $parentId, $contentId)) {
+            $slug = $slug + '-1';
+        }
+        return $slug;
+    }
+
+    public function checkSlugExists($slug, $type = 'Page', $parentId = null, $contentId = null)
+    {
+        $contentRepository = $this->cm()->getContentRepository();
+        if (empty($parentId) || $parentId == 'Root') {
+            $qb = $contentRepository->getChildrenQueryBuilder(null, true);
+        } else {
+            $parentFolder = $contentRepository->find($parentId);
+            $qb = $contentRepository->getChildrenQueryBuilder($parentFolder, true);
+        }
+        $qb->andWhere(" node.type = '{$type}' ");
+        if (!empty($contentId)) {
+            $qb->andWhere(" node.id != '{$contentId}' ");
+        }
+        $qb->andWhere(" node.slug = '{$slug}' ");
+        $totalCount = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+        if ($totalCount > 0) {
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * @return Image
@@ -214,6 +259,15 @@ class ContentManager extends BaseService
     public function getThumbService()
     {
         return $this->container->get('image.handling');
+    }
+
+
+    /**
+     * @return \Bellwether\BWCMSBundle\Entity\ContentRepository
+     */
+    public function getContentRepository()
+    {
+        return $this->em()->getRepository('BWCMSBundle:ContentEntity');
     }
 
 
@@ -256,5 +310,57 @@ class ContentManager extends BaseService
         return $this->contentTypeIcons;
     }
 
+    public static function sanitizeTitle($title)
+    {
+        $title = strip_tags($title);
+        // Preserve escaped octets.
+        $title = preg_replace('|%([a-fA-F0-9][a-fA-F0-9])|', '---$1---', $title);
+        // Remove percent signs that are not part of an octet.
+        $title = str_replace('%', '', $title);
+        // Restore octets.
+        $title = preg_replace('|---([a-fA-F0-9][a-fA-F0-9])---|', '%$1', $title);
+
+        $mbStrLen = mb_strlen($title, 'utf-8');
+        $strLen = strlen($title);
+        if ($mbStrLen == $strLen) {
+            $cleaned = strtolower($title);
+        } else {
+            $cleaned = urlencode(mb_strtolower($title));
+        }
+
+        $title = strtolower($title);
+        $title = preg_replace('/&.+?;/', '', $title); // kill entities
+        $title = str_replace('.', '-', $title);
+
+        // Convert nbsp, ndash and mdash to hyphens
+        $title = str_replace(array('%c2%a0', '%e2%80%93', '%e2%80%94'), '-', $title);
+
+        // Strip these characters entirely
+        $title = str_replace(array(
+            // iexcl and iquest
+            '%c2%a1', '%c2%bf',
+            // angle quotes
+            '%c2%ab', '%c2%bb', '%e2%80%b9', '%e2%80%ba',
+            // curly quotes
+            '%e2%80%98', '%e2%80%99', '%e2%80%9c', '%e2%80%9d',
+            '%e2%80%9a', '%e2%80%9b', '%e2%80%9e', '%e2%80%9f',
+            // copy, reg, deg, hellip and trade
+            '%c2%a9', '%c2%ae', '%c2%b0', '%e2%80%a6', '%e2%84%a2',
+            // acute accents
+            '%c2%b4', '%cb%8a', '%cc%81', '%cd%81',
+            // grave accent, macron, caron
+            '%cc%80', '%cc%84', '%cc%8c',
+        ), '', $title);
+
+        // Convert times to x
+        $title = str_replace('%c3%97', 'x', $title);
+
+        $title = preg_replace('/[^%a-z0-9 _-]/', '', $title);
+        $title = preg_replace('/\s+/', '-', $title);
+        $title = preg_replace('|-+|', '-', $title);
+        $title = trim($title, '-');
+
+        return $title;
+    }
 
 }

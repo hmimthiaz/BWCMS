@@ -127,8 +127,8 @@ class MediaController extends BaseController
                 $ca['thumbnail'] = $this->mm()->getSystemThumbURL($content->getFile(), $content->getMime(), $content->getExtension(), 64, 64);
                 $ca['thumbnail'] = '<img src="' . $ca['thumbnail'] . '"/>';
                 if ($this->mm()->isImage($content->getFile(), $content->getMime())) {
-                    $imageThumb = $this->getImageThumbURL($content->getFile(),800,800);
-                    $ca['thumbnail'] = '<a href="'.$imageThumb.'" data-title="'.$content->getTitle().'" class="lightBox">' . $ca['thumbnail'] . '</a>';
+                    $imageThumb = $this->getImageThumbURL($content->getFile(), 800, 800);
+                    $ca['thumbnail'] = '<a href="' . $imageThumb . '" data-title="' . $content->getTitle() . '" class="lightBox">' . $ca['thumbnail'] . '</a>';
                 }
                 $data['data'][] = $ca;
             }
@@ -217,6 +217,7 @@ class MediaController extends BaseController
             $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
             $content = new ContentEntity();
             $content->setType('Media');
+            $content->setSchema('Default');
             $content->setSite($this->getSite());
             if ($parentId == 'Root') {
                 $content->setTreeParent(null);
@@ -228,8 +229,12 @@ class MediaController extends BaseController
             $content->setMime($mediaInfo['mimeType']);
             $content->setFile($mediaInfo['filename']);
             $content->setSize($mediaInfo['size']);
-            $content->setStatus('Publish');
             $content->setExtension($mediaInfo['extension']);
+            $content->setWidth($mediaInfo['width']);
+            $content->setHeight($mediaInfo['height']);
+
+            $content->setStatus('Publish');
+            $content->setSlug($this->cm()->generateSlug($content->getFile(), $content->getType(), $parentId));
             $this->cm()->save($content);
         }
         return new Response('Ok', 200);

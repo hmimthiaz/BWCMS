@@ -26,12 +26,7 @@ class ContentController extends BaseController
 
         $parentId = $request->get('parent', 'Root');
 
-        /**
-         * Get All the root folders
-         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
-         */
-        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
-        $qb = $contentRepository->getChildrenQueryBuilder(null, false);
+        $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
         $qb->andWhere(" node.type = 'Folder' ");
         $rootFolders = $qb->getQuery()->getResult();
 
@@ -112,11 +107,9 @@ class ContentController extends BaseController
         }
 
         /**
-         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
          * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
          */
-        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
-        $content = $contentRepository->find($contentId);
+        $content = $this->cm()->getContentRepository()->find($contentId);
 
         $class = $this->cm()->getContentClass($content->getType(), $content->getSchema());
         if ($content->getTreeParent() != null) {
@@ -158,8 +151,7 @@ class ContentController extends BaseController
                 $contentEntity = new ContentEntity();
                 $contentEntity->setSite($this->getSite());
             } else {
-                $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
-                $contentEntity = $contentRepository->find($contentId);
+                $contentEntity = $this->cm()->getContentRepository()->find($contentId);
             }
 
             $contentEntity = $this->cm()->prepareEntity($contentEntity, $form->getData(), $class);
@@ -196,10 +188,9 @@ class ContentController extends BaseController
 
         /**
          * Get All the root folders
-         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
          * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
          */
-        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+        $contentRepository = $this->cm()->getContentRepository();
         if ($parentId == 'Root') {
             $qb = $contentRepository->getChildrenQueryBuilder(null, true);
         } else {

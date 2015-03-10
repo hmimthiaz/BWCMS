@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Content\Form\ContentEmptyForm;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Bellwether\BWCMSBundle\Classes\SiteManager;
+use Bellwether\BWCMSBundle\Classes\ContentManager;
+use Bellwether\BWCMSBundle\Classes\MediaManager;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
@@ -55,6 +58,11 @@ abstract class BaseContentType implements ContentTypeInterface
      * @var bool
      */
     private $isContentEnabled = true;
+
+    /**
+     * @var bool
+     */
+    private $isSlugEnabled = false;
 
     /**
      * @var bool
@@ -126,6 +134,9 @@ abstract class BaseContentType implements ContentTypeInterface
             if ($this->isContentEnabled) {
                 $this->addField('content', ContentFieldType::Internal);
             }
+            if ($this->isSlugEnabled) {
+                $this->addField('slug', ContentFieldType::Internal);
+            }
             if ($this->isUploadEnabled) {
                 $this->addField('attachment', ContentFieldType::Internal);
             }
@@ -144,12 +155,12 @@ abstract class BaseContentType implements ContentTypeInterface
         if ($this->formBuilder == null) {
             $contentEmptyForm = new ContentEmptyForm();
             $this->formBuilder = $this->container->get('form.factory')->createBuilder($contentEmptyForm);
-            $this->formBuilder->addEventListener(FormEvents::POST_SUBMIT, array(&$this, 'formEventPost'));
+            $this->formBuilder->addEventListener(FormEvents::POST_SUBMIT, array(&$this, 'formEventPostSubmit'));
         }
         return $this->formBuilder;
     }
 
-    public function formEventPost(FormEvent $event)
+    final public function formEventPostSubmit(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -167,6 +178,16 @@ abstract class BaseContentType implements ContentTypeInterface
                     $form->get('attachment')->addError(new FormError($data['attachment']->getErrorMessage()));
                 }
             }
+        }
+        if ($this->isSlugEnabled) {
+            if (empty($data['slug'])) {
+                $form->get('slug')->addError(new FormError('Slug cannot be empty!'));
+            } else {
+                if ($this->cm()->checkSlugExists($data['slug'], $this->getType(), $data['parent'], $data['id'])) {
+                    $form->get('slug')->addError(new FormError('Slug already exists!'));
+                }
+            }
+
         }
         $this->validateForm($event);
     }
@@ -208,6 +229,16 @@ abstract class BaseContentType implements ContentTypeInterface
             );
         }
 
+        if ($this->isSlugEnabled) {
+            $this->fb()->add('slug', 'text',
+                array(
+                    'max_length' => 100,
+                    'required' => true,
+                    'label' => 'Page Slug'
+                )
+            );
+        }
+
         if ($this->isUploadEnabled) {
             $this->fb()->add('attachment', 'file',
                 array(
@@ -217,7 +248,6 @@ abstract class BaseContentType implements ContentTypeInterface
         }
 
     }
-
 
     private function setDefaultHiddenFormFields()
     {
@@ -264,6 +294,30 @@ abstract class BaseContentType implements ContentTypeInterface
     public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
         return $this->container->get('router')->generate($route, $parameters, $referenceType);
+    }
+
+    /**
+     * @return SiteManager
+     */
+    public function sm()
+    {
+        return $this->container->get('BWCMS.Site')->getManager();
+    }
+
+    /**
+     * @return ContentManager
+     */
+    public function cm()
+    {
+        return $this->container->get('BWCMS.Content')->getManager();
+    }
+
+    /**
+     * @return MediaManager
+     */
+    public function mm()
+    {
+        return $this->container->get('BWCMS.Media')->getManager();
     }
 
     /**
@@ -346,5 +400,20 @@ abstract class BaseContentType implements ContentTypeInterface
         $this->isUploadEnabled = $isUploadEnabled;
     }
 
+    /**
+     * @return boolean
+     */
+    public function isIsSlugEnabled()
+    {
+        return $this->isSlugEnabled;
+    }
+
+    /**
+     * @param boolean $isSlugEnabled
+     */
+    public function setIsSlugEnabled($isSlugEnabled)
+    {
+        $this->isSlugEnabled = $isSlugEnabled;
+    }
 
 }

@@ -24,6 +24,7 @@ class PageContentType Extends BaseContentType
 
         $this->setIsSummaryEnabled(true);
         $this->setIsContentEnabled(true);
+        $this->setIsSlugEnabled(true);
         $this->setIsUploadEnabled(false);
     }
 
