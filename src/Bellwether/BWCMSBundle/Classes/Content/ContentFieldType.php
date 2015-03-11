@@ -18,4 +18,9 @@ class ContentFieldType
 
     const DateTime = 'CF.DateTime';
 
+    const Serialized = 'CF.Serialized';
+
+    const Custom = 'CF.Custom';
+
+
 }

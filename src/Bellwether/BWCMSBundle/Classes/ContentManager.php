@@ -136,14 +136,17 @@ class ContentManager extends BaseService
                 $metaField = $meta->getField();
                 $metaValue = $meta->getValue();
                 $metaType = $meta->getType();
-                if ($metaType == ContentFieldType::String) {
+                if ($metaType == ContentFieldType::String || $metaType == ContentFieldType::Number) {
                     $form->get($metaField)->setData($metaValue);
                 }
-                if ($metaType == ContentFieldType::DateTime) {
+                if ($metaType == ContentFieldType::Date || $metaType == ContentFieldType::Time || $metaType == ContentFieldType::DateTime) {
                     $dateValue = new \DateTime($metaValue);
                     $form->get($metaField)->setData($dateValue);
                 }
-
+                if ($metaType == ContentFieldType::Serialized) {
+                    $dateValue = $this->getSerializer()->deserialize($metaValue,'ArrayCollection','json');
+                    $form->get($metaField)->setData($dateValue);
+                }
             }
         }
 
@@ -223,15 +226,25 @@ class ContentManager extends BaseService
                 $meta->setContent($content);
                 $meta->setField($fieldName);
                 $meta->setType($fields[$fieldName]['type']);
-                if ($fields[$fieldName]['type'] == ContentFieldType::String) {
+                if ($fields[$fieldName]['type'] == ContentFieldType::String || $fields[$fieldName]['type'] == ContentFieldType::Number) {
                     $meta->setValue($fieldValue);
+                }
+                if ($fields[$fieldName]['type'] == ContentFieldType::Date) {
+                    $dateString = $fieldValue->format('Y-m-d');
+                    $meta->setValue($dateString);
+                }
+                if ($fields[$fieldName]['type'] == ContentFieldType::Time) {
+                    $dateString = $fieldValue->format('H:i:sO');
+                    $meta->setValue($dateString);
                 }
                 if ($fields[$fieldName]['type'] == ContentFieldType::DateTime) {
                     $dateString = $fieldValue->format(\DateTime::ISO8601);
                     $meta->setValue($dateString);
                 }
-
-
+                if ($fields[$fieldName]['type'] == ContentFieldType::Serialized) {
+                    $serializedString = $this->getSerializer()->serialize($fieldValue,'json');
+                    $meta->setValue($serializedString);
+                }
             }
             foreach ($existingMeta as $meta) {
                 if ($meta->getValue() == null) {

@@ -30,11 +30,14 @@ class PageContentType Extends BaseContentType
 
     public function buildFields()
     {
-        $this->addField('field1',ContentFieldType::String);
-        $this->addField('field2',ContentFieldType::String);
-        $this->addField('field3',ContentFieldType::String);
-        $this->addField('field4',ContentFieldType::String);
-        $this->addField('field5',ContentFieldType::DateTime);
+        $this->addField('field1', ContentFieldType::String);
+        $this->addField('field2', ContentFieldType::String);
+        $this->addField('field3', ContentFieldType::String);
+        $this->addField('field4', ContentFieldType::String);
+        $this->addField('field5', ContentFieldType::DateTime);
+        $this->addField('field6', ContentFieldType::Date);
+        $this->addField('field7', ContentFieldType::Time);
+        $this->addField('heading', ContentFieldType::Serialized);
     }
 
     public function buildForm()
@@ -72,6 +75,38 @@ class PageContentType Extends BaseContentType
                 'label' => 'field5'
             )
         );
+
+        $this->fb()->add('field6', 'date',
+            array(
+                'label' => 'field6'
+            )
+        );
+
+        $this->fb()->add('field7', 'time',
+            array(
+                'label' => 'field7'
+            )
+        );
+
+        $this->fb()->add('heading', 'bootstrap_collection', array(
+            'type' => 'bootstrap_collection',
+            'allow_add' => true,
+            'allow_delete' => true,
+            'add_button_text' => 'Add Level 1',
+            'delete_button_text' => 'Delete Level 1',
+            'sub_widget_col' => 9,
+            'button_col' => 3,
+            'options' => array(
+                'type' => 'text',
+                'allow_add' => true,
+                'allow_delete' => true,
+                'add_button_text' => 'Add Level 2',
+                'delete_button_text' => 'Delete Level 2',
+                'prototype_name' => '__subname__',
+                'sub_widget_col' => 8,
+                'button_col' => 4
+            )
+        ));
     }
 
     public function validateForm(FormEvent $event)

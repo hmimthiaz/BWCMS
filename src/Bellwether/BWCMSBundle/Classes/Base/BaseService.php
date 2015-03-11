@@ -82,6 +82,13 @@ class BaseService  extends ContainerAware
     }
 
     /**
+     * @return \JMS\Serializer\Serializer
+     */
+    public function getSerializer(){
+        return $this->container->get('serializer');
+    }
+
+    /**
      * @return UserEntity
      */
     public function getUser(){
