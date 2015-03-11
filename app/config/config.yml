@@ -30,6 +30,7 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
 
+
 #braincrafted_bootstrap
 braincrafted_bootstrap:
     less_filter: less

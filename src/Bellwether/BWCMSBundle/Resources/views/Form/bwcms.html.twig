@@ -1,0 +1,11 @@
+{% block bwcms_collection_widget %}
+    {% spaceless %}
+        {% if prototype is defined %}
+            {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
+        {% endif %}
+
+        {{ dump(prototype) }}
+
+        aaaa {{ block('form_widget') }}
+    {% endspaceless %}
+{% endblock bwcms_collection_widget %}
