@@ -30,12 +30,48 @@ class PageContentType Extends BaseContentType
 
     public function buildFields()
     {
-
+        $this->addField('field1',ContentFieldType::String);
+        $this->addField('field2',ContentFieldType::String);
+        $this->addField('field3',ContentFieldType::String);
+        $this->addField('field4',ContentFieldType::String);
+        $this->addField('field5',ContentFieldType::DateTime);
     }
 
     public function buildForm()
     {
+        $this->fb()->add('field1', 'text',
+            array(
+                'max_length' => 100,
+                'label' => 'field1'
+            )
+        );
 
+        $this->fb()->add('field2', 'text',
+            array(
+                'max_length' => 100,
+                'label' => 'field2'
+            )
+        );
+
+        $this->fb()->add('field3', 'text',
+            array(
+                'max_length' => 100,
+                'label' => 'field3'
+            )
+        );
+
+        $this->fb()->add('field4', 'text',
+            array(
+                'max_length' => 100,
+                'label' => 'field4'
+            )
+        );
+
+        $this->fb()->add('field5', 'datetime',
+            array(
+                'label' => 'field5'
+            )
+        );
     }
 
     public function validateForm(FormEvent $event)

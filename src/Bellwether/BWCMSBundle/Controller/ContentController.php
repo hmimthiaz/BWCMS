@@ -119,6 +119,7 @@ class ContentController extends BaseController
 
         $form = $this->cm()->loadFormData($content, $form, $class);
         return array(
+            'content' => $content,
             'form' => $form->createView()
         );
     }

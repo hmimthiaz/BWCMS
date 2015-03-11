@@ -6,16 +6,16 @@ namespace Bellwether\BWCMSBundle\Classes\Content;
 class ContentFieldType
 {
 
-    const Internal = 'ContentFieldType.Internal';
+    const Internal = 'CF.Internal';
 
-    const Number = 'ContentFieldType.Number';
+    const Number = 'CF.Number';
 
-    const String = 'ContentFieldType.String';
+    const String = 'CF.String';
 
-    const Date = 'ContentFieldType.Date';
+    const Date = 'CF.Date';
 
-    const Time = 'ContentFieldType.Time';
+    const Time = 'CF.Time';
 
-    const DateTime = 'ContentFieldType.DateTime';
+    const DateTime = 'CF.DateTime';
 
 }

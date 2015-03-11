@@ -2,6 +2,7 @@
 
 namespace Bellwether\BWCMSBundle\Classes;
 
+use Bellwether\BWCMSBundle\Classes\Content\ContentFieldType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
@@ -110,7 +111,6 @@ class ContentManager extends BaseService
             return;
         }
 
-
         $form->get('id')->setData($content->getId());
         $form->get('type')->setData($content->getType());
         $form->get('schema')->setData($content->getSchema());
@@ -125,6 +125,26 @@ class ContentManager extends BaseService
         }
         if ($classInstance->isIsSlugEnabled()) {
             $form->get('slug')->setData($content->getSlug());
+        }
+
+        $existingMeta = $content->getMeta();
+        if (!empty($existingMeta)) {
+            /**
+             * @var ContentMetaEntity $meta
+             */
+            foreach ($existingMeta as $meta) {
+                $metaField = $meta->getField();
+                $metaValue = $meta->getValue();
+                $metaType = $meta->getType();
+                if ($metaType == ContentFieldType::String) {
+                    $form->get($metaField)->setData($metaValue);
+                }
+                if ($metaType == ContentFieldType::DateTime) {
+                    $dateValue = new \DateTime($metaValue);
+                    $form->get($metaField)->setData($dateValue);
+                }
+
+            }
         }
 
         $form = $classInstance->loadFormData($content, $form);
@@ -188,17 +208,61 @@ class ContentManager extends BaseService
                 $content->setHeight($mediaInfo['height']);
             }
         }
-        if (empty($content->getSlug())) {
+        if ($content->getSlug() == null) {
             $parentId = null;
             if ($content->getTreeParent() != null) {
                 $parentId = $content->getTreeParent()->getId();
             }
             $content->setSlug($this->generateSlug($content->getTitle(), $content->getType(), $parentId, $content->getId()));
         }
+        $metaData = $this->removeNonMetaData($data);
+        if (!empty($metaData)) {
+            $existingMeta = $content->getMeta();
+            foreach ($metaData as $fieldName => $fieldValue) {
+                $meta = $this->getMetaForField($existingMeta, $fieldName);
+                $meta->setContent($content);
+                $meta->setField($fieldName);
+                $meta->setType($fields[$fieldName]['type']);
+                if ($fields[$fieldName]['type'] == ContentFieldType::String) {
+                    $meta->setValue($fieldValue);
+                }
+                if ($fields[$fieldName]['type'] == ContentFieldType::DateTime) {
+                    $dateString = $fieldValue->format(\DateTime::ISO8601);
+                    $meta->setValue($dateString);
+                }
+
+
+            }
+            foreach ($existingMeta as $meta) {
+                if ($meta->getValue() == null) {
+                    $this->em()->remove($meta);
+                }
+            }
+
+        }
         $content = $classInstance->prepareEntity($content, $data);
         return $content;
     }
 
+
+    /**
+     * @param $existingMeta
+     * @param $fieldName
+     * @return ContentMetaEntity
+     */
+    private function getMetaForField($existingMeta, $fieldName)
+    {
+        if (!empty($existingMeta)) {
+            foreach ($existingMeta as $eMeta) {
+                if ($eMeta->getField() == $fieldName) {
+                    return $eMeta;
+                }
+            }
+        }
+        $meta = new ContentMetaEntity();
+        $this->em()->persist($meta);
+        return $meta;
+    }
 
     /**
      * @param ContentEntity $content
@@ -252,6 +316,30 @@ class ContentManager extends BaseService
         return false;
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function removeNonMetaData($data = array())
+    {
+        $contentFields = $this->getContentFields();
+        foreach ($contentFields as $field) {
+            unset ($data[$field]);
+        }
+        return $data;
+    }
+
+    public function getContentFields()
+    {
+        return array(
+            "id", "expireDate", "publishDate",
+            "title", "summary", "content",
+            "slug", "file", "type",
+            "schema", "mime", "extension",
+            "size", "height", "width",
+            "modifiedDate", "createdDate", "status",
+            "author", "site", "parent");
+    }
 
     /**
      * @return Image
