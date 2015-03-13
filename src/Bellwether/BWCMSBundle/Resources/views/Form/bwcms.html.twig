@@ -3,11 +3,9 @@
         {% if prototype is defined %}
             {% set attr = attr|merge({'data-prototype': form_row(prototype) , 'class': 'FCData'}) %}
         {% endif %}
-
-        {{ dump(prototype) }}
         <div class="FCHolder">
             {{ block('form_widget') }}
-            <button class="FCAdd">Add</button>
+            <button type="button" class="FCAdd btn btn-primary edit"><i class="glyphicon glyphicon-plus"></i></button>
         </div>
     {% endspaceless %}
 {% endblock bwcms_collection_widget %}
