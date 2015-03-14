@@ -4,8 +4,73 @@
             {% set attr = attr|merge({'data-prototype': form_row(prototype) , 'class': 'FCData'}) %}
         {% endif %}
         <div class="FCHolder">
-            {{ block('form_widget') }}
+            {{ block('bwcms_collection_form_widget') }}
             <button type="button" class="FCAdd btn btn-primary edit"><i class="glyphicon glyphicon-plus"></i></button>
         </div>
     {% endspaceless %}
 {% endblock bwcms_collection_widget %}
+
+
+{% block bwcms_collection_form_widget %}
+    {% spaceless %}
+       asd ssdsd asdasd <div {{ block('widget_container_attributes') }} style="border: 1px solid #ccc;">
+            {% if form.parent is empty %}
+                {{ block('global_form_errors') }}
+            {% endif %}
+            {{ block('form_row') }}
+            {{ form_rest(form) }}
+        </div>
+    {% endspaceless %}
+{% endblock bwcms_collection_form_widget %}
+
+
+{% block form_row %}
+    {% spaceless %}
+        {% set style = style|default(bootstrap_get_style()) %}
+        {% set col_size = col_size|default(bootstrap_get_col_size()) %}
+
+        {% if attr.label_col is defined and attr.label_col is not empty %}
+            {% set label_col = attr.label_col %}
+        {% endif %}
+        {% if attr.widget_col is defined and attr.widget_col is not empty %}
+            {% set widget_col = attr.widget_col %}
+            {% if label is sameas(false) and label_col is defined %}
+                {% set widget_col = widget_col + label_col %}
+            {% endif %}
+        {% endif %}
+        {% if attr.col_size is defined and attr.col_size is not empty %}
+            {% set col_size = attr.col_size %}
+        {% endif %}
+        {% if attr.style is defined and attr.style is not empty %}
+            {% set style = attr.style %}
+        {% endif %}
+
+        {% set label_col = label_col|default(bootstrap_get_label_col()) %}
+        {% set widget_col = widget_col|default(bootstrap_get_widget_col()) %}
+        {% if form.parent.parent is empty %}
+            <div class="form-group{% if form.vars.errors|length > 0 %} has-error{% endif %}">
+                {% if style == 'horizontal' %}
+                    {{ form_label(form) }}
+                    <div class="col-{{ col_size }}-{{ widget_col }}">
+                        {{ block('form_input_group') }}
+                        {{ block('form_help') }}
+                        {{ form_errors(form) }}
+                    </div>
+                {% else %}
+                    {{ form_label(form) }}
+                    {{ block('form_input_group') }}
+                    {{ block('form_help') }}
+                    {{ form_errors(form) }}
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="form-group{% if form.vars.errors|length > 0 %} has-error{% endif %}">
+                    {{ block('form_input_group') }}
+                    {{ block('form_help') }}
+                    {{ form_errors(form) }}
+            </div>
+        {% endif %}
+
+        {% if style == 'inline' %}&nbsp;{% endif %}
+    {% endspaceless %}
+{% endblock form_row %}
