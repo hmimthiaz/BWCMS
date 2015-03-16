@@ -20,6 +20,8 @@ class ContentFieldType
 
     const Serialized = 'CF.Serialized';
 
+    const Content = 'CF.Content';
+
     const Custom = 'CF.Custom';
 
 

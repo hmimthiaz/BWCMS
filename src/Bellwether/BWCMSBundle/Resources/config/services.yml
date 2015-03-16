@@ -8,9 +8,13 @@ services:
   BWCMS.Media:
     class: Bellwether\BWCMSBundle\Classes\MediaManager
     arguments: [@service_container,@request_stack]
-
   BWCMS.Form.Type.Collection:
-    class: Bellwether\BWCMSBundle\Form\Type\BWCMSCollectionType
+    class: Bellwether\BWCMSBundle\Form\Type\ContentType
+    arguments: [@service_container]
+    tags:
+      - { name: form.type , alias: bwcms_content }
+  BWCMS.Form.Type.Collection:
+    class: Bellwether\BWCMSBundle\Form\Type\CollectionType
     tags:
       - { name: form.type , alias: bwcms_collection }
 

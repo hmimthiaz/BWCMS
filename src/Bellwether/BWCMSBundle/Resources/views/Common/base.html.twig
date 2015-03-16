@@ -10,7 +10,7 @@
     {% include 'BraincraftedBootstrapBundle::ie8-support.html.twig' %}
     {% block header %}{% endblock %}
 </head>
-<body>
+<body {% block bodyAttr '' %}>
     {% block bodyContainer %}{% endblock %}
     <script src="/include/js/bootstrap.js"></script>
     <script src="{{ asset('bundles/bwcms/js/bootbox.min.js') }}"></script>

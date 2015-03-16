@@ -31,18 +31,14 @@ class PageContentType Extends BaseContentType
 
     public function buildFields()
     {
-        $this->addField('field1', ContentFieldType::Serialized);
+        $this->addField('fieldContent', ContentFieldType::Content);
     }
 
     public function buildForm()
     {
-        $this->fb()->add('field1', 'bwcms_collection',
+        $this->fb()->add('fieldContent', 'bwcms_content',
             array(
-                'type' => new SampleForm(),
-                'label' => 'Sample',
-                'allow_add'    => true,
-                'allow_delete'    => true,
-
+                'label' => 'Content'
             )
         );
     }

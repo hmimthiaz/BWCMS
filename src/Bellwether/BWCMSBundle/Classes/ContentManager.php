@@ -136,16 +136,25 @@ class ContentManager extends BaseService
                 $metaField = $meta->getField();
                 $metaValue = $meta->getValue();
                 $metaType = $meta->getType();
-                if ($metaType == ContentFieldType::String || $metaType == ContentFieldType::Number) {
-                    $form->get($metaField)->setData($metaValue);
+                try{
+                    $formField = $form->get($metaField);
+                }catch (\OutOfBoundsException $e){
+                    continue;
                 }
+                if ($metaType == ContentFieldType::String || $metaType == ContentFieldType::Number) {
+                    $formField->setData($metaValue);
+                }
+                if ($metaType == ContentFieldType::Content) {
+                    $formField->setData($metaValue);
+                }
+
                 if ($metaType == ContentFieldType::Date || $metaType == ContentFieldType::Time || $metaType == ContentFieldType::DateTime) {
                     $dateValue = new \DateTime($metaValue);
-                    $form->get($metaField)->setData($dateValue);
+                    $formField->setData($dateValue);
                 }
                 if ($metaType == ContentFieldType::Serialized) {
-                    $dateValue = $this->getSerializer()->deserialize($metaValue,'ArrayCollection','json');
-                    $form->get($metaField)->setData($dateValue);
+                    $dateValue = $this->getSerializer()->deserialize($metaValue, 'ArrayCollection', 'json');
+                    $formField->setData($dateValue);
                 }
             }
         }
@@ -229,6 +238,9 @@ class ContentManager extends BaseService
                 if ($fields[$fieldName]['type'] == ContentFieldType::String || $fields[$fieldName]['type'] == ContentFieldType::Number) {
                     $meta->setValue($fieldValue);
                 }
+                if ($fields[$fieldName]['type'] == ContentFieldType::Content) {
+                    $meta->setValue($fieldValue);
+                }
                 if ($fields[$fieldName]['type'] == ContentFieldType::Date) {
                     $dateString = $fieldValue->format('Y-m-d');
                     $meta->setValue($dateString);
@@ -242,7 +254,7 @@ class ContentManager extends BaseService
                     $meta->setValue($dateString);
                 }
                 if ($fields[$fieldName]['type'] == ContentFieldType::Serialized) {
-                    $serializedString = $this->getSerializer()->serialize($fieldValue,'json');
+                    $serializedString = $this->getSerializer()->serialize($fieldValue, 'json');
                     $meta->setValue($serializedString);
                 }
             }

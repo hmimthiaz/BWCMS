@@ -35,6 +35,6 @@ class ContentEmptyForm extends AbstractType
      */
     public function getName()
     {
-        return 'BWCMSBundle_Content';
+        return 'BWCF';
     }
 }

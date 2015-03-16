@@ -10,3 +10,12 @@
     {% endspaceless %}
 {% endblock bwcms_collection_widget %}
 
+
+{% block bwcms_content_widget %}
+    {% spaceless %}
+        <div id="{{ holderId }}">
+            <input type="text" class="title"><button type="button" class="btn btn-primary" data-url="{{ browserURL }}" onclick="showContentBrowser(this);"><i class="glyphicon glyphicon-plus"></i></button>
+            <input id="{{ id }}" type="text" name="{{ full_name }}" class="value" {% if value is not empty %}value="{{ value }}" {% endif %}>
+        </div>
+    {% endspaceless %}
+{% endblock bwcms_content_widget %}

@@ -21,6 +21,10 @@ $(document).ready(function () {
         });
         $(this).parent().find('div.FCData').children(':last').append(FCRemoveButton);
     });
-
-
 });
+
+function showContentBrowser(ele){
+    var cbURL = $(ele).data('url');
+    window.open(cbURL, "contentBrowserWindow", "scrollbars,resizable,width=800,height=600");
+    return false;
+}

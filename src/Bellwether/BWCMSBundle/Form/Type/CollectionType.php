@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class BWCMSCollectionType extends AbstractType
+class CollectionType extends AbstractType
 {
     public function buildView(FormView $view, FormInterface $form, array $options)
     {

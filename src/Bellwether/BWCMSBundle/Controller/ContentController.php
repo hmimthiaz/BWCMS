@@ -71,6 +71,65 @@ class ContentController extends BaseController
         );
     }
 
+    /**
+     * @Route("/browser.php",name="content_browser")
+     * @Template()
+     */
+    public function browserAction(Request $request)
+    {
+
+        $parentId = $request->get('parent', 'Root');
+        $holder = $request->get('holder', '');
+
+
+        $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
+        $qb->andWhere(" node.type = 'Folder' ");
+        $rootFolders = $qb->getQuery()->getResult();
+
+        $jsNodes = array(
+            array(
+                'id' => 'Root',
+                'text' => 'Folders',
+                'icon' => 'glyphicon glyphicon-folder-open',
+                'parent' => '#',
+                'state' => array(
+                    'opened' => true,
+                    'selected' => ($parentId == 'Root')
+                )
+            )
+        );
+        if (!empty($rootFolders)) {
+            /** @var ContentEntity $content */
+            foreach ($rootFolders as $content) {
+                $jsNode = array();
+                $jsNode['id'] = $content->getId();
+                $jsNode['text'] = $content->getTitle();
+                $jsNode['icon'] = 'glyphicon glyphicon-folder-open';
+                if ($content->getTreeParent() != null) {
+                    $jsNode['parent'] = $content->getTreeParent()->getId();
+                } else {
+                    $jsNode['parent'] = 'Root';
+                }
+                if ($parentId == $content->getId()) {
+                    $jsNode['state'] = array(
+                        'opened' => true,
+                        'selected' => true
+                    );
+                }
+                $jsNodes[] = $jsNode;
+            }
+        }
+
+        return array(
+            'parentId' => $parentId,
+            'holder' => $holder,
+            'contentTypes' => $this->cm()->getRegisteredContent(),
+            'jsNodes' => json_encode($jsNodes),
+        );
+
+
+    }
+
 
     /**
      * @Route("/create.php",name="content_create")
@@ -133,7 +192,7 @@ class ContentController extends BaseController
     public function saveAction(Request $request)
     {
 
-        $contentFormData = $request->request->get('BWCMSBundle_Content');
+        $contentFormData = $request->request->get('BWCF');
         $type = $contentFormData['type'];
         $schema = $contentFormData['schema'];
 
@@ -204,7 +263,7 @@ class ContentController extends BaseController
         $qb->add('orderBy', 'node.createdDate ASC');
 
         if (!empty($searchString)) {
-            $qb->andWhere(" node.title LIKE :query1 OR node.name LIKE :query2 ");
+            $qb->andWhere(" node.title LIKE :query1 OR node.file LIKE :query2 ");
             $qb->setParameter('query1', '%' . $searchString . '%');
             $qb->setParameter('query2', '%' . $searchString . '%');
         }
