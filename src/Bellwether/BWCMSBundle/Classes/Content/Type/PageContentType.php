@@ -32,6 +32,7 @@ class PageContentType Extends BaseContentType
     public function buildFields()
     {
         $this->addField('fieldContent', ContentFieldType::Content);
+        $this->addField('gallery', ContentFieldType::Serialized);
     }
 
     public function buildForm()
@@ -41,6 +42,17 @@ class PageContentType Extends BaseContentType
                 'label' => 'Content'
             )
         );
+
+        $this->fb()->add('gallery', 'bwcms_collection',
+            array(
+                'type' => new SampleForm(),
+                'required' => false,
+                'label' => 'Content',
+                'allow_add' => true
+            )
+        );
+
+
     }
 
     public function validateForm(FormEvent $event)

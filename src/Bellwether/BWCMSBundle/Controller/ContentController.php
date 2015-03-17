@@ -285,7 +285,7 @@ class ContentController extends BaseController
                 $ca['type'] = $content->getType();
                 $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');;
                 $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content, 32, 32);
-                $ca['thumbnail'] = '<img src="' . $ca['thumbnail'] . '"/>';
+                $ca['thumbnail'] = '<img class="contentThumb" src="' . $ca['thumbnail'] . '"/>';
                 $data['data'][] = $ca;
             }
         }

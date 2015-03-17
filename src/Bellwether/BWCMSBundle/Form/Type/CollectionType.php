@@ -12,7 +12,10 @@ class CollectionType extends AbstractType
 {
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
+//        \Doctrine\Common\Util\Debug::dump($form);
 
+        $view->vars['attr']['label_col'] = null;
+        $view->vars['attr']['label'] = null;
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)

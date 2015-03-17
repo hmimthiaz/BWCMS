@@ -23,3 +23,10 @@ table.dataTable tr.odd {
 table.dataTable tr.even {
     background-color: #FFFFFF;
 }
+
+ul.FCList li{
+    border: 1px solid #cccccc;
+    border-radius: 25px;
+    margin-bottom: 3px;
+    padding-top: 5px;
+}

@@ -8,7 +8,7 @@ services:
   BWCMS.Media:
     class: Bellwether\BWCMSBundle\Classes\MediaManager
     arguments: [@service_container,@request_stack]
-  BWCMS.Form.Type.Collection:
+  BWCMS.Form.Type.Content:
     class: Bellwether\BWCMSBundle\Form\Type\ContentType
     arguments: [@service_container]
     tags:
@@ -17,7 +17,6 @@ services:
     class: Bellwether\BWCMSBundle\Form\Type\CollectionType
     tags:
       - { name: form.type , alias: bwcms_collection }
-
   BWCMS.AdminMenu:
       class: Bellwether\BWCMSBundle\Classes\AdminMenuManager
       arguments: ["@knp_menu.factory",@service_container,@request_stack]

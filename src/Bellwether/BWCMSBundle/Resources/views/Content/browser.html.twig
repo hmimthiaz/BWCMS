@@ -73,16 +73,17 @@
                 fnDrawCallback: function (oSettings) {
                     $('#contentTable button.select').click(function (e) {
                         var title = $(this).parents('tr').find('td.title').first().html();
+                        var contentThumb =  $(this).parents('tr').find('img.contentThumb').first().attr('src');
                         var contentId = $(this).parents('tr').attr('id');
                         window.opener.$("#{{ holder }} input.title").val(title);
                         window.opener.$("#{{ holder }} input.value").val(contentId);
+                        window.opener.$("#{{ holder }} img.contentThumb").attr('src',contentThumb);
                         window.close();
                         e.preventDefault();
                         return false;
                     });
                 }
             });
-
             $('#jstree_div').jstree({
                 'core': {
                     'data': {{ jsNodes|raw }},

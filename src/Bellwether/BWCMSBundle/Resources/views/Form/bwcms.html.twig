@@ -1,4 +1,5 @@
-{% block bwcms_collection_widget %}
+{% block bwcms_collection_widget3 %}
+    {{ dump(form_row(prototype)) }}
     {% spaceless %}
         {% if prototype is defined %}
             {% set attr = attr|merge({'data-prototype': form_row(prototype) , 'class': 'FCData'}) %}
@@ -8,14 +9,59 @@
             <button type="button" class="FCAdd btn btn-primary edit"><i class="glyphicon glyphicon-plus"></i></button>
         </div>
     {% endspaceless %}
+{% endblock bwcms_collection_widget3 %}
+
+
+{% block bwcms_collection_widget %}
+    {% spaceless %}
+        {% if prototype is defined %}
+            {% set prototype_vars = {} %}
+            {% if style is defined %}
+                {% set prototype_vars = prototype_vars|merge({'style': style}) %}
+            {% endif %}
+            {% set prototype_html = '<div class="row"><div class="col-lg-10">' ~ form_widget(prototype, prototype_vars) ~ '</div>' %}
+            {% set prototype_html = prototype_html ~ '<div class="col-lg-2 text-center"><button type="button" class="FCAdd btn btn-danger FCRemove"><i class="glyphicon glyphicon-minus"></i></button></div>' %}
+            {{ dump(prototype_html) }}
+            {% set attr = attr|merge({'data-prototype': prototype_html }) %}
+            {#{% set attr = attr|merge({'data-prototype-name': prototype_name }) %}#}
+        {% endif %}
+        <div class="FCHolder" {{ block('widget_container_attributes') }}>
+            <ul class="list-unstyled FCList">
+                {% for field in form %}
+                    <li>
+                        <div class="row">
+                            <div class="col-lg-10">
+                                {{ form_widget(field) }}
+                                {{ form_errors(field) }}
+                            </div>
+                            <div class="col-lg-2 text-center ">
+                                <button type="button" class="btn btn-danger FCRemove "><i class="glyphicon glyphicon-minus"></i></button>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% if form.vars.allow_add %}
+                <button type="button" class="btn btn-primary FCAdd"><i class="glyphicon glyphicon-plus"></i></button>
+            {% endif %}
+        </div>
+    {% endspaceless %}
 {% endblock bwcms_collection_widget %}
 
 
 {% block bwcms_content_widget %}
     {% spaceless %}
-        <div id="{{ holderId }}">
-            <input type="text" class="title"><button type="button" class="btn btn-primary" data-url="{{ browserURL }}" onclick="showContentBrowser(this);"><i class="glyphicon glyphicon-plus"></i></button>
-            <input id="{{ id }}" type="text" name="{{ full_name }}" class="value" {% if value is not empty %}value="{{ value }}" {% endif %}>
+        <div id="{{ holderId }}"  class="input-group">
+            <div class="input-group-addon">
+                <img class="contentThumb" src="{{ selectedThumb }}"/>
+            </div>
+            <input type="text" style="height: 50px;" value="{{ selectedText }}" class="form-control title">
+            <div class="input-group-addon">
+                <button type="button" class="btn btn-primary" data-url="{{ browserURL }}" onclick="showContentBrowser(this);">
+                    <i class="glyphicon glyphicon-folder-open"></i>
+                </button>
+            </div>
+            <input id="{{ id }}" type="hidden" name="{{ full_name }}" class="value" {% if value is not empty %}value="{{ value }}" {% endif %}>
         </div>
     {% endspaceless %}
 {% endblock bwcms_content_widget %}

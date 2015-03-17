@@ -19,8 +19,9 @@ class SampleForm extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('Title', 'text');
-        $builder->add('Summary', 'text');
+        $builder->add('title', 'text');
+        $builder->add('summary', 'textarea');
+        $builder->add('item', 'bwcms_content');
     }
 
     /**

@@ -8,6 +8,10 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Bellwether\BWCMSBundle\Classes\ContentManager;
+use Bellwether\BWCMSBundle\Entity\ContentRepository;
+use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
 class ContentType extends AbstractType
 {
@@ -28,7 +32,18 @@ class ContentType extends AbstractType
         $holder = $view->vars['id'] . 'Holder';
         $view->vars['holderId'] = $holder;
 
-        $view->vars['browserURL'] = $this->container->get('router')->generate('content_browser', array('holder' => $holder), true);
+        $value = $view->vars['value'];
+        $view->vars['selectedText'] = '';
+        $view->vars['selectedThumb'] = '';
+        if (!empty($value)) {
+            $cr = $this->cm()->getContentRepository();
+            $content = $cr->find($value);
+            if (!empty($content)) {
+                $view->vars['selectedText'] = $content->getTitle();
+                $view->vars['selectedThumb'] = $this->cm()->getSystemThumbURL($content,32,32);
+            }
+        }
+        $view->vars['browserURL'] = $this->generateUrl('content_browser', array('holder' => $holder), true);
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
@@ -40,6 +55,30 @@ class ContentType extends AbstractType
             'required' => false,
             'compound' => false,
         ));
+    }
+
+    /**
+     * Generates a URL from the given parameters.
+     *
+     * @param string $route The name of the route
+     * @param mixed $parameters An array of parameters
+     * @param bool|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     *
+     * @return string The generated URL
+     *
+     * @see UrlGeneratorInterface
+     */
+    public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        return $this->container->get('router')->generate($route, $parameters, $referenceType);
+    }
+
+    /**
+     * @return ContentManager
+     */
+    public function cm()
+    {
+        return $this->container->get('BWCMS.Content')->getManager();
     }
 
 
