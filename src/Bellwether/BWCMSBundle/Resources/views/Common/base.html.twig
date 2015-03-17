@@ -5,6 +5,7 @@
     <title>{% block title %}BWCMS!{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="/include/js/jquery.js"></script>
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/jquery-ui/jquery-ui.min.css') }}"/>
     <link href="/include/css/bootstrap.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/css/style.css') }}" />
     {% include 'BraincraftedBootstrapBundle::ie8-support.html.twig' %}
@@ -12,6 +13,7 @@
 </head>
 <body {% block bodyAttr '' %}>
     {% block bodyContainer %}{% endblock %}
+    <script src="{{ asset('bundles/bwcms/jquery-ui/jquery-ui.min.js') }}"></script>
     <script src="/include/js/bootstrap.js"></script>
     <script src="{{ asset('bundles/bwcms/js/bootbox.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/js/script.js') }}"></script>
