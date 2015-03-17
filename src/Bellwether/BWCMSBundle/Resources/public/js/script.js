@@ -5,16 +5,19 @@ $(document).ready(function () {
     });
     $('div.FCHolder button.FCAdd').click(function (e) {
         e.preventDefault();
-        var totalItems = $(this).parent().find('ul.FCList li').length;
+        var totalItems = parseInt($(this).parent().attr('data-length'));
+        $(this).parent().attr('data-length', (totalItems + 1));
         var fData = $(this).parent().data('prototype');
         fData = fData.replace(/__name__label__/g, totalItems);
         fData = fData.replace(/__name__/g, totalItems);
         $(this).parent().find('ul.FCList').first().append('<li>' + fData + '</li>');
-        $(this).parent().find('button.FCRemove').last().click(function(e){
+        $(this).parent().find('button.FCRemove').last().click(function (e) {
             e.preventDefault();
             $(this).parents('li').first().remove()
         });
     });
+    $('ul.FCList').sortable();
+
 });
 
 function showContentBrowser(ele) {

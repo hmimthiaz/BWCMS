@@ -29,4 +29,10 @@ ul.FCList li{
     border-radius: 25px;
     margin-bottom: 3px;
     padding-top: 5px;
+    cursor: move;
+}
+
+img.contentThumb{
+    height: 32px;
+    width: 32px;
 }

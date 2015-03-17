@@ -21,8 +21,8 @@
             {% endif %}
             {% set prototype_html = '<div class="row"><div class="col-lg-10">' ~ form_widget(prototype, prototype_vars) ~ '</div>' %}
             {% set prototype_html = prototype_html ~ '<div class="col-lg-2 text-center"><button type="button" class="FCAdd btn btn-danger FCRemove"><i class="glyphicon glyphicon-minus"></i></button></div>' %}
-            {{ dump(prototype_html) }}
             {% set attr = attr|merge({'data-prototype': prototype_html }) %}
+            {% set attr = attr|merge({'data-length': form|length }) %}
             {#{% set attr = attr|merge({'data-prototype-name': prototype_name }) %}#}
         {% endif %}
         <div class="FCHolder" {{ block('widget_container_attributes') }}>

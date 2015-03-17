@@ -136,9 +136,9 @@ class ContentManager extends BaseService
                 $metaField = $meta->getField();
                 $metaValue = $meta->getValue();
                 $metaType = $meta->getType();
-                try{
+                try {
                     $formField = $form->get($metaField);
-                }catch (\OutOfBoundsException $e){
+                } catch (\OutOfBoundsException $e) {
                     continue;
                 }
                 if ($metaType == ContentFieldType::String || $metaType == ContentFieldType::Number) {
@@ -153,14 +153,25 @@ class ContentManager extends BaseService
                     $formField->setData($dateValue);
                 }
                 if ($metaType == ContentFieldType::Serialized) {
-                    $dateValue = $this->getSerializer()->deserialize($metaValue, 'ArrayCollection', 'json');
-                    $formField->setData($dateValue);
+                    $data = $this->getSerializer()->deserialize($metaValue, 'ArrayCollection', 'json');
+                    $data = $this->loadSerializedData($data);
+                    $formField->setData($data);
                 }
             }
         }
-
         $form = $classInstance->loadFormData($content, $form);
         return $form;
+    }
+
+    private function loadSerializedData($value)
+    {
+        usort($value, function ($a, $b) {
+            if (isset($a['__sort__']) && isset($b['__sort__'])) {
+                return $a['__sort__'] - $b['__sort__'];
+            }
+            return 0;
+        });
+        return $value;
     }
 
     /**
@@ -254,7 +265,8 @@ class ContentManager extends BaseService
                     $meta->setValue($dateString);
                 }
                 if ($fields[$fieldName]['type'] == ContentFieldType::Serialized) {
-                    $serializedString = $this->getSerializer()->serialize($fieldValue, 'json');
+                    $cleanedData = $this->prepareSerializedMeta($fieldValue);
+                    $serializedString = $this->getSerializer()->serialize($cleanedData, 'json');
                     $meta->setValue($serializedString);
                 }
             }
@@ -263,10 +275,35 @@ class ContentManager extends BaseService
                     $this->em()->remove($meta);
                 }
             }
-
         }
         $content = $classInstance->prepareEntity($content, $data);
         return $content;
+    }
+
+    private function prepareSerializedMeta($value)
+    {
+        $returnValue = array();
+        $value = $this->cleanArray($value);
+        $sort = 0;
+        foreach ($value as $key => $value) {
+            $value['__sort__'] = $sort++;
+            $returnValue[] = $value;
+        }
+        return $returnValue;
+    }
+
+    private function cleanArray($haystack)
+    {
+        foreach ($haystack as $key => $value) {
+            if (is_array($value)) {
+                $haystack[$key] = $this->cleanArray($haystack[$key]);
+            }
+            if (empty($haystack[$key])) {
+                unset($haystack[$key]);
+            }
+        }
+
+        return $haystack;
     }
 
 
