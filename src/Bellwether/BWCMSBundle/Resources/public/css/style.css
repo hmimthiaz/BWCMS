@@ -1,8 +1,14 @@
 body {
     padding-top: 30px;
+    padding-bottom: 30px;
 }
 
 .row {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.form-horizontal .form-group{
     margin-left: 0px;
     margin-right: 0px;
 }

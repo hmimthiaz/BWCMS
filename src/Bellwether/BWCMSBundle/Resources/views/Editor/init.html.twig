@@ -1,0 +1,12 @@
+//TinyMCE Configuration
+tinymce.init({
+	selector: "textarea.editor",
+	theme: "modern",
+	plugins: [
+		"advlist link image lists charmap hr anchor",
+		"wordcount visualblocks visualchars code  nonbreaking",
+		"table contextmenu directionality template paste textcolor"
+	],
+	content_css: "css/content.css",
+	toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | forecolor backcolor | link image  ",
+});

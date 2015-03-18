@@ -224,7 +224,10 @@ abstract class BaseContentType implements ContentTypeInterface
                 array(
                     'max_length' => 100,
                     'required' => false,
-                    'label' => 'Content'
+                    'label' => 'Content',
+                    'attr' => array(
+                        'class' => 'editor'
+                    )
                 )
             );
         }
