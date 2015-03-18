@@ -150,6 +150,8 @@ class ContentController extends BaseController
 
 
         return array(
+            'title' => 'Content: Create ' . $class->getName(),
+            'pageTitle' => 'Content: Create ' . $class->getName(),
             'form' => $form->createView()
         );
     }
@@ -178,7 +180,8 @@ class ContentController extends BaseController
 
         $form = $this->cm()->loadFormData($content, $form, $class);
         return array(
-            'content' => $content,
+            'title' => 'Content: Edit ' . $class->getName(),
+            'pageTitle' => 'Content: Edit ' . $class->getName(),
             'form' => $form->createView()
         );
     }
@@ -225,6 +228,8 @@ class ContentController extends BaseController
         }
 
         return array(
+            'title' => 'Content: Edit ' . $class->getName(),
+            'pageTitle' => 'Content: Edit ' . $class->getName(),
             'form' => $form->createView()
         );
     }

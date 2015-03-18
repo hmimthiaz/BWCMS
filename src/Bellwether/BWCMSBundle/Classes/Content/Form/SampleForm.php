@@ -21,6 +21,15 @@ class SampleForm extends AbstractType
     {
         $builder->add('title', 'text');
         $builder->add('item', 'bwcms_content');
+        $builder->add('content', 'textarea',
+            array(
+                'required' => false,
+                'label' => 'Content',
+                'attr' => array(
+                    'class' => 'editor'
+                )
+            )
+        );
     }
 
     /**
