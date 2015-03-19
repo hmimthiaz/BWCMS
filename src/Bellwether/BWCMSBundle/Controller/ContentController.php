@@ -265,7 +265,7 @@ class ContentController extends BaseController
         //$qb->andWhere(" node.type = 'Page' OR  node.type = 'Folder' ");
         $qb->setFirstResult($start);
         $qb->setMaxResults($length);
-        $qb->add('orderBy', 'node.createdDate ASC');
+        //$qb->add('orderBy', 'node.createdDate ASC');
 
         if (!empty($searchString)) {
             $qb->andWhere(" node.title LIKE :query1 OR node.file LIKE :query2 ");

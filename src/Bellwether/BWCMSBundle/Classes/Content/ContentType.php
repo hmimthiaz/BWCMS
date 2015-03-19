@@ -13,11 +13,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Bellwether\BWCMSBundle\Classes\SiteManager;
 use Bellwether\BWCMSBundle\Classes\ContentManager;
 use Bellwether\BWCMSBundle\Classes\MediaManager;
-
+use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
 
-abstract class BaseContentType implements ContentTypeInterface
+abstract class ContentType implements ContentTypeInterface
 {
 
 
@@ -63,6 +63,11 @@ abstract class BaseContentType implements ContentTypeInterface
      * @var bool
      */
     private $isSlugEnabled = false;
+
+    /**
+     * @var bool
+     */
+    private $isSortEnabled = false;
 
     /**
      * @var bool
@@ -417,6 +422,22 @@ abstract class BaseContentType implements ContentTypeInterface
     public function setIsSlugEnabled($isSlugEnabled)
     {
         $this->isSlugEnabled = $isSlugEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIsSortEnabled()
+    {
+        return $this->isSortEnabled;
+    }
+
+    /**
+     * @param boolean $isSortEnabled
+     */
+    public function setIsSortEnabled($isSortEnabled)
+    {
+        $this->isSortEnabled = $isSortEnabled;
     }
 
 }

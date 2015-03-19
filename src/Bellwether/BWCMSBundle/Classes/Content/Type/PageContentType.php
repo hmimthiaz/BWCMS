@@ -6,8 +6,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Bellwether\BWCMSBundle\Classes\Content\BaseContentType;
-use Bellwether\BWCMSBundle\Classes\Content\ContentFieldType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
+use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 use Symfony\Component\Form\FormEvent;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
@@ -15,7 +15,7 @@ use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Content\Form\SampleForm;
 
 
-class PageContentType Extends BaseContentType
+class PageContentType Extends ContentType
 {
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)

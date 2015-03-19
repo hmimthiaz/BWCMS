@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes\Content;
+namespace Bellwether\BWCMSBundle\Classes\Constants;
 
 
 class ContentFieldType
@@ -23,6 +23,5 @@ class ContentFieldType
     const Content = 'CF.Content';
 
     const Custom = 'CF.Custom';
-
 
 }

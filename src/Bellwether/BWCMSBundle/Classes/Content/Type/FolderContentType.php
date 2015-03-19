@@ -6,8 +6,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Bellwether\BWCMSBundle\Classes\Content\BaseContentType;
-use Bellwether\BWCMSBundle\Classes\Content\ContentFieldType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
+use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Form\FormEvent;
@@ -16,7 +16,7 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 
 
-class FolderContentType Extends BaseContentType
+class FolderContentType Extends ContentType
 {
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)

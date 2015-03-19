@@ -4,6 +4,9 @@ namespace Bellwether\BWCMSBundle\Entity;
 
 use Doctrine\ORM\Mapping AS ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
+
 
 
 /**
@@ -132,6 +135,16 @@ class ContentEntity
      * @ORM\Column(type="integer", nullable=true)
      */
     private $width;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=false)
+     */
+    private $sortBy = ContentSortByType::Created;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=false)
+     */
+    private $sortOrder = ContentSortOrderType::DESC;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -509,6 +522,39 @@ class ContentEntity
     {
         $this->width = $width;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getSortBy()
+    {
+        return $this->sortBy;
+    }
+
+    /**
+     * @param mixed $sortBy
+     */
+    public function setSortBy($sortBy)
+    {
+        $this->sortBy = $sortBy;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSortOrder()
+    {
+        return $this->sortOrder;
+    }
+
+    /**
+     * @param mixed $sortOrder
+     */
+    public function setSortOrder($sortOrder)
+    {
+        $this->sortOrder = $sortOrder;
+    }
+
 
     /**
      * @return \DateTime

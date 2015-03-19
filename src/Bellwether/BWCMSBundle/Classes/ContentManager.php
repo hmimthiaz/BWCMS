@@ -153,7 +153,12 @@ class ContentManager extends BaseService
                     $formField->setData($dateValue);
                 }
                 if ($metaType == ContentFieldType::Serialized) {
-                    $data = $this->getSerializer()->deserialize($metaValue, 'ArrayCollection', 'json');
+                    try {
+                        $data = $this->getSerializer()->deserialize($metaValue, 'ArrayCollection', 'json');
+                    } catch (\RuntimeException $exp) {
+                        $data = array();
+                    }
+
                     $data = $this->loadSerializedData($data);
                     $formField->setData($data);
                 }
