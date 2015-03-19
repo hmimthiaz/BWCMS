@@ -297,4 +297,31 @@ class ContentController extends BaseController
         return $this->returnJsonReponse($request, $data);
     }
 
+    /**
+     * @Route("/sort.php",name="content_sort")
+     * @Method({"POST"})
+     */
+    public function sortAction(Request $request)
+    {
+        $start = intval($request->get('start', 0));
+        $end = intval($request->get('end', 0));
+        $contentId = $request->get('contentId');
+
+        $contentRepo = $this->cm()->getContentRepository();
+        $content = $contentRepo->find($contentId);
+        $toMove = $start - $end;
+
+        try {
+            if ($toMove > 0) {
+                $contentRepo->moveUp($content, $toMove);
+            }
+            if ($toMove < 0) {
+                $contentRepo->moveDown($content, $toMove * -1);
+            }
+        } catch (\Gedmo\Exception\InvalidArgumentException $exp) {
+            return $this->returnErrorResponse($exp->getMessage());
+        }
+        return $this->returnJsonReponse($request, array());
+    }
+
 }

@@ -32,6 +32,8 @@
 
     <script language="JavaScript">
         var createURL = '{{ url('content_create') }}';
+        var sortStartPosition, sortEndPosition = 0;
+        var ajaxRequestActive = false;
         $(document).ready(function () {
             var contentTable = $('#contentTable').DataTable({
                 ordering: false,
@@ -71,6 +73,38 @@
                     });
                 }
             });
+            $('#contentTable').on('draw.dt', function () {
+                $("#contentTable tbody").sortable({
+                    start: function (event, ui) {
+                        sortStartPosition = ui.item.prevAll().length;
+                    },
+                    update: function (event, ui) {
+                        if (ajaxRequestActive) {
+                            $("#contentTable tbody").sortable("cancel");
+                            return;
+                        }
+                        sortEndPosition = ui.item.prevAll().length;
+                        var contentId = ui.item.first().attr('id');
+
+                        var request = $.ajax({
+                            method: "POST",
+                            url: "{{ url('content_sort') }}",
+                            data: {start: sortStartPosition, end: sortEndPosition, contentId: contentId},
+                            beforeSend: function () {
+                                ajaxRequestActive = true;
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                ajaxRequestActive = false;
+                                $("#contentTable tbody").sortable("cancel");
+                                alert(xhr.responseText);
+                            },
+                            complete: function () {
+                                ajaxRequestActive = false;
+                            }
+                        });
+                    }
+                });
+            });
             $('#jstree_div').jstree({
                 'core': {
                     'data': {{ jsNodes|raw }},
@@ -90,7 +124,7 @@
                                         "label": "{{ type.name }}",
                                         "icon": "glyphicon glyphicon-plus",
                                         "action": function () {
-                                            window.location = createURL + '?parent=' + node.id  + '&type={{ type.type }}&schema={{ type.schema }}';
+                                            window.location = createURL + '?parent=' + node.id + '&type={{ type.type }}&schema={{ type.schema }}';
                                             return false;
                                         }
                                     },
