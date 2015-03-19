@@ -2,6 +2,9 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Content;
 
+use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -145,6 +148,10 @@ abstract class ContentType implements ContentTypeInterface
             if ($this->isUploadEnabled) {
                 $this->addField('attachment', ContentFieldType::Internal);
             }
+            if ($this->isSortEnabled) {
+                $this->addField('sortBy', ContentFieldType::Internal);
+                $this->addField('sortOrder', ContentFieldType::Internal);
+            }
 
             $this->addField('status', ContentFieldType::Internal);
             $this->buildFields();
@@ -192,7 +199,6 @@ abstract class ContentType implements ContentTypeInterface
                     $form->get('slug')->addError(new FormError('Slug already exists!'));
                 }
             }
-
         }
         $this->validateForm($event);
     }
@@ -255,6 +261,27 @@ abstract class ContentType implements ContentTypeInterface
             );
         }
 
+        if ($this->isSortEnabled) {
+            $this->fb()->add('sortBy', 'choice', array(
+                'choices' => array(
+                    ContentSortByType::Created => 'Created',
+                    ContentSortByType::Published => 'Published',
+                    ContentSortByType::SortIndex => 'Sort',
+                    ContentSortByType::Title => 'Title',
+                    ContentSortByType::Size => 'Size',
+                ),
+                'label' => 'Sort By'
+            ));
+            $this->fb()->add('sortOrder', 'choice', array(
+                'choices' => array(
+                    ContentSortOrderType::DESC => 'DESC [Z-A]',
+                    ContentSortOrderType::ASC => 'ASC [A-Z]',
+                ),
+                'label' => 'Sort Order'
+            ));
+        }
+
+
     }
 
     private function setDefaultHiddenFormFields()
@@ -264,8 +291,9 @@ abstract class ContentType implements ContentTypeInterface
             array(
                 'label' => 'Status',
                 'choices' => array(
-                    'Draft' => 'Draft',
-                    'Publish' => 'Publish'
+                    ContentPublishType::Draft => 'Draft',
+                    ContentPublishType::Published => 'Published',
+                    ContentPublishType::Expired => 'Expired'
                 )
             )
         );

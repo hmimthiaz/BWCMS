@@ -177,6 +177,9 @@ class ContentEntity
     public function __construct()
     {
         $this->meta = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->sortBy = ContentSortByType::Created;
+        $this->sortOrder = ContentSortOrderType::DESC;
+        $this->status = 'Draft';
     }
 
     /**

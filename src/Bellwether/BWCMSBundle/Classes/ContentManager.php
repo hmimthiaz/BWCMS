@@ -2,11 +2,13 @@
 
 namespace Bellwether\BWCMSBundle\Classes;
 
-use Bellwether\BWCMSBundle\Classes\Content\ContentFieldType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
-use Bellwether\BWCMSBundle\Classes\Content\BaseContentType;
+use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Content\Type\FolderContentType;
@@ -126,6 +128,10 @@ class ContentManager extends BaseService
         if ($classInstance->isIsSlugEnabled()) {
             $form->get('slug')->setData($content->getSlug());
         }
+        if ($classInstance->isIsSortEnabled()) {
+            $form->get('sortBy')->setData($content->getSortBy());
+            $form->get('sortOrder')->setData($content->getSortOrder());
+        }
 
         $existingMeta = $content->getMeta();
         if (!empty($existingMeta)) {
@@ -216,7 +222,6 @@ class ContentManager extends BaseService
             if ($fieldName == 'slug') {
                 $content->setSlug($data['slug']);
             }
-
             if ($fieldName == 'title') {
                 $content->setTitle($data['title']);
             }
@@ -225,6 +230,12 @@ class ContentManager extends BaseService
             }
             if ($fieldName == 'content') {
                 $content->setContent($data['content']);
+            }
+            if ($fieldName == 'sortBy') {
+                $content->setSortBy($data['sortBy']);
+            }
+            if ($fieldName == 'sortOrder') {
+                $content->setSortOrder($data['sortOrder']);
             }
             if ($fieldName == 'attachment') {
                 $mediaInfo = $this->mm()->handleUpload($data['attachment']);

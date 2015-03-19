@@ -27,6 +27,7 @@ class FolderContentType Extends ContentType
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
         $this->setIsUploadEnabled(false);
+        $this->setIsSortEnabled(true);
     }
 
     public function buildFields()
