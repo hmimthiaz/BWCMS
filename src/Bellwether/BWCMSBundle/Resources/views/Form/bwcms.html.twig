@@ -1,17 +1,3 @@
-{% block bwcms_collection_widget3 %}
-    {{ dump(form_row(prototype)) }}
-    {% spaceless %}
-        {% if prototype is defined %}
-            {% set attr = attr|merge({'data-prototype': form_row(prototype) , 'class': 'FCData'}) %}
-        {% endif %}
-        <div class="FCHolder" style="border: 1px solid #cccccc;">
-            {{ block('form_widget') }}
-            <button type="button" class="FCAdd btn btn-primary edit"><i class="glyphicon glyphicon-plus"></i></button>
-        </div>
-    {% endspaceless %}
-{% endblock bwcms_collection_widget3 %}
-
-
 {% block bwcms_collection_widget %}
     {% spaceless %}
         {% if prototype is defined %}
