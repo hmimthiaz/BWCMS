@@ -135,6 +135,9 @@
                                     "{{ typeKey }}": {
                                         "label": "{{ type.name }}",
                                         "icon": "glyphicon glyphicon-plus",
+                                        "_disabled": function(){
+                                            return true;
+                                        },
                                         "action": function () {
                                             window.location = createURL + '?parent=' + node.id + '&type={{ type.type }}&schema={{ type.schema }}';
                                             return false;

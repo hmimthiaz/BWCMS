@@ -151,10 +151,10 @@ class ContentController extends BaseController
         $form = $class->getForm();
 
         $title = '';
-        if ($class->isIsContent()) {
+        if ($class->isContent()) {
             $title = 'Content: ';
         }
-        if ($class->isIsNavigation()) {
+        if ($class->isNavigation()) {
             $title = 'Navigation: ';
         }
         return array(
@@ -188,10 +188,10 @@ class ContentController extends BaseController
         $form = $this->cm()->loadFormData($content, $form, $class);
 
         $title = '';
-        if ($class->isIsContent()) {
+        if ($class->isContent()) {
             $title = 'Content: ';
         }
-        if ($class->isIsNavigation()) {
+        if ($class->isNavigation()) {
             $title = 'Navigation: ';
         }
         return array(
@@ -239,17 +239,17 @@ class ContentController extends BaseController
             if ($contentEntity->getTreeParent() != null) {
                 $parentId = $contentEntity->getTreeParent()->getId();
             }
-            if ($class->isIsNavigation()) {
+            if ($class->isNavigation()) {
                 return $this->redirect($this->generateUrl('navigation_home', array('parent' => $parentId)));
             }
             return $this->redirect($this->generateUrl('content_home', array('parent' => $parentId)));
         }
 
         $title = '';
-        if ($class->isIsContent()) {
+        if ($class->isContent()) {
             $title = 'Content: ';
         }
-        if ($class->isIsNavigation()) {
+        if ($class->isNavigation()) {
             $title = 'Navigation: ';
         }
         return array(

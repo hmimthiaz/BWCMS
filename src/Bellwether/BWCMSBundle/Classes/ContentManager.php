@@ -85,7 +85,7 @@ class ContentManager extends BaseService
          * @var ContentTypeInterface $class
          */
         foreach ($this->contentType as $key => $class) {
-            if ($class->isIsContent()) {
+            if ($class->isContent()) {
                 $retVal[$key] = array(
                     'name' => $class->getName(),
                     'type' => $class->getType(),
@@ -106,7 +106,7 @@ class ContentManager extends BaseService
          * @var ContentTypeInterface $class
          */
         foreach ($this->contentType as $key => $class) {
-            if ($class->isIsNavigation()) {
+            if ($class->isNavigation()) {
                 $retVal[$key] = array(
                     'name' => $class->getName(),
                     'type' => $class->getType(),
@@ -152,16 +152,16 @@ class ContentManager extends BaseService
         $form->get('status')->setData($content->getStatus());
         $form->get('title')->setData($content->getTitle());
 
-        if ($classInstance->isIsSummaryEnabled()) {
+        if ($classInstance->isSummaryEnabled()) {
             $form->get('summary')->setData($content->getSummary());
         }
-        if ($classInstance->isIsContentEnabled()) {
+        if ($classInstance->isContentEnabled()) {
             $form->get('content')->setData($content->getContent());
         }
-        if ($classInstance->isIsSlugEnabled()) {
+        if ($classInstance->isSlugEnabled()) {
             $form->get('slug')->setData($content->getSlug());
         }
-        if ($classInstance->isIsSortEnabled()) {
+        if ($classInstance->isSortEnabled()) {
             $form->get('sortBy')->setData($content->getSortBy());
             $form->get('sortOrder')->setData($content->getSortOrder());
         }

@@ -55,6 +55,10 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @var bool
      */
+    private $isHierarchy = false;
+    /**
+     * @var bool
+     */
     private $isContent = false;
 
     /**
@@ -401,7 +405,7 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return boolean
      */
-    public function isIsContent()
+    public function isContent()
     {
         return $this->isContent;
     }
@@ -417,7 +421,7 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return boolean
      */
-    public function isIsNavigation()
+    public function isNavigation()
     {
         return $this->isNavigation;
     }
@@ -433,7 +437,7 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return boolean
      */
-    public function isIsSummaryEnabled()
+    public function isSummaryEnabled()
     {
         return $this->isSummaryEnabled;
     }
@@ -449,7 +453,7 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return boolean
      */
-    public function isIsContentEnabled()
+    public function isContentEnabled()
     {
         return $this->isContentEnabled;
     }
@@ -465,7 +469,7 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return boolean
      */
-    public function isIsUploadEnabled()
+    public function isUploadEnabled()
     {
         return $this->isUploadEnabled;
     }
@@ -481,7 +485,7 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return boolean
      */
-    public function isIsSlugEnabled()
+    public function isSlugEnabled()
     {
         return $this->isSlugEnabled;
     }
@@ -497,7 +501,7 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return boolean
      */
-    public function isIsSortEnabled()
+    public function isSortEnabled()
     {
         return $this->isSortEnabled;
     }
