@@ -24,6 +24,9 @@ class FolderContentType Extends ContentType
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
 
+        $this->setIsContent(true);
+        $this->setIsNavigation(false);
+
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
         $this->setIsUploadEnabled(false);

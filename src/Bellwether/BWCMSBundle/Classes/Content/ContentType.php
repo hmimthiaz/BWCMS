@@ -55,6 +55,16 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @var bool
      */
+    private $isContent = false;
+
+    /**
+     * @var bool
+     */
+    private $isNavigation = false;
+
+    /**
+     * @var bool
+     */
     private $isSummaryEnabled = true;
 
     /**
@@ -386,6 +396,38 @@ abstract class ContentType implements ContentTypeInterface
     public function setRequestStack($requestStack)
     {
         $this->requestStack = $requestStack;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIsContent()
+    {
+        return $this->isContent;
+    }
+
+    /**
+     * @param boolean $isContent
+     */
+    public function setIsContent($isContent)
+    {
+        $this->isContent = $isContent;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIsNavigation()
+    {
+        return $this->isNavigation;
+    }
+
+    /**
+     * @param boolean $isNavigation
+     */
+    public function setIsNavigation($isNavigation)
+    {
+        $this->isNavigation = $isNavigation;
     }
 
     /**

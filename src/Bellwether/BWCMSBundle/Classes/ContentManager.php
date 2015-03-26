@@ -15,6 +15,10 @@ use Bellwether\BWCMSBundle\Classes\Content\Type\FolderContentType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\MediaContentType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\PageContentType;
 
+use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationFolderContentType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationLinkContentType;
+
+
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Symfony\Component\Form\Form;
@@ -54,6 +58,12 @@ class ContentManager extends BaseService
         $defaultPageContentType = new PageContentType($this->container, $this->requestStack);
         $this->registerContentType($defaultPageContentType);
 
+        $defaultNavigationFolderType = new NavigationFolderContentType($this->container, $this->requestStack);
+        $this->registerContentType($defaultNavigationFolderType);
+
+        $defaultNavigationLinkType = new NavigationLinkContentType($this->container, $this->requestStack);
+        $this->registerContentType($defaultNavigationLinkType);
+
     }
 
     /**
@@ -75,11 +85,34 @@ class ContentManager extends BaseService
          * @var ContentTypeInterface $class
          */
         foreach ($this->contentType as $key => $class) {
-            $retVal[$key] = array(
-                'name' => $class->getName(),
-                'type' => $class->getType(),
-                'schema' => $class->getSchema()
-            );
+            if ($class->isIsContent()) {
+                $retVal[$key] = array(
+                    'name' => $class->getName(),
+                    'type' => $class->getType(),
+                    'schema' => $class->getSchema()
+                );
+            }
+        }
+        return $retVal;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRegisteredNavigation()
+    {
+        $retVal = array();
+        /**
+         * @var ContentTypeInterface $class
+         */
+        foreach ($this->contentType as $key => $class) {
+            if ($class->isIsNavigation()) {
+                $retVal[$key] = array(
+                    'name' => $class->getName(),
+                    'type' => $class->getType(),
+                    'schema' => $class->getSchema()
+                );
+            }
         }
         return $retVal;
     }

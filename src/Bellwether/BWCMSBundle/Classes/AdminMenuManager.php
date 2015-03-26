@@ -52,6 +52,8 @@ class AdminMenuManager extends BaseService
         $menu->addChild('Manage', array('uri' => '#', 'label' => 'Manage' ))->setAttribute('dropdown', true);
         $menu['Manage']->addChild('Content', array('route' => 'content_home'));
         $menu['Manage']->addChild('Media', array('route' => 'media_home'));
+        $menu['Manage']->addChild('Navigation', array('route' => 'navigation_home'));
+
         return $menu;
     }
 
