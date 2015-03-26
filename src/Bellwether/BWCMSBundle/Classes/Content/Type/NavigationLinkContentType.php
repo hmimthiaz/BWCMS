@@ -24,6 +24,9 @@ class NavigationLinkContentType Extends ContentType
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
 
+        $this->setIsHierarchy(false);
+        $this->setIsRootItem(false);
+
         $this->setIsContent(false);
         $this->setIsNavigation(true);
 

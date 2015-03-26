@@ -2,6 +2,8 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Content;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
@@ -56,6 +58,12 @@ abstract class ContentType implements ContentTypeInterface
      * @var bool
      */
     private $isHierarchy = false;
+
+    /**
+     * @var bool
+     */
+    private $isRootItem = false;
+
     /**
      * @var bool
      */
@@ -400,6 +408,38 @@ abstract class ContentType implements ContentTypeInterface
     public function setRequestStack($requestStack)
     {
         $this->requestStack = $requestStack;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isHierarchy()
+    {
+        return $this->isHierarchy;
+    }
+
+    /**
+     * @param boolean $isHierarchy
+     */
+    public function setIsHierarchy($isHierarchy)
+    {
+        $this->isHierarchy = $isHierarchy;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isRootItem()
+    {
+        return $this->isRootItem;
+    }
+
+    /**
+     * @param boolean $isRootItem
+     */
+    public function setIsRootItem($isRootItem)
+    {
+        $this->isRootItem = $isRootItem;
     }
 
     /**

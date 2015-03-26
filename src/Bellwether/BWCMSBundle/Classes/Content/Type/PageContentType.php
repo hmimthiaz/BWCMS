@@ -23,6 +23,9 @@ class PageContentType Extends ContentType
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
 
+        $this->setIsHierarchy(false);
+        $this->setIsRootItem(false);
+
         $this->setIsContent(true);
         $this->setIsNavigation(false);
 

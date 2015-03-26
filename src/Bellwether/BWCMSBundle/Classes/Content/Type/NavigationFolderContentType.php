@@ -24,6 +24,9 @@ class NavigationFolderContentType Extends ContentType
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
 
+        $this->setIsHierarchy(true);
+        $this->setIsRootItem(true);
+
         $this->setIsContent(false);
         $this->setIsNavigation(true);
 
