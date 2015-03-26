@@ -3,6 +3,8 @@
 namespace Bellwether\BWCMSBundle\Controller;
 
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -254,29 +256,53 @@ class ContentController extends BaseController
         /**
          * Get All the root folders
          * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $parentFolder
          */
+        $uiSortEnabled = false;
         $contentRepository = $this->cm()->getContentRepository();
         if ($parentId == 'Root') {
             $qb = $contentRepository->getChildrenQueryBuilder(null, true);
         } else {
             $parentFolder = $contentRepository->find($parentId);
             $qb = $contentRepository->getChildrenQueryBuilder($parentFolder, true);
+            $sortOrder = ' ASC';
+            if($parentFolder->getSortOrder()==ContentSortOrderType::DESC){
+                $sortOrder = ' DESC';
+            }
+            if ($parentFolder->getSortBy() == ContentSortByType::SortIndex) {
+                $uiSortEnabled = true;
+                $qb->add('orderBy', 'node.treeLeft' . $sortOrder);
+            } elseif ($parentFolder->getSortBy() == ContentSortByType::Created) {
+                $qb->add('orderBy', 'node.createdDate' . $sortOrder);
+            } elseif ($parentFolder->getSortBy() == ContentSortByType::Published) {
+                $qb->add('orderBy', 'node.publishDate' . $sortOrder);
+            } elseif ($parentFolder->getSortBy() == ContentSortByType::Title) {
+                $qb->add('orderBy', 'node.title' . $sortOrder);
+            } elseif ($parentFolder->getSortBy() == ContentSortByType::Size) {
+                $qb->add('orderBy', 'node.size' . $sortOrder);
+            }
         }
         //$qb->andWhere(" node.type = 'Page' OR  node.type = 'Folder' ");
         $qb->setFirstResult($start);
         $qb->setMaxResults($length);
-        //$qb->add('orderBy', 'node.createdDate ASC');
+
+        //
 
         if (!empty($searchString)) {
             $qb->andWhere(" node.title LIKE :query1 OR node.file LIKE :query2 ");
             $qb->setParameter('query1', '%' . $searchString . '%');
             $qb->setParameter('query2', '%' . $searchString . '%');
         }
+//
+//        var_dump($qb->getDQL());
+//        exit;
 
         $result = $qb->getQuery()->getResult();
         $totalCount = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
         $data = array();
         $data['draw'] = $draw;
+        $data['sort'] = $uiSortEnabled;
+
         $data['recordsFiltered'] = $totalCount;
         $data['recordsTotal'] = $totalCount;
         $data['data'] = array();
