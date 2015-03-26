@@ -150,10 +150,16 @@ class ContentController extends BaseController
         }
         $form = $class->getForm();
 
-
+        $title = '';
+        if ($class->isIsContent()) {
+            $title = 'Content: ';
+        }
+        if ($class->isIsNavigation()) {
+            $title = 'Navigation: ';
+        }
         return array(
-            'title' => 'Content: Create ' . $class->getName(),
-            'pageTitle' => 'Content: Create ' . $class->getName(),
+            'title' => $title . 'Create ' . $class->getName(),
+            'pageTitle' => $title . 'Create ' . $class->getName(),
             'form' => $form->createView()
         );
     }
@@ -179,11 +185,18 @@ class ContentController extends BaseController
             $class->setParent($content->getTreeParent()->getId());
         }
         $form = $class->getForm();
-
         $form = $this->cm()->loadFormData($content, $form, $class);
+
+        $title = '';
+        if ($class->isIsContent()) {
+            $title = 'Content: ';
+        }
+        if ($class->isIsNavigation()) {
+            $title = 'Navigation: ';
+        }
         return array(
-            'title' => 'Content: Edit ' . $class->getName(),
-            'pageTitle' => 'Content: Edit ' . $class->getName(),
+            'title' => $title . 'Edit ' . $class->getName(),
+            'pageTitle' => $title . 'Edit ' . $class->getName(),
             'form' => $form->createView()
         );
     }
@@ -226,12 +239,22 @@ class ContentController extends BaseController
             if ($contentEntity->getTreeParent() != null) {
                 $parentId = $contentEntity->getTreeParent()->getId();
             }
+            if ($class->isIsNavigation()) {
+                return $this->redirect($this->generateUrl('navigation_home', array('parent' => $parentId)));
+            }
             return $this->redirect($this->generateUrl('content_home', array('parent' => $parentId)));
         }
 
+        $title = '';
+        if ($class->isIsContent()) {
+            $title = 'Content: ';
+        }
+        if ($class->isIsNavigation()) {
+            $title = 'Navigation: ';
+        }
         return array(
-            'title' => 'Content: Edit ' . $class->getName(),
-            'pageTitle' => 'Content: Edit ' . $class->getName(),
+            'title' => $title . 'Edit ' . $class->getName(),
+            'pageTitle' => $title . 'Edit ' . $class->getName(),
             'form' => $form->createView()
         );
     }
@@ -266,7 +289,7 @@ class ContentController extends BaseController
             $parentFolder = $contentRepository->find($parentId);
             $qb = $contentRepository->getChildrenQueryBuilder($parentFolder, true);
             $sortOrder = ' ASC';
-            if($parentFolder->getSortOrder()==ContentSortOrderType::DESC){
+            if ($parentFolder->getSortOrder() == ContentSortOrderType::DESC) {
                 $sortOrder = ' DESC';
             }
             if ($parentFolder->getSortBy() == ContentSortByType::SortIndex) {
@@ -282,11 +305,18 @@ class ContentController extends BaseController
                 $qb->add('orderBy', 'node.size' . $sortOrder);
             }
         }
-        //$qb->andWhere(" node.type = 'Page' OR  node.type = 'Folder' ");
+
+        $registeredContents = $this->cm()->getRegisteredContent();
+        $condition = array();
+        foreach ($registeredContents as $cInfo) {
+            $condition[] = " node.type = '" . $cInfo['type'] . "' ";
+        }
+        if (!empty($condition)) {
+            $qb->andWhere(implode(' OR ', $condition));
+        }
+
         $qb->setFirstResult($start);
         $qb->setMaxResults($length);
-
-        //
 
         if (!empty($searchString)) {
             $qb->andWhere(" node.title LIKE :query1 OR node.file LIKE :query2 ");

@@ -42,7 +42,7 @@
                 drag: true,
                 select: true,
                 ajax: {
-                    url: "{{ url('content_table_data') }}",
+                    url: "{{ url('navigation_table_data') }}",
                     type: 'GET',
                     'data': function (params) {
                         params.parent = $("#selectedContentFolderId").val();

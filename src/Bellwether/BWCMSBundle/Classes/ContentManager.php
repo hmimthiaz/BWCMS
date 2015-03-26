@@ -120,7 +120,7 @@ class ContentManager extends BaseService
     /**
      * @param string $type
      * @param string $schema
-     * @return ContentTypeInterface
+     * @return ContentType
      */
     public function getContentClass($type, $schema = 'Default')
     {
