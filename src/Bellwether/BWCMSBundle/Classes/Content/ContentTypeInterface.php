@@ -38,4 +38,11 @@ interface ContentTypeInterface
      * @return mixed
      */
     public function setParent($contentId);
+
+
+    /**
+     * @param string $type
+     * @return bool
+     */
+    public function isType($type = '');
 }

@@ -16,7 +16,7 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 
 
-class FolderContentType Extends ContentType
+class NavigationLinkType Extends ContentType
 {
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
@@ -24,16 +24,13 @@ class FolderContentType Extends ContentType
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
 
-        $this->setIsHierarchy(true);
-        $this->setIsRootItem(true);
-
-        $this->setIsContent(true);
-        $this->setIsNavigation(false);
+        $this->setIsHierarchy(false);
+        $this->setIsRootItem(false);
 
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
         $this->setIsUploadEnabled(false);
-        $this->setIsSortEnabled(true);
+        $this->setIsSortEnabled(false);
     }
 
     public function buildFields()
@@ -63,7 +60,7 @@ class FolderContentType Extends ContentType
 
     public function getType()
     {
-        return "Folder";
+        return "Navigation.Link";
     }
 
     public function getSchema()
@@ -73,7 +70,7 @@ class FolderContentType Extends ContentType
 
     public function getName()
     {
-        return "Folder";
+        return "Link";
     }
 
 }

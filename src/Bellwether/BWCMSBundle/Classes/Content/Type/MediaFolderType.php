@@ -16,7 +16,7 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 
 
-class NavigationFolderContentType Extends ContentType
+class MediaFolderType Extends ContentType
 {
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
@@ -26,9 +26,6 @@ class NavigationFolderContentType Extends ContentType
 
         $this->setIsHierarchy(true);
         $this->setIsRootItem(true);
-
-        $this->setIsContent(false);
-        $this->setIsNavigation(true);
 
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
@@ -63,7 +60,7 @@ class NavigationFolderContentType Extends ContentType
 
     public function getType()
     {
-        return "NavFolder";
+        return "Media.Folder";
     }
 
     public function getSchema()

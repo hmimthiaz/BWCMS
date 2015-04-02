@@ -67,16 +67,6 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @var bool
      */
-    private $isContent = false;
-
-    /**
-     * @var bool
-     */
-    private $isNavigation = false;
-
-    /**
-     * @var bool
-     */
     private $isSummaryEnabled = true;
 
     /**
@@ -442,36 +432,13 @@ abstract class ContentType implements ContentTypeInterface
         $this->isRootItem = $isRootItem;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isContent()
+    public function isType($type = 'Content')
     {
-        return $this->isContent;
-    }
-
-    /**
-     * @param boolean $isContent
-     */
-    public function setIsContent($isContent)
-    {
-        $this->isContent = $isContent;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isNavigation()
-    {
-        return $this->isNavigation;
-    }
-
-    /**
-     * @param boolean $isNavigation
-     */
-    public function setIsNavigation($isNavigation)
-    {
-        $this->isNavigation = $isNavigation;
+        $contentType = strtoupper($this->getType());
+        if (strpos($contentType, strtoupper($type) . '') !== false) {
+            return true;
+        }
+        return false;
     }
 
     /**

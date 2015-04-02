@@ -11,12 +11,12 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
-use Bellwether\BWCMSBundle\Classes\Content\Type\FolderContentType;
-use Bellwether\BWCMSBundle\Classes\Content\Type\MediaContentType;
-use Bellwether\BWCMSBundle\Classes\Content\Type\PageContentType;
-
-use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationFolderContentType;
-use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationLinkContentType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\ContentFolderType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\ContentPageType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\MediaFolderType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\MediaFileType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationFolderType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationLinkType;
 
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
@@ -48,26 +48,18 @@ class ContentManager extends BaseService
 
     private function addDefaultContentTypes()
     {
+        $this->registerContentType(new ContentFolderType($this->container, $this->requestStack));
+        $this->registerContentType(new ContentPageType($this->container, $this->requestStack));
 
-        $defaultFolderContentType = new FolderContentType($this->container, $this->requestStack);
-        $this->registerContentType($defaultFolderContentType);
+        $this->registerContentType(new MediaFolderType($this->container, $this->requestStack));
+        $this->registerContentType(new MediaFileType($this->container, $this->requestStack));
 
-        $defaultMediaContentType = new MediaContentType($this->container, $this->requestStack);
-        $this->registerContentType($defaultMediaContentType);
-
-        $defaultPageContentType = new PageContentType($this->container, $this->requestStack);
-        $this->registerContentType($defaultPageContentType);
-
-        $defaultNavigationFolderType = new NavigationFolderContentType($this->container, $this->requestStack);
-        $this->registerContentType($defaultNavigationFolderType);
-
-        $defaultNavigationLinkType = new NavigationLinkContentType($this->container, $this->requestStack);
-        $this->registerContentType($defaultNavigationLinkType);
-
+        $this->registerContentType(new NavigationFolderType($this->container, $this->requestStack));
+        $this->registerContentType(new NavigationLinkType($this->container, $this->requestStack));
     }
 
     /**
-     * @param ContentTypeInterface|BaseContentType $classInstance
+     * @param ContentTypeInterface|ContentType $classInstance
      */
     public function registerContentType(ContentTypeInterface $classInstance)
     {
@@ -78,18 +70,20 @@ class ContentManager extends BaseService
     /**
      * @return array
      */
-    public function getRegisteredContent()
+    public function getRegisteredContent($type = 'Content')
     {
         $retVal = array();
         /**
-         * @var ContentTypeInterface $class
+         * @var ContentType $class
          */
         foreach ($this->contentType as $key => $class) {
-            if ($class->isContent()) {
+            if ($class->isType($type)) {
                 $retVal[$key] = array(
                     'name' => $class->getName(),
                     'type' => $class->getType(),
-                    'schema' => $class->getSchema()
+                    'schema' => $class->getSchema(),
+                    'isHierarchy' => $class->isHierarchy(),
+                    'isRootItem' => $class->isRootItem()
                 );
             }
         }
@@ -103,16 +97,18 @@ class ContentManager extends BaseService
     {
         $retVal = array();
         /**
-         * @var ContentTypeInterface $class
+         * @var ContentType $class
          */
         foreach ($this->contentType as $key => $class) {
-            if ($class->isNavigation()) {
-                $retVal[$key] = array(
-                    'name' => $class->getName(),
-                    'type' => $class->getType(),
-                    'schema' => $class->getSchema()
-                );
-            }
+            //if ($class->isNavigation()) {
+            $retVal[$key] = array(
+                'name' => $class->getName(),
+                'type' => $class->getType(),
+                'schema' => $class->getSchema(),
+                'isHierarchy' => $class->isHierarchy(),
+                'isRootItem' => $class->isRootItem()
+            );
+            //}
         }
         return $retVal;
     }

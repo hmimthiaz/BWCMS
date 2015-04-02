@@ -126,10 +126,10 @@ class NavigationController extends BaseController
         $registeredContents = $this->cm()->getRegisteredNavigation();
         $condition = array();
         foreach ($registeredContents as $cInfo) {
-            $condition[] = " node.type = '" . $cInfo['type'] . "' ";
+            $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
         }
         if (!empty($condition)) {
-            $qb->andWhere(implode(' OR ', $condition));
+            $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
 
         $qb->setFirstResult($start);

@@ -26,10 +26,24 @@ class ContentController extends BaseController
     public function indexAction(Request $request)
     {
 
+        $type = ucfirst($request->get('type', 'Content'));
+
         $parentId = $request->get('parent', 'Root');
 
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
-        $qb->andWhere(" node.type = 'Folder' ");
+
+        $registeredContents = $this->cm()->getRegisteredContent($type);
+
+        $condition = array();
+        foreach ($registeredContents as $cInfo) {
+            if ($cInfo['isHierarchy']) {
+                $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
+            }
+        }
+        if (!empty($condition)) {
+            $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
+        }
+
         $rootFolders = $qb->getQuery()->getResult();
 
         $jsNodes = array(
@@ -68,7 +82,7 @@ class ContentController extends BaseController
 
         return array(
             'parentId' => $parentId,
-            'contentTypes' => $this->cm()->getRegisteredContent(),
+            'contentTypes' => $registeredContents,
             'jsNodes' => json_encode($jsNodes),
         );
     }
@@ -85,7 +99,11 @@ class ContentController extends BaseController
 
 
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
+
+        $registeredContents = $this->cm()->getRegisteredContent();
+
         $qb->andWhere(" node.type = 'Folder' ");
+
         $rootFolders = $qb->getQuery()->getResult();
 
         $jsNodes = array(
@@ -151,12 +169,12 @@ class ContentController extends BaseController
         $form = $class->getForm();
 
         $title = '';
-        if ($class->isContent()) {
-            $title = 'Content: ';
-        }
-        if ($class->isNavigation()) {
-            $title = 'Navigation: ';
-        }
+//        if ($class->isContent()) {
+//            $title = 'Content: ';
+//        }
+//        if ($class->isNavigation()) {
+//            $title = 'Navigation: ';
+//        }
         return array(
             'title' => $title . 'Create ' . $class->getName(),
             'pageTitle' => $title . 'Create ' . $class->getName(),
@@ -188,12 +206,12 @@ class ContentController extends BaseController
         $form = $this->cm()->loadFormData($content, $form, $class);
 
         $title = '';
-        if ($class->isContent()) {
-            $title = 'Content: ';
-        }
-        if ($class->isNavigation()) {
-            $title = 'Navigation: ';
-        }
+//        if ($class->isContent()) {
+//            $title = 'Content: ';
+//        }
+//        if ($class->isNavigation()) {
+//            $title = 'Navigation: ';
+//        }
         return array(
             'title' => $title . 'Edit ' . $class->getName(),
             'pageTitle' => $title . 'Edit ' . $class->getName(),
@@ -239,19 +257,19 @@ class ContentController extends BaseController
             if ($contentEntity->getTreeParent() != null) {
                 $parentId = $contentEntity->getTreeParent()->getId();
             }
-            if ($class->isNavigation()) {
-                return $this->redirect($this->generateUrl('navigation_home', array('parent' => $parentId)));
-            }
+//            if ($class->isNavigation()) {
+//                return $this->redirect($this->generateUrl('navigation_home', array('parent' => $parentId)));
+//            }
             return $this->redirect($this->generateUrl('content_home', array('parent' => $parentId)));
         }
 
         $title = '';
-        if ($class->isContent()) {
-            $title = 'Content: ';
-        }
-        if ($class->isNavigation()) {
-            $title = 'Navigation: ';
-        }
+//        if ($class->isContent()) {
+//            $title = 'Content: ';
+//        }
+//        if ($class->isNavigation()) {
+//            $title = 'Navigation: ';
+//        }
         return array(
             'title' => $title . 'Edit ' . $class->getName(),
             'pageTitle' => $title . 'Edit ' . $class->getName(),
@@ -309,10 +327,10 @@ class ContentController extends BaseController
         $registeredContents = $this->cm()->getRegisteredContent();
         $condition = array();
         foreach ($registeredContents as $cInfo) {
-            $condition[] = " node.type = '" . $cInfo['type'] . "' ";
+            $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
         }
         if (!empty($condition)) {
-            $qb->andWhere(implode(' OR ', $condition));
+            $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
 
         $qb->setFirstResult($start);

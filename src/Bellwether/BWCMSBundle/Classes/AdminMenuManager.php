@@ -9,7 +9,6 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Symfony\Component\HttpFoundation\Request;
 
 
-
 class AdminMenuManager extends BaseService
 {
     private $factory;
@@ -29,15 +28,16 @@ class AdminMenuManager extends BaseService
         return $this;
     }
 
-    public function buildRightMainMenu(Request $request){
+    public function buildRightMainMenu(Request $request)
+    {
         $menu = $this->factory->createItem('root');
 
-        $menu->addChild('Profile', array('uri' => '#','label' => $this->getUser()->getEmail() ))->setAttribute('dropdown', true);
+        $menu->addChild('Profile', array('uri' => '#', 'label' => $this->getUser()->getEmail()))->setAttribute('dropdown', true);
         $menu['Profile']->addChild('Profile', array('uri' => '#'));
-        if($this->getSecurityContext()->isGranted('ROLE_PREVIOUS_ADMIN')){
+        if ($this->getSecurityContext()->isGranted('ROLE_PREVIOUS_ADMIN')) {
             $menu['Profile']->addChild('Exit User', array(
                 'route' => 'Homepage',
-                'routeParameters' => array('_switch_user' =>  '_exit')
+                'routeParameters' => array('_switch_user' => '_exit')
             ));
         }
         $menu['Profile']->addChild('Logout', array('route' => 'fos_user_security_logout'));
@@ -45,12 +45,31 @@ class AdminMenuManager extends BaseService
         return $menu;
     }
 
-    public function buildLeftMainMenu(Request $request){
+    public function buildLeftMainMenu(Request $request)
+    {
         $menu = $this->factory->createItem('root');
-        $menu->addChild('Dashboard', array('route' => 'dashboard_home' ));
+        $menu->addChild('Dashboard', array('route' => 'dashboard_home'));
 
-        $menu->addChild('Manage', array('uri' => '#', 'label' => 'Manage' ))->setAttribute('dropdown', true);
-        $menu['Manage']->addChild('Content', array('route' => 'content_home'));
+        $menu->addChild('Manage', array('uri' => '#', 'label' => 'Manage'))->setAttribute('dropdown', true);
+        $menu['Manage']->addChild('C->Content', array(
+            'route' => 'content_home',
+            'routeParameters' => array(
+                'type' => 'Content'
+            )
+        ));
+        $menu['Manage']->addChild('C->Media', array(
+            'route' => 'content_home',
+            'routeParameters' => array(
+                'type' => 'Media'
+            )
+        ));
+        $menu['Manage']->addChild('C->Navigation', array(
+            'route' => 'content_home',
+            'routeParameters' => array(
+                'type' => 'Navigation'
+            )
+        ));
+
         $menu['Manage']->addChild('Media', array('route' => 'media_home'));
         $menu['Manage']->addChild('Navigation', array('route' => 'navigation_home'));
 

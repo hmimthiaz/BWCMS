@@ -15,7 +15,7 @@ use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Content\Form\SampleForm;
 
 
-class PageContentType Extends ContentType
+class ContentPageType Extends ContentType
 {
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
@@ -25,9 +25,6 @@ class PageContentType Extends ContentType
 
         $this->setIsHierarchy(false);
         $this->setIsRootItem(false);
-
-        $this->setIsContent(true);
-        $this->setIsNavigation(false);
 
         $this->setIsSummaryEnabled(true);
         $this->setIsContentEnabled(true);
@@ -78,7 +75,7 @@ class PageContentType Extends ContentType
 
     public function getType()
     {
-        return "Page";
+        return "Content.Page";
     }
 
     public function getSchema()

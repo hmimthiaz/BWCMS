@@ -8,15 +8,13 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Classes\Content\ContentType;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Form\FormEvent;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 
 
-class NavigationLinkContentType Extends ContentType
+class MediaFileType Extends ContentType
 {
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
@@ -27,13 +25,9 @@ class NavigationLinkContentType Extends ContentType
         $this->setIsHierarchy(false);
         $this->setIsRootItem(false);
 
-        $this->setIsContent(false);
-        $this->setIsNavigation(true);
-
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
-        $this->setIsUploadEnabled(false);
-        $this->setIsSortEnabled(false);
+        $this->setIsUploadEnabled(true);
     }
 
     public function buildFields()
@@ -61,9 +55,10 @@ class NavigationLinkContentType Extends ContentType
         return $content;
     }
 
+
     public function getType()
     {
-        return "NavLink";
+        return "Media.Files";
     }
 
     public function getSchema()
@@ -73,7 +68,7 @@ class NavigationLinkContentType Extends ContentType
 
     public function getName()
     {
-        return "Link";
+        return "Media";
     }
 
 }
