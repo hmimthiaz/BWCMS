@@ -51,27 +51,32 @@ class AdminMenuManager extends BaseService
         $menu->addChild('Dashboard', array('route' => 'dashboard_home'));
 
         $menu->addChild('Manage', array('uri' => '#', 'label' => 'Manage'))->setAttribute('dropdown', true);
-        $menu['Manage']->addChild('C->Content', array(
+        $menu['Manage']->addChild('Content', array(
             'route' => 'content_home',
             'routeParameters' => array(
                 'type' => 'Content'
             )
         ));
-        $menu['Manage']->addChild('C->Media', array(
+        $menu['Manage']->addChild('Media', array(
             'route' => 'content_home',
             'routeParameters' => array(
                 'type' => 'Media'
             )
         ));
-        $menu['Manage']->addChild('C->Navigation', array(
+        $menu['Manage']->addChild('Navigation', array(
             'route' => 'content_home',
             'routeParameters' => array(
                 'type' => 'Navigation'
             )
         ));
+        $menu['Manage']->addChild('Widget', array(
+            'route' => 'content_home',
+            'routeParameters' => array(
+                'type' => 'Widget'
+            )
+        ));
 
-        $menu['Manage']->addChild('Media', array('route' => 'media_home'));
-        $menu['Manage']->addChild('Navigation', array('route' => 'navigation_home'));
+        $menu['Manage']->addChild('Upload Media', array('route' => 'media_home'));
 
         return $menu;
     }

@@ -26,8 +26,7 @@ class ContentController extends BaseController
     public function indexAction(Request $request)
     {
 
-        $type = ucfirst($request->get('type', 'Content'));
-
+        $type = $request->get('type', 'Content');
         $parentId = $request->get('parent', 'Root');
 
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
@@ -82,6 +81,8 @@ class ContentController extends BaseController
 
         return array(
             'parentId' => $parentId,
+            'type' => $type,
+            'title' => ucfirst($type) . ' Manager',
             'contentTypes' => $registeredContents,
             'jsNodes' => json_encode($jsNodes),
         );
@@ -96,7 +97,6 @@ class ContentController extends BaseController
 
         $parentId = $request->get('parent', 'Root');
         $holder = $request->get('holder', '');
-
 
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
 
@@ -158,9 +158,13 @@ class ContentController extends BaseController
     public function createAction(Request $request)
     {
 
-        $type = $request->get('type', 'Page');
-        $schema = $request->get('schema', 'Default');
-        $parent = $request->get('parent', 'Root');
+        $type = $request->get('type', null);
+        $schema = $request->get('schema', null);
+        $parent = $request->get('parent', null);
+
+        if (is_null($type) || is_null($schema) || is_null($parent)) {
+            die('Unexpected parameters');
+        }
 
         $class = $this->cm()->getContentClass($type, $schema);
         if ($parent != 'Root') {
@@ -168,16 +172,8 @@ class ContentController extends BaseController
         }
         $form = $class->getForm();
 
-        $title = '';
-//        if ($class->isContent()) {
-//            $title = 'Content: ';
-//        }
-//        if ($class->isNavigation()) {
-//            $title = 'Navigation: ';
-//        }
         return array(
-            'title' => $title . 'Create ' . $class->getName(),
-            'pageTitle' => $title . 'Create ' . $class->getName(),
+            'title' => 'Create ' . $class->getName(),
             'form' => $form->createView()
         );
     }
@@ -205,16 +201,8 @@ class ContentController extends BaseController
         $form = $class->getForm();
         $form = $this->cm()->loadFormData($content, $form, $class);
 
-        $title = '';
-//        if ($class->isContent()) {
-//            $title = 'Content: ';
-//        }
-//        if ($class->isNavigation()) {
-//            $title = 'Navigation: ';
-//        }
         return array(
-            'title' => $title . 'Edit ' . $class->getName(),
-            'pageTitle' => $title . 'Edit ' . $class->getName(),
+            'title' => 'Edit ' . $class->getName(),
             'form' => $form->createView()
         );
     }
@@ -257,22 +245,13 @@ class ContentController extends BaseController
             if ($contentEntity->getTreeParent() != null) {
                 $parentId = $contentEntity->getTreeParent()->getId();
             }
-//            if ($class->isNavigation()) {
-//                return $this->redirect($this->generateUrl('navigation_home', array('parent' => $parentId)));
-//            }
-            return $this->redirect($this->generateUrl('content_home', array('parent' => $parentId)));
+            list($type) = explode('.', $contentEntity->getType());
+            return $this->redirect($this->generateUrl('content_home', array('type' => $type, 'parent' => $parentId)));
         }
 
-        $title = '';
-//        if ($class->isContent()) {
-//            $title = 'Content: ';
-//        }
-//        if ($class->isNavigation()) {
-//            $title = 'Navigation: ';
-//        }
         return array(
-            'title' => $title . 'Edit ' . $class->getName(),
-            'pageTitle' => $title . 'Edit ' . $class->getName(),
+            'title' => 'Edit ' . $class->getName(),
+            'pageTitle' => 'Edit ' . $class->getName(),
             'form' => $form->createView()
         );
     }
@@ -284,6 +263,7 @@ class ContentController extends BaseController
      */
     public function indexDataAction(Request $request)
     {
+        $type = $request->get('type', 'Content');
         $draw = $request->get('draw', 0);
         $start = $request->get('start', 10);
         $length = $request->get('length', 10);
@@ -324,7 +304,7 @@ class ContentController extends BaseController
             }
         }
 
-        $registeredContents = $this->cm()->getRegisteredContent();
+        $registeredContents = $this->cm()->getRegisteredContent($type);
         $condition = array();
         foreach ($registeredContents as $cInfo) {
             $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";

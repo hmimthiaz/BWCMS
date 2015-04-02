@@ -8,13 +8,15 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Classes\Content\ContentType;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Form\FormEvent;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 
 
-class MediaFileType Extends ContentType
+class WidgetFolderType Extends ContentType
 {
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
@@ -22,12 +24,13 @@ class MediaFileType Extends ContentType
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
 
-        $this->setIsHierarchy(false);
-        $this->setIsRootItem(false);
+        $this->setIsHierarchy(true);
+        $this->setIsRootItem(true);
 
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
-        $this->setIsUploadEnabled(true);
+        $this->setIsUploadEnabled(false);
+        $this->setIsSortEnabled(false);
     }
 
     public function buildFields()
@@ -55,10 +58,9 @@ class MediaFileType Extends ContentType
         return $content;
     }
 
-
     public function getType()
     {
-        return "Media.Files";
+        return "Widget.Folder";
     }
 
     public function getSchema()
@@ -68,7 +70,7 @@ class MediaFileType Extends ContentType
 
     public function getName()
     {
-        return "File";
+        return "Folder";
     }
 
 }

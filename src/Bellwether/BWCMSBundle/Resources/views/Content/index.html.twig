@@ -1,8 +1,8 @@
 {% extends "BWCMSBundle:Common:default.html.twig" %}
 
-{% block title %}Content Manager{% endblock %}
+{% block title %} {{ title }} {% endblock %}
 {% block pageTitle %}
-    <h1>Content Manager</h1>
+    <h1>{{ title }}</h1>
 {% endblock %}
 
 {% block header %}
@@ -45,6 +45,7 @@
                     url: "{{ url('content_table_data') }}",
                     type: 'GET',
                     'data': function (params) {
+                        params.type = '{{ type }}';
                         params.parent = $("#selectedContentFolderId").val();
                         return params;
                     },
