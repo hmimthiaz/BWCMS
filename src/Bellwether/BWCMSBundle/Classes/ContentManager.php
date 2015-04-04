@@ -88,11 +88,27 @@ class ContentManager extends BaseService
                     'type' => $class->getType(),
                     'schema' => $class->getSchema(),
                     'isHierarchy' => $class->isHierarchy(),
-                    'isRootItem' => $class->isRootItem()
+                    'isRootItem' => $class->isRootItem(),
+                    'class' => $class
                 );
             }
         }
         return $retVal;
+    }
+
+    public function getMediaContentTypes($type = 'Content')
+    {
+        $mediaContentTypes = array();
+        $registeredContents = $this->getRegisteredContent($type);
+        if (!empty($registeredContents)) {
+            foreach ($registeredContents as $content) {
+                $class = $content['class'];
+                if ($class->isUploadEnabled()) {
+                    $mediaContentTypes[] = $content;
+                }
+            }
+        }
+        return $mediaContentTypes;
     }
 
     /**

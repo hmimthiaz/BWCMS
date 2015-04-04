@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block header %}
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/dropzone/dropzone.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/datatable/css/jquery.dataTables.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/jstree/themes/default/style.min.css') }}"/>
 {% endblock %}
@@ -29,6 +30,62 @@
             </table>
         </div>
     </div>
+
+    {% if mediaContentTypes %}
+        <!-- Modal -->
+        <div class="modal fade bs-example-modal-lg" id="uploadModel" tabindex="-1" data-backdrop="static"
+             data-keyboard="false" role="dialog"
+             aria-labelledby="uploadModelLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" id="uploadModelCloseButton" class="close"><span
+                                    aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="uploadModelLabel">
+                            Upload File
+                            <span class="btn btn-success fileinput-button dz-clickable"><i
+                                        class="glyphicon glyphicon-plus"></i><span>Add files...</span></span>
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="uploadContentParentId" value="">
+                        <input type="hidden" id="uploadContentType" value="">
+                        <input type="hidden" id="uploadContentSchema" value="">
+
+                        <div id="fileUploaderPreviews">
+                        </div>
+                        <div style="display: none;" id="fileUploaderTemplate">
+                            <table border="1" width="100%" cellpadding="5">
+                                <tr>
+                                    <td width="100"><img data-dz-thumbnail/></td>
+                                    <td align="left">
+                                        <h5 class="name" data-dz-name></h5>
+                                        Size: <span class="size" data-dz-size></span>
+
+                                        <div class="progress progress-striped active" role="progressbar"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100" aria-valuenow="0">
+                                            <div class="progress-bar progress-bar-success" style="width:0%;"
+                                                 data-dz-uploadprogress></div>
+                                        </div>
+                                        <strong class="error text-danger" data-dz-errormessage></strong>
+                                    </td>
+                                    <td align="center">
+                                        <button data-dz-remove class="btn btn-warning cancel">
+                                            <i class="glyphicon glyphicon-ban-circle"></i>
+                                        </button>
+                                        <button data-dz-remove class="btn btn-danger delete">
+                                            <i class="glyphicon glyphicon-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
     <script language="JavaScript">
         var createURL = '{{ url('content_create') }}';
@@ -118,6 +175,39 @@
                 }
 
             });
+            {% if mediaContentTypes %}
+            var previewNode = document.querySelector("#fileUploaderTemplate");
+            var previewTemplate = previewNode.innerHTML;
+            $('#fileUploaderTemplate').remove();
+            var myDropZone = new Dropzone('div#uploadModel', {
+                url: "{{ url('content_media_upload') }}",
+                thumbnailWidth: 100,
+                thumbnailHeight: 100,
+                parallelUploads: 3,
+                previewTemplate: previewTemplate,
+                autoQueue: true,
+                previewsContainer: "#fileUploaderPreviews",
+                clickable: ".fileinput-button"
+            });
+            myDropZone.on("success", function (file) {
+                setTimeout(function () {
+                    myDropZone.removeFile(file);
+                }, 1500);
+            });
+            myDropZone.on("sending", function (file, xhr, formData) {
+                formData.append('parent', $("#uploadContentParentId").val());
+                formData.append('type', $("#uploadContentType").val());
+                formData.append('schema', $("#uploadContentSchema").val());
+            });
+            myDropZone.on("queuecomplete", function (progress) {
+                contentTable.ajax.reload();
+            });
+            $('#uploadModelCloseButton').click(function () {
+                if (myDropZone.getUploadingFiles().length === 0 && myDropZone.getQueuedFiles().length === 0) {
+                    $('#uploadModel').modal('hide');
+                }
+            });
+            {% endif %}
             $('#jstree_div').jstree({
                 'core': {
                     'data': {{ jsNodes|raw }},
@@ -126,6 +216,7 @@
                 'contextmenu': {
                     'items': function (node, treeObj) {
                         return {
+
                             "Create": {
                                 "separator_before": false,
                                 "separator_after": false,
@@ -151,6 +242,36 @@
                                     {% endfor %}
                                 }
                             }
+                            {% if mediaContentTypes %}
+                            , "Upload": {
+                                "separator_before": false,
+                                "separator_after": false,
+                                "label": "Upload",
+                                "icon": "glyphicon glyphicon-file",
+                                "submenu": {
+                                    {% for typeKey,type in mediaContentTypes %}
+                                    "{{ typeKey }}": {
+                                        "label": "{{ type.name }}",
+                                        "icon": "glyphicon glyphicon-plus",
+                                        "_disabled": function () {
+                                            var isRootItem = {{ type.isRootItem ? 'true' : 'false' }};
+                                            if (node.parent == '#' && !isRootItem) {
+                                                return true;
+                                            }
+                                            return false;
+                                        },
+                                        "action": function () {
+                                            $("#uploadContentParentId").val(node.id);
+                                            $("#uploadContentType").val('{{ type.type }}');
+                                            $("#uploadContentSchema").val('{{ type.schema }}');
+                                            $('#uploadModel').modal('show');
+                                            return false;
+                                        }
+                                    },
+                                    {% endfor %}
+                                }
+                            }
+                            {% endif %}
                         }
                     }
                 },
@@ -165,6 +286,7 @@
 {% endblock %}
 
 {% block footer %}
+    <script src="{{ asset('bundles/bwcms/dropzone/dropzone.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/datatable/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/jstree/jstree.min.js') }}"></script>
 {% endblock %}

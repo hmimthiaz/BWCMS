@@ -42,3 +42,19 @@ img.contentThumb{
     height: 32px;
     width: 32px;
 }
+
+#fileUploaderPreviews{
+    height: 350px;
+    overflow: scroll;
+    background-color: #f1f0f0;
+    background-image: url(../images/dragndrop.png);
+    background-repeat:no-repeat;
+    background-position: center center;
+}
+#fileUploaderPreviews table{
+    margin-bottom: 5px;
+    background-color: #ccc;
+    margin-left: 5px;
+    margin-right: 5px;
+    width: 98%;
+}

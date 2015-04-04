@@ -32,6 +32,7 @@ class ContentController extends BaseController
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
 
         $registeredContents = $this->cm()->getRegisteredContent($type);
+        $mediaContentTypes = $this->cm()->getMediaContentTypes($type);
 
         $condition = array();
         foreach ($registeredContents as $cInfo) {
@@ -84,6 +85,7 @@ class ContentController extends BaseController
             'type' => $type,
             'title' => ucfirst($type) . ' Manager',
             'contentTypes' => $registeredContents,
+            'mediaContentTypes' => $mediaContentTypes,
             'jsNodes' => json_encode($jsNodes),
         );
     }
@@ -163,7 +165,7 @@ class ContentController extends BaseController
         $parent = $request->get('parent', null);
 
         if (is_null($type) || is_null($schema) || is_null($parent)) {
-            die('Unexpected parameters');
+            return $this->returnErrorResponse();
         }
 
         $class = $this->cm()->getContentClass($type, $schema);
@@ -220,7 +222,7 @@ class ContentController extends BaseController
         $type = $contentFormData['type'];
         $schema = $contentFormData['schema'];
 
-        if ($type == null || $schema == null) {
+        if (is_null($type) || is_null($schema)) {
             return $this->returnErrorResponse();
         }
 
@@ -256,6 +258,57 @@ class ContentController extends BaseController
         );
     }
 
+
+    /**
+     * @Route("/upload.php",name="content_media_upload")
+     * @Method({"POST"})
+     */
+    public function uploadAction(Request $request)
+    {
+        $parentId = $request->get('parent', null);
+        $type = $request->get('type', null);
+        $schema = $request->get('schema', null);
+
+        if (is_null($type) || is_null($schema) || is_null($parentId)) {
+            return $this->returnErrorResponse();
+        }
+
+        try {
+            $uploadedFile = $request->files->get('file');
+            $mediaInfo = $this->mm()->handleUpload($uploadedFile);
+        } catch (\Exception $e) {
+            return new Response($e->getMessage(), 500);
+        }
+        if (!empty($mediaInfo)) {
+            /**
+             * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+             * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+             */
+            $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+            $content = new ContentEntity();
+            $content->setType($type);
+            $content->setSchema($schema);
+            $content->setSite($this->getSite());
+            if ($parentId == 'Root') {
+                $content->setTreeParent(null);
+            } else {
+                $parentEntity = $contentRepository->find($parentId);
+                $content->setTreeParent($parentEntity);
+            }
+            $content->setTitle($mediaInfo['originalName']);
+            $content->setMime($mediaInfo['mimeType']);
+            $content->setFile($mediaInfo['filename']);
+            $content->setSize($mediaInfo['size']);
+            $content->setExtension($mediaInfo['extension']);
+            $content->setWidth($mediaInfo['width']);
+            $content->setHeight($mediaInfo['height']);
+
+            $content->setSlug($this->cm()->generateSlug($content->getFile(), $content->getType(), $parentId));
+            $content->setStatus('Draft');
+            $this->cm()->save($content);
+        }
+        return new Response('Ok', 200);
+    }
 
     /**
      * @Route("/data.php",name="content_table_data")
