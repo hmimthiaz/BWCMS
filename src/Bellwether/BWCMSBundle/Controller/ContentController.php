@@ -10,6 +10,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
 /**
@@ -395,13 +397,29 @@ class ContentController extends BaseController
                 $ca['title'] = $content->getTitle();
                 $ca['name'] = $content->getFile();
                 $ca['type'] = $content->getType();
-                $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');;
+                $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');
+
                 $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content, 32, 32);
                 $ca['thumbnail'] = '<img class="contentThumb" src="' . $ca['thumbnail'] . '"/>';
+                $ca['download'] = '';
+                if ($content->getFile() != null) {
+                    $ca['download'] = $this->generateUrl('content_media_download', array('contentId' => $content->getId()));
+                }
+                if ($this->mm()->isImage($content->getFile(), $content->getMime())) {
+                    $imageThumb = $this->getImageThumbURL($content->getFile(), 800, 800);
+                    $ca['thumbnail'] = '<a href="' . $imageThumb . '" data-title="' . $content->getTitle() . '" class="lightBox">' . $ca['thumbnail'] . '</a>';
+                }
                 $data['data'][] = $ca;
             }
         }
         return $this->returnJsonReponse($request, $data);
+    }
+
+    public function getImageThumbURL($filename, $width, $height)
+    {
+        $publicFilename = $this->mm()->getFilePath($filename);
+        $thumbURL = $this->mm()->getThumbService()->open($publicFilename)->cropResize($width, $height)->cacheFile('guess');
+        return $thumbURL;
     }
 
     /**
@@ -429,6 +447,69 @@ class ContentController extends BaseController
             return $this->returnErrorResponse($exp->getMessage());
         }
         return $this->returnJsonReponse($request, array());
+    }
+
+    /**
+     * @Route("/delete.php",name="content_delete")
+     * @Method({"GET", "POST"})
+     */
+    public function deleteAction(Request $request)
+    {
+        $contentId = $request->get('contentId');
+        if ($contentId == null) {
+            return new Response('Invalid Params', 500);
+        }
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         */
+        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+        $content = $contentRepository->find($contentId);
+        if ($content == null) {
+            return new Response('Content not available', 500);
+        }
+        if ($content->getFile() == null) {
+            $this->em()->remove($content);
+            $this->em()->flush();
+        } else {
+            if ($this->mm()->deleteMedia($content->getFile()) == true) {
+                $this->em()->remove($content);
+                $this->em()->flush();
+            } else {
+                return new Response('Media deletion error', 500);
+            }
+        }
+
+        return $this->returnJsonReponse($request, array('contentId' => $contentId));
+    }
+
+    /**
+     * @Route("/download.php",name="content_media_download")
+     * @Method({"GET"})
+     */
+    public function downloadAction(Request $request)
+    {
+        $contentId = $request->get('contentId');
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         */
+        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
+        $content = $contentRepository->find($contentId);
+        if ($content == null) {
+            return new Response('Content not available', 500);
+        }
+        $downloadFile = $this->mm()->getFilePath($content->getFile(), true);
+
+        $response = new BinaryFileResponse($downloadFile);
+        $response->trustXSendfileTypeHeader();
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $content->getFile(),
+            iconv('UTF-8', 'ASCII//TRANSLIT', $content->getFile())
+        );
+
+        return $response;
     }
 
 }

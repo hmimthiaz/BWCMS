@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/dropzone/dropzone.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/datatable/css/jquery.dataTables.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/jstree/themes/default/style.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/lightbox/ekko-lightbox.min.css') }}"/>
 {% endblock %}
 
 {% block body %}
@@ -24,7 +25,7 @@
                     <th width="32">Icon</th>
                     <th>Filename</th>
                     <th width="200">Date</th>
-                    <th width="100">Action</th>
+                    <th width="200">Action</th>
                 </tr>
                 </thead>
             </table>
@@ -119,8 +120,12 @@
                         data: null,
                         className: "center",
                         render: function (data, type, full, meta) {
+                            console.log(data);
                             var ret = '<button type="button" class="btn btn-primary edit"><i class="glyphicon glyphicon-pencil"></i></button>';
-                            ret = ret + ' <button type="button" class="btn btn-danger remove"><i class="glyphicon glyphicon-remove"></i></a>';
+                            if (data.download.length > 0) {
+                                ret = ret + ' <button type="button" class="btn btn-primary download" data-url="' + data.download + '"><i class="glyphicon glyphicon-download-alt"></i></button>';
+                            }
+                            //ret = ret + ' <button type="button" class="btn btn-danger remove"><i class="glyphicon glyphicon-remove"></i></a>';
                             return ret;
                         }
                     }
@@ -132,6 +137,29 @@
                         window.location = editURL + '?contentId=' + contentId;
                         e.preventDefault();
                         return false;
+                    });
+                    $('#contentTable a.lightBox').click(function (e) {
+                        e.preventDefault();
+                        $(this).ekkoLightbox();
+                    });
+                    $('#contentTable button.download').click(function (e) {
+                        console.log($(this).data('url'));
+                        window.location = $(this).data('url');
+                        return false;
+                    });
+                    $('#contentTable button.remove').click(function (e) {
+                        var contentId = $(this).parents('tr').attr('id');
+                        bootbox.confirm("Do you want to delete the selected item?", function (result) {
+                            var request = $.post("{{ url('content_delete') }}", {
+                                contentId: contentId
+                            });
+                            request.done(function (data) {
+                                contentTable.ajax.reload(null,false);
+                            });
+                            request.fail(function () {
+                                alert('Unable to delete media');
+                            });
+                        });
                     });
                 }
             });
@@ -289,4 +317,5 @@
     <script src="{{ asset('bundles/bwcms/dropzone/dropzone.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/datatable/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/jstree/jstree.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/lightbox/ekko-lightbox.min.js') }}"></script>
 {% endblock %}

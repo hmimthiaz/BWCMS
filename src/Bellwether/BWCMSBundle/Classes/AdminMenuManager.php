@@ -75,9 +75,6 @@ class AdminMenuManager extends BaseService
                 'type' => 'Widget'
             )
         ));
-
-        $menu['Manage']->addChild('Upload Media', array('route' => 'media_home'));
-
         return $menu;
     }
 
