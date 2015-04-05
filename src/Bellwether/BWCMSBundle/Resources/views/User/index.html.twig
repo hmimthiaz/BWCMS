@@ -1,0 +1,58 @@
+{% extends "BWCMSBundle:Common:default.html.twig" %}
+
+{% block title %}User Manager{% endblock %}
+{% block pageTitle %}
+    <h1>User Manager</h1>
+{% endblock %}
+
+{% block body %}
+
+    <table class="table table-striped table-hover table-bordered records_list">
+        <thead>
+        <tr>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Mobile</th>
+            <th scope="col">Email</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td>{{ entity.firstName }}</td>
+                <td>{{ entity.lastName }}</td>
+                <td>{{ entity.mobile }}</td>
+                <td>{{ entity.email }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a class="btn btn-default btn-sm" href="{{ path('user_home', {'id': entity.id}) }}">
+                            <i class="fa fa-file"></i> {{ 'show'|trans({}, 'admin') }}
+                        </a>
+                        {% if is_granted('ROLE_ALLOWED_TO_SWITCH') %}
+                            <a class="btn btn-default btn-sm" href="{{ path('user_home', {'_switch_user': entity.username}) }}">
+                                <i class="fa fa-file"></i>Switch
+                            </a>
+                        {% endif %}
+                        <a class="btn btn-default btn-sm" href="{{ path('user_home', {'id': entity.id}) }}">
+                            <i class="fa fa-edit"></i> {{ 'edit'|trans({}, 'admin') }}
+                        </a>
+                        <a class="btn btn-default btn-sm" href="{{ path('user_home', {'id': entity.id}) }}">
+                            <i class="fa fa-repeat"></i> Reset Password
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('user_create') }}">
+                Create a new entry
+            </a>
+        </li>
+    </ul>
+{% endblock %}

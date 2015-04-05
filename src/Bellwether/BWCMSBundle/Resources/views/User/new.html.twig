@@ -1,0 +1,20 @@
+{% extends "BWCMSBundle:Common:default.html.twig" %}
+
+{% block title %}New User{% endblock %}
+{% block pageTitle %}
+    <h1>User Manager</h1>
+{% endblock %}
+
+
+{% block body -%}
+
+    {{ form(form, { 'style': 'horizontal' , 'label_col': 2, 'widget_col': 10 }) }}
+
+    {#<ul class="record_actions">#}
+        {#<li>#}
+            {#<a href="{{ path('userentity') }}">#}
+                {#Back to the list#}
+            {#</a>#}
+        {#</li>#}
+    {#</ul>#}
+{% endblock %}

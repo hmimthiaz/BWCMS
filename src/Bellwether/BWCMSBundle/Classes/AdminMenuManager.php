@@ -75,6 +75,12 @@ class AdminMenuManager extends BaseService
                 'type' => 'Widget'
             )
         ));
+
+        $menu->addChild('Admin', array('uri' => '#', 'label' => 'Admin'))->setAttribute('dropdown', true);
+        $menu['Admin']->addChild('User', array(
+            'route' => 'user_home'
+        ));
+
         return $menu;
     }
 
