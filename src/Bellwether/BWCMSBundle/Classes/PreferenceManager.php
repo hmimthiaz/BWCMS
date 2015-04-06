@@ -10,6 +10,8 @@ use Bellwether\BWCMSBundle\Classes\Preference\PreferenceTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Preference\Type\GeneralType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Bellwether\BWCMSBundle\Entity\PreferenceEntity;
+use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
 
 class PreferenceManager extends BaseService
 {
@@ -82,25 +84,78 @@ class PreferenceManager extends BaseService
      * @param PreferenceTypeInterface|PreferenceType $classInstance
      * @return Form|void
      */
-    final public function loadFormData( Form $form = null, PreferenceTypeInterface $classInstance)
+    final public function loadFormData(Form $form = null, PreferenceTypeInterface $classInstance)
     {
         if (null === $form) {
             return;
         }
 
+        $preferenceRepo = $this->getPreferenceRepository();
         $fields = $classInstance->getFields();
 
-        $this->dump($fields);
-        exit;
+        if (!empty($fields)) {
+            foreach ($fields as $fieldName => $fieldInfo) {
+                $fieldType = $fieldInfo['type'];
+                $criteria = array(
+                    'field' => $fieldInfo['name'],
+                    'fieldType' => $fieldType,
+                    'type' => $classInstance->getType()
+                );
+                if (!$fieldInfo['global']) {
+                    $criteria['site'] = $this->sm()->getCurrentSite()->getId();
+                }
+                /**
+                 * @var \Bellwether\BWCMSBundle\Entity\PreferenceEntity $preferenceEntity
+                 */
+                $preferenceEntity = $preferenceRepo->findOneBy($criteria);
+                if (is_null($preferenceEntity)) {
+                    continue;
+                }
+                try {
+                    $formField = $form->get($fieldName);
+                } catch (\OutOfBoundsException $e) {
+                    continue;
+                }
+                $fieldValue = $preferenceEntity->getValue();
 
-
+                if ($fieldType == PreferenceFieldType::String || $fieldValue == PreferenceFieldType::Number) {
+                    $formField->setData($fieldValue);
+                }
+                if ($fieldType == PreferenceFieldType::Content) {
+                    $formField->setData($fieldValue);
+                }
+                if ($fieldType == PreferenceFieldType::Date || $fieldType == PreferenceFieldType::Time || $fieldType == PreferenceFieldType::DateTime) {
+                    $dateValue = new \DateTime($fieldValue);
+                    $formField->setData($dateValue);
+                }
+                if ($fieldType == PreferenceFieldType::Serialized) {
+                    try {
+                        $data = $this->getSerializer()->deserialize($fieldValue, 'ArrayCollection', 'json');
+                    } catch (\RuntimeException $exp) {
+                        $data = array();
+                    }
+                    $data = $this->loadSerializedData($data);
+                    $formField->setData($data);
+                }
+            }
+        }
 //        $form = $classInstance->loadFormData($content, $form);
         return $form;
     }
 
+    private function loadSerializedData($value)
+    {
+        usort($value, function ($a, $b) {
+            if (isset($a['__sort__']) && isset($b['__sort__'])) {
+                return $a['__sort__'] - $b['__sort__'];
+            }
+            return 0;
+        });
+        return $value;
+    }
 
     /**
-     * @return \Bellwether\BWCMSBundle\Entity\ContentRepository
+     * @return \Bellwether\BWCMSBundle\Entity\PreferenceRepository
      */
     public function getPreferenceRepository()
     {

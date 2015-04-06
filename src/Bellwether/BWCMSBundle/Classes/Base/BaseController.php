@@ -80,7 +80,7 @@ class BaseController extends Controller
      */
     public function session()
     {
-        return $this->container->get('session')->getManager();
+        return $this->container->get('session');
     }
 
     /**

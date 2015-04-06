@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Bellwether\BWCMSBundle\Classes\SiteManager;
 use Bellwether\BWCMSBundle\Classes\ContentManager;
 use Bellwether\BWCMSBundle\Classes\MediaManager;
-use Bellwether\BWCMSBundle\Entity\OptionEntity;
+use Bellwether\BWCMSBundle\Entity\PreferenceEntity;
 use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
 
 abstract class PreferenceType implements PreferenceTypeInterface
@@ -58,12 +58,11 @@ abstract class PreferenceType implements PreferenceTypeInterface
         return $this->formBuilder;
     }
 
-    final public function addField($fieldName, $type, $default = false, $global = false)
+    final public function addField($fieldName, $type, $global = false)
     {
         $this->fields[$fieldName] = array(
             'name' => $fieldName,
             'type' => $type,
-            'default' => $default,
             'global' => $global
         );
     }

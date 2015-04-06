@@ -2,17 +2,15 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Preference\Type;
 
-
-use Bellwether\BWCMSBundle\Classes\Preference\PreferenceTypeInterface;
-use Bellwether\BWCMSBundle\Classes\Preference\PreferenceType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormBuilder;
+use Bellwether\BWCMSBundle\Classes\Preference\PreferenceType;
 use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Form\FormEvent;
 
 
 class GeneralType Extends PreferenceType
@@ -27,9 +25,9 @@ class GeneralType Extends PreferenceType
     protected function buildFields()
     {
         $this->addField('title', PreferenceFieldType::String);
-//        $this->addField('description', PreferenceFieldType::String);
-//        $this->addField('keywords', PreferenceFieldType::String);
-//        $this->addField('adminEmail', PreferenceFieldType::String, false, true);
+        $this->addField('description', PreferenceFieldType::String);
+        $this->addField('keywords', PreferenceFieldType::String);
+        $this->addField('adminEmail', PreferenceFieldType::String, true);
     }
 
     protected function buildForm()
