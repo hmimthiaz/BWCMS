@@ -52,9 +52,9 @@
       <field name="modifiedDate" type="datetime" uuid="23d9f56c-c5f6-4881-b552-41ea95c44396"/>
       <field name="createdDate" type="datetime" uuid="b091a960-f45a-405f-9aae-32bbb25b54a7"/>
       <field name="status" type="string" size="100" required="true" uuid="2ef30c44-3423-4a8d-8aa9-550337ac39bb"/>
-      <field name="treeParentId" uuid="e1f39a90-5134-4d4e-a2f1-eae4bdd23c00"/>
-      <field name="authorId" required="true" uuid="22b37934-37f7-48a1-8944-df2560f572e6"/>
-      <field name="siteId" required="true" uuid="98e53811-d58a-415b-8a0e-83381f85a2e4"/>
+      <field name="treeParentId" type="guid" uuid="e1f39a90-5134-4d4e-a2f1-eae4bdd23c00"/>
+      <field name="authorId" type="guid" required="true" uuid="22b37934-37f7-48a1-8944-df2560f572e6"/>
+      <field name="siteId" type="guid" required="true" uuid="98e53811-d58a-415b-8a0e-83381f85a2e4"/>
       <orm-attributes>
         <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\ContentRepository</attribute>
         <attribute name="table">BWContent</attribute>
@@ -102,7 +102,7 @@
       <field name="value" type="text" uuid="70db220d-bfd9-4156-b823-af53e93f2648"/>
       <field name="field" type="string" size="100" uuid="d1cb472b-3603-4ff3-9a54-0c6ff62f43e9"/>
       <field name="type" type="string" size="100" uuid="491a26a2-e339-4ae0-a06a-09bfe595e388"/>
-      <field name="contentId" required="true" uuid="a462c640-9e2b-450e-bc5d-8998384f303b"/>
+      <field name="contentId" type="guid" required="true" uuid="a462c640-9e2b-450e-bc5d-8998384f303b"/>
       <orm-attributes>
         <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\ContentMetaRepository</attribute>
         <attribute name="table">BWContentMeta</attribute>
