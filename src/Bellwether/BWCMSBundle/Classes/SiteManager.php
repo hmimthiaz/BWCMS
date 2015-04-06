@@ -2,6 +2,7 @@
 
 namespace Bellwether\BWCMSBundle\Classes;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
@@ -34,6 +35,8 @@ class SiteManager extends BaseService
      */
     public function getCurrentSite()
     {
+        return $this->getDefaultSite();
+
         $siteEntity = $this->session()->get('site', null);
         if (is_null($siteEntity)) {
             $siteEntity = $this->getDefaultSite();
@@ -53,6 +56,8 @@ class SiteManager extends BaseService
             );
             $this->defaultSite = $this->em()->getRepository('BWCMSBundle:SiteEntity')->findOneBy($criteria);
             if ($this->defaultSite == null) {
+                exit;
+
                 $siteEntity = new SiteEntity();
                 $siteEntity->setName('Default');
                 $siteEntity->setLocale('en');

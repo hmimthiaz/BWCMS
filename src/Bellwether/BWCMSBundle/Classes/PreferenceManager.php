@@ -193,13 +193,13 @@ class PreferenceManager extends BaseService
                     if (!$fieldInfo['global']) {
                         $preferenceEntity->setSite($this->sm()->getCurrentSite());
                     }
-                }elseif (!is_null($preferenceEntity) && is_null($fieldValue)) {
+                } elseif (!is_null($preferenceEntity) && is_null($fieldValue)) {
                     $this->em()->remove($preferenceEntity);
-                    $this->em()->flush();
                     continue;
-                }else{
+                } elseif (is_null($preferenceEntity) && is_null($fieldValue)) {
                     continue;
                 }
+
 
                 if ($fieldType == PreferenceFieldType::String || $fieldType == PreferenceFieldType::Number) {
                     $preferenceEntity->setValue($fieldValue);
@@ -225,8 +225,8 @@ class PreferenceManager extends BaseService
                     $preferenceEntity->setValue($serializedString);
                 }
                 $this->em()->persist($preferenceEntity);
-                $this->em()->flush();
             }
+            $this->em()->flush();
         }
     }
 
@@ -241,6 +241,20 @@ class PreferenceManager extends BaseService
         }
         return $returnValue;
     }
+
+    private function cleanArray($haystack)
+    {
+        foreach ($haystack as $key => $value) {
+            if (is_array($value)) {
+                $haystack[$key] = $this->cleanArray($haystack[$key]);
+            }
+            if (empty($haystack[$key])) {
+                unset($haystack[$key]);
+            }
+        }
+        return $haystack;
+    }
+
 
     /**
      * @return \Bellwether\BWCMSBundle\Entity\PreferenceRepository

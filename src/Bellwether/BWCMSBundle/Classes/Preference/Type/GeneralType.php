@@ -11,7 +11,7 @@ use Bellwether\BWCMSBundle\Classes\Preference\PreferenceType;
 use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
-
+use Bellwether\BWCMSBundle\Classes\Preference\Form\SampleForm;
 
 class GeneralType Extends PreferenceType
 {
@@ -28,6 +28,9 @@ class GeneralType Extends PreferenceType
         $this->addField('description', PreferenceFieldType::String);
         $this->addField('keywords', PreferenceFieldType::String);
         $this->addField('adminEmail', PreferenceFieldType::String, true);
+
+        $this->addField('fieldContent', PreferenceFieldType::Content);
+        $this->addField('gallery', PreferenceFieldType::Serialized);
     }
 
     protected function buildForm()
@@ -52,6 +55,21 @@ class GeneralType Extends PreferenceType
                 'label' => 'Admin Email'
             )
         );
+
+        $this->fb()->add('fieldContent', 'bwcms_content',
+            array(
+                'label' => 'Content'
+            )
+        );
+
+        $this->fb()->add('gallery', 'bwcms_collection',
+            array(
+                'type' => new SampleForm(),
+                'label' => 'Content',
+                'allow_add' => true
+            )
+        );
+
     }
 
     function validateForm(FormEvent $event)

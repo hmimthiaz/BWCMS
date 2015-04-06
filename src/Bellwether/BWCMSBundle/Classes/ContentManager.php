@@ -321,7 +321,7 @@ class ContentManager extends BaseService
                 }
             }
         }
-        $content = $classInstance->prepareEntity($content, $data);
+        $content = $classInstance->prepareEntity($content, $form);
         return $content;
     }
 
