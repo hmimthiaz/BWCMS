@@ -219,7 +219,7 @@ abstract class ContentType implements ContentTypeInterface
 
     abstract public function loadFormData(ContentEntity $content = null, Form $form = null);
 
-    abstract public function prepareEntity(ContentEntity $content = null, $data = array());
+    abstract public function prepareEntity(ContentEntity $content = null, Form $form = null);
 
 
     private function setDefaultFormFields()

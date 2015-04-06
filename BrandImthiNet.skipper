@@ -165,7 +165,13 @@
       </orm-attributes>
     </entity>
     <entity name="PreferenceEntity" uuid="570465dc-6816-469e-93e4-30bae17f18e9">
-      <field name="id" type="guid" required="true" unique="true" primary="true" auto-increment="true" uuid="50286c64-fe06-4b70-af83-f2c76b05ed07"/>
+      <field name="id" type="guid" required="true" unique="true" primary="true" auto-increment="true" uuid="50286c64-fe06-4b70-af83-f2c76b05ed07">
+        <orm-attributes>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
       <field name="siteId" type="guid" uuid="fb4f22a1-3c61-4a6b-aade-53076fdef9ef"/>
       <field name="type" type="string" size="100" uuid="f68c0fc1-bccd-4322-87cc-d94d85e3aecb"/>
       <field name="field" type="string" size="100" uuid="80dbc1be-d07d-46d1-adf2-ecc2e15c40df"/>

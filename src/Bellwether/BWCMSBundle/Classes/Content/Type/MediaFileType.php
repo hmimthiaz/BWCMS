@@ -50,7 +50,7 @@ class MediaFileType Extends ContentType
         return $form;
     }
 
-    public function prepareEntity(ContentEntity $content = null, $data = array())
+    public function prepareEntity(ContentEntity $content = null, Form $form = null)
     {
         return $content;
     }

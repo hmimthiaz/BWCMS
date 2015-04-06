@@ -218,14 +218,16 @@ class ContentManager extends BaseService
      * @param ContentTypeInterface|BaseContentType $classInstance
      * @return ContentEntity|void
      */
-    final public function prepareEntity(ContentEntity $content = null, $data = array(), ContentTypeInterface $classInstance)
+    final public function prepareEntity(ContentEntity $content = null, Form $form = null, ContentTypeInterface $classInstance)
     {
         if (null === $content) {
             return;
         }
-        if (empty($data)) {
+        if (null === $form) {
             return;
         }
+
+        $data = $form->getData();
 
         $fields = $classInstance->getFields();
 

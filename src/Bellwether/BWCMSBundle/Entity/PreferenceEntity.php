@@ -12,7 +12,7 @@ class PreferenceEntity
     /**
      * @ORM\Id
      * @ORM\Column(type="guid")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\GeneratedValue(strategy="UUID")
      */
     private $id;
 
@@ -37,8 +37,8 @@ class PreferenceEntity
     private $value;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity")
-     * @ORM\JoinColumn(name="siteId", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity",cascade={"persist"})
+     * @ORM\JoinColumn(name="siteId", referencedColumnName="id", nullable=true)
      */
     private $site;
 

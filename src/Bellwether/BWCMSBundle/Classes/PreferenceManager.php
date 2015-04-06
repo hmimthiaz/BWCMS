@@ -155,6 +155,94 @@ class PreferenceManager extends BaseService
     }
 
     /**
+     * @param Form $form
+     * @param PreferenceTypeInterface|PreferenceType $classInstance
+     */
+    final public function saveFormData(Form $form = null, PreferenceTypeInterface $classInstance)
+    {
+        if (null === $form) {
+            return;
+        }
+
+        $preferenceRepo = $this->getPreferenceRepository();
+        $fields = $classInstance->getFields();
+
+        $data = $form->getData();
+
+        if (!empty($fields)) {
+            foreach ($fields as $fieldName => $fieldInfo) {
+                $fieldType = $fieldInfo['type'];
+                $fieldValue = $data[$fieldName];
+                $criteria = array(
+                    'field' => $fieldInfo['name'],
+                    'fieldType' => $fieldType,
+                    'type' => $classInstance->getType()
+                );
+                if (!$fieldInfo['global']) {
+                    $criteria['site'] = $this->sm()->getCurrentSite()->getId();
+                }
+                /**
+                 * @var \Bellwether\BWCMSBundle\Entity\PreferenceEntity $preferenceEntity
+                 */
+                $preferenceEntity = $preferenceRepo->findOneBy($criteria);
+                if (is_null($preferenceEntity) && !is_null($fieldValue)) {
+                    $preferenceEntity = new PreferenceEntity();
+                    $preferenceEntity->setType($classInstance->getType());
+                    $preferenceEntity->setField($fieldName);
+                    $preferenceEntity->setFieldType($fieldType);
+                    if (!$fieldInfo['global']) {
+                        $preferenceEntity->setSite($this->sm()->getCurrentSite());
+                    }
+                }elseif (!is_null($preferenceEntity) && is_null($fieldValue)) {
+                    $this->em()->remove($preferenceEntity);
+                    $this->em()->flush();
+                    continue;
+                }else{
+                    continue;
+                }
+
+                if ($fieldType == PreferenceFieldType::String || $fieldType == PreferenceFieldType::Number) {
+                    $preferenceEntity->setValue($fieldValue);
+                }
+                if ($fieldType == PreferenceFieldType::Content) {
+                    $preferenceEntity->setValue($fieldValue);
+                }
+                if ($fieldType == PreferenceFieldType::Date) {
+                    $dateString = $fieldValue->format('Y-m-d');
+                    $preferenceEntity->setValue($dateString);
+                }
+                if ($fieldType == PreferenceFieldType::Time) {
+                    $dateString = $fieldValue->format('H:i:sO');
+                    $preferenceEntity->setValue($dateString);
+                }
+                if ($fieldType == PreferenceFieldType::DateTime) {
+                    $dateString = $fieldValue->format(\DateTime::ISO8601);
+                    $preferenceEntity->setValue($dateString);
+                }
+                if ($fieldType == PreferenceFieldType::Serialized) {
+                    $cleanedData = $this->prepareSerializedMeta($fieldValue);
+                    $serializedString = $this->getSerializer()->serialize($cleanedData, 'json');
+                    $preferenceEntity->setValue($serializedString);
+                }
+                $this->em()->persist($preferenceEntity);
+                $this->em()->flush();
+            }
+        }
+    }
+
+    private function prepareSerializedMeta($value)
+    {
+        $returnValue = array();
+        $value = $this->cleanArray($value);
+        $sort = 0;
+        foreach ($value as $key => $value) {
+            $value['__sort__'] = $sort++;
+            $returnValue[] = $value;
+        }
+        return $returnValue;
+    }
+
+    /**
      * @return \Bellwether\BWCMSBundle\Entity\PreferenceRepository
      */
     public function getPreferenceRepository()

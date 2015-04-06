@@ -242,7 +242,7 @@ class ContentController extends BaseController
                 $contentEntity = $this->cm()->getContentRepository()->find($contentId);
             }
 
-            $contentEntity = $this->cm()->prepareEntity($contentEntity, $form->getData(), $class);
+            $contentEntity = $this->cm()->prepareEntity($contentEntity, $form, $class);
             $this->cm()->save($contentEntity);
 
             $parentId = 'Root';
