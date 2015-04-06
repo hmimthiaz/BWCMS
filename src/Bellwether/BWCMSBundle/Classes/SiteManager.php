@@ -56,8 +56,6 @@ class SiteManager extends BaseService
             );
             $this->defaultSite = $this->em()->getRepository('BWCMSBundle:SiteEntity')->findOneBy($criteria);
             if ($this->defaultSite == null) {
-                exit;
-
                 $siteEntity = new SiteEntity();
                 $siteEntity->setName('Default');
                 $siteEntity->setLocale('en');
