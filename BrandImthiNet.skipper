@@ -164,7 +164,7 @@
         <attribute name="export-file-name">UserEntity.php</attribute>
       </orm-attributes>
     </entity>
-    <entity name="OptionEntity" uuid="570465dc-6816-469e-93e4-30bae17f18e9">
+    <entity name="PreferenceEntity" uuid="570465dc-6816-469e-93e4-30bae17f18e9">
       <field name="id" type="guid" required="true" unique="true" primary="true" auto-increment="true" uuid="50286c64-fe06-4b70-af83-f2c76b05ed07"/>
       <field name="siteId" type="guid" uuid="fb4f22a1-3c61-4a6b-aade-53076fdef9ef"/>
       <field name="type" type="string" size="100" uuid="f68c0fc1-bccd-4322-87cc-d94d85e3aecb"/>
@@ -172,12 +172,12 @@
       <field name="fieldType" type="string" size="100" uuid="cefea88d-aca4-4977-bf97-acba8fcadb52"/>
       <field name="value" type="text" uuid="9ff14b7a-7dc0-4b3b-85e6-ebf446c86e95"/>
       <orm-attributes>
-        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\OptionRepository</attribute>
-        <attribute name="table">BWOption</attribute>
-        <attribute name="export-file-name">OptionEntity.php</attribute>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\PreferenceRepository</attribute>
+        <attribute name="table">BWPreference</attribute>
+        <attribute name="export-file-name">PreferenceEntity.php</attribute>
       </orm-attributes>
     </entity>
-    <association from="OptionEntity" to="SiteEntity" caption="SiteEntity OptionEntity" inverse-alias="site" many-owner="true" many-inverse="false" uuid="1981054b-8c11-4edf-8a3e-ced445966f4a">
+    <association from="PreferenceEntity" to="SiteEntity" caption="SiteEntity OptionEntity" inverse-alias="site" many-owner="true" many-inverse="false" uuid="1981054b-8c11-4edf-8a3e-ced445966f4a">
       <association-field from="siteId" to="id"/>
     </association>
     <orm-attributes>

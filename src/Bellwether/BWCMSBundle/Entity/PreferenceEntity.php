@@ -1,12 +1,13 @@
 <?php
 namespace Bellwether\BWCMSBundle\Entity;
+
 use Doctrine\ORM\Mapping AS ORM;
 
 /**
- * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\OptionRepository")
- * @ORM\Table(name="BWOption")
+ * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\PreferenceRepository")
+ * @ORM\Table(name="BWPreference")
  */
-class OptionEntity
+class PreferenceEntity
 {
     /**
      * @ORM\Id
@@ -137,5 +138,4 @@ class OptionEntity
     {
         $this->site = $site;
     }
-
 }

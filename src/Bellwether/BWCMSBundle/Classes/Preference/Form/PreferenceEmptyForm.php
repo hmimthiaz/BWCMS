@@ -1,12 +1,12 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes\Option\Form;
+namespace Bellwether\BWCMSBundle\Classes\Preference\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class OptionEmptyForm extends AbstractType
+class PreferenceEmptyForm extends AbstractType
 {
     function __construct()
     {

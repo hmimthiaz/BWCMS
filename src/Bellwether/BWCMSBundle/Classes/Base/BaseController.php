@@ -4,6 +4,7 @@ namespace Bellwether\BWCMSBundle\Classes\Base;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Doctrine\ORM\EntityManager;
 
 use Bellwether\BWCMSBundle\Entity\UserEntity;
@@ -72,6 +73,14 @@ class BaseController extends Controller
     public function pref()
     {
         return $this->container->get('BWCMS.Preference')->getManager();
+    }
+
+    /**
+     * @return Session
+     */
+    public function session()
+    {
+        return $this->container->get('session')->getManager();
     }
 
     /**

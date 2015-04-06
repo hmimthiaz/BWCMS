@@ -9,8 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
-use Bellwether\BWCMSBundle\Classes\Content\ContentType;
+use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Form\FormEvent;
@@ -27,17 +26,39 @@ class GeneralType Extends PreferenceType
 
     protected function buildFields()
     {
-        // TODO: Implement buildFields() method.
+        $this->addField('title', PreferenceFieldType::String);
+//        $this->addField('description', PreferenceFieldType::String);
+//        $this->addField('keywords', PreferenceFieldType::String);
+//        $this->addField('adminEmail', PreferenceFieldType::String, false, true);
     }
 
     protected function buildForm()
     {
-        // TODO: Implement buildForm() method.
+        $this->fb()->add('title', 'text',
+            array(
+                'label' => 'Title'
+            )
+        );
+        $this->fb()->add('description', 'text',
+            array(
+                'label' => 'Description'
+            )
+        );
+        $this->fb()->add('keywords', 'text',
+            array(
+                'label' => 'Keywords'
+            )
+        );
+        $this->fb()->add('adminEmail', 'text',
+            array(
+                'label' => 'Admin Email'
+            )
+        );
     }
 
     function validateForm(FormEvent $event)
     {
-        // TODO: Implement validateForm() method.
+
     }
 
     public function getType()

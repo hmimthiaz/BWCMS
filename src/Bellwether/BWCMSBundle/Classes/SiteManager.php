@@ -13,7 +13,7 @@ use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 class SiteManager extends BaseService
 {
 
-    private $currentSite = null;
+    private $defaultSite = null;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -34,12 +34,25 @@ class SiteManager extends BaseService
      */
     public function getCurrentSite()
     {
-        if ($this->currentSite == null) {
+        $siteEntity = $this->session()->get('site', null);
+        if (is_null($siteEntity)) {
+            $siteEntity = $this->getDefaultSite();
+            $this->session()->set('site', $siteEntity);
+        }
+        return $siteEntity;
+    }
+
+    /**
+     * @return SiteEntity
+     */
+    public function getDefaultSite()
+    {
+        if ($this->defaultSite == null) {
             $criteria = array(
                 'isDefault' => true
             );
-            $this->currentSite = $this->em()->getRepository('BWCMSBundle:SiteEntity')->findOneBy($criteria);
-            if($this->currentSite == null){
+            $this->defaultSite = $this->em()->getRepository('BWCMSBundle:SiteEntity')->findOneBy($criteria);
+            if ($this->defaultSite == null) {
                 $siteEntity = new SiteEntity();
                 $siteEntity->setName('Default');
                 $siteEntity->setLocale('en');
@@ -49,10 +62,10 @@ class SiteManager extends BaseService
                 $siteEntity->setIsDefault(true);
                 $this->em()->persist($siteEntity);
                 $this->em()->flush();
-                $this->currentSite = $siteEntity;
+                $this->defaultSite = $siteEntity;
             }
         }
-        return $this->currentSite;
+        return $this->defaultSite;
     }
 
 }

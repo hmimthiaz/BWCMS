@@ -12,6 +12,7 @@ use Bellwether\BWCMSBundle\Classes\SiteManager;
 use Bellwether\BWCMSBundle\Classes\ContentManager;
 use Bellwether\BWCMSBundle\Classes\MediaManager;
 use Bellwether\BWCMSBundle\Classes\PreferenceManager;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 
 class BaseService  extends ContainerAware
@@ -82,6 +83,15 @@ class BaseService  extends ContainerAware
     {
         return $this->container->get('BWCMS.Preference')->getManager();
     }
+
+    /**
+     * @return Session
+     */
+    public function session()
+    {
+        return $this->container->get('session')->getManager();
+    }
+
 
     /**
      * @return SecurityContext
