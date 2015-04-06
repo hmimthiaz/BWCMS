@@ -17,12 +17,12 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 /**
  * Page controller.
  *
- * @Route("/admin/content")
+ * @Route("/admin/manage")
  */
 class ContentController extends BaseController
 {
     /**
-     * @Route("/",name="content_home")
+     * @Route("/{type}/index.php",name="content_home")
      * @Template()
      */
     public function indexAction(Request $request)

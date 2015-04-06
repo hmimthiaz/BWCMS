@@ -2,9 +2,10 @@
 
 namespace Bellwether\BWCMSBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Bellwether\BWCMSBundle\Classes\Base\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 
 /**
@@ -12,16 +13,16 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
  *
  * @Route("/admin/preference")
  */
-class PreferenceController extends Controller
+class PreferenceController extends BaseController
 {
     /**
-     * @Route("/",name="preference_home")
+     * @Route("/{type}.php",name="preference_page")
      * @Template()
      */
     public function indexAction()
     {
-        return array(
-                // ...
-            );    }
+        return array(// ...
+        );
+    }
 
 }

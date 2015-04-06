@@ -43,6 +43,8 @@ abstract class PreferenceType implements PreferenceTypeInterface
      */
     private $form = null;
 
+    private $fields = null;
+
     /**
      * @return FormBuilder
      */
@@ -61,33 +63,17 @@ abstract class PreferenceType implements PreferenceTypeInterface
         if ($this->fields == null) {
             $this->fields = array();
 
-            $this->addField('id', ContentFieldType::Internal);
-            $this->addField('type', ContentFieldType::Internal);
-            $this->addField('schema', ContentFieldType::Internal);
-            $this->addField('parent', ContentFieldType::Internal);
-
-            $this->addField('title', ContentFieldType::Internal);
-            if ($this->isSummaryEnabled) {
-                $this->addField('summary', ContentFieldType::Internal);
-            }
-            if ($this->isContentEnabled) {
-                $this->addField('content', ContentFieldType::Internal);
-            }
-            if ($this->isSlugEnabled) {
-                $this->addField('slug', ContentFieldType::Internal);
-            }
-            if ($this->isUploadEnabled) {
-                $this->addField('attachment', ContentFieldType::Internal);
-            }
-            if ($this->isSortEnabled) {
-                $this->addField('sortBy', ContentFieldType::Internal);
-                $this->addField('sortOrder', ContentFieldType::Internal);
-            }
-
-            $this->addField('status', ContentFieldType::Internal);
             $this->buildFields();
         }
         return $this->fields;
+    }
+
+    final public function addField($fieldName, $type)
+    {
+        $this->fields[$fieldName] = array(
+            'name' => $fieldName,
+            'type' => $type
+        );
     }
 
     abstract protected function buildFields();

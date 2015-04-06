@@ -76,11 +76,14 @@ class AdminMenuManager extends BaseService
             )
         ));
 
-        $menu->addChild('Options', array('uri' => '#', 'label' => 'Options'))->setAttribute('dropdown', true);
+        $menu->addChild('Preference', array('uri' => '#', 'label' => 'Preference'))->setAttribute('dropdown', true);
         $registeredOptionTypes = $this->pref()->getRegisteredOptionTypes();
         foreach ($registeredOptionTypes as $optionType) {
-            $menu['Options']->addChild($optionType['name'], array(
-                'route' => 'preference_home'
+            $menu['Preference']->addChild($optionType['name'], array(
+                'route' => 'preference_page',
+                'routeParameters' => array(
+                    'type' => $optionType['type']
+                )
             ));
         }
 
