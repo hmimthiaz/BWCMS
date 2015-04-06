@@ -11,6 +11,7 @@ use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Classes\SiteManager;
 use Bellwether\BWCMSBundle\Classes\ContentManager;
 use Bellwether\BWCMSBundle\Classes\MediaManager;
+use Bellwether\BWCMSBundle\Classes\OptionManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -63,6 +64,14 @@ class BaseController extends Controller
     public function mm()
     {
         return $this->container->get('BWCMS.Media')->getManager();
+    }
+
+    /**
+     * @return OptionManager
+     */
+    public function op()
+    {
+        return $this->container->get('BWCMS.Option')->getManager();
     }
 
     /**
