@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Bellwether\BWCMSBundle\Classes\SiteManager;
 use Bellwether\BWCMSBundle\Classes\ContentManager;
 use Bellwether\BWCMSBundle\Classes\MediaManager;
+use Bellwether\BWCMSBundle\Entity\OptionEntity;
 
 
 abstract class OptionType implements OptionTypeInterface
@@ -117,9 +118,9 @@ abstract class OptionType implements OptionTypeInterface
 
     abstract function validateForm(FormEvent $event);
 
-    abstract public function loadFormData(ContentEntity $content = null, Form $form = null);
-
-    abstract public function prepareEntity(ContentEntity $content = null, $data = array());
+//    abstract public function loadFormData(OptionEntity $option = null, Form $form = null);
+//
+//    abstract public function prepareEntity(OptionEntity $content = null, $data = array());
 
     /**
      * Generates a URL from the given parameters.
