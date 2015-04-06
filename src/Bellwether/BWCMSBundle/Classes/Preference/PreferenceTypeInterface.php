@@ -1,10 +1,10 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes\Option;
+namespace Bellwether\BWCMSBundle\Classes\Preference;
 
 
 
-interface OptionTypeInterface
+interface PreferenceTypeInterface
 {
 
     /**

@@ -5,8 +5,8 @@ namespace Bellwether\BWCMSBundle\Classes;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
-use Bellwether\BWCMSBundle\Classes\Option\OptionType;
-use Bellwether\BWCMSBundle\Classes\Option\OptionTypeInterface;
+use Bellwether\BWCMSBundle\Classes\Option\PreferenceType;
+use Bellwether\BWCMSBundle\Classes\Option\PreferenceTypeInterface;
 
 use Bellwether\BWCMSBundle\Classes\Option\Type\GeneralType;
 
@@ -40,9 +40,9 @@ class OptionManager extends BaseService
     }
 
     /**
-     * @param OptionTypeInterface|OptionType $classInstance
+     * @param PreferenceTypeInterface|PreferenceType $classInstance
      */
-    public function registerOptionType(OptionTypeInterface $classInstance)
+    public function registerOptionType(PreferenceTypeInterface $classInstance)
     {
         $slug = $classInstance->getType();
         $this->optionType[$slug] = $classInstance;
@@ -52,7 +52,7 @@ class OptionManager extends BaseService
     {
         $retVal = array();
         /**
-         * @var OptionType $class
+         * @var PreferenceType $class
          */
         foreach ($this->optionType as $key => $class) {
             $retVal[$key] = array(

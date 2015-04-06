@@ -1,5 +1,5 @@
 <?php
-namespace Bellwether\BWCMSBundle\Classes\Option;
+namespace Bellwether\BWCMSBundle\Classes\Preference;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -16,7 +16,7 @@ use Bellwether\BWCMSBundle\Classes\MediaManager;
 use Bellwether\BWCMSBundle\Entity\OptionEntity;
 
 
-abstract class OptionType implements OptionTypeInterface
+abstract class PreferenceType implements PreferenceTypeInterface
 {
     /**
      * @var ContainerInterface
