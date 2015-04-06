@@ -33,7 +33,7 @@ class ContentController extends BaseController
 
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
 
-        $registeredContents = $this->cm()->getRegisteredContent($type);
+        $registeredContents = $this->cm()->getRegisteredContentTypes($type);
         $mediaContentTypes = $this->cm()->getMediaContentTypes($type);
 
         $condition = array();
@@ -104,7 +104,7 @@ class ContentController extends BaseController
 
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
 
-        $registeredContents = $this->cm()->getRegisteredContent();
+        $registeredContents = $this->cm()->getRegisteredContentTypes();
 
         $qb->andWhere(" node.type = 'Folder' ");
 
@@ -147,7 +147,7 @@ class ContentController extends BaseController
         return array(
             'parentId' => $parentId,
             'holder' => $holder,
-            'contentTypes' => $this->cm()->getRegisteredContent(),
+            'contentTypes' => $this->cm()->getRegisteredContentTypes(),
             'jsNodes' => json_encode($jsNodes),
         );
 
@@ -359,7 +359,7 @@ class ContentController extends BaseController
             }
         }
 
-        $registeredContents = $this->cm()->getRegisteredContent($type);
+        $registeredContents = $this->cm()->getRegisteredContentTypes($type);
         $condition = array();
         foreach ($registeredContents as $cInfo) {
             $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";

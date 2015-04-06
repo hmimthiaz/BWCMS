@@ -75,7 +75,7 @@ class ContentManager extends BaseService
     /**
      * @return array
      */
-    public function getRegisteredContent($type = 'Content')
+    public function getRegisteredContentTypes($type = 'Content')
     {
         $retVal = array();
         /**
@@ -99,7 +99,7 @@ class ContentManager extends BaseService
     public function getMediaContentTypes($type = 'Content')
     {
         $mediaContentTypes = array();
-        $registeredContents = $this->getRegisteredContent($type);
+        $registeredContents = $this->getRegisteredContentTypes($type);
         if (!empty($registeredContents)) {
             foreach ($registeredContents as $content) {
                 $class = $content['class'];
@@ -109,29 +109,6 @@ class ContentManager extends BaseService
             }
         }
         return $mediaContentTypes;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRegisteredNavigation()
-    {
-        $retVal = array();
-        /**
-         * @var ContentType $class
-         */
-        foreach ($this->contentType as $key => $class) {
-            //if ($class->isNavigation()) {
-            $retVal[$key] = array(
-                'name' => $class->getName(),
-                'type' => $class->getType(),
-                'schema' => $class->getSchema(),
-                'isHierarchy' => $class->isHierarchy(),
-                'isRootItem' => $class->isRootItem()
-            );
-            //}
-        }
-        return $retVal;
     }
 
     /**

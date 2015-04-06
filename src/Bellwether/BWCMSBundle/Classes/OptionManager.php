@@ -21,6 +21,7 @@ class OptionManager extends BaseService
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
+        $this->addDefaultOptionTypes();
     }
 
     /**
@@ -45,6 +46,22 @@ class OptionManager extends BaseService
     {
         $slug = $classInstance->getType();
         $this->optionType[$slug] = $classInstance;
+    }
+
+    public function getRegisteredOptionTypes()
+    {
+        $retVal = array();
+        /**
+         * @var OptionType $class
+         */
+        foreach ($this->optionType as $key => $class) {
+            $retVal[$key] = array(
+                'name' => $class->getName(),
+                'type' => $class->getType(),
+                'class' => $class
+            );
+        }
+        return $retVal;
     }
 
 }

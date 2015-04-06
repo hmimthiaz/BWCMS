@@ -167,8 +167,9 @@
     <entity name="OptionEntity" uuid="570465dc-6816-469e-93e4-30bae17f18e9">
       <field name="id" type="guid" required="true" unique="true" primary="true" auto-increment="true" uuid="50286c64-fe06-4b70-af83-f2c76b05ed07"/>
       <field name="siteId" type="guid" uuid="fb4f22a1-3c61-4a6b-aade-53076fdef9ef"/>
-      <field name="fieldType" type="string" size="100" uuid="cefea88d-aca4-4977-bf97-acba8fcadb52"/>
+      <field name="type" type="string" size="100" uuid="f68c0fc1-bccd-4322-87cc-d94d85e3aecb"/>
       <field name="field" type="string" size="100" uuid="80dbc1be-d07d-46d1-adf2-ecc2e15c40df"/>
+      <field name="fieldType" type="string" size="100" uuid="cefea88d-aca4-4977-bf97-acba8fcadb52"/>
       <field name="value" type="text" uuid="9ff14b7a-7dc0-4b3b-85e6-ebf446c86e95"/>
       <orm-attributes>
         <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\OptionRepository</attribute>

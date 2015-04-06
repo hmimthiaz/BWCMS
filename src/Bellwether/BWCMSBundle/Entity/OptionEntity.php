@@ -18,6 +18,11 @@ class OptionEntity
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
      */
+    private $type;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
     private $fieldType;
 
     /**
@@ -50,6 +55,22 @@ class OptionEntity
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
     }
 
     /**
