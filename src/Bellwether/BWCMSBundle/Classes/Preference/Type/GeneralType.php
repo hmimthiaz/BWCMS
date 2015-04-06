@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes\Option\Type;
+namespace Bellwether\BWCMSBundle\Classes\Preference\Type;
 
 
 use Bellwether\BWCMSBundle\Classes\Preference\PreferenceTypeInterface;

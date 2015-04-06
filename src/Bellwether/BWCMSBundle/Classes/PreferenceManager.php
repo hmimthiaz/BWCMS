@@ -5,13 +5,13 @@ namespace Bellwether\BWCMSBundle\Classes;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
-use Bellwether\BWCMSBundle\Classes\Option\PreferenceType;
-use Bellwether\BWCMSBundle\Classes\Option\PreferenceTypeInterface;
+use Bellwether\BWCMSBundle\Classes\Preference\PreferenceType;
+use Bellwether\BWCMSBundle\Classes\Preference\PreferenceTypeInterface;
 
-use Bellwether\BWCMSBundle\Classes\Option\Type\GeneralType;
+use Bellwether\BWCMSBundle\Classes\Preference\Type\GeneralType;
 
 
-class OptionManager extends BaseService
+class PreferenceManager extends BaseService
 {
 
     private $optionType = array();

@@ -10,12 +10,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 /**
  * Page controller.
  *
- * @Route("/admin/option")
+ * @Route("/admin/preference")
  */
-class OptionController extends Controller
+class PreferenceController extends Controller
 {
     /**
-     * @Route("/",name="option_home")
+     * @Route("/",name="preference_home")
      * @Template()
      */
     public function indexAction()

@@ -2,8 +2,8 @@ services:
   BWCMS.Site:
     class: Bellwether\BWCMSBundle\Classes\SiteManager
     arguments: [@service_container,@request_stack]
-  BWCMS.Option:
-    class: Bellwether\BWCMSBundle\Classes\OptionManager
+  BWCMS.Preference:
+    class: Bellwether\BWCMSBundle\Classes\PreferenceManager
     arguments: [@service_container,@request_stack]
   BWCMS.Content:
     class: Bellwether\BWCMSBundle\Classes\ContentManager
