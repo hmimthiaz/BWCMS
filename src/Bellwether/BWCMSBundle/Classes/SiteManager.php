@@ -35,7 +35,7 @@ class SiteManager extends BaseService
      */
     public function getCurrentSite()
     {
-        return $this->getDefaultSite();
+        //return $this->getDefaultSite();
 
         $siteEntity = $this->session()->get('site', null);
         if (is_null($siteEntity)) {
