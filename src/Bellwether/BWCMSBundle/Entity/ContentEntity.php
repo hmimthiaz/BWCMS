@@ -163,13 +163,13 @@ class ContentEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\UserEntity")
-     * @ORM\JoinColumn(name="author", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="authorId", referencedColumnName="id", nullable=false)
      */
     private $author;
 
     /**
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity")
-     * @ORM\JoinColumn(name="site", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="siteId", referencedColumnName="id", nullable=false)
      */
     private $site;
 

@@ -17,7 +17,7 @@ class ContentMetaEntity
      * @var integer
      *
      * @ORM\Id
-     * @ORM\Column(type="guid",name="id")
+     * @ORM\Column(type="guid", name="id")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     private $id;
@@ -39,7 +39,7 @@ class ContentMetaEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="meta")
-     * @ORM\JoinColumn(name="content_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="contentId", referencedColumnName="id", nullable=false)
      */
     private $content;
 

@@ -36,7 +36,7 @@ class OptionManager extends BaseService
     /**
      * @param ContentTypeInterface|ContentType $classInstance
      */
-    public function registerContentType(ContentTypeInterface $classInstance)
+    public function registerOptionType(ContentTypeInterface $classInstance)
     {
         $slug = $classInstance->getType() . '.' . $classInstance->getSchema();
         $this->contentType[$slug] = $classInstance;

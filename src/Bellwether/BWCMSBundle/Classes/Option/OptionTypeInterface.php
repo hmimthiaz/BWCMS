@@ -27,9 +27,4 @@ interface OptionTypeInterface
      */
     public function getName();
 
-    /**
-     * @param string $type
-     * @return bool
-     */
-    public function isType($type = '');
 }
