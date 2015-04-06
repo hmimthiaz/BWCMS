@@ -5,6 +5,10 @@ namespace Bellwether\BWCMSBundle\Classes;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
+use Bellwether\BWCMSBundle\Classes\Option\OptionType;
+use Bellwether\BWCMSBundle\Classes\Option\OptionTypeInterface;
+
+use Bellwether\BWCMSBundle\Classes\Option\Type\GeneralType;
 
 
 class OptionManager extends BaseService
@@ -30,16 +34,17 @@ class OptionManager extends BaseService
 
     private function addDefaultOptionTypes()
     {
+        $this->registerOptionType(new GeneralType($this->container, $this->requestStack));
 
     }
 
     /**
-     * @param ContentTypeInterface|ContentType $classInstance
+     * @param OptionTypeInterface|OptionType $classInstance
      */
-    public function registerOptionType(ContentTypeInterface $classInstance)
+    public function registerOptionType(OptionTypeInterface $classInstance)
     {
-        $slug = $classInstance->getType() . '.' . $classInstance->getSchema();
-        $this->contentType[$slug] = $classInstance;
+        $slug = $classInstance->getType();
+        $this->optionType[$slug] = $classInstance;
     }
 
 }

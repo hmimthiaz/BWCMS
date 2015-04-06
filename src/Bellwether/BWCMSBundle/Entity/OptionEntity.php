@@ -18,7 +18,7 @@ class OptionEntity
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
      */
-    private $type;
+    private $fieldType;
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
@@ -55,18 +55,19 @@ class OptionEntity
     /**
      * @return mixed
      */
-    public function getType()
+    public function getFieldType()
     {
-        return $this->type;
+        return $this->fieldType;
     }
 
     /**
-     * @param mixed $type
+     * @param mixed $fieldType
      */
-    public function setType($type)
+    public function setFieldType($fieldType)
     {
-        $this->type = $type;
+        $this->fieldType = $fieldType;
     }
+
 
     /**
      * @return mixed

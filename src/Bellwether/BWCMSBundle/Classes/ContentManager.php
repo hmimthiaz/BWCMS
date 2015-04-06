@@ -191,7 +191,7 @@ class ContentManager extends BaseService
             foreach ($existingMeta as $meta) {
                 $metaField = $meta->getField();
                 $metaValue = $meta->getValue();
-                $metaType = $meta->getType();
+                $metaType = $meta->getFieldType();
                 try {
                     $formField = $form->get($metaField);
                 } catch (\OutOfBoundsException $e) {
@@ -311,7 +311,7 @@ class ContentManager extends BaseService
                 $meta = $this->getMetaForField($existingMeta, $fieldName);
                 $meta->setContent($content);
                 $meta->setField($fieldName);
-                $meta->setType($fields[$fieldName]['type']);
+                $meta->setFieldType($fields[$fieldName]['type']);
                 if ($fields[$fieldName]['type'] == ContentFieldType::String || $fields[$fieldName]['type'] == ContentFieldType::Number) {
                     $meta->setValue($fieldValue);
                 }
