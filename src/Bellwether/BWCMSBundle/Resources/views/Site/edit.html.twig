@@ -1,0 +1,11 @@
+{% extends "BWCMSBundle:Common:default.html.twig" %}
+
+{% block title %}Edit Site{% endblock %}
+{% block pageTitle %}
+    <h1>Edit Site</h1>
+{% endblock %}
+
+{% block body %}
+    {{ form(edit_form, { 'style': 'horizontal' , 'label_col': 2, 'widget_col': 10 }) }}
+{% endblock %}
+

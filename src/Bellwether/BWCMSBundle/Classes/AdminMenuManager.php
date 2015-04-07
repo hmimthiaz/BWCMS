@@ -28,9 +28,32 @@ class AdminMenuManager extends BaseService
         return $this;
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     public function buildRightMainMenu(Request $request)
     {
         $menu = $this->factory->createItem('root');
+
+        $currentSite = $this->sm()->getCurrentSite();
+        $allSites = $this->sm()->getAllSites();
+        if (count($allSites) > 1) {
+            $menu->addChild('Site', array('uri' => '#', 'label' => 'Site: ' . $currentSite->getName()))->setAttribute('dropdown', true);
+            foreach ($allSites as $siteInfo) {
+                /**
+                 * @var \Knp\Menu\MenuItem $siteMenu
+                 */
+                $siteMenu = $menu['Site']->addChild($siteInfo->getName(), array(
+                    'route' => 'site_change_current',
+                    'routeParameters' => array('siteId' => $siteInfo->getId())
+                ));
+                if ($currentSite->getId() == $siteInfo->getId()) {
+                    $siteMenu->setCurrent(true);
+                }
+            }
+        }
+
 
         $menu->addChild('Profile', array('uri' => '#', 'label' => $this->getUser()->getEmail()))->setAttribute('dropdown', true);
         $menu['Profile']->addChild('Profile', array('uri' => '#'));
@@ -90,6 +113,9 @@ class AdminMenuManager extends BaseService
 
         $menu->addChild('Admin', array('uri' => '#', 'label' => 'Admin'))->setAttribute('dropdown', true);
 
+        $menu['Admin']->addChild('Site', array(
+            'route' => 'site_home'
+        ));
         $menu['Admin']->addChild('User', array(
             'route' => 'user_home'
         ));

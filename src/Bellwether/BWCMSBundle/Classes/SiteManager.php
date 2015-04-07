@@ -6,15 +6,15 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
-
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
-use Bellwether\BWCMSBundle\Entity\ContentEntity;
-use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
+use Bellwether\BWCMSBundle\Entity\SiteRepository;
 
 class SiteManager extends BaseService
 {
 
     private $defaultSite = null;
+
+    private $currentSite = null;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -30,19 +30,39 @@ class SiteManager extends BaseService
         return $this;
     }
 
+    public function setCurrentSite($siteId = null)
+    {
+        $this->currentSite = null;
+        $this->session()->remove('currentSiteId');
+        if (!is_null($siteId)) {
+            $this->session()->set('currentSiteId', $siteId);
+        }
+    }
+
     /**
      * @return SiteEntity
      */
     public function getCurrentSite()
     {
-        //return $this->getDefaultSite();
-
-        $siteEntity = $this->session()->get('site', null);
-        if (is_null($siteEntity)) {
-            $siteEntity = $this->getDefaultSite();
-            $this->session()->set('site', $siteEntity);
+        if ($this->currentSite == null) {
+            $currentSiteId = $this->session()->get('currentSiteId', null);
+            if ($currentSiteId != null) {
+                $this->currentSite = $this->getSiteRepository()->find($currentSiteId);
+            }
+            if ($this->currentSite == null) {
+                $this->currentSite = $this->getDefaultSite();
+            }
+            $this->session()->set('currentSiteId', $this->currentSite->getId());
         }
-        return $siteEntity;
+        return $this->currentSite;
+    }
+
+    /**
+     * @return Array();
+     */
+    public function getAllSites()
+    {
+        return $this->getSiteRepository()->findAll();
     }
 
     /**
@@ -54,7 +74,7 @@ class SiteManager extends BaseService
             $criteria = array(
                 'isDefault' => true
             );
-            $this->defaultSite = $this->em()->getRepository('BWCMSBundle:SiteEntity')->findOneBy($criteria);
+            $this->defaultSite = $this->getSiteRepository()->findOneBy($criteria);
             if ($this->defaultSite == null) {
                 $siteEntity = new SiteEntity();
                 $siteEntity->setName('Default');
@@ -69,6 +89,14 @@ class SiteManager extends BaseService
             }
         }
         return $this->defaultSite;
+    }
+
+    /**
+     * @return SiteRepository
+     */
+    public function getSiteRepository()
+    {
+        return $this->em()->getRepository('BWCMSBundle:SiteEntity');
     }
 
 }

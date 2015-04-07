@@ -13,6 +13,7 @@ use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Content\Type\ContentFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\ContentPageType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\ContentArticleType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\MediaFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\MediaFileType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationFolderType;
@@ -52,6 +53,7 @@ class ContentManager extends BaseService
     {
         $this->registerContentType(new ContentFolderType($this->container, $this->requestStack));
         $this->registerContentType(new ContentPageType($this->container, $this->requestStack));
+        $this->registerContentType(new ContentArticleType($this->container, $this->requestStack));
 
         $this->registerContentType(new MediaFolderType($this->container, $this->requestStack));
         $this->registerContentType(new MediaFileType($this->container, $this->requestStack));
