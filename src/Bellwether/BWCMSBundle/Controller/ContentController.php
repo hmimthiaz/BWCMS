@@ -45,6 +45,7 @@ class ContentController extends BaseController
         if (!empty($condition)) {
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
+        $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
 
         $rootFolders = $qb->getQuery()->getResult();
 
@@ -107,6 +108,7 @@ class ContentController extends BaseController
         $registeredContents = $this->cm()->getRegisteredContentTypes();
 
         $qb->andWhere(" node.type = 'Folder' ");
+        $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
 
         $rootFolders = $qb->getQuery()->getResult();
 
@@ -367,6 +369,7 @@ class ContentController extends BaseController
         if (!empty($condition)) {
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
+        $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
 
         $qb->setFirstResult($start);
         $qb->setMaxResults($length);
