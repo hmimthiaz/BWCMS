@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Bellwether\BWCMSBundle\Entity\Site;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Symfony\Component\Form\Form;
+use AppKernel;
 
 /**
  * Dashboard controller.
@@ -25,6 +26,12 @@ class DashboardController extends BaseController
      */
     public function indexAction()
     {
+
+
+
+        $this->dump($this->container);
+
+        exit;
 
         return array(
         );

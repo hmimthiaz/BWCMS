@@ -41,7 +41,7 @@ services:
           - { name: knp_menu.menu, alias: AdminMenu.Right }
   BWCMS.KernelEventListener:
         class: Bellwether\BWCMSBundle\EventListener\KernelEventListener
-        arguments: [@service_container,@request_stack]
+        arguments: [@kernel,@service_container,@request_stack]
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }

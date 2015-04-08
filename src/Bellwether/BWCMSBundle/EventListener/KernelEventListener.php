@@ -14,9 +14,24 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
 class KernelEventListener extends BaseService
 {
-    function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
+    function __construct($kernel, ContainerInterface $container = null, RequestStack $request_stack = null)
     {
+//        $this->dump($kernel);
+//        exit;
+
         $this->setContainer($container);
+
+//        $container->loadFromExtension('swiftmailer', array(
+//            'transport'  => "smtp",
+//            'encryption' => "ssl",
+//            'auth_mode'  => "login",
+//            'host'       => "smtp.gmail.com",
+//            'username'   => "your_username",
+//            'password'   => "your_password",
+//        ));
+
+//        $container->setParameter('swiftmailer.mailer.default.transport.smtp.port',25);
+
         $this->setRequestStack($request_stack);
     }
 

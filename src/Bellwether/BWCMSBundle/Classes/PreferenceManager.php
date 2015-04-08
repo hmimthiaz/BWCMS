@@ -8,6 +8,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Bellwether\BWCMSBundle\Classes\Preference\PreferenceType;
 use Bellwether\BWCMSBundle\Classes\Preference\PreferenceTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Preference\Type\GeneralType;
+use Bellwether\BWCMSBundle\Classes\Preference\Type\EmailSMTPType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Entity\PreferenceEntity;
@@ -38,6 +39,7 @@ class PreferenceManager extends BaseService
     private function addDefaultOptionTypes()
     {
         $this->registerOptionType(new GeneralType($this->container, $this->requestStack));
+        $this->registerOptionType(new EmailSMTPType($this->container, $this->requestStack));
     }
 
     /**
@@ -103,6 +105,8 @@ class PreferenceManager extends BaseService
                 );
                 if (!$fieldInfo['global']) {
                     $criteria['site'] = $this->sm()->getCurrentSite()->getId();
+                }else{
+                    $criteria['site'] = null;
                 }
                 /**
                  * @var \Bellwether\BWCMSBundle\Entity\PreferenceEntity $preferenceEntity
@@ -180,7 +184,10 @@ class PreferenceManager extends BaseService
                 );
                 if (!$fieldInfo['global']) {
                     $criteria['site'] = $this->sm()->getCurrentSite()->getId();
+                }else{
+                    $criteria['site'] = null;
                 }
+
                 /**
                  * @var \Bellwether\BWCMSBundle\Entity\PreferenceEntity $preferenceEntity
                  */
