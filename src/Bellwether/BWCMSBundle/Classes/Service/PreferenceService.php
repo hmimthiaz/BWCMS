@@ -19,6 +19,8 @@ class PreferenceService extends BaseService
 
     private $preferenceType = array();
 
+    private $loaded = array();
+
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -80,6 +82,31 @@ class PreferenceService extends BaseService
         return $this->preferenceType[$slug];
     }
 
+    public function getAllPreferenceByType($type)
+    {
+
+        if (isset($this->loaded[$type]) && !empty($this->loaded[$type])) {
+            return $this->loaded[$type];
+        }
+
+        $classInstance = $this->getPreferenceClass($type);
+        $currentSite = $this->sm()->getCurrentSite();
+
+        $qb = $this->getPreferenceRepository()->createQueryBuilder('p');
+        $qb->andWhere(" ( p.type = '" . $classInstance->getType() . "' ) ");
+        $qb->andWhere(" ( p.site = '" . $currentSite->getId() . "' OR p.site IS NULL ) ");
+        $preferenceResult = $qb->getQuery()->getResult();
+
+        $returnArray = array();
+        if (!empty($preferenceResult)) {
+            foreach ($preferenceResult as $preferenceEntity) {
+                $returnArray[$preferenceEntity->getField()] = $this->decodeDataFromDB($preferenceEntity->getFieldType(), $preferenceEntity->getValue());
+            }
+        }
+        $this->loaded[$classInstance->getType()] = $returnArray;
+        return $returnArray;
+    }
+
 
     /**
      * @param Form $form
@@ -105,7 +132,7 @@ class PreferenceService extends BaseService
                 );
                 if (!$fieldInfo['global']) {
                     $criteria['site'] = $this->sm()->getCurrentSite()->getId();
-                }else{
+                } else {
                     $criteria['site'] = null;
                 }
                 /**
@@ -120,32 +147,42 @@ class PreferenceService extends BaseService
                 } catch (\OutOfBoundsException $e) {
                     continue;
                 }
-                $fieldValue = $preferenceEntity->getValue();
-
-                if ($fieldType == PreferenceFieldType::String || $fieldValue == PreferenceFieldType::Number) {
-                    $formField->setData($fieldValue);
-                }
-                if ($fieldType == PreferenceFieldType::Content) {
-                    $formField->setData($fieldValue);
-                }
-                if ($fieldType == PreferenceFieldType::Date || $fieldType == PreferenceFieldType::Time || $fieldType == PreferenceFieldType::DateTime) {
-                    $dateValue = new \DateTime($fieldValue);
-                    $formField->setData($dateValue);
-                }
-                if ($fieldType == PreferenceFieldType::Serialized) {
-                    try {
-                        $data = $this->getSerializer()->deserialize($fieldValue, 'ArrayCollection', 'json');
-                    } catch (\RuntimeException $exp) {
-                        $data = array();
-                    }
-                    $data = $this->loadSerializedData($data);
-                    $formField->setData($data);
-                }
+                $fieldValue = $this->decodeDataFromDB($fieldType, $preferenceEntity->getValue());
+                $formField->setData($fieldValue);
             }
         }
 //        $form = $classInstance->loadFormData($content, $form);
         return $form;
     }
+
+
+    private function decodeDataFromDB($fieldType, $fieldValue)
+    {
+        if (is_null($fieldValue)) {
+            return null;
+        }
+        if ($fieldType == PreferenceFieldType::String || $fieldValue == PreferenceFieldType::Number) {
+            return $fieldValue;
+        }
+        if ($fieldType == PreferenceFieldType::Content) {
+            return $fieldValue;
+        }
+        if ($fieldType == PreferenceFieldType::Date || $fieldType == PreferenceFieldType::Time || $fieldType == PreferenceFieldType::DateTime) {
+            $dateValue = new \DateTime($fieldValue);
+            return $dateValue;
+        }
+        if ($fieldType == PreferenceFieldType::Serialized) {
+            try {
+                $data = $this->getSerializer()->deserialize($fieldValue, 'ArrayCollection', 'json');
+            } catch (\RuntimeException $exp) {
+                $data = array();
+            }
+            $data = $this->loadSerializedData($data);
+            return $data;
+        }
+        return $fieldValue;
+    }
+
 
     private function loadSerializedData($value)
     {
@@ -184,7 +221,7 @@ class PreferenceService extends BaseService
                 );
                 if (!$fieldInfo['global']) {
                     $criteria['site'] = $this->sm()->getCurrentSite()->getId();
-                }else{
+                } else {
                     $criteria['site'] = null;
                 }
 

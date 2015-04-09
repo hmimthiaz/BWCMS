@@ -27,12 +27,13 @@ class DashboardController extends BaseController
     public function indexAction()
     {
 
-
-
-//        $this->dump($this->container);
-//
-//        exit;
-
+        $values = $this->pref()->getAllPreferenceByType('Email.SMTP');
+        $values = $this->pref()->getAllPreferenceByType('Email.SMTP');
+        $values = $this->pref()->getAllPreferenceByType('Email.SMTP');
+        $values = $this->pref()->getAllPreferenceByType('Email.SMTP');
+        $values = $this->pref()->getAllPreferenceByType('Email.SMTP');
+        $values = $this->pref()->getAllPreferenceByType('Email.SMTP');
+        $this->dump($values);
         return array(
         );
 
