@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes;
+namespace Bellwether\BWCMSBundle\Classes\Service;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Entity\PreferenceEntity;
 use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
 
-class PreferenceManager extends BaseService
+class PreferenceService extends BaseService
 {
 
     private $preferenceType = array();
@@ -28,7 +28,7 @@ class PreferenceManager extends BaseService
     }
 
     /**
-     * @return SiteManager
+     * @return SiteService
      */
     public function getManager()
     {

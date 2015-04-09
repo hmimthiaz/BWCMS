@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes;
+namespace Bellwether\BWCMSBundle\Classes\Service;
 
 use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
@@ -28,7 +28,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
 
-class ContentManager extends BaseService
+class ContentService extends BaseService
 {
 
     private $contentType = array();
@@ -42,7 +42,7 @@ class ContentManager extends BaseService
     }
 
     /**
-     * @return ContentManager
+     * @return ContentService
      */
     public function getManager()
     {

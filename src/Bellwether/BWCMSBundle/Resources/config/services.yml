@@ -1,15 +1,15 @@
 services:
   BWCMS.Site:
-    class: Bellwether\BWCMSBundle\Classes\SiteManager
+    class: Bellwether\BWCMSBundle\Classes\Service\SiteService
     arguments: [@service_container,@request_stack]
   BWCMS.Preference:
-    class: Bellwether\BWCMSBundle\Classes\PreferenceManager
+    class: Bellwether\BWCMSBundle\Classes\Service\PreferenceService
     arguments: [@service_container,@request_stack]
   BWCMS.Content:
-    class: Bellwether\BWCMSBundle\Classes\ContentManager
+    class: Bellwether\BWCMSBundle\Classes\Service\ContentService
     arguments: [@service_container,@request_stack]
   BWCMS.Media:
-    class: Bellwether\BWCMSBundle\Classes\MediaManager
+    class: Bellwether\BWCMSBundle\Classes\Service\MediaService
     arguments: [@service_container,@request_stack]
   BWCMS.Form.Type.Content:
     class: Bellwether\BWCMSBundle\Form\Type\ContentType
@@ -21,7 +21,7 @@ services:
     tags:
       - { name: form.type , alias: bwcms_collection }
   BWCMS.AdminMenu:
-      class: Bellwether\BWCMSBundle\Classes\AdminMenuManager
+      class: Bellwether\BWCMSBundle\Classes\Service\AdminMenuService
       arguments: ["@knp_menu.factory",@service_container,@request_stack]
   BWCMS.AdminMenu.Left:
       class: Knp\Menu\MenuItem

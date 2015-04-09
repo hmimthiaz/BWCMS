@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes;
+namespace Bellwether\BWCMSBundle\Classes\Service;
 
 use Knp\Menu\FactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -9,7 +9,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Symfony\Component\HttpFoundation\Request;
 
 
-class AdminMenuManager extends BaseService
+class AdminMenuService extends BaseService
 {
     private $factory;
 
@@ -21,7 +21,7 @@ class AdminMenuManager extends BaseService
     }
 
     /**
-     * @return ContentManager
+     * @return ContentService
      */
     public function getManager()
     {

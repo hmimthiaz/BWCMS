@@ -15,9 +15,6 @@ use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Content\Form\ContentEmptyForm;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Bellwether\BWCMSBundle\Classes\SiteManager;
-use Bellwether\BWCMSBundle\Classes\ContentManager;
-use Bellwether\BWCMSBundle\Classes\MediaManager;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
@@ -345,7 +342,7 @@ abstract class ContentType implements ContentTypeInterface
     }
 
     /**
-     * @return SiteManager
+     * @return SiteService
      */
     public function sm()
     {
@@ -353,7 +350,7 @@ abstract class ContentType implements ContentTypeInterface
     }
 
     /**
-     * @return ContentManager
+     * @return ContentService
      */
     public function cm()
     {
@@ -361,7 +358,7 @@ abstract class ContentType implements ContentTypeInterface
     }
 
     /**
-     * @return MediaManager
+     * @return MediaService
      */
     public function mm()
     {

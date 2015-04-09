@@ -8,10 +8,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\SecurityContext;
 use Bellwether\BWCMSBundle\Entity\UserEntity;
-use Bellwether\BWCMSBundle\Classes\SiteManager;
-use Bellwether\BWCMSBundle\Classes\ContentManager;
-use Bellwether\BWCMSBundle\Classes\MediaManager;
-use Bellwether\BWCMSBundle\Classes\PreferenceManager;
+use Bellwether\BWCMSBundle\Classes\SiteService;
+use Bellwether\BWCMSBundle\Classes\ContentService;
+use Bellwether\BWCMSBundle\Classes\MediaService;
+use Bellwether\BWCMSBundle\Classes\PreferenceService;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 
@@ -53,7 +53,7 @@ class BaseService  extends ContainerAware
     }
 
     /**
-     * @return SiteManager
+     * @return SiteService
      */
     public function sm()
     {
@@ -61,7 +61,7 @@ class BaseService  extends ContainerAware
     }
 
     /**
-     * @return ContentManager
+     * @return ContentService
      */
     public function cm()
     {
@@ -69,7 +69,7 @@ class BaseService  extends ContainerAware
     }
 
     /**
-     * @return MediaManager
+     * @return MediaService
      */
     public function mm()
     {
@@ -77,7 +77,7 @@ class BaseService  extends ContainerAware
     }
 
     /**
-     * @return PreferenceManager
+     * @return PreferenceService
      */
     public function pref()
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes;
+namespace Bellwether\BWCMSBundle\Classes\Service;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -9,7 +9,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Entity\SiteRepository;
 
-class SiteManager extends BaseService
+class SiteService extends BaseService
 {
 
     private $defaultSite = null;
@@ -23,7 +23,7 @@ class SiteManager extends BaseService
     }
 
     /**
-     * @return SiteManager
+     * @return SiteService
      */
     public function getManager()
     {

@@ -9,10 +9,10 @@ use Doctrine\ORM\EntityManager;
 
 use Bellwether\BWCMSBundle\Entity\UserEntity;
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
-use Bellwether\BWCMSBundle\Classes\SiteManager;
-use Bellwether\BWCMSBundle\Classes\ContentManager;
-use Bellwether\BWCMSBundle\Classes\MediaManager;
-use Bellwether\BWCMSBundle\Classes\PreferenceManager;
+use Bellwether\BWCMSBundle\Classes\Service\SiteService;
+use Bellwether\BWCMSBundle\Classes\Service\ContentService;
+use Bellwether\BWCMSBundle\Classes\Service\MediaService;
+use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -44,7 +44,7 @@ class BaseController extends Controller
     }
 
     /**
-     * @return SiteManager
+     * @return SiteService
      */
     public function sm()
     {
@@ -52,7 +52,7 @@ class BaseController extends Controller
     }
 
     /**
-     * @return ContentManager
+     * @return ContentService
      */
     public function cm()
     {
@@ -60,7 +60,7 @@ class BaseController extends Controller
     }
 
     /**
-     * @return MediaManager
+     * @return MediaService
      */
     public function mm()
     {
@@ -68,7 +68,7 @@ class BaseController extends Controller
     }
 
     /**
-     * @return PreferenceManager
+     * @return PreferenceService
      */
     public function pref()
     {

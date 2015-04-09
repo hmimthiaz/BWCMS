@@ -10,9 +10,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Preference\Form\PreferenceEmptyForm;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Bellwether\BWCMSBundle\Classes\SiteManager;
-use Bellwether\BWCMSBundle\Classes\ContentManager;
-use Bellwether\BWCMSBundle\Classes\MediaManager;
 use Bellwether\BWCMSBundle\Entity\PreferenceEntity;
 use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
 

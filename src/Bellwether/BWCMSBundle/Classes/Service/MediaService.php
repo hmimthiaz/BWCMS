@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes;
+namespace Bellwether\BWCMSBundle\Classes\Service;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -10,7 +10,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Gregwar\Image\Image;
 
-class MediaManager extends BaseService
+class MediaService extends BaseService
 {
 
     private $uploadFolder;
@@ -29,7 +29,7 @@ class MediaManager extends BaseService
     }
 
     /**
-     * @return MediaManager
+     * @return MediaService
      */
     public function getManager()
     {

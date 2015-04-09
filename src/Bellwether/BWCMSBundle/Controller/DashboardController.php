@@ -29,9 +29,9 @@ class DashboardController extends BaseController
 
 
 
-        $this->dump($this->container);
-
-        exit;
+//        $this->dump($this->container);
+//
+//        exit;
 
         return array(
         );
