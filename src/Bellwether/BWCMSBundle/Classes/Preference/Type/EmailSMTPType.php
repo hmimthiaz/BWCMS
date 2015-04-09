@@ -24,7 +24,7 @@ class EmailSMTPType Extends PreferenceType
 
     protected function buildFields()
     {
-        $this->addField('transport', PreferenceFieldType::String, true);
+//        $this->addField('transport', PreferenceFieldType::String, true);
         $this->addField('username', PreferenceFieldType::String, true);
         $this->addField('password', PreferenceFieldType::String, true);
         $this->addField('host', PreferenceFieldType::String, true);
@@ -37,12 +37,12 @@ class EmailSMTPType Extends PreferenceType
 
     protected function buildForm()
     {
-        $this->fb()->add('transport', 'choice',
-            array(
-                'label' => 'Transport',
-                'choices' => array('smtp' => 'SMTP', 'gmail' => 'Gmail'),
-            )
-        );
+//        $this->fb()->add('transport', 'choice',
+//            array(
+//                'label' => 'Transport',
+//                'choices' => array('smtp' => 'SMTP', 'gmail' => 'Gmail'),
+//            )
+//        );
         $this->fb()->add('username', 'text',
             array(
                 'label' => 'Username'

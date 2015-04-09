@@ -49,7 +49,40 @@ class MailService extends BaseService
         if ($this->transport == null) {
             $this->transport = \Swift_SmtpTransport::newInstance();
 
-            $this->transport->setHost('');
+            $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
+            /**
+             *  'username' => string 'AKIAJ3EUV7MIOZ33MVWA' (length=20)
+             * 'password' => string 'AiIqolUYybkRBJ43HrXeAsXUjgaBzFDi63RrZ9v1shwy' (length=44)
+             * 'host' => string 'email-smtp.us-west-2.amazonaws.com' (length=34)
+             * 'port' => string '25' (length=2)
+             * 'encryption' => string 'tls' (length=3)
+             * 'sender_address' => string 'imthi@dxb.io' (length=12)
+             * 'auth_mode' => null
+             * 'delivery_address' => null
+             */
+
+            if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
+                $this->transport->setHost($emailSettings['host']);
+            }
+            if (!is_null($emailSettings['username']) && !empty($emailSettings['username'])) {
+                $this->transport->setUsername($emailSettings['username']);
+            }
+            if (!is_null($emailSettings['password']) && !empty($emailSettings['password'])) {
+                $this->transport->setPassword($emailSettings['password']);
+            }
+            if (!is_null($emailSettings['port']) && !empty($emailSettings['port'])) {
+                $this->transport->setPassword($emailSettings['port']);
+            }
+            if (!is_null($emailSettings['encryption']) && !empty($emailSettings['encryption'])) {
+                $this->transport->setEncryption($emailSettings['encryption']);
+            }
+            if (!is_null($emailSettings['auth_mode']) && !empty($emailSettings['auth_mode'])) {
+                $this->transport->setAuthMode($emailSettings['auth_mode']);
+            }
+            if (!is_null($emailSettings['auth_mode']) && !empty($emailSettings['auth_mode'])) {
+            }
+
+
 
         }
         return $this->transport;

@@ -84,23 +84,29 @@ class PreferenceService extends BaseService
 
     public function getAllPreferenceByType($type)
     {
-
         if (isset($this->loaded[$type]) && !empty($this->loaded[$type])) {
             return $this->loaded[$type];
         }
-
         $classInstance = $this->getPreferenceClass($type);
         $currentSite = $this->sm()->getCurrentSite();
-
         $qb = $this->getPreferenceRepository()->createQueryBuilder('p');
         $qb->andWhere(" ( p.type = '" . $classInstance->getType() . "' ) ");
         $qb->andWhere(" ( p.site = '" . $currentSite->getId() . "' OR p.site IS NULL ) ");
         $preferenceResult = $qb->getQuery()->getResult();
-
         $returnArray = array();
         if (!empty($preferenceResult)) {
             foreach ($preferenceResult as $preferenceEntity) {
                 $returnArray[$preferenceEntity->getField()] = $this->decodeDataFromDB($preferenceEntity->getFieldType(), $preferenceEntity->getValue());
+            }
+            $fields = $classInstance->getFields();
+            $fieldsNames = array_keys($fields);
+            if (!empty($fieldsNames)) {
+                foreach ($fieldsNames as $fieldName) {
+                    if (!isset($returnArray[$fieldName])) {
+                        $returnArray[$fieldName] = null;
+                    }
+                }
+                $returnArray = array_intersect_key($returnArray, $fields);
             }
         }
         $this->loaded[$classInstance->getType()] = $returnArray;
