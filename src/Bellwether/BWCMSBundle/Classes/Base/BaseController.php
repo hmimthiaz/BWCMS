@@ -12,6 +12,7 @@ use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
 use Bellwether\BWCMSBundle\Classes\Service\MediaService;
+use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -81,6 +82,14 @@ class BaseController extends Controller
     public function session()
     {
         return $this->container->get('session');
+    }
+
+    /**
+     * @return MailService
+     */
+    public function mailer()
+    {
+        return $this->container->get('BWCMS.Mailer');
     }
 
     /**

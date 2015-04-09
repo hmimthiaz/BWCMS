@@ -8,10 +8,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\SecurityContext;
 use Bellwether\BWCMSBundle\Entity\UserEntity;
-use Bellwether\BWCMSBundle\Classes\SiteService;
-use Bellwether\BWCMSBundle\Classes\ContentService;
-use Bellwether\BWCMSBundle\Classes\MediaService;
-use Bellwether\BWCMSBundle\Classes\PreferenceService;
+use Bellwether\BWCMSBundle\Classes\Service\SiteService;
+use Bellwether\BWCMSBundle\Classes\Service\ContentService;
+use Bellwether\BWCMSBundle\Classes\Service\MediaService;
+use Bellwether\BWCMSBundle\Classes\Service\MailService;
+use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 
@@ -90,6 +91,14 @@ class BaseService  extends ContainerAware
     public function session()
     {
         return $this->container->get('session');
+    }
+
+    /**
+     * @return MailService
+     */
+    public function mailer()
+    {
+        return $this->container->get('BWCMS.Mailer');
     }
 
 
