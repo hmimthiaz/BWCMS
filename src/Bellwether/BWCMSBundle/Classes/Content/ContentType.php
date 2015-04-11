@@ -88,12 +88,12 @@ abstract class ContentType implements ContentTypeInterface
 
     public function getType()
     {
-        return "Page";
+        return "Content";
     }
 
     public function getSchema()
     {
-        return "Default";
+        return "Page";
     }
 
     public function getName()
@@ -432,7 +432,7 @@ abstract class ContentType implements ContentTypeInterface
     public function isType($type = 'Content')
     {
         $contentType = strtoupper($this->getType());
-        if (strpos($contentType, strtoupper($type) . '') !== false) {
+        if (strpos($contentType, strtoupper($type)) !== false) {
             return true;
         }
         return false;

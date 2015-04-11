@@ -63,6 +63,9 @@ class ContentService extends BaseService
 
         $this->registerContentType(new WidgetFolderType($this->container, $this->requestStack));
         $this->registerContentType(new WidgetHtmlType($this->container, $this->requestStack));
+
+        //Call other Content Types
+        $this->getEventDispatcher()->dispatch('BWCMS.Content.Register');
     }
 
     /**

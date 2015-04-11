@@ -101,12 +101,18 @@ class BaseService  extends ContainerAware
         return $this->container->get('BWCMS.Mailer');
     }
 
-
     /**
      * @return SecurityContext
      */
     public function getSecurityContext(){
         return $this->container->get('security.context');
+    }
+
+    /**
+     * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     */
+    public function getEventDispatcher(){
+        return $this->container->get('event_dispatcher');
     }
 
     /**

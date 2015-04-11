@@ -60,12 +60,12 @@ class MediaFolderType Extends ContentType
 
     public function getType()
     {
-        return "Media.Folder";
+        return "Media";
     }
 
     public function getSchema()
     {
-        return "Default";
+        return "Folder";
     }
 
     public function getName()

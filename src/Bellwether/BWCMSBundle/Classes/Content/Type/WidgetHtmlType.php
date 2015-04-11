@@ -60,12 +60,12 @@ class WidgetHtmlType Extends ContentType
 
     public function getType()
     {
-        return "Widget.HTML";
+        return "Widget";
     }
 
     public function getSchema()
     {
-        return "Default";
+        return "HTML";
     }
 
     public function getName()

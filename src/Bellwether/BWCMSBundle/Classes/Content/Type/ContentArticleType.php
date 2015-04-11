@@ -75,12 +75,12 @@ class ContentArticleType Extends ContentType
 
     public function getType()
     {
-        return "Content.Article";
+        return "Content";
     }
 
     public function getSchema()
     {
-        return "Default";
+        return "Article";
     }
 
     public function getName()

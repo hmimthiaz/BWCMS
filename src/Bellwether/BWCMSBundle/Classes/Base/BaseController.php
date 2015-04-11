@@ -93,6 +93,20 @@ class BaseController extends Controller
     }
 
     /**
+     * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     */
+    public function getEventDispatcher(){
+        return $this->container->get('event_dispatcher');
+    }
+
+    /**
+     * @return \JMS\Serializer\Serializer
+     */
+    public function getSerializer(){
+        return $this->container->get('serializer');
+    }
+
+    /**
      * @param Request $request
      * @param Array $jsonArray
      * @return Response

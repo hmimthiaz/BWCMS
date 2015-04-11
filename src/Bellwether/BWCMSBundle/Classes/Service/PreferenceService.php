@@ -42,6 +42,9 @@ class PreferenceService extends BaseService
     {
         $this->registerOptionType(new GeneralType($this->container, $this->requestStack));
         $this->registerOptionType(new EmailSMTPType($this->container, $this->requestStack));
+
+        //Call other Preference Types
+        $this->getEventDispatcher()->dispatch('BWCMS.Preference.Register');
     }
 
     /**

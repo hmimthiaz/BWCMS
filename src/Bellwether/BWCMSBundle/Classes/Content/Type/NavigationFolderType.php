@@ -60,12 +60,12 @@ class NavigationFolderType Extends ContentType
 
     public function getType()
     {
-        return "Navigation.Folder";
+        return "Navigation";
     }
 
     public function getSchema()
     {
-        return "Default";
+        return "Folder";
     }
 
     public function getName()

@@ -60,12 +60,12 @@ class NavigationLinkType Extends ContentType
 
     public function getType()
     {
-        return "Navigation.Link";
+        return "Navigation";
     }
 
     public function getSchema()
     {
-        return "Default";
+        return "Link";
     }
 
     public function getName()
