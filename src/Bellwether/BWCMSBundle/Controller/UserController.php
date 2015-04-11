@@ -78,10 +78,10 @@ class UserController extends BaseController
             $message = \Swift_Message::newInstance()
                 ->setSubject('Iris: Welcome Email')
                 ->setFrom('iris@dxb.io')
-                ->setTo($entity->getEmail(),$entity->getFirstname())
+                ->setTo($entity->getEmail(), $entity->getFirstname())
                 ->setBody(
                     $this->renderView(
-                        'IrisAdminBundle:User:welcome.email.txt.twig',
+                        'BWCMSBundle:User:welcome.email.txt.twig',
                         array(
                             'firstname' => $entity->getFirstname(),
                             'username' => $entity->getEmail(),
@@ -89,7 +89,7 @@ class UserController extends BaseController
                         )
                     )
                 );
-            $this->get('mailer')->send($message);
+            $this->mailer()->getMailer()->send($message);
 
             return $this->redirect($this->generateUrl('user_home', array('id' => $user->getId())));
         }

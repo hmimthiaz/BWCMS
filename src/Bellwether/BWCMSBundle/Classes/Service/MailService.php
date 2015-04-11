@@ -39,7 +39,6 @@ class MailService extends BaseService
     {
         if ($this->mailer == null) {
             $this->mailer = \Swift_Mailer::newInstance($this->getTransport());
-            $this->mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($this->getLogger()));
         }
         return $this->mailer;
     }
@@ -47,10 +46,11 @@ class MailService extends BaseService
     /**
      * @return \Swift_Plugins_Loggers_EchoLogger
      */
-    public function getLogger()
+    public function enableLogger()
     {
         if ($this->logger == null) {
-            $this->logger = new \Swift_Plugins_Loggers_EchoLogger();
+            $this->logger = new \Swift_Plugins_Loggers_ArrayLogger();
+            $this->getMailer()->registerPlugin(new \Swift_Plugins_LoggerPlugin($this->logger));
         }
         return $this->logger;
     }
@@ -84,6 +84,5 @@ class MailService extends BaseService
         }
         return $this->transport;
     }
-
 
 }
