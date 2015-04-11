@@ -2,39 +2,48 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Base;
 
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
-
+use Symfony\Component\Security\Core\SecurityContext;
 use Bellwether\BWCMSBundle\Entity\UserEntity;
-use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
 use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 
-abstract class BaseController extends Controller
+abstract class BaseSkin  extends ContainerAware
 {
+
     /**
-     * @return UserEntity
+     * @var RequestStack
+     *
+     * @api
      */
-    public function getUser()
+    protected $requestStack;
+
+    /**
+     * @param RequestStack $requestStack
+     */
+    public function setRequestStack(RequestStack $requestStack = null)
     {
-        return parent::getUser();
+        $this->requestStack = $requestStack;
     }
 
     /**
-     * @return SiteEntity
+     * @return Request|null
      */
-    public function getSite()
-    {
-        return $this->sm()->getCurrentSite();
+    public function getRequest(){
+        return $this->requestStack->getCurrentRequest();
+    }
+
+    public function getKernel(){
+        return $this->container->get( 'kernel' );
     }
 
     /**
@@ -102,6 +111,13 @@ abstract class BaseController extends Controller
     }
 
     /**
+     * @return SecurityContext
+     */
+    public function getSecurityContext(){
+        return $this->container->get('security.context');
+    }
+
+    /**
      * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
      */
     public function getEventDispatcher(){
@@ -116,35 +132,17 @@ abstract class BaseController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param Array $jsonArray
-     * @return Response
+     * @return UserEntity
      */
-    public function returnJsonReponse(Request $request, $jsonArray)
-    {
-        $serializer = $this->container->get('serializer');
-        $serializedReturn = $serializer->serialize($jsonArray, 'json');
-        if ($request->query->has('callback')) {
-            $callback = $request->query->get('callback');
-            $serializedReturn = $callback . '(' . $serializedReturn . ')';
-        }
-        return new Response($serializedReturn, 200, array('Content-Type' => 'application/json'));
+    public function getUser(){
+        return $this->getSecurityContext()->getToken()->getUser();
     }
 
-    public function returnErrorResponse($message = 'Unknown error occurred.')
-    {
-        $response = new Response();
-        $response->setStatusCode(500);
-        $response->setContent($message);
-        return $response;
-    }
 
-    public function dump($var, $maxDepth = 2, $stripTags = true)
-    {
+    public function dump($var, $maxDepth = 2, $stripTags = true){
         print '<pre>';
         \Doctrine\Common\Util\Debug::dump($var, $maxDepth, $stripTags);
         print '</pre>';
     }
-
 
 }

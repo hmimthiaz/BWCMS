@@ -21,7 +21,7 @@ class AdminMenuService extends BaseService
     }
 
     /**
-     * @return ContentService
+     * @return AdminMenuService
      */
     public function getManager()
     {

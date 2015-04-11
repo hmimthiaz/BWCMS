@@ -25,7 +25,7 @@ class MailService extends BaseService
     }
 
     /**
-     * @return SiteService
+     * @return MailService
      */
     public function getManager()
     {

@@ -13,10 +13,11 @@ use Bellwether\BWCMSBundle\Classes\Service\ContentService;
 use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
+use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 
-class BaseService  extends ContainerAware
+abstract class BaseService  extends ContainerAware
 {
 
     /**
@@ -25,6 +26,9 @@ class BaseService  extends ContainerAware
      * @api
      */
     protected $requestStack;
+
+    abstract public function getPath();
+
 
     /**
      * @param RequestStack $requestStack
@@ -83,6 +87,14 @@ class BaseService  extends ContainerAware
     public function pref()
     {
         return $this->container->get('BWCMS.Preference')->getManager();
+    }
+
+    /**
+     * @return TemplateService
+     */
+    public function tp()
+    {
+        return $this->container->get('BWCMS.Template')->getManager();
     }
 
     /**

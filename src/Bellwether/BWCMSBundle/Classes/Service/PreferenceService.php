@@ -30,7 +30,7 @@ class PreferenceService extends BaseService
     }
 
     /**
-     * @return SiteService
+     * @return PreferenceService
      */
     public function getManager()
     {

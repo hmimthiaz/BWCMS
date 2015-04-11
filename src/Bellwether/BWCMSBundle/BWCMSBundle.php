@@ -7,5 +7,8 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseBundle;
 class BWCMSBundle extends BaseBundle
 {
 
+    public function boot()
+    {
+    }
 
 }
