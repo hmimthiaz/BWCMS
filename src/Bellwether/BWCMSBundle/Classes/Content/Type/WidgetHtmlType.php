@@ -69,7 +69,7 @@ class WidgetHtmlType Extends ContentType
 
     public function getType()
     {
-        return "Widget";
+        return "Widget.Item";
     }
 
     public function getSchema()

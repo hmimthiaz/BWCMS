@@ -17,6 +17,11 @@ services:
   BWCMS.Template:
      class: Bellwether\BWCMSBundle\Classes\Service\TemplateService
      arguments: [@service_container,@request_stack]
+  BWCMS.Router:
+    class: Bellwether\BWCMSBundle\DependencyInjection\RoutingLoader
+    arguments: [@service_container,@request_stack]
+    tags:
+      - { name: routing.loader }
   BWCMS.Form.Type.Content:
     class: Bellwether\BWCMSBundle\Form\Type\ContentType
     arguments: [@service_container]

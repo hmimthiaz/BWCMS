@@ -69,12 +69,12 @@ class WidgetFolderType Extends ContentType
 
     public function getType()
     {
-        return "Widget";
+        return "Widget.Region";
     }
 
     public function getSchema()
     {
-        return "Folder";
+        return "Default";
     }
 
     public function getName()

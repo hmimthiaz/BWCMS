@@ -68,12 +68,12 @@ class MediaFileType Extends ContentType
 
     public function getType()
     {
-        return "Media";
+        return "Media.Files";
     }
 
     public function getSchema()
     {
-        return "Files";
+        return "Default";
     }
 
     public function getName()

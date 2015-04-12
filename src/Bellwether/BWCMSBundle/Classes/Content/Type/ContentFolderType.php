@@ -70,12 +70,12 @@ class ContentFolderType Extends ContentType
 
     public function getType()
     {
-        return "Content";
+        return "Content.Folder";
     }
 
     public function getSchema()
     {
-        return "Folder";
+        return "Default";
     }
 
     public function getName()

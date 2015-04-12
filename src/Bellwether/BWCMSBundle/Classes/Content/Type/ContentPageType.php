@@ -85,12 +85,12 @@ class ContentPageType Extends ContentType
 
     public function getType()
     {
-        return "Content";
+        return "Content.Page";
     }
 
     public function getSchema()
     {
-        return "Page";
+        return "Default";
     }
 
     public function getName()

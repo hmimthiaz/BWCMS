@@ -292,8 +292,6 @@ abstract class ContentType implements ContentTypeInterface
                 'label' => 'Sort Order'
             ));
         }
-
-
     }
 
     private function setDefaultHiddenFormFields()
@@ -451,7 +449,7 @@ abstract class ContentType implements ContentTypeInterface
     public function isType($type = 'Content')
     {
         $contentType = strtoupper($this->getType());
-        if (strpos($contentType, strtoupper($type)) !== false) {
+        if (strpos($contentType, strtoupper($type) . '.') !== false) {
             return true;
         }
         return false;

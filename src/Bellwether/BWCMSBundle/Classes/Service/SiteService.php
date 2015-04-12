@@ -65,6 +65,14 @@ class SiteService extends BaseService
         return $this->getSiteRepository()->findAll();
     }
 
+    public function getSiteBySlug($slug)
+    {
+        $criteria = array(
+            'slug' => $slug
+        );
+        return $this->getSiteRepository()->findOneBy($criteria);
+    }
+
     /**
      * @return SiteEntity
      */
