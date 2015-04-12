@@ -293,6 +293,8 @@ class ContentService extends BaseService
                 $parentId = $content->getTreeParent()->getId();
             }
             $content->setSlug($this->generateSlug($content->getTitle(), $content->getType(), $parentId, $content->getId()));
+        } else {
+            $content->setSlug($this->sanitizeTitle($content->getSlug()));
         }
         $metaData = $this->removeNonMetaData($data);
         if (!empty($metaData)) {
@@ -412,6 +414,57 @@ class ContentService extends BaseService
             $slug = $slug + '-1';
         }
         return $slug;
+    }
+
+    public function getContentBySlugPath($pathSlug = null)
+    {
+        if ($pathSlug == null) {
+            return null;
+        }
+
+        $pathList = $this->getCleanedPathArray($pathSlug);
+        if (empty($pathList)) {
+            return null;
+        }
+
+        $content = null;
+        foreach ($pathList as $path) {
+            $content = $this->getContentBySlug($path, $content);
+            if ($content == null) {
+                return null;
+            }
+        }
+        return $content;
+    }
+
+    /**
+     * @param string $slug
+     * @param ContentEntity $parent
+     * @return null|ContentEntity
+     */
+    private function getContentBySlug($slug, $parent = null)
+    {
+        $criteria = array(
+            'slug' => $slug
+        );
+        if (!empty($parent)) {
+            $criteria['treeParent'] = $parent->getId();
+        }
+        return $this->getContentRepository()->findOneBy($criteria);
+    }
+
+    private function getCleanedPathArray($pathSlug)
+    {
+        $returnArray = array();
+        $pathList = explode('/', $pathSlug);
+        if (!empty($pathList)) {
+            foreach ($pathList as $path) {
+                if (!empty($path)) {
+                    $returnArray[] = strtolower($path);
+                }
+            }
+        }
+        return $returnArray;
     }
 
     public function checkSlugExists($slug, $type = 'Page', $parentId = null, $contentId = null)

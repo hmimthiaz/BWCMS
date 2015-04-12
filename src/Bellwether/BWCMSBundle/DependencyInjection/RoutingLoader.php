@@ -38,20 +38,30 @@ class RoutingLoader extends BaseService implements LoaderInterface
         ));
         $routes->add('homeRedirect', $homeRedirectRoute);
 
-        $homeRedirectRoute = new Route('/{slug}/index.php', array(
+        $homeRedirectRoute = new Route('/{siteSlug}/index.php', array(
             '_controller' => 'BWCMSBundle:FrontEnd:home',
         ), array(
-            'requirements' => '[a-zA-Z0-9-]+'
+            'siteSlug' => '[a-zA-Z0-9-]+'
         ));
         $routes->add('home', $homeRedirectRoute);
 
 
-        $contentFolderRoute = new Route('/{slug}/index.php', array(
-            '_controller' => 'BWCMSBundle:FrontEnd:home',
+        $contentFolderRoute = new Route('/{siteSlug}/{folderSlug}/index.php', array(
+            '_controller' => 'BWCMSBundle:FrontEnd:contentFolder',
         ), array(
-            'requirements' => '[a-zA-Z0-9-]+'
+            'siteSlug' => '[a-zA-Z0-9-]+',
+            'folderSlug' => '[a-zA-Z0-9-_/]+'
         ));
         $routes->add('contentFolder', $contentFolderRoute);
+
+        $contentPageRoute = new Route('/{siteSlug}/{folderSlug}/{pageSlug}.php', array(
+            '_controller' => 'BWCMSBundle:FrontEnd:contentFolder',
+        ), array(
+            'siteSlug' => '[a-zA-Z0-9-]+',
+            'folderSlug' => '[a-zA-Z0-9-_/]+',
+            'pageSlug' => '[a-zA-Z0-9-_]+'
+        ));
+        $routes->add('contentPage', $contentPageRoute);
 
         $this->loaded = true;
 
