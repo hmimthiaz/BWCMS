@@ -148,6 +148,7 @@ class ContentService extends BaseService
         $form->get('id')->setData($content->getId());
         $form->get('type')->setData($content->getType());
         $form->get('schema')->setData($content->getSchema());
+        $form->get('template')->setData($content->getTemplate());
         $form->get('status')->setData($content->getStatus());
         $form->get('title')->setData($content->getTitle());
 
@@ -234,6 +235,8 @@ class ContentService extends BaseService
 
         $data = $form->getData();
 
+        $this->dump($data);
+
         $fields = $classInstance->getFields();
 
         foreach ($fields as $fieldName => $fieldInfo) {
@@ -252,6 +255,9 @@ class ContentService extends BaseService
             }
             if ($fieldName == 'status') {
                 $content->setStatus($data['status']);
+            }
+            if ($fieldName == 'template') {
+                $content->setTemplate($data['template']);
             }
             if ($fieldName == 'slug') {
                 $content->setSlug($data['slug']);
@@ -326,6 +332,7 @@ class ContentService extends BaseService
                 }
             }
         }
+
         $content = $classInstance->prepareEntity($content, $form);
         return $content;
     }
@@ -447,7 +454,7 @@ class ContentService extends BaseService
             "id", "expireDate", "publishDate",
             "title", "summary", "content",
             "slug", "file", "type",
-            "schema", "mime", "extension",
+            "schema", "template", "mime", "extension",
             "size", "height", "width",
             "modifiedDate", "createdDate", "status",
             "author", "site", "parent");

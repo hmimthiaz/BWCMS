@@ -43,6 +43,15 @@ class MediaFolderType Extends ContentType
 
     }
 
+    public function getTemplates()
+    {
+        $templates = array();
+
+        $templates['Default.html.twig'] = 'Default';
+
+        return $templates;
+    }
+
     public function validateForm(FormEvent $event)
     {
 

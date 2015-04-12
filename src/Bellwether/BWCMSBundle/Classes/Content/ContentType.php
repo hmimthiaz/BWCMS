@@ -118,6 +118,8 @@ abstract class ContentType implements ContentTypeInterface
 
     abstract protected function buildForm();
 
+    abstract protected function getTemplates();
+
     /**
      * @return Form
      */
@@ -142,6 +144,7 @@ abstract class ContentType implements ContentTypeInterface
             $this->addField('id', ContentFieldType::Internal);
             $this->addField('type', ContentFieldType::Internal);
             $this->addField('schema', ContentFieldType::Internal);
+            $this->addField('template', ContentFieldType::Internal);
             $this->addField('parent', ContentFieldType::Internal);
 
             $this->addField('title', ContentFieldType::Internal);
@@ -295,6 +298,22 @@ abstract class ContentType implements ContentTypeInterface
 
     private function setDefaultHiddenFormFields()
     {
+
+        $templates = $this->getTemplates();
+        if (count($templates) > 1) {
+            $this->fb()->add('template', 'choice',
+                array(
+                    'label' => 'Template',
+                    'choices' => $this->getTemplates()
+                )
+            );
+        } else {
+            reset($templates);
+            $template = key($templates);
+            $this->fb()->add('template', 'hidden', array(
+                'data' => $template,
+            ));
+        }
 
         $this->fb()->add('status', 'choice',
             array(

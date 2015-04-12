@@ -112,6 +112,11 @@ class ContentEntity
     private $schema = "Default";
 
     /**
+     * @ORM\Column(type="string", length=100, nullable=false)
+     */
+    private $template;
+
+    /**
      * @ORM\Column(type="string", length=100, nullable=true)
      */
     private $mime;
@@ -412,6 +417,22 @@ class ContentEntity
     public function setSlug($slug)
     {
         $this->slug = $slug;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * @param mixed $template
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
     }
 
     /**

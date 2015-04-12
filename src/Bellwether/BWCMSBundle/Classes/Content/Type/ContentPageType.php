@@ -58,6 +58,16 @@ class ContentPageType Extends ContentType
 
     }
 
+    public function getTemplates()
+    {
+        $templates = array();
+
+        $templates['LeftImage.html.twig'] = 'Image Left';
+        $templates['RightImage.html.twig'] = 'Image Right';
+
+        return $templates;
+    }
+
     public function validateForm(FormEvent $event)
     {
 
