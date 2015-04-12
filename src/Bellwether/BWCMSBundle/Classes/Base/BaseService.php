@@ -20,15 +20,26 @@ use Symfony\Component\HttpFoundation\Session\Session;
 abstract class BaseService  extends ContainerAware
 {
 
+    private $path;
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        if (null === $this->path) {
+            $reflected = new \ReflectionObject($this);
+            $this->path = dirname($reflected->getFileName());
+        }
+        return $this->path;
+    }
+
     /**
      * @var RequestStack
      *
      * @api
      */
     protected $requestStack;
-
-    abstract public function getPath();
-
 
     /**
      * @param RequestStack $requestStack

@@ -3,14 +3,22 @@
 namespace Bellwether\BWCMSBundle\Skins\Generic;
 
 use Bellwether\BWCMSBundle\Classes\Base\BaseSkin;
-
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class GenericSkin extends BaseSkin
 {
 
-    public function getPath()
+    function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
-        return __DIR__;
+        $this->setContainer($container);
+        $this->setRequestStack($request_stack);
     }
+
+    public function getName()
+    {
+        return 'Generic';
+    }
+
 
 }

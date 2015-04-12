@@ -17,8 +17,32 @@ use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 
-abstract class BaseSkin  extends ContainerAware
+abstract class BaseSkin extends ContainerAware
 {
+
+    abstract public function getName();
+
+    private $path = null;
+
+    /**
+     * @return null|string
+     */
+    public function getPath()
+    {
+        if (null === $this->path) {
+            $reflected = new \ReflectionObject($this);
+            $this->path = dirname($reflected->getFileName());
+        }
+        return $this->path;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFolderName()
+    {
+        return basename($this->getPath());
+    }
 
     /**
      * @var RequestStack
@@ -38,12 +62,14 @@ abstract class BaseSkin  extends ContainerAware
     /**
      * @return Request|null
      */
-    public function getRequest(){
+    public function getRequest()
+    {
         return $this->requestStack->getCurrentRequest();
     }
 
-    public function getKernel(){
-        return $this->container->get( 'kernel' );
+    public function getKernel()
+    {
+        return $this->container->get('kernel');
     }
 
     /**
@@ -113,33 +139,38 @@ abstract class BaseSkin  extends ContainerAware
     /**
      * @return SecurityContext
      */
-    public function getSecurityContext(){
+    public function getSecurityContext()
+    {
         return $this->container->get('security.context');
     }
 
     /**
      * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
      */
-    public function getEventDispatcher(){
+    public function getEventDispatcher()
+    {
         return $this->container->get('event_dispatcher');
     }
 
     /**
      * @return \JMS\Serializer\Serializer
      */
-    public function getSerializer(){
+    public function getSerializer()
+    {
         return $this->container->get('serializer');
     }
 
     /**
      * @return UserEntity
      */
-    public function getUser(){
+    public function getUser()
+    {
         return $this->getSecurityContext()->getToken()->getUser();
     }
 
 
-    public function dump($var, $maxDepth = 2, $stripTags = true){
+    public function dump($var, $maxDepth = 2, $stripTags = true)
+    {
         print '<pre>';
         \Doctrine\Common\Util\Debug::dump($var, $maxDepth, $stripTags);
         print '</pre>';

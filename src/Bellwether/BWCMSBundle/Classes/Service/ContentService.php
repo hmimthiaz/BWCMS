@@ -125,7 +125,7 @@ class ContentService extends BaseService
     {
         $slug = $type . '.' . $schema;
         if (!isset($this->contentType[$slug])) {
-            throw new \InvalidArgumentException("ContentType: `{$slug}` does not exists.");
+            throw new \RuntimeException("ContentType: `{$slug}` does not exists.");
         }
         return $this->contentType[$slug];
     }

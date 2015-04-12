@@ -41,12 +41,17 @@ class SiteEntity
     private $domain;
 
     /**
+     * @ORM\Column(type="string", length=100, nullable=false)
+     */
+    private $skinFolderName;
+
+    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $isDefault;
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getId()
     {
@@ -54,7 +59,7 @@ class SiteEntity
     }
 
     /**
-     * @param mixed $id
+     * @param string $id
      */
     public function setId($id)
     {
@@ -62,7 +67,7 @@ class SiteEntity
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
@@ -70,7 +75,7 @@ class SiteEntity
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      */
     public function setName($name)
     {
@@ -78,7 +83,7 @@ class SiteEntity
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getLocale()
     {
@@ -86,7 +91,7 @@ class SiteEntity
     }
 
     /**
-     * @param mixed $locale
+     * @param string $locale
      */
     public function setLocale($locale)
     {
@@ -94,7 +99,7 @@ class SiteEntity
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getDirection()
     {
@@ -102,7 +107,7 @@ class SiteEntity
     }
 
     /**
-     * @param mixed $direction
+     * @param string $direction
      */
     public function setDirection($direction)
     {
@@ -110,7 +115,7 @@ class SiteEntity
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getSlug()
     {
@@ -118,7 +123,7 @@ class SiteEntity
     }
 
     /**
-     * @param mixed $slug
+     * @param string $slug
      */
     public function setSlug($slug)
     {
@@ -126,7 +131,7 @@ class SiteEntity
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getDomain()
     {
@@ -134,11 +139,27 @@ class SiteEntity
     }
 
     /**
-     * @param mixed $domain
+     * @param string $domain
      */
     public function setDomain($domain)
     {
         $this->domain = $domain;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSkinFolderName()
+    {
+        return $this->skinFolderName;
+    }
+
+    /**
+     * @param string $skinFolderName
+     */
+    public function setSkinFolderName($skinFolderName)
+    {
+        $this->skinFolderName = $skinFolderName;
     }
 
     /**

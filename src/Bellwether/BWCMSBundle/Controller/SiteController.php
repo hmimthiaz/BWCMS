@@ -109,7 +109,7 @@ class SiteController extends BaseController
      */
     private function createCreateForm(SiteEntity $entity)
     {
-        $form = $this->createForm(new SiteEntityType(), $entity, array(
+        $form = $this->createForm(new SiteEntityType($this->tp()), $entity, array(
             'action' => $this->generateUrl('site_create'),
             'method' => 'POST',
         ));
@@ -186,7 +186,7 @@ class SiteController extends BaseController
      */
     private function createEditForm(SiteEntity $entity)
     {
-        $form = $this->createForm(new SiteEntityType(), $entity, array(
+        $form = $this->createForm(new SiteEntityType($this->tp()), $entity, array(
             'action' => $this->generateUrl('site_update', array('id' => $entity->getId())),
             'method' => 'POST',
         ));

@@ -5,9 +5,21 @@ namespace Bellwether\BWCMSBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
 
 class SiteEntityType extends AbstractType
 {
+
+    /**
+     * @var TemplateService
+     */
+    private $templateService;
+
+    function __construct(TemplateService $templateService)
+    {
+        $this->templateService = $templateService;
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
@@ -17,11 +29,22 @@ class SiteEntityType extends AbstractType
         $builder
             ->add('name')
             ->add('locale')
-            ->add('direction')
+            ->add('direction', 'choice',
+                array(
+                    'label' => 'Direction',
+                    'choices' => array('ltr' => 'Left to right', 'rtl' => 'Right to left'),
+                )
+            )
             ->add('slug')
-            ->add('domain');
+            ->add('domain')
+            ->add('skinFolderName', 'choice',
+                array(
+                    'label' => 'Skin',
+                    'choices' => $this->templateService->getSkins(),
+                )
+            );
     }
-    
+
     /**
      * @param OptionsResolverInterface $resolver
      */

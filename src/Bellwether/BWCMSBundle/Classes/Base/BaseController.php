@@ -21,6 +21,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class BaseController extends Controller
 {
+
+    private $path;
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        if (null === $this->path) {
+            $reflected = new \ReflectionObject($this);
+            $this->path = dirname($reflected->getFileName());
+        }
+        return $this->path;
+    }
+
     /**
      * @return UserEntity
      */
