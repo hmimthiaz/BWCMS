@@ -80,6 +80,14 @@ class ContentService extends BaseService
     /**
      * @return array
      */
+    public function getAllContentTypes()
+    {
+        return $this->contentType;
+    }
+
+    /**
+     * @return array
+     */
     public function getRegisteredContentTypes($type = 'Content')
     {
         $retVal = array();

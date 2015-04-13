@@ -62,6 +62,14 @@ class MediaFolderType Extends ContentType
         return $form;
     }
 
+    /**
+     * @return null
+     */
+    public function getRouteCollection()
+    {
+        return null;
+    }
+
     public function prepareEntity(ContentEntity $content = null, Form $form = null)
     {
         return $content;

@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
-
+use Symfony\Component\Routing\RouteCollection;
 
 abstract class ContentType implements ContentTypeInterface
 {
@@ -119,6 +119,11 @@ abstract class ContentType implements ContentTypeInterface
     abstract protected function buildForm();
 
     abstract protected function getTemplates();
+
+    /**
+     * @return null|RouteCollection
+     */
+    abstract protected function getRouteCollection();
 
     /**
      * @return Form

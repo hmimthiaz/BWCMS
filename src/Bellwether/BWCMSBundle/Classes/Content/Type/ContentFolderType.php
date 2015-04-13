@@ -14,7 +14,8 @@ use Symfony\Component\Form\FormEvent;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
-
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 class ContentFolderType Extends ContentType
 {
@@ -66,6 +67,22 @@ class ContentFolderType Extends ContentType
     public function prepareEntity(ContentEntity $content = null, Form $form = null)
     {
         return $content;
+    }
+
+    /**
+     * @return null|RouteCollection
+     */
+    public function getRouteCollection()
+    {
+        $routes = new RouteCollection();
+        $contentFolderRoute = new Route('/{siteSlug}/content/{folderSlug}/index.php', array(
+            '_controller' => 'BWCMSBundle:FrontEnd:contentFolder',
+        ), array(
+            'siteSlug' => '[a-zA-Z0-9-]+',
+            'folderSlug' => '[a-zA-Z0-9-_/]+'
+        ));
+        $routes->add('contentFolder', $contentFolderRoute);
+        return $routes;
     }
 
     public function getType()

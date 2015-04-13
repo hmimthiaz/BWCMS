@@ -90,6 +90,7 @@ class SiteService extends BaseService
                 $siteEntity->setDirection('ltr');
                 $siteEntity->setSlug('en');
                 $siteEntity->setDomain($this->getRequest()->getHost());
+                $siteEntity->setSkinFolderName('Generic');
                 $siteEntity->setIsDefault(true);
                 $this->em()->persist($siteEntity);
                 $this->em()->flush();

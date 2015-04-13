@@ -67,6 +67,14 @@ class NavigationLinkType Extends ContentType
         return $content;
     }
 
+    /**
+     * @return null
+     */
+    public function getRouteCollection()
+    {
+        return null;
+    }
+
     public function getType()
     {
         return "Navigation.Link";
