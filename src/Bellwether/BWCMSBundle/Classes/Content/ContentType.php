@@ -12,6 +12,14 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilder;
+
+use Bellwether\BWCMSBundle\Classes\Service\SiteService;
+use Bellwether\BWCMSBundle\Classes\Service\ContentService;
+use Bellwether\BWCMSBundle\Classes\Service\MediaService;
+use Bellwether\BWCMSBundle\Classes\Service\MailService;
+use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
+use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
+
 use Bellwether\BWCMSBundle\Classes\Content\Form\ContentEmptyForm;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -123,7 +131,13 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return null|RouteCollection
      */
-    abstract protected function getRouteCollection();
+    abstract public function getRouteCollection();
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return string|null
+     */
+    abstract public function getPublicURL($contentEntity);
 
     /**
      * @return Form
@@ -388,6 +402,30 @@ abstract class ContentType implements ContentTypeInterface
     }
 
     /**
+     * @return PreferenceService
+     */
+    public function pref()
+    {
+        return $this->container->get('BWCMS.Preference')->getManager();
+    }
+
+    /**
+     * @return TemplateService
+     */
+    public function tp()
+    {
+        return $this->container->get('BWCMS.Template')->getManager();
+    }
+
+    /**
+     * @return MailService
+     */
+    public function mailer()
+    {
+        return $this->container->get('BWCMS.Mailer');
+    }
+
+    /**
      * @return ContainerInterface
      */
     public function getContainer()
@@ -538,6 +576,13 @@ abstract class ContentType implements ContentTypeInterface
     public function setIsSortEnabled($isSortEnabled)
     {
         $this->isSortEnabled = $isSortEnabled;
+    }
+
+    public function dump($var, $maxDepth = 2, $stripTags = true)
+    {
+        print '<pre>';
+        \Doctrine\Common\Util\Debug::dump($var, $maxDepth, $stripTags);
+        print '</pre>';
     }
 
 }

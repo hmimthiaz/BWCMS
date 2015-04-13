@@ -66,6 +66,15 @@ class MediaFileType Extends ContentType
     }
 
     /**
+     * @param ContentEntity $contentEntity
+     * @return string|null
+     */
+    public function getPublicURL($contentEntity)
+    {
+        return null;
+    }
+
+    /**
      * @return null
      */
     public function getRouteCollection()

@@ -29,7 +29,7 @@ class ContentPageType Extends ContentType
 
         $this->setIsSummaryEnabled(true);
         $this->setIsContentEnabled(true);
-        $this->setIsSlugEnabled(true);
+        $this->setIsSlugEnabled(false);
         $this->setIsUploadEnabled(false);
     }
 
@@ -82,6 +82,29 @@ class ContentPageType Extends ContentType
     public function prepareEntity(ContentEntity $content = null, Form $form = null)
     {
         return $content;
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return string|null
+     */
+    public function getPublicURL($contentEntity)
+    {
+        $contentParents = $this->cm()->getContentRepository()->getPath($contentEntity);
+        if (count($contentParents) < 2) {
+            return null;
+        }
+        array_pop($contentParents);
+        $folders = array();
+        foreach ($contentParents as $parent) {
+            $folders[] = $parent->getSlug();
+        }
+        $parameters = array(
+            'folderSlug' => implode('/', $folders),
+            'pageSlug' => $contentEntity->getSlug(),
+            'siteSlug' => $contentEntity->getSite()->getSlug()
+        );
+        return $this->container->get('router')->generate('contentPage', $parameters);
     }
 
     /**

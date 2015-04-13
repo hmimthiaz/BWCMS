@@ -70,6 +70,15 @@ class ContentFolderType Extends ContentType
     }
 
     /**
+     * @param ContentEntity $contentEntity
+     * @return string|null
+     */
+    public function getPublicURL($contentEntity)
+    {
+        return null;
+    }
+
+    /**
      * @return null|RouteCollection
      */
     public function getRouteCollection()

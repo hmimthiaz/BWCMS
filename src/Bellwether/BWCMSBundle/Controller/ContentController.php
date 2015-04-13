@@ -404,6 +404,14 @@ class ContentController extends BaseController
 
                 $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content, 32, 32);
                 $ca['thumbnail'] = '<img class="contentThumb" src="' . $ca['thumbnail'] . '"/>';
+
+                $ca['link'] = '';
+                $contentClass = $this->cm()->getContentClass($content->getType(), $content->getSchema());
+                $contentPublicURL = $contentClass->getPublicURL($content);
+                if (!is_null($contentPublicURL)) {
+                    $ca['link'] = $contentPublicURL;
+                }
+
                 $ca['download'] = '';
                 if ($content->getFile() != null) {
                     $ca['download'] = $this->generateUrl('content_media_download', array('contentId' => $content->getId()));
