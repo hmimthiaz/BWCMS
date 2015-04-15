@@ -541,9 +541,10 @@ class ContentService extends BaseService
 
     public function getSystemThumbURL(ContentEntity $content = null, $width, $height)
     {
-        if ($content->getFile() == null) {
+        $contentClass = $this->getContentClass($content->getType(), $content->getSchema());
+        if (!$contentClass->isUploadEnabled()) {
             $thumbURL = $this->getThumbService()
-                ->open($this->getContentTypeResourceImage($content->getType()))
+                ->open($contentClass->getImage())
                 ->resize($width, $height)
                 ->cacheFile('guess');
             return $thumbURL;

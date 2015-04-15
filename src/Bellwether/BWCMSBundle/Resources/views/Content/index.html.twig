@@ -23,7 +23,8 @@
                 <thead>
                 <tr>
                     <th width="32">Icon</th>
-                    <th>Filename</th>
+                    <th>Title</th>
+                    <th width="200">Type</th>
                     <th width="200">Date</th>
                     <th width="200">Action</th>
                 </tr>
@@ -115,6 +116,7 @@
                 columns: [
                     {data: "thumbnail"},
                     {data: "title"},
+                    {data: "type"},
                     {data: "createdDate"},
                     {
                         data: null,
@@ -125,7 +127,9 @@
                             if (data.download.length > 0) {
                                 ret = ret + ' <button type="button" class="btn btn-primary download" data-url="' + data.download + '"><i class="glyphicon glyphicon-download-alt"></i></button>';
                             }
-                            //ret = ret + ' <button type="button" class="btn btn-danger remove"><i class="glyphicon glyphicon-remove"></i></a>';
+                            if (data.link.length > 0) {
+                                ret = ret + ' <button type="button" class="btn btn-primary preview" data-url="' + data.link + '"><i class="glyphicon glyphicon-globe"></i></button>';
+                            }
                             return ret;
                         }
                     }
@@ -143,9 +147,12 @@
                         $(this).ekkoLightbox();
                     });
                     $('#contentTable button.download').click(function (e) {
-                        console.log($(this).data('url'));
+                        e.preventDefault();
                         window.location = $(this).data('url');
-                        return false;
+                    });
+                    $('#contentTable button.preview').click(function (e) {
+                        e.preventDefault();
+                        window.open($(this).data('url'));
                     });
                     $('#contentTable button.remove').click(function (e) {
                         var contentId = $(this).parents('tr').attr('id');

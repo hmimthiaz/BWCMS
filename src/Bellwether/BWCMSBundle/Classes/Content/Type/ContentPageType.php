@@ -85,6 +85,14 @@ class ContentPageType Extends ContentType
     }
 
     /**
+     * @return string
+     */
+    public function getImage()
+    {
+        return '@BWCMSBundle/Resources/icons/content/Page.png';
+    }
+
+    /**
      * @param ContentEntity $contentEntity
      * @return string|null
      */

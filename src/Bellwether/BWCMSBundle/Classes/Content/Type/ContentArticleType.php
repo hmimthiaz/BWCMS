@@ -86,12 +86,34 @@ class ContentArticleType Extends ContentType
     }
 
     /**
+     * @return string
+     */
+    public function getImage()
+    {
+        return '@BWCMSBundle/Resources/icons/content/Article.png';
+    }
+
+    /**
      * @param ContentEntity $contentEntity
      * @return string|null
      */
     public function getPublicURL($contentEntity)
     {
-        return null;
+        $contentParents = $this->cm()->getContentRepository()->getPath($contentEntity);
+        if (count($contentParents) < 2) {
+            return null;
+        }
+        array_pop($contentParents);
+        $folders = array();
+        foreach ($contentParents as $parent) {
+            $folders[] = $parent->getSlug();
+        }
+        $parameters = array(
+            'folderSlug' => implode('/', $folders),
+            'pageSlug' => $contentEntity->getSlug(),
+            'siteSlug' => $contentEntity->getSite()->getSlug()
+        );
+        return $this->container->get('router')->generate('contentArticle', $parameters);
     }
 
     /**

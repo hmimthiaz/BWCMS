@@ -306,6 +306,7 @@ class ContentController extends BaseController
             $content->setExtension($mediaInfo['extension']);
             $content->setWidth($mediaInfo['width']);
             $content->setHeight($mediaInfo['height']);
+            $content->setTemplate('');
 
             $content->setSlug($this->cm()->generateSlug($content->getFile(), $content->getType(), $parentId));
             $content->setStatus('Draft');
@@ -395,18 +396,19 @@ class ContentController extends BaseController
 
         if (!empty($result)) {
             foreach ($result as $content) {
+                $contentClass = $this->cm()->getContentClass($content->getType(), $content->getSchema());
+
                 $ca = array();
                 $ca['DT_RowId'] = $content->getId();
                 $ca['title'] = $content->getTitle();
                 $ca['name'] = $content->getFile();
-                $ca['type'] = $content->getType();
+                $ca['type'] = $contentClass->getName();
                 $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');
 
                 $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content, 32, 32);
                 $ca['thumbnail'] = '<img class="contentThumb" src="' . $ca['thumbnail'] . '"/>';
 
                 $ca['link'] = '';
-                $contentClass = $this->cm()->getContentClass($content->getType(), $content->getSchema());
                 $contentPublicURL = $contentClass->getPublicURL($content);
                 if (!is_null($contentPublicURL)) {
                     $ca['link'] = $contentPublicURL;

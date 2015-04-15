@@ -68,6 +68,14 @@ class NavigationLinkType Extends ContentType
     }
 
     /**
+     * @return string
+     */
+    public function getImage()
+    {
+        return '@BWCMSBundle/Resources/icons/content/Unknown.png';
+    }
+
+    /**
      * @param ContentEntity $contentEntity
      * @return string|null
      */

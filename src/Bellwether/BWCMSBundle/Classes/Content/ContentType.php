@@ -126,7 +126,12 @@ abstract class ContentType implements ContentTypeInterface
 
     abstract protected function buildForm();
 
-    abstract protected function getTemplates();
+    /**
+     * @return string
+     */
+    abstract public function getImage();
+
+    abstract public function getTemplates();
 
     /**
      * @return null|RouteCollection
