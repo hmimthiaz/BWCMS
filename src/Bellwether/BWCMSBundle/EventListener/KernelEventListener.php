@@ -11,32 +11,31 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
+use Bellwether\BWCMSBundle\Controller\FrontEndControllerInterface;
 
 class KernelEventListener extends BaseService
 {
     function __construct($kernel, ContainerInterface $container = null, RequestStack $request_stack = null)
     {
-//        $this->dump($kernel);
-//        exit;
-
         $this->setContainer($container);
-
-//        $container->loadFromExtension('swiftmailer', array(
-//            'transport'  => "smtp",
-//            'encryption' => "ssl",
-//            'auth_mode'  => "login",
-//            'host'       => "smtp.gmail.com",
-//            'username'   => "your_username",
-//            'password'   => "your_password",
-//        ));
-
-//        $container->setParameter('swiftmailer.mailer.default.transport.smtp.port',25);
-
         $this->setRequestStack($request_stack);
     }
 
     public function onKernelController(FilterControllerEvent $event)
     {
+        $controller = $event->getController();
+        if (!is_array($controller)) {
+            return;
+        }
+
+        if ($controller[0] instanceof FrontEndControllerInterface) {
+
+//            $request = $event->getRequest();
+//            $params = $request->attributes->get('_route_params');
+            return;
+        }
+        $currentSite = $this->sm()->getCurrentSite();
+        $this->tp()->setSkin($currentSite->getSkinFolderName());
     }
 
     public function onKernelException(GetResponseForExceptionEvent $event)
@@ -49,6 +48,7 @@ class KernelEventListener extends BaseService
 
     public function onKernelRequest(GetResponseEvent $event)
     {
+        $this->dump($event);
     }
 
     public function onKernelResponse(FilterResponseEvent $event)

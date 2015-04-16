@@ -6,7 +6,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class FrontEndController extends BaseController
+class FrontEndController extends BaseController implements FrontEndControllerInterface
 {
     /**
      * @Template()

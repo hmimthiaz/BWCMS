@@ -48,6 +48,17 @@ class TemplateService extends BaseService
             throw new \RuntimeException("Skins: `{$slug}` already exists.");
         }
         $this->skins[$slug] = $classInstance;
+
+        /**
+         * @var \Symfony\Bundle\TwigBundle\Loader\FilesystemLoader $twigLoader
+         */
+        $twigLoader = $this->container->get('twig.loader');
+        $twigLoader->addPath($classInstance->getPath(), $classInstance->getName());
+    }
+
+    public function setSkin($folderName)
+    {
+
     }
 
     /**
