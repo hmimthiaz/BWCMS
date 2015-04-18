@@ -25,7 +25,9 @@
 # Assets and user uploads
 /web/bundles/
 /web/uploads/
-/web/media
+/web/media/
+/web/include/
+/web/skins/
 
 # PHPUnit
 /app/phpunit.xml
@@ -34,4 +36,3 @@
 # Composer PHAR
 /composer.phar
 composer.lock
-web/include
