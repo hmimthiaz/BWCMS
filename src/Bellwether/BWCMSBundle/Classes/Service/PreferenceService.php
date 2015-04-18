@@ -91,7 +91,7 @@ class PreferenceService extends BaseService
             return $this->loaded[$type];
         }
         $classInstance = $this->getPreferenceClass($type);
-        $currentSite = $this->sm()->getCurrentSite();
+        $currentSite = $this->sm()->getAdminCurrentSite();
         $qb = $this->getPreferenceRepository()->createQueryBuilder('p');
         $qb->andWhere(" ( p.type = '" . $classInstance->getType() . "' ) ");
         $qb->andWhere(" ( p.site = '" . $currentSite->getId() . "' OR p.site IS NULL ) ");
@@ -140,7 +140,7 @@ class PreferenceService extends BaseService
                     'type' => $classInstance->getType()
                 );
                 if (!$fieldInfo['global']) {
-                    $criteria['site'] = $this->sm()->getCurrentSite()->getId();
+                    $criteria['site'] = $this->sm()->getAdminCurrentSite()->getId();
                 } else {
                     $criteria['site'] = null;
                 }
@@ -229,7 +229,7 @@ class PreferenceService extends BaseService
                     'type' => $classInstance->getType()
                 );
                 if (!$fieldInfo['global']) {
-                    $criteria['site'] = $this->sm()->getCurrentSite()->getId();
+                    $criteria['site'] = $this->sm()->getAdminCurrentSite()->getId();
                 } else {
                     $criteria['site'] = null;
                 }
@@ -244,7 +244,7 @@ class PreferenceService extends BaseService
                     $preferenceEntity->setField($fieldName);
                     $preferenceEntity->setFieldType($fieldType);
                     if (!$fieldInfo['global']) {
-                        $preferenceEntity->setSite($this->sm()->getCurrentSite());
+                        $preferenceEntity->setSite($this->sm()->getAdminCurrentSite());
                     }
                 } elseif (!is_null($preferenceEntity) && is_null($fieldValue)) {
                     $this->em()->remove($preferenceEntity);

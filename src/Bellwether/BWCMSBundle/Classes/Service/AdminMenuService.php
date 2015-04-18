@@ -36,7 +36,7 @@ class AdminMenuService extends BaseService
     {
         $menu = $this->factory->createItem('root');
 
-        $currentSite = $this->sm()->getCurrentSite();
+        $currentSite = $this->sm()->getAdminCurrentSite();
         $allSites = $this->sm()->getAllSites();
         if (count($allSites) > 1) {
             $menu->addChild('Site', array('uri' => '#', 'label' => 'Site: ' . $currentSite->getName()))->setAttribute('dropdown', true);

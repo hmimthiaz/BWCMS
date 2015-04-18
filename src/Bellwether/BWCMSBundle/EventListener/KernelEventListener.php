@@ -34,7 +34,7 @@ class KernelEventListener extends BaseService
 //            $params = $request->attributes->get('_route_params');
             return;
         }
-        $currentSite = $this->sm()->getCurrentSite();
+        $currentSite = $this->sm()->getAdminCurrentSite();
         $this->tp()->setSkin($currentSite->getSkinFolderName());
     }
 
@@ -48,7 +48,6 @@ class KernelEventListener extends BaseService
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $this->dump($event);
     }
 
     public function onKernelResponse(FilterResponseEvent $event)

@@ -49,7 +49,7 @@ class SiteController extends BaseController
         if (!is_null($siteId)) {
             $siteEntity = $this->em()->getRepository('BWCMSBundle:SiteEntity')->find($siteId);
             if (!is_null($siteEntity)) {
-                $this->sm()->setCurrentSite($siteEntity->getId());
+                $this->sm()->setAdminCurrentSite($siteEntity->getId());
             }
         }
         return $this->redirect($this->generateUrl('dashboard_home'));

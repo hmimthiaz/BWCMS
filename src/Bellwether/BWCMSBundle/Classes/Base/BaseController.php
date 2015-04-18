@@ -49,7 +49,7 @@ abstract class BaseController extends Controller
      */
     public function getSite()
     {
-        return $this->sm()->getCurrentSite();
+        return $this->sm()->getAdminCurrentSite();
     }
 
     /**

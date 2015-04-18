@@ -16,6 +16,8 @@ class SiteService extends BaseService
 
     private $currentSite = null;
 
+    private $adminCurrentSite = null;
+
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
         $this->setContainer($container);
@@ -30,31 +32,47 @@ class SiteService extends BaseService
         return $this;
     }
 
-    public function setCurrentSite($siteId = null)
+    /**
+     * @param SiteEntity $site
+     */
+    public function setCurrentSite($site = null)
     {
-        $this->currentSite = null;
-        $this->session()->remove('currentSiteId');
+        $this->currentSite = $site;
+    }
+
+    /**
+     * @return null|SiteEntity
+     */
+    public function getCurrentSite()
+    {
+        return $this->currentSite;
+    }
+
+    public function setAdminCurrentSite($siteId = null)
+    {
+        $this->adminCurrentSite = null;
+        $this->session()->remove('adminCurrentSiteId');
         if (!is_null($siteId)) {
-            $this->session()->set('currentSiteId', $siteId);
+            $this->session()->set('adminCurrentSiteId', $siteId);
         }
     }
 
     /**
      * @return SiteEntity
      */
-    public function getCurrentSite()
+    public function getAdminCurrentSite()
     {
-        if ($this->currentSite == null) {
-            $currentSiteId = $this->session()->get('currentSiteId', null);
+        if ($this->adminCurrentSite == null) {
+            $currentSiteId = $this->session()->get('adminCurrentSiteId', null);
             if ($currentSiteId != null) {
-                $this->currentSite = $this->getSiteRepository()->find($currentSiteId);
+                $this->adminCurrentSite = $this->getSiteRepository()->find($currentSiteId);
             }
-            if ($this->currentSite == null) {
-                $this->currentSite = $this->getDefaultSite();
+            if ($this->adminCurrentSite == null) {
+                $this->adminCurrentSite = $this->getDefaultSite();
             }
-            $this->session()->set('currentSiteId', $this->currentSite->getId());
+            $this->session()->set('adminCurrentSiteId', $this->adminCurrentSite->getId());
         }
-        return $this->currentSite;
+        return $this->adminCurrentSite;
     }
 
     /**
