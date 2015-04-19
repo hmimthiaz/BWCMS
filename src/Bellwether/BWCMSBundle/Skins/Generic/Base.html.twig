@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}BWCMS!{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block head %}{% endblock %}
+</head>
+<body {% block bodyAttr '' %}>
+{% block header %}{% endblock %}
+{% block body %}{% endblock %}
+{% block footer %}{% endblock %}
+</body>
+</html>
+

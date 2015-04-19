@@ -27,7 +27,9 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
         $contentEntity = $this->cm()->getContentBySlugPath($folderSlug);
 
         $template = $this->tp()->getCurrentSkin()->getContentTemplate($contentEntity);
-        $templateVariables = array();
+        $templateVariables = array(
+            'content' => $contentEntity
+        );
 
         return $this->render($template, $templateVariables);
     }
@@ -42,7 +44,9 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
 
         $template = $this->tp()->getCurrentSkin()->getContentTemplate($contentEntity);
         $templateVariables = array();
-
+        $templateVariables = array(
+            'content' => $contentEntity
+        );
         return $this->render($template, $templateVariables);
     }
 
