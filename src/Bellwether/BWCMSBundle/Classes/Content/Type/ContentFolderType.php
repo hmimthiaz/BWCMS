@@ -84,7 +84,7 @@ class ContentFolderType Extends ContentType
     public function getPublicURL($contentEntity)
     {
         $contentParents = $this->cm()->getContentRepository()->getPath($contentEntity);
-        if (count($contentParents) < 2) {
+        if (count($contentParents) < 1) {
             return null;
         }
         $folders = array();

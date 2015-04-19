@@ -447,6 +447,57 @@ class ContentService extends BaseService
 
     /**
      * @param ContentEntity $contentEntity
+     * @param string $type
+     * @param int $start
+     */
+    public function getFolderItems($contentEntity = null, $start = 0, $type = 'Content')
+    {
+        $limit = 5;
+
+        $contentRepository = $this->getContentRepository();
+        $qb = $contentRepository->getChildrenQueryBuilder($contentEntity, true);
+        $sortOrder = ' ASC';
+        if ($contentEntity->getSortOrder() == ContentSortOrderType::DESC) {
+            $sortOrder = ' DESC';
+        }
+        if ($contentEntity->getSortBy() == ContentSortByType::SortIndex) {
+            $qb->add('orderBy', 'node.treeLeft' . $sortOrder);
+        } elseif ($contentEntity->getSortBy() == ContentSortByType::Created) {
+            $qb->add('orderBy', 'node.createdDate' . $sortOrder);
+        } elseif ($contentEntity->getSortBy() == ContentSortByType::Published) {
+            $qb->add('orderBy', 'node.publishDate' . $sortOrder);
+        } elseif ($contentEntity->getSortBy() == ContentSortByType::Title) {
+            $qb->add('orderBy', 'node.title' . $sortOrder);
+        } elseif ($contentEntity->getSortBy() == ContentSortByType::Size) {
+            $qb->add('orderBy', 'node.size' . $sortOrder);
+        }
+
+        $registeredContents = $this->cm()->getRegisteredContentTypes($type);
+        $condition = array();
+        foreach ($registeredContents as $cInfo) {
+            $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
+        }
+        if (!empty($condition)) {
+            $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
+        }
+        $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
+
+        $qb->setFirstResult($start);
+        $qb->setMaxResults($limit);
+
+        $result = $qb->getQuery()->getResult();
+        $totalCount = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+
+        return array(
+            'start' => $start,
+            'limit' => $limit,
+            'items' => $result,
+            'count' => $totalCount
+        );
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
      * @return string
      */
     final public function getContentTemplate($contentEntity)
