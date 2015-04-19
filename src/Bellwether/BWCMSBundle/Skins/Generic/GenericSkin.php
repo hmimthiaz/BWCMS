@@ -15,9 +15,14 @@ class GenericSkin extends BaseSkin
         $this->setRequestStack($request_stack);
     }
 
+    public function getHomePageTemplate()
+    {
+        return $this->getTemplateName("Home/Home.html.twig");
+    }
+
     public function getName()
     {
-        return 'Generic';
+        return $this->getFolderName();
     }
 
 

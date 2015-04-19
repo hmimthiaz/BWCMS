@@ -15,6 +15,7 @@ class TemplateService extends BaseService
 
     private $skins = array();
 
+    private $currentSkin = null;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -56,9 +57,23 @@ class TemplateService extends BaseService
         $twigLoader->addPath($classInstance->getPath(), $classInstance->getName());
     }
 
+    /**
+     * @param $folderName
+     */
     public function setSkin($folderName)
     {
+        $this->currentSkin = $folderName;
+    }
 
+    /**
+     * @return BaseSkin|null
+     */
+    public function getCurrentSkin()
+    {
+        if (!is_null($this->currentSkin)) {
+            return $this->getSkinClass($this->currentSkin);
+        }
+        return null;
     }
 
     /**

@@ -446,6 +446,16 @@ class ContentService extends BaseService
     }
 
     /**
+     * @param ContentEntity $contentEntity
+     * @return string
+     */
+    final public function getContentTemplate($contentEntity)
+    {
+        $templatePath = str_replace('.', DIRECTORY_SEPARATOR, $contentEntity->getType() . '.' . $contentEntity->getSchema());
+        return $templatePath . DIRECTORY_SEPARATOR . $contentEntity->getTemplate();
+    }
+
+    /**
      * @param string $slug
      * @param ContentEntity $parent
      * @return null|ContentEntity

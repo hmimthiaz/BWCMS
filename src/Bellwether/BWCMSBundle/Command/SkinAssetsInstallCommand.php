@@ -27,7 +27,7 @@ assets of CMS skins to public directory (e.g. the <comment>web</comment> directo
   <info>php %command.full_name% web</info>
 
 A "skins" directory will be created inside the target directory and the
-"Bundle/Skins/skin/public" directory of each bundle will be copied into it.
+"{Bundle}/Skins/{SkinFolder}/Public" directory of each bundle will be copied into it.
 
 This will install all the assets as symlinks only.
 
@@ -61,7 +61,7 @@ EOT
 
         foreach ($skins as $skin) {
             $skinClass = $templateService->getSkinClass($skin);
-            $sourceDir = $skinClass->getPath() . DIRECTORY_SEPARATOR . 'public';
+            $sourceDir = $skinClass->getPath() . DIRECTORY_SEPARATOR . 'Public';
             $targetDir = $skinsPublicDir . strtolower($skinClass->getFolderName());
             $output->writeln(sprintf('Installing assets symlink for skin : %s -> %s', $skinClass->getName(), $targetDir));
 

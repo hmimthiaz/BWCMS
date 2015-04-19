@@ -13,14 +13,10 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
      */
     public function homeAction($siteSlug)
     {
-        $siteEntity = $this->sm()->getSiteBySlug($siteSlug);
-        if ($siteEntity == null) {
-            throw new NotFoundHttpException("Page not found");
-        }
+        $template = $this->tp()->getCurrentSkin()->getHomePageTemplate();
+        $templateVariables = array();
 
-        var_dump($siteEntity);
-        exit;
-        return array();
+        return $this->render($template, $templateVariables);
     }
 
     /**
@@ -28,20 +24,12 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
      */
     public function contentFolderAction($siteSlug, $folderSlug)
     {
-        $siteEntity = $this->sm()->getSiteBySlug($siteSlug);
-        if ($siteEntity == null) {
-            throw new NotFoundHttpException("Page not found");
-        }
-
-
         $contentEntity = $this->cm()->getContentBySlugPath($folderSlug);
 
-        $this->dump($siteEntity);
+        $template = $this->tp()->getCurrentSkin()->getContentTemplate($contentEntity);
+        $templateVariables = array();
 
-        $this->dump($contentEntity);
-
-        exit;
-        return array();
+        return $this->render($template, $templateVariables);
     }
 
     /**
@@ -49,20 +37,13 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
      */
     public function contentPageAction($siteSlug, $folderSlug, $pageSlug)
     {
-        $siteEntity = $this->sm()->getSiteBySlug($siteSlug);
-        if ($siteEntity == null) {
-            throw new NotFoundHttpException("Page not found");
-        }
 
+        $contentEntity = $this->cm()->getContentBySlugPath($folderSlug.'/'.$pageSlug);
 
-        $contentEntity = $this->cm()->getContentBySlugPath($folderSlug);
+        $template = $this->tp()->getCurrentSkin()->getContentTemplate($contentEntity);
+        $templateVariables = array();
 
-        $this->dump($siteEntity);
-
-        $this->dump($contentEntity);
-
-        exit;
-        return array();
+        return $this->render($template, $templateVariables);
     }
 
 }

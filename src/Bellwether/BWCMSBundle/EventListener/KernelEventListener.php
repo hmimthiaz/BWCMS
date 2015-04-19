@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Bellwether\BWCMSBundle\Controller\FrontEndControllerInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class KernelEventListener extends BaseService
 {
@@ -29,11 +30,20 @@ class KernelEventListener extends BaseService
         }
 
         if ($controller[0] instanceof FrontEndControllerInterface) {
-
-//            $request = $event->getRequest();
-//            $params = $request->attributes->get('_route_params');
+            $request = $event->getRequest();
+            $params = $request->attributes->get('_route_params');
+            if (!isset($params['siteSlug']) || empty($params['siteSlug'])) {
+                throw new NotFoundHttpException("Unable to detect language");
+            }
+            $siteEntity = $this->sm()->getSiteBySlug($params['siteSlug']);
+            if ($siteEntity == null) {
+                throw new NotFoundHttpException("Language does not exists");
+            }
+            $this->sm()->setCurrentSite($siteEntity);
+            $this->tp()->setSkin($siteEntity->getSkinFolderName());
             return;
         }
+
         $currentSite = $this->sm()->getAdminCurrentSite();
         $this->tp()->setSkin($currentSite->getSkinFolderName());
     }

@@ -15,10 +15,13 @@ use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
 
 abstract class BaseSkin extends ContainerAware
 {
+
+    abstract public function getHomePageTemplate();
 
     abstract public function getName();
 
@@ -42,6 +45,20 @@ abstract class BaseSkin extends ContainerAware
     public function getFolderName()
     {
         return basename($this->getPath());
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return string
+     */
+    public function getContentTemplate($contentEntity)
+    {
+        return $this->getTemplateName($this->cm()->getContentTemplate($contentEntity));
+    }
+
+    public function getTemplateName($templateFilename)
+    {
+        return "@" . $this->getFolderName() . DIRECTORY_SEPARATOR . $templateFilename;
     }
 
     /**

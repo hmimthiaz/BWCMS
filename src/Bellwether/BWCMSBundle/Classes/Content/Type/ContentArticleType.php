@@ -123,7 +123,7 @@ class ContentArticleType Extends ContentType
     {
         $routes = new RouteCollection();
         $contentArticleRoute = new Route('/{siteSlug}/content/{folderSlug}/{pageSlug}.php', array(
-            '_controller' => 'BWCMSBundle:FrontEnd:contentFolder',
+            '_controller' => 'BWCMSBundle:FrontEnd:contentPage',
         ), array(
             'siteSlug' => '[a-zA-Z0-9-]+',
             'folderSlug' => '[a-zA-Z0-9-_/]+',
