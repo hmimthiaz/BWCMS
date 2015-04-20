@@ -30,7 +30,8 @@ class NavigationFolderType Extends ContentType
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
         $this->setIsUploadEnabled(false);
-        $this->setIsSortEnabled(false);
+        $this->setIsSortEnabled(true);
+        $this->setIsSlugEnabled(true);
     }
 
     public function buildFields()
@@ -40,6 +41,7 @@ class NavigationFolderType Extends ContentType
 
     public function buildForm()
     {
+
 
     }
 

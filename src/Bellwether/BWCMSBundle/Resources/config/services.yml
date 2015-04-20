@@ -24,7 +24,7 @@ services:
       - { name: routing.loader }
   BWCMS.Twig.Extension:
     class: Bellwether\BWCMSBundle\Classes\Service\TwigService
-    arguments: [@service_container,@request_stack]
+    arguments: ["@knp_menu.factory",@service_container,@request_stack]
     public: false
     tags:
       - { name: twig.extension }

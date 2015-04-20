@@ -3,6 +3,7 @@
 namespace Bellwether\BWCMSBundle\Controller;
 
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -403,8 +404,24 @@ class ContentController extends BaseController
                 $ca['title'] = $content->getTitle();
                 $ca['name'] = $content->getFile();
                 $ca['type'] = $contentClass->getName();
-                $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');
 
+                switch ($content->getStatus()) {
+                    case ContentPublishType::Draft:
+                        $ca['status'] = 'Draft';
+                        break;
+                    case ContentPublishType::Published:
+                        $ca['status'] = 'Published';
+                        break;
+                    case ContentPublishType::Expired:
+                        $ca['status'] = 'Expired';
+                        break;
+                    case ContentPublishType::WorkFlow:
+                        $ca['status'] = 'WorkFlow';
+                        break;
+                    default:
+                        $ca['status'] = 'Custom';
+                }
+                $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');
                 $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content, 32, 32);
                 $ca['thumbnail'] = '<img class="contentThumb" src="' . $ca['thumbnail'] . '"/>';
 

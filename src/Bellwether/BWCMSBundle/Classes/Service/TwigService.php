@@ -9,13 +9,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
+use Knp\Menu\FactoryInterface;
+use Knp\Menu\Renderer\ListRenderer;
+
 
 class TwigService extends BaseService implements \Twig_ExtensionInterface
 {
 
+    private $factory;
 
-    function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
+    function __construct(FactoryInterface $factory = null, ContainerInterface $container = null, RequestStack $request_stack = null)
     {
+        $this->setFactory($factory);
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
     }
@@ -79,7 +84,8 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     public function getFunctions()
     {
         return array(
-            'link' => new \Twig_Function_Method($this, 'getContentLink')
+            'link' => new \Twig_Function_Method($this, 'getContentLink'),
+            'menu' => new \Twig_Function_Method($this, 'getContentMenuBySlug')
         );
     }
 
@@ -107,8 +113,52 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      * @param ContentEntity $contentEntity
      * @return null|string
      */
-    public function getContentLink($contentEntity){
+    public function getContentLink($contentEntity)
+    {
         return $this->cm()->getPublicURL($contentEntity);
+    }
+
+    /**
+     * @param string $slug
+     * @return string
+     */
+    public function getContentMenuBySlug($slug)
+    {
+
+        $contentEntity = $this->cm()->getContentBySlugPath($slug);
+        if (is_null($contentEntity)) {
+            return '';
+        }
+
+        $contentMenuItems = $this->cm()->getContentMenuItemsBySlug($contentEntity);
+
+        /**
+         * @var \Knp\Menu\MenuItem $menu
+         */
+        $menu = array();
+        $menu[$contentEntity->getId()] = $this->factory->createItem($contentEntity->getSlug());
+
+        $this->dump($menu[$contentEntity->getId()]);
+
+        /**
+         * @var ContentEntity $content
+         */
+        foreach ($contentMenuItems as $content) {
+            $menu[$content->getId()] = $menu[$content->getTreeParent()->getId()]->addChild($content->getTitle(), array());
+            $menu[$content->getId()]->setUri(rand(1,10));
+            $this->dump($content->getMeta());
+        }
+
+        $renderer = new ListRenderer(new \Knp\Menu\Matcher\Matcher());
+        return $renderer->render($menu[$contentEntity->getId()]);
+    }
+
+    /**
+     * @param FactoryInterface $factory
+     */
+    public function setFactory(FactoryInterface $factory)
+    {
+        $this->factory = $factory;
     }
 
     /**

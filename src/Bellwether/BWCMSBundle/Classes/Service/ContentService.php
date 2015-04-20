@@ -27,7 +27,6 @@ use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
-
 class ContentService extends BaseService
 {
 
@@ -494,6 +493,18 @@ class ContentService extends BaseService
             'items' => $result,
             'count' => $totalCount
         );
+    }
+
+    /**
+     * @param ContentEntity $slug
+     * @return array
+     */
+    public function getContentMenuItemsBySlug($contentEntity)
+    {
+        $contentRepository = $this->cm()->getContentRepository();
+        $qb = $contentRepository->getChildrenQueryBuilder($contentEntity, false);
+        $result = $qb->getQuery()->getResult();
+        return $result;
     }
 
     /**

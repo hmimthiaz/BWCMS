@@ -1,5 +1,13 @@
 {% extends "@Generic/Base.html.twig" %}
 
+{% block header %}
+    {{ menu('header')|raw }}
+{% endblock %}
+
 {% block body %}
     <h1>Hello World!!!!</h1>
 {% endblock %}
+
+{#{% block footer %}#}
+    {#{{ menu('footer') }}#}
+{#{% endblock %}#}
