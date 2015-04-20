@@ -1,11 +1,12 @@
 {% extends "@Generic/Base.html.twig" %}
 
 {% block body %}
+
     <h1>Folder: {{ content.title }}</h1>
 
     <ul>
     {% for entity in items %}
-        <li>{{ entity.title }}</li>
+        <li><a href="{{ link(entity) }}">{{ entity.title }}</a></li>
     {% endfor %}
     </ul>
 

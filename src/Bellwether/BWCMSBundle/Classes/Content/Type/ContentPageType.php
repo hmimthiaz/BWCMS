@@ -112,7 +112,7 @@ class ContentPageType Extends ContentType
             'pageSlug' => $contentEntity->getSlug(),
             'siteSlug' => $contentEntity->getSite()->getSlug()
         );
-        return $this->container->get('router')->generate('contentPage', $parameters);
+        return $this->container->get('router')->generate('contentPage', $parameters,true);
     }
 
     /**

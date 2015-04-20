@@ -507,6 +507,16 @@ class ContentService extends BaseService
     }
 
     /**
+     * @param ContentEntity $contentEntity
+     * @return string|null
+     */
+    public function getPublicURL($contentEntity)
+    {
+        $contentClass = $this->cm()->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
+        return $contentClass->getPublicURL($contentEntity);
+    }
+
+    /**
      * @param string $slug
      * @param ContentEntity $parent
      * @return null|ContentEntity

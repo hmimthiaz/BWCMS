@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\DependencyInjection;
+namespace Bellwether\BWCMSBundle\Classes\Service;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
-class RoutingLoader extends BaseService implements LoaderInterface
+class RoutingService extends BaseService implements LoaderInterface
 {
     private $loaded = false;
 

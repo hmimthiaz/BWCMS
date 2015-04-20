@@ -113,7 +113,7 @@ class ContentArticleType Extends ContentType
             'pageSlug' => $contentEntity->getSlug(),
             'siteSlug' => $contentEntity->getSite()->getSlug()
         );
-        return $this->container->get('router')->generate('contentArticle', $parameters);
+        return $this->container->get('router')->generate('contentArticle', $parameters,true);
     }
 
     /**

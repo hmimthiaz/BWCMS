@@ -18,10 +18,16 @@ services:
      class: Bellwether\BWCMSBundle\Classes\Service\TemplateService
      arguments: [@service_container,@request_stack]
   BWCMS.Router:
-    class: Bellwether\BWCMSBundle\DependencyInjection\RoutingLoader
+    class: Bellwether\BWCMSBundle\Classes\Service\RoutingService
     arguments: [@service_container,@request_stack]
     tags:
       - { name: routing.loader }
+  BWCMS.Twig.Extension:
+    class: Bellwether\BWCMSBundle\Classes\Service\TwigService
+    arguments: [@service_container,@request_stack]
+    public: false
+    tags:
+      - { name: twig.extension }
   BWCMS.Form.Type.Content:
     class: Bellwether\BWCMSBundle\Form\Type\ContentType
     arguments: [@service_container]

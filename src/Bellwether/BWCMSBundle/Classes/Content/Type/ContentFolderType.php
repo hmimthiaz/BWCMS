@@ -95,7 +95,7 @@ class ContentFolderType Extends ContentType
             'folderSlug' => implode('/', $folders),
             'siteSlug' => $contentEntity->getSite()->getSlug()
         );
-        return $this->container->get('router')->generate('contentFolder', $parameters);
+        return $this->container->get('router')->generate('contentFolder', $parameters, true);
     }
 
     /**
