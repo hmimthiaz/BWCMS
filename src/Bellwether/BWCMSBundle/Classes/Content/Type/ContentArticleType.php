@@ -97,7 +97,7 @@ class ContentArticleType Extends ContentType
      * @param ContentEntity $contentEntity
      * @return string|null
      */
-    public function getPublicURL($contentEntity)
+    public function getPublicURL($contentEntity, $full = false)
     {
         $contentParents = $this->cm()->getContentRepository()->getPath($contentEntity);
         if (count($contentParents) < 2) {
@@ -113,7 +113,7 @@ class ContentArticleType Extends ContentType
             'pageSlug' => $contentEntity->getSlug(),
             'siteSlug' => $contentEntity->getSite()->getSlug()
         );
-        return $this->container->get('router')->generate('contentArticle', $parameters,true);
+        return $this->container->get('router')->generate('contentArticle', $parameters, $full);
     }
 
     /**

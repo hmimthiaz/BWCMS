@@ -10,13 +10,21 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
 use Knp\Menu\FactoryInterface;
+use Knp\Menu\Matcher\Matcher;
+use Knp\Menu\Matcher\Voter\UriVoter;
 use Knp\Menu\Renderer\ListRenderer;
+use Knp\Menu\Renderer\TwigRenderer;
 
 
 class TwigService extends BaseService implements \Twig_ExtensionInterface
 {
 
     private $factory;
+
+    /**
+     * @var \Twig_Environment
+     */
+    private $environment;
 
     function __construct(FactoryInterface $factory = null, ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -34,6 +42,23 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      */
     public function initRuntime(\Twig_Environment $environment)
     {
+        $this->setEnvironment($environment);
+    }
+
+    /**
+     * @return \Twig_Environment
+     */
+    public function getEnvironment()
+    {
+        return $this->environment;
+    }
+
+    /**
+     * @param \Twig_Environment $environment
+     */
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
     }
 
     /**
@@ -128,14 +153,12 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         if (is_null($contentEntity)) {
             return '';
         }
-
         $contentMenuItems = $this->cm()->getContentMenuItemsBySlug($contentEntity);
-
         /**
          * @var \Knp\Menu\MenuItem $menu
          */
         $menu = array();
-        $menu[$contentEntity->getId()] = $this->factory->createItem($contentEntity->getSlug());
+        $menu[$contentEntity->getId()] = $this->factory->createItem($contentEntity->getSlug() . rand(100, 999));
         /**
          * @var ContentEntity $content
          */
@@ -157,11 +180,17 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
                 $menu[$content->getId()]->setLinkAttribute('target', $contentMeta['linkTarget']);
             }
             if (isset($contentMeta['linkClass']) && !empty($contentMeta['linkClass'])) {
-                $menu[$content->getId()]->setLinkAttribute('class',$contentMeta['linkClass']);
+                $menu[$content->getId()]->setLinkAttribute('class', $contentMeta['linkClass']);
             }
         }
 
-        $renderer = new ListRenderer(new \Knp\Menu\Matcher\Matcher());
+        $requestURL = $this->getRequest()->getRequestUri();
+        $menuTemplate = $this->tp()->getCurrentSkin()->getTemplateName($this->cm()->getContentTemplate($contentEntity));
+        $matcher = new Matcher();
+        $voter = new UriVoter($requestURL);
+        $matcher->addVoter($voter);
+
+        $renderer = new TwigRenderer($this->getEnvironment(), $menuTemplate , $matcher);
         return $renderer->render($menu[$contentEntity->getId()]);
     }
 

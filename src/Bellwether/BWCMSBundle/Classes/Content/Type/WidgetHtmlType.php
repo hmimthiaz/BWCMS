@@ -79,7 +79,7 @@ class WidgetHtmlType Extends ContentType
      * @param ContentEntity $contentEntity
      * @return string|null
      */
-    public function getPublicURL($contentEntity)
+    public function getPublicURL($contentEntity, $full = false)
     {
         return null;
     }

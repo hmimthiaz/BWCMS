@@ -142,7 +142,7 @@ abstract class ContentType implements ContentTypeInterface
      * @param ContentEntity $contentEntity
      * @return string|null
      */
-    abstract public function getPublicURL($contentEntity);
+    abstract public function getPublicURL($contentEntity, $full = false);
 
     /**
      * @return Form

@@ -81,7 +81,7 @@ class ContentFolderType Extends ContentType
      * @param ContentEntity $contentEntity
      * @return string|null
      */
-    public function getPublicURL($contentEntity)
+    public function getPublicURL($contentEntity, $full = false)
     {
         $contentParents = $this->cm()->getContentRepository()->getPath($contentEntity);
         if (count($contentParents) < 1) {
@@ -95,7 +95,7 @@ class ContentFolderType Extends ContentType
             'folderSlug' => implode('/', $folders),
             'siteSlug' => $contentEntity->getSite()->getSlug()
         );
-        return $this->container->get('router')->generate('contentFolder', $parameters, true);
+        return $this->container->get('router')->generate('contentFolder', $parameters, $full);
     }
 
     /**
