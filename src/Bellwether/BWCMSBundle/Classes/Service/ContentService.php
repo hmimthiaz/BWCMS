@@ -187,31 +187,69 @@ class ContentService extends BaseService
                 } catch (\OutOfBoundsException $e) {
                     continue;
                 }
-                if ($metaType == ContentFieldType::String || $metaType == ContentFieldType::Number) {
-                    $formField->setData($metaValue);
-                }
-                if ($metaType == ContentFieldType::Content) {
-                    $formField->setData($metaValue);
-                }
-
-                if ($metaType == ContentFieldType::Date || $metaType == ContentFieldType::Time || $metaType == ContentFieldType::DateTime) {
-                    $dateValue = new \DateTime($metaValue);
-                    $formField->setData($dateValue);
-                }
-                if ($metaType == ContentFieldType::Serialized) {
-                    try {
-                        $data = $this->getSerializer()->deserialize($metaValue, 'ArrayCollection', 'json');
-                    } catch (\RuntimeException $exp) {
-                        $data = array();
-                    }
-
-                    $data = $this->loadSerializedData($data);
-                    $formField->setData($data);
-                }
+                $fieldValue = $this->decodeDataFromDB($metaType, $metaValue->getValue(), $classInstance);
+                $formField->setData($fieldValue);
             }
         }
         $form = $classInstance->loadFormData($content, $form);
         return $form;
+    }
+
+    private function decodeDataFromDB($fieldType, $fieldValue, ContentTypeInterface $classInstance)
+    {
+        if (is_null($fieldValue)) {
+            return null;
+        }
+
+        if ($fieldType == ContentFieldType::String || $fieldValue == ContentFieldType::Number) {
+            return $fieldValue;
+        }
+        if ($fieldType == ContentFieldType::Content) {
+            return $fieldValue;
+        }
+        if ($fieldType == ContentFieldType::Date || $fieldType == ContentFieldType::Time || $fieldType == ContentFieldType::DateTime) {
+            $dateValue = new \DateTime($fieldValue);
+            return $dateValue;
+        }
+        if ($fieldType == ContentFieldType::Serialized) {
+            try {
+                $data = $this->getSerializer()->deserialize($fieldValue, 'ArrayCollection', 'json');
+            } catch (\RuntimeException $exp) {
+                $data = array();
+            }
+            $data = $this->loadSerializedData($data);
+            return $data;
+        }
+        return $fieldValue;
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return array
+     */
+    public function getContentAllMeta($contentEntity)
+    {
+        $returnValue = array();
+        $classInstance = $this->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
+        $existingMeta = $contentEntity->getMeta();
+        if (!empty($existingMeta)) {
+            /**
+             * @var ContentMetaEntity $meta
+             */
+            foreach ($existingMeta as $meta) {
+                $metaField = $meta->getField();
+                $metaValue = $meta->getValue();
+                $metaType = $meta->getFieldType();
+                $metaValue = $this->decodeDataFromDB($metaType, $metaValue, $classInstance);
+                if ($metaType == ContentFieldType::Content) {
+                    if (!is_array($metaValue) && !is_null($metaValue)) {
+                        $metaValue = $this->getContentRepository()->find($metaValue);
+                    }
+                }
+                $returnValue[$metaField] = $metaValue;
+            }
+        }
+        return $returnValue;
     }
 
     private function loadSerializedData($value)

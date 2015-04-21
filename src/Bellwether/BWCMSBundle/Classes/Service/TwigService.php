@@ -124,7 +124,6 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      */
     public function getContentMenuBySlug($slug)
     {
-
         $contentEntity = $this->cm()->getContentBySlugPath($slug);
         if (is_null($contentEntity)) {
             return '';
@@ -137,16 +136,29 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
          */
         $menu = array();
         $menu[$contentEntity->getId()] = $this->factory->createItem($contentEntity->getSlug());
-
-        $this->dump($menu[$contentEntity->getId()]);
-
         /**
          * @var ContentEntity $content
          */
         foreach ($contentMenuItems as $content) {
-            $menu[$content->getId()] = $menu[$content->getTreeParent()->getId()]->addChild($content->getTitle(), array());
-            $menu[$content->getId()]->setUri(rand(1,10));
-            $this->dump($content->getMeta());
+            $menu[$content->getId()] = $menu[$content->getTreeParent()->getId()]->addChild($content->getTitle(), array('uri' => '#'));
+            $contentMeta = $this->cm()->getContentAllMeta($content);
+            if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'link') {
+                if (isset($contentMeta['linkExternal']) && !empty($contentMeta['linkExternal'])) {
+                    $menu[$content->getId()]->setUri($contentMeta['linkExternal']);
+                }
+            }
+            if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'content') {
+                if (isset($contentMeta['linkContent']) && ($contentMeta['linkContent'] instanceof ContentEntity)) {
+                    $contentLinkURL = $this->cm()->getPublicURL($contentMeta['linkContent']);
+                    $menu[$content->getId()]->setUri($contentLinkURL);
+                }
+            }
+            if (isset($contentMeta['linkTarget']) && !empty($contentMeta['linkTarget'])) {
+                $menu[$content->getId()]->setLinkAttribute('target', $contentMeta['linkTarget']);
+            }
+            if (isset($contentMeta['linkClass']) && !empty($contentMeta['linkClass'])) {
+                $menu[$content->getId()]->setLinkAttribute('class',$contentMeta['linkClass']);
+            }
         }
 
         $renderer = new ListRenderer(new \Knp\Menu\Matcher\Matcher());
