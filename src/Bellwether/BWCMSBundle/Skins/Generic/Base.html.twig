@@ -5,6 +5,11 @@
     <title>{% block title %}BWCMS!{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block head %}{% endblock %}
+    <style>
+        li.current{
+            background-color: red;
+        }
+    </style>
 </head>
 <body {% block bodyAttr '' %}>
 {% block header %}{% endblock %}

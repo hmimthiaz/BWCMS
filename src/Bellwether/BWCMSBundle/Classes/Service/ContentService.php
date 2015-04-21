@@ -187,7 +187,7 @@ class ContentService extends BaseService
                 } catch (\OutOfBoundsException $e) {
                     continue;
                 }
-                $fieldValue = $this->decodeDataFromDB($metaType, $metaValue->getValue(), $classInstance);
+                $fieldValue = $this->decodeDataFromDB($metaType, $metaValue, $classInstance);
                 $formField->setData($fieldValue);
             }
         }
