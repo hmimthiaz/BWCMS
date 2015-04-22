@@ -22,7 +22,9 @@ class SampleForm extends AbstractType
         $builder->add('title', 'text');
         $builder->add('desc', 'text');
         $builder->add('age', 'text');
-        $builder->add('item', 'bwcms_content');
+        $builder->add('item', 'bwcms_content', array(
+            'contentType' => 'Media'
+        ));
         $builder->add('content', 'textarea',
             array(
                 'required' => false,

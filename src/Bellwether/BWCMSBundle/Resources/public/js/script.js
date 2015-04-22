@@ -21,7 +21,12 @@ $(document).ready(function () {
 });
 
 function showContentBrowser(ele) {
+    var holder = $(ele).parent().parent();
     var cbURL = $(ele).data('url');
+    var selectedValue = holder.find('input[type=hidden]').val();
+    if(selectedValue.length!=0){
+        cbURL = cbURL + '&selectedContentId=' + selectedValue;
+    }
     window.open(cbURL, "contentBrowserWindow", "scrollbars,resizable,width=800,height=600");
     return false;
 }

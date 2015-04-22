@@ -43,7 +43,8 @@ class ContentPageType Extends ContentType
     {
         $this->fb()->add('fieldContent', 'bwcms_content',
             array(
-                'label' => 'Content'
+                'label' => 'Content',
+                'contentType' => 'Media'
             )
         );
 

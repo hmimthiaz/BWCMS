@@ -20,6 +20,19 @@
         <div class="panel-heading">
             <h3 class="panel-title">Content Browser</h3>
         </div>
+        {% if selectContentPath is not null %}
+            <div class="panel-heading">
+                <h3 class="panel-title">Selected:
+                {% for content in selectContentPath %}
+                    {% if not loop.last %}
+                        {{ content.title }} /
+                    {% else %}
+                        {{ content.title }}
+                    {% endif %}
+                {% endfor %}
+                </h3>
+            </div>
+        {% endif %}
         <div style="min-width: 780px;">
 
             <div class="row">
@@ -54,6 +67,8 @@
                     url: "{{ url('content_table_data') }}",
                     type: 'GET',
                     'data': function (params) {
+                        params.type = '{{ type }}';
+                        params.length = '5';
                         params.parent = $("#selectedContentFolderId").val();
                         return params;
                     }

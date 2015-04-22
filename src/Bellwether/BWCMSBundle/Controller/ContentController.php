@@ -101,14 +101,36 @@ class ContentController extends BaseController
     public function browserAction(Request $request)
     {
 
+        $type = $request->get('type', 'Content');
         $parentId = $request->get('parent', 'Root');
         $holder = $request->get('holder', '');
+        $selectedContentId = $request->get('selectedContentId', null);
 
-        $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
+        $contentRepo = $this->cm()->getContentRepository();
 
-        $registeredContents = $this->cm()->getRegisteredContentTypes();
+        $selectContentPath = null;
+        if (!is_null($selectedContentId)) {
+            $selectedContent = $contentRepo->find($selectedContentId);
+            if (!is_null($selectedContent)) {
+                $selectContentPath = $contentRepo->getPath($selectedContent);
+                if (count($selectContentPath) > 1) {
+                    $parentId = $selectContentPath[count($selectContentPath) - 2]->getId();
+                }
+            }
+        }
 
-        $qb->andWhere(" node.type = 'Folder' ");
+        $qb = $contentRepo->getChildrenQueryBuilder(null, false);
+        $registeredContents = $this->cm()->getRegisteredContentTypes($type);
+
+        $condition = array();
+        foreach ($registeredContents as $cInfo) {
+            if ($cInfo['isHierarchy']) {
+                $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
+            }
+        }
+        if (!empty($condition)) {
+            $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
+        }
         $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
 
         $rootFolders = $qb->getQuery()->getResult();
@@ -150,10 +172,11 @@ class ContentController extends BaseController
         return array(
             'parentId' => $parentId,
             'holder' => $holder,
+            'type' => $type,
+            'selectContentPath' => $selectContentPath,
             'contentTypes' => $this->cm()->getRegisteredContentTypes(),
             'jsNodes' => json_encode($jsNodes),
         );
-
 
     }
 
@@ -324,7 +347,7 @@ class ContentController extends BaseController
     {
         $type = $request->get('type', 'Content');
         $draw = $request->get('draw', 0);
-        $start = $request->get('start', 10);
+        $start = $request->get('start', 0);
         $length = $request->get('length', 10);
         $parentId = $request->get('parent', 'Root');
 

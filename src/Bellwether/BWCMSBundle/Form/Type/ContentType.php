@@ -40,16 +40,21 @@ class ContentType extends AbstractType
             $content = $cr->find($value);
             if (!empty($content)) {
                 $view->vars['selectedText'] = $content->getTitle();
-                $view->vars['selectedThumb'] = $this->cm()->getSystemThumbURL($content,32,32);
+                $view->vars['selectedThumb'] = $this->cm()->getSystemThumbURL($content, 32, 32);
             }
         }
-        $view->vars['browserURL'] = $this->generateUrl('content_browser', array('holder' => $holder), true);
+        $browserURLOptions = array();
+        $browserURLOptions['holder'] = $holder;
+        if (isset($options['contentType']) && !empty($options['contentType'])) {
+            $browserURLOptions['type'] = $options['contentType'];
+        }
+        $view->vars['browserURL'] = $this->generateUrl('content_browser', $browserURLOptions, true);
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'contentType' => 'content',
+            'contentType' => 'Content',
             'required' => false,
             'compound' => false,
         ));
