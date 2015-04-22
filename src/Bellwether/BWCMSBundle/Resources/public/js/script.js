@@ -25,3 +25,11 @@ function showContentBrowser(ele) {
     window.open(cbURL, "contentBrowserWindow", "scrollbars,resizable,width=800,height=600");
     return false;
 }
+
+function clearContentBrowser(ele) {
+    var holder = $(ele).parent().parent();
+    holder.find('img.contentThumb').attr('src','');
+    holder.find('input[type=text],input[type=hidden]').val('');
+    console.log(holder);
+    return false;
+}

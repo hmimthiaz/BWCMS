@@ -10,27 +10,28 @@
             {% set attr = attr|merge({'data-prototype': prototype_html }) %}
             {% set attr = attr|merge({'data-length': form|length }) %}
             {#{% set attr = attr|merge({'data-prototype-name': prototype_name }) %}#}
+
+            <div class="FCHolder" {{ block('widget_container_attributes') }}>
+                <ul class="list-unstyled FCList">
+                    {% for field in form %}
+                        <li>
+                            <div class="row">
+                                <div class="col-lg-10">
+                                    {{ form_widget(field) }}
+                                    {{ form_errors(field) }}
+                                </div>
+                                <div class="col-lg-2 text-center ">
+                                    <button type="button" class="btn btn-danger FCRemove "><i class="glyphicon glyphicon-minus"></i></button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% if form.vars.allow_add %}
+                    <button type="button" class="btn btn-primary FCAdd"><i class="glyphicon glyphicon-plus"></i></button>
+                {% endif %}
+            </div>
         {% endif %}
-        <div class="FCHolder" {{ block('widget_container_attributes') }}>
-            <ul class="list-unstyled FCList">
-                {% for field in form %}
-                    <li>
-                        <div class="row">
-                            <div class="col-lg-10">
-                                {{ form_widget(field) }}
-                                {{ form_errors(field) }}
-                            </div>
-                            <div class="col-lg-2 text-center ">
-                                <button type="button" class="btn btn-danger FCRemove "><i class="glyphicon glyphicon-minus"></i></button>
-                            </div>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-            {% if form.vars.allow_add %}
-                <button type="button" class="btn btn-primary FCAdd"><i class="glyphicon glyphicon-plus"></i></button>
-            {% endif %}
-        </div>
     {% endspaceless %}
 {% endblock bwcms_collection_widget %}
 
@@ -45,6 +46,9 @@
             <div class="input-group-addon">
                 <button type="button" class="btn btn-primary" data-url="{{ browserURL }}" onclick="showContentBrowser(this);">
                     <i class="glyphicon glyphicon-folder-open"></i>
+                </button>&nbsp;
+                <button type="button" class="btn btn-danger"  onclick="clearContentBrowser(this);">
+                    <i class="glyphicon glyphicon-remove"></i>
                 </button>
             </div>
             <input id="{{ id }}" type="hidden" name="{{ full_name }}" class="value" {% if value is not empty %}value="{{ value }}" {% endif %}>

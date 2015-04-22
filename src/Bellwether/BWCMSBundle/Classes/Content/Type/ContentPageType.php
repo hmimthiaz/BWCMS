@@ -50,7 +50,6 @@ class ContentPageType Extends ContentType
         $this->fb()->add('gallery', 'bwcms_collection',
             array(
                 'type' => new SampleForm(),
-                'required' => false,
                 'label' => 'Content',
                 'allow_add' => true
             )

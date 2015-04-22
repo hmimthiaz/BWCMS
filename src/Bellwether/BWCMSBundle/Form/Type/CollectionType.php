@@ -21,9 +21,6 @@ class CollectionType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-
-
-
         $view->vars['attr']['label_col'] = null;
         $view->vars['attr']['label'] = null;
     }
