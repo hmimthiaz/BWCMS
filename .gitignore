@@ -36,3 +36,7 @@
 # Composer PHAR
 /composer.phar
 composer.lock
+
+#CMS Related
+/src/*
+/app/BWBundleRegister.php

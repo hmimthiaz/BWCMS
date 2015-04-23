@@ -16,7 +16,6 @@ class AppKernel extends Kernel
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
-            new Bellwether\BWCMSBundle\BWCMSBundle(),
             new FOS\UserBundle\FOSUserBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
             new Braincrafted\Bundle\BootstrapBundle\BraincraftedBootstrapBundle(),
@@ -24,7 +23,16 @@ class AppKernel extends Kernel
             new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new Gregwar\ImageBundle\GregwarImageBundle(),
+            new Bellwether\BWCMSBundle\BWCMSBundle(),
         );
+
+        if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'BWBundleRegister.php')) {
+            include_once(__DIR__ . DIRECTORY_SEPARATOR . 'BWBundleRegister.php');
+            $extraBundles = BWBundleRegister::getBundles();
+            if (!empty($extraBundles)) {
+                $bundles = array_merge($bundles, $extraBundles);
+            }
+        }
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
             $bundles[] = new Symfony\Bundle\DebugBundle\DebugBundle();
@@ -38,6 +46,6 @@ class AppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
+        $loader->load(__DIR__ . '/config/config_' . $this->getEnvironment() . '.yml');
     }
 }

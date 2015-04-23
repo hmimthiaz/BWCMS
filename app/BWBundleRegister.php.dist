@@ -1,0 +1,13 @@
+<?php
+
+class BWBundleRegister
+{
+    static public function getBundles()
+    {
+        $bundles = array(
+
+        );
+        return $bundles;
+    }
+
+}
