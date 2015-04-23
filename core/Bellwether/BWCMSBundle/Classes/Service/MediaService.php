@@ -25,8 +25,8 @@ class MediaService extends BaseService
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
-        $this->initMedia();
     }
+
 
     /**
      * @return MediaService
@@ -36,7 +36,7 @@ class MediaService extends BaseService
         return $this;
     }
 
-    private function initMedia()
+    public function init()
     {
         $rootDirectory = $this->getKernel()->getRootDir();
         $webRoot = realpath($rootDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'web');

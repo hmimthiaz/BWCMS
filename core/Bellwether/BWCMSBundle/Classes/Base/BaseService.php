@@ -23,6 +23,14 @@ abstract class BaseService  extends ContainerAware
     private $path;
 
     /**
+     * Service Init.
+     */
+    public function init()
+    {
+
+    }
+
+    /**
      * @return string
      */
     public function getPath()

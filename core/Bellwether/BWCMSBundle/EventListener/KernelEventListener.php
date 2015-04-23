@@ -22,6 +22,15 @@ class KernelEventListener extends BaseService
         $this->setRequestStack($request_stack);
     }
 
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        $this->cm()->init();
+        $this->mm()->init();
+        $this->pref()->init();
+        $this->sm()->init();
+        $this->tp()->init();
+    }
+
     public function onKernelController(FilterControllerEvent $event)
     {
         $controller = $event->getController();
@@ -56,10 +65,6 @@ class KernelEventListener extends BaseService
     {
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-    }
-
     public function onKernelResponse(FilterResponseEvent $event)
     {
     }
@@ -67,4 +72,5 @@ class KernelEventListener extends BaseService
     public function onKernelTerminate(PostResponseEvent $event)
     {
     }
+
 }

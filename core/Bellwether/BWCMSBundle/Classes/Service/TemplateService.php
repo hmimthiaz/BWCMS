@@ -21,6 +21,10 @@ class TemplateService extends BaseService
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
+    }
+
+    public function init()
+    {
         $this->addDefaultSkins();
     }
 
