@@ -7,11 +7,6 @@ bwcms_dynamic:
     resource: .
     type: dynamic
 
-dmb_web:
-    resource: "@DMBWebBundle/Controller/"
-    type:     annotation
-    prefix:   /
-
 fos_user_security:
     resource: "@FOSUserBundle/Resources/config/routing/security.xml"
 

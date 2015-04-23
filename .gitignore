@@ -13,6 +13,7 @@
 # Parameters
 /app/config/parameters.yml
 /app/config/parameters.ini
+/app/config/routing.yml
 
 # Managed by Composer
 /app/bootstrap.php.cache
@@ -40,3 +41,4 @@ composer.lock
 #CMS Related
 /src/*
 /app/BWBundleRegister.php
+
