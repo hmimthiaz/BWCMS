@@ -29,6 +29,7 @@ class ContentController extends BaseController
     public function indexAction(Request $request)
     {
 
+
         $type = $request->get('type', 'Content');
         $parentId = $request->get('parent', 'Root');
 

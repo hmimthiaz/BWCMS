@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
 
+
 use Bellwether\BWCMSBundle\Entity\Site;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Symfony\Component\Form\Form;
@@ -26,6 +27,9 @@ class DashboardController extends BaseController
      */
     public function indexAction()
     {
+
+//        $x = new TestSampleLoad();
+
         return array();
     }
 
