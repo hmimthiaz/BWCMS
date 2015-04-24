@@ -25,7 +25,10 @@ class TemplateService extends BaseService
 
     public function init()
     {
-        $this->addDefaultSkins();
+        if (!$this->loaded) {
+            $this->addDefaultSkins();
+        }
+        $this->loaded = true;
     }
 
     /**

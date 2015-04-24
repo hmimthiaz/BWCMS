@@ -16,19 +16,29 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class KernelEventListener extends BaseService
 {
+
     function __construct($kernel, ContainerInterface $container = null, RequestStack $request_stack = null)
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
+        $this->init();
+    }
+
+    public function init()
+    {
+        if (!$this->loaded) {
+            $this->cm()->init();
+            $this->mm()->init();
+            $this->pref()->init();
+            $this->sm()->init();
+            $this->tp()->init();
+        }
+        $this->loaded = true;
     }
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $this->cm()->init();
-        $this->mm()->init();
-        $this->pref()->init();
-        $this->sm()->init();
-        $this->tp()->init();
+
     }
 
     public function onKernelController(FilterControllerEvent $event)

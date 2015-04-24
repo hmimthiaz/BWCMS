@@ -38,11 +38,14 @@ class MediaService extends BaseService
 
     public function init()
     {
-        $rootDirectory = $this->getKernel()->getRootDir();
-        $webRoot = realpath($rootDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'web');
-        $this->webPath = $this->container->getParameter('media.path');
-        $this->uploadFolder = $webRoot . DIRECTORY_SEPARATOR . $this->webPath;
-        $this->fs = new Filesystem();
+        if (!$this->loaded) {
+            $rootDirectory = $this->getKernel()->getRootDir();
+            $webRoot = realpath($rootDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'web');
+            $this->webPath = $this->container->getParameter('media.path');
+            $this->uploadFolder = $webRoot . DIRECTORY_SEPARATOR . $this->webPath;
+            $this->fs = new Filesystem();
+        }
+        $this->loaded = true;
     }
 
     /**

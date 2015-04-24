@@ -22,6 +22,9 @@ abstract class BaseService  extends ContainerAware
 
     private $path;
 
+    protected $loaded = false;
+
+
     /**
      * Service Init.
      */

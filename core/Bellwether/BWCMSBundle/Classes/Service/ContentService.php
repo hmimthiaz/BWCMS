@@ -41,7 +41,10 @@ class ContentService extends BaseService
 
     public function init()
     {
-        $this->addDefaultContentTypes();
+        if (!$this->loaded) {
+            $this->addDefaultContentTypes();
+        }
+        $this->loaded = true;
     }
 
     /**
@@ -54,6 +57,7 @@ class ContentService extends BaseService
 
     private function addDefaultContentTypes()
     {
+
         $this->registerContentType(new ContentFolderType($this->container, $this->requestStack));
         $this->registerContentType(new ContentPageType($this->container, $this->requestStack));
         $this->registerContentType(new ContentArticleType($this->container, $this->requestStack));

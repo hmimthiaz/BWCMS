@@ -12,7 +12,6 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
 class RoutingService extends BaseService implements LoaderInterface
 {
-    private $loaded = false;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -24,7 +23,7 @@ class RoutingService extends BaseService implements LoaderInterface
     public function load($resource, $type = null)
     {
         if (true === $this->loaded) {
-            throw new \RuntimeException('Do not add the "extra" loader twice');
+            throw new \RuntimeException('Do not add the "dynamic" loader twice');
         }
 
         $defaultSite = $this->sm()->getDefaultSite();
@@ -45,7 +44,10 @@ class RoutingService extends BaseService implements LoaderInterface
         ));
         $routes->add('home', $homeRedirectRoute);
 
+        //make sure all content types are initialized.
+        $this->cm()->init();
         $registerContentTypes = $this->cm()->getAllContentTypes();
+
         foreach ($registerContentTypes as $contentType) {
             $routeCollection = $contentType->getRouteCollection();
             if (!is_null($routeCollection)) {

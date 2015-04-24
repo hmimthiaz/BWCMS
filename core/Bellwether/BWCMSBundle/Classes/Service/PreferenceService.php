@@ -19,14 +19,21 @@ class PreferenceService extends BaseService
 
     private $preferenceType = array();
 
-    private $loaded = array();
+    private $loadedPreference = array();
 
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
         $this->setContainer($container);
         $this->setRequestStack($request_stack);
-        $this->addDefaultOptionTypes();
+    }
+
+    public function init()
+    {
+        if (!$this->loaded) {
+            $this->addDefaultOptionTypes();
+        }
+        $this->loaded = true;
     }
 
     /**
@@ -87,8 +94,8 @@ class PreferenceService extends BaseService
 
     public function getAllPreferenceByType($type)
     {
-        if (isset($this->loaded[$type]) && !empty($this->loaded[$type])) {
-            return $this->loaded[$type];
+        if (isset($this->loadedPreference[$type]) && !empty($this->loadedPreference[$type])) {
+            return $this->loadedPreference[$type];
         }
         $classInstance = $this->getPreferenceClass($type);
         $currentSite = $this->sm()->getAdminCurrentSite();
@@ -112,7 +119,7 @@ class PreferenceService extends BaseService
                 $returnArray = array_intersect_key($returnArray, $fields);
             }
         }
-        $this->loaded[$classInstance->getType()] = $returnArray;
+        $this->loadedPreference[$classInstance->getType()] = $returnArray;
         return $returnArray;
     }
 
