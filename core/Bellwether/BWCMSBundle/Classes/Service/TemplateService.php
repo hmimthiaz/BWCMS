@@ -61,7 +61,7 @@ class TemplateService extends BaseService
          * @var \Symfony\Bundle\TwigBundle\Loader\FilesystemLoader $twigLoader
          */
         $twigLoader = $this->container->get('twig.loader');
-        $twigLoader->addPath($classInstance->getPath(), $classInstance->getName());
+        $twigLoader->addPath($classInstance->getPath(), $classInstance->getFolderName());
     }
 
     /**

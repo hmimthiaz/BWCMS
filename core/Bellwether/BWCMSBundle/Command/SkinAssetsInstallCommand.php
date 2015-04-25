@@ -54,18 +54,20 @@ EOT
          * @var TemplateService $templateService ;
          */
         $templateService = $this->getContainer()->get('bwcms.template');
+        $templateService->init();
         $skins = $templateService->getSkins();
+
         if (empty($skins)) {
             return;
         }
 
-        foreach ($skins as $skin) {
-            $skinClass = $templateService->getSkinClass($skin);
+        foreach ($skins as $skinFolder => $skinnName) {
+            $skinClass = $templateService->getSkinClass($skinFolder);
             $sourceDir = $skinClass->getPath() . DIRECTORY_SEPARATOR . 'Public';
             $targetDir = $skinsPublicDir . strtolower($skinClass->getFolderName());
-            $output->writeln(sprintf('Installing assets symlink for skin : %s -> %s', $skinClass->getName(), $targetDir));
 
             if (file_exists($sourceDir)) {
+                $output->writeln(sprintf('Installing assets symlink for skin : %s -> %s', $skinClass->getName(), $targetDir));
                 $filesystem->remove($targetDir);
                 $filesystem->symlink($sourceDir, $targetDir);
                 if (!file_exists($targetDir)) {

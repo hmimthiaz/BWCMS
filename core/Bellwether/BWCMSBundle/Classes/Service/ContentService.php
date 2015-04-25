@@ -85,6 +85,19 @@ class ContentService extends BaseService
     }
 
     /**
+     * @param string $type
+     * @param string $schema
+     */
+    public function removeContentType($type, $schema)
+    {
+        $slug = $type . '.' . $schema;
+        if (isset($this->contentType[$slug])) {
+            unset($this->contentType[$slug]);
+        }
+    }
+
+
+    /**
      * @return array
      */
     public function getAllContentTypes()
