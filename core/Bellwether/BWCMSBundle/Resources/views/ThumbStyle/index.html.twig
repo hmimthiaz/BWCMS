@@ -1,55 +1,49 @@
-{% extends '::base.html.twig' %}
+{% extends "BWCMSBundle:Common:default.html.twig" %}
+
+{% block title %}Thumbnail Style Manager{% endblock %}
+{% block pageTitle %}
+    <h1>Thumbnail Style Manager</h1>
+{% endblock %}
 
 {% block body -%}
-    <h1>ThumbStyle list</h1>
-
-    <table class="records_list">
-        <thead>
+    <div class="col-md-12">
+        <table class="table table-striped table-hover table-bordered records_list">
+            <thead>
             <tr>
-                <th>Id</th>
                 <th>Name</th>
                 <th>Slug</th>
                 <th>Mode</th>
                 <th>Width</th>
                 <th>Height</th>
-                <th>Background</th>
-                <th>Options</th>
-                <th>Quality</th>
                 <th>Actions</th>
             </tr>
-        </thead>
-        <tbody>
-        {% for entity in entities %}
-            <tr>
-                <td><a href="{{ path('thumbstyle_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-                <td>{{ entity.name }}</td>
-                <td>{{ entity.slug }}</td>
-                <td>{{ entity.mode }}</td>
-                <td>{{ entity.width }}</td>
-                <td>{{ entity.height }}</td>
-                <td>{{ entity.background }}</td>
-                <td>{{ entity.options }}</td>
-                <td>{{ entity.quality }}</td>
-                <td>
-                <ul>
-                    <li>
-                        <a href="{{ path('thumbstyle_show', { 'id': entity.id }) }}">show</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('thumbstyle_edit', { 'id': entity.id }) }}">edit</a>
-                    </li>
-                </ul>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for entity in entities %}
+                <tr>
+                    <td>{{ entity.name }}</td>
+                    <td>{{ entity.slug }}</td>
+                    <td>{{ entity.mode }}</td>
+                    <td>{{ entity.width }}</td>
+                    <td>{{ entity.height }}</td>
+                    <td>
+                        <div class="btn-group">
+                            <a class="btn btn-default btn-sm" href="{{ path('site_edit', {'id': entity.id}) }}">
+                                <i class="fa fa-edit"></i> Edit
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
         <ul>
-        <li>
-            <a href="{{ path('thumbstyle_new') }}">
-                Create a new entry
-            </a>
-        </li>
-    </ul>
-    {% endblock %}
+            <li>
+                <a href="{{ path('thumbstyle_new') }}">
+                    Create a new entry
+                </a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}

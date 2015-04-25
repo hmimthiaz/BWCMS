@@ -17,16 +17,40 @@ class ThumbStyleType extends AbstractType
         $builder
             ->add('name')
             ->add('slug')
-            ->add('mode')
-            ->add('width')
-            ->add('height')
+            ->add('mode', 'choice',
+                array(
+                    'label' => 'Mode',
+                    'choices' => array(
+                        'resize' => 'Resize',
+                        'scaleResize' => 'Scale Resize',
+                        'forceResize' => 'Force Resize',
+                        'cropResize' => 'Crop Resize',
+                        'zoomCrop' => 'Zoom Crop'
+                    ),
+                    'data' => 'scaleResize',
+                )
+            )
+            ->add('width', 'text',
+                array(
+                    'label' => 'Width',
+                    'data' => '100'
+                )
+            )
+            ->add('height', 'text',
+                array(
+                    'label' => 'Height',
+                    'data' => '100'
+                )
+            )
             ->add('background')
-            ->add('options')
-            ->add('quality')
-            ->add('site')
-        ;
+            ->add('quality', 'text',
+                array(
+                    'label' => 'Quality',
+                    'data' => '80'
+                )
+            );
     }
-    
+
     /**
      * @param OptionsResolverInterface $resolver
      */

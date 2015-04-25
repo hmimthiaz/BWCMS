@@ -2,8 +2,9 @@
 
 namespace Bellwether\BWCMSBundle\Controller;
 
+use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -11,17 +12,17 @@ use Bellwether\BWCMSBundle\Entity\ThumbStyle;
 use Bellwether\BWCMSBundle\Form\ThumbStyleType;
 
 /**
- * ThumbStyle controller.
+ * Site controller.
  *
- * @Route("/thumbstyle")
+ * @Route("/admin/thumbstyle")
  */
-class ThumbStyleController extends Controller
+class ThumbStyleController extends BaseController
 {
 
     /**
      * Lists all ThumbStyle entities.
      *
-     * @Route("/", name="thumbstyle")
+     * @Route("/", name="thumbstyle_home")
      * @Method("GET")
      * @Template()
      */

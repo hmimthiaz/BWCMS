@@ -98,6 +98,10 @@ class AdminMenuService extends BaseService
                 'type' => 'Widget'
             )
         ));
+        $menu['Manage']->addChild('Thumbnail Styles', array(
+            'route' => 'thumbstyle_home'
+        ));
+
 
         $menu->addChild('Preference', array('uri' => '#', 'label' => 'Preference'))->setAttribute('dropdown', true);
         $registeredOptionTypes = $this->pref()->getRegisteredOptionTypes();
