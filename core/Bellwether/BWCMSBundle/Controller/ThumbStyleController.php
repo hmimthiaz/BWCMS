@@ -10,6 +10,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Bellwether\BWCMSBundle\Entity\ThumbStyle;
 use Bellwether\BWCMSBundle\Form\ThumbStyleType;
+use Symfony\Component\Form\FormError;
+use Bellwether\Common\StringUtility;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Site controller.
@@ -36,6 +39,7 @@ class ThumbStyleController extends BaseController
             'entities' => $entities,
         );
     }
+
     /**
      * Creates a new ThumbStyle entity.
      *
@@ -49,17 +53,38 @@ class ThumbStyleController extends BaseController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
+        if ($request->getMethod() == 'POST') {
 
-            return $this->redirect($this->generateUrl('thumbstyle_show', array('id' => $entity->getId())));
+            if (strlen($entity->getName()) < 3) {
+                $form->get('name')->addError(new FormError('Name too short'));
+            }
+
+            if (strlen($entity->getSlug()) < 3) {
+                $form->get('slug')->addError(new FormError('Slug too short'));
+            } else {
+                $criteria = array(
+                    'slug' => $entity->getSlug(),
+                    'site' => $this->sm()->getAdminCurrentSite()->getId()
+                );
+                $em = $this->getDoctrine()->getManager();
+                $existingEntity = $em->getRepository('BWCMSBundle:ThumbStyle')->findOneBy($criteria);
+                if ($existingEntity != null) {
+                    $form->get('slug')->addError(new FormError('Slug already exists'));
+                }
+            }
+
+            if ($form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $entity->setSite($this->sm()->getAdminCurrentSite());
+                $em->persist($entity);
+                $em->flush();
+                return $this->redirect($this->generateUrl('thumbstyle_home'));
+            }
         }
 
         return array(
             'entity' => $entity,
-            'form'   => $form->createView(),
+            'form' => $form->createView(),
         );
     }
 
@@ -92,36 +117,11 @@ class ThumbStyleController extends BaseController
     public function newAction()
     {
         $entity = new ThumbStyle();
-        $form   = $this->createCreateForm($entity);
+        $form = $this->createCreateForm($entity);
 
         return array(
             'entity' => $entity,
-            'form'   => $form->createView(),
-        );
-    }
-
-    /**
-     * Finds and displays a ThumbStyle entity.
-     *
-     * @Route("/{id}", name="thumbstyle_show")
-     * @Method("GET")
-     * @Template()
-     */
-    public function showAction($id)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $entity = $em->getRepository('BWCMSBundle:ThumbStyle')->find($id);
-
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find ThumbStyle entity.');
-        }
-
-        $deleteForm = $this->createDeleteForm($id);
-
-        return array(
-            'entity'      => $entity,
-            'delete_form' => $deleteForm->createView(),
+            'form' => $form->createView(),
         );
     }
 
@@ -143,38 +143,37 @@ class ThumbStyleController extends BaseController
         }
 
         $editForm = $this->createEditForm($entity);
-        $deleteForm = $this->createDeleteForm($id);
 
         return array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
+            'entity' => $entity,
+            'form' => $editForm->createView()
         );
     }
 
     /**
-    * Creates a form to edit a ThumbStyle entity.
-    *
-    * @param ThumbStyle $entity The entity
-    *
-    * @return \Symfony\Component\Form\Form The form
-    */
+     * Creates a form to edit a ThumbStyle entity.
+     *
+     * @param ThumbStyle $entity The entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
     private function createEditForm(ThumbStyle $entity)
     {
         $form = $this->createForm(new ThumbStyleType(), $entity, array(
             'action' => $this->generateUrl('thumbstyle_update', array('id' => $entity->getId())),
-            'method' => 'PUT',
+            'method' => 'POST',
         ));
 
         $form->add('submit', 'submit', array('label' => 'Update'));
 
         return $form;
     }
+
     /**
      * Edits an existing ThumbStyle entity.
      *
      * @Route("/{id}", name="thumbstyle_update")
-     * @Method("PUT")
+     * @Method("POST")
      * @Template("BWCMSBundle:ThumbStyle:edit.html.twig")
      */
     public function updateAction(Request $request, $id)
@@ -187,62 +186,45 @@ class ThumbStyleController extends BaseController
             throw $this->createNotFoundException('Unable to find ThumbStyle entity.');
         }
 
-        $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createEditForm($entity);
-        $editForm->handleRequest($request);
+        $form = $this->createEditForm($entity);
+        $form->handleRequest($request);
 
-        if ($editForm->isValid()) {
-            $em->flush();
 
-            return $this->redirect($this->generateUrl('thumbstyle_edit', array('id' => $id)));
+        if ($request->getMethod() == 'POST') {
+
+            if (strlen($entity->getName()) < 3) {
+                $form->get('name')->addError(new FormError('Name too short'));
+            }
+
+            if (strlen($entity->getSlug()) < 3) {
+                $form->get('slug')->addError(new FormError('Slug too short'));
+            } else {
+                $em = $this->getDoctrine()->getManager();
+                $qb = $em->createQueryBuilder();
+                $queryResult = $qb->select(array('t'))
+                    ->from('BWCMSBundle:ThumbStyle', 't')
+                    ->andWhere(" t.slug = '" . $entity->getSlug() . "'")
+                    ->andWhere(" t.site = '" . $this->sm()->getAdminCurrentSite()->getId() . "'")
+                    ->andWhere(" t.id != '" . $entity->getId() . "'")
+                    ->getQuery()
+                    ->getResult();
+                if (!empty($queryResult)) {
+                    $form->get('slug')->addError(new FormError('Slug already exists'));
+                }
+            }
+
+            if ($form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $entity->setSite($this->sm()->getAdminCurrentSite());
+                $em->persist($entity);
+                $em->flush();
+                return $this->redirect($this->generateUrl('thumbstyle_home'));
+            }
         }
 
         return array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
+            'entity' => $entity,
+            'form' => $form->createView()
         );
-    }
-    /**
-     * Deletes a ThumbStyle entity.
-     *
-     * @Route("/{id}", name="thumbstyle_delete")
-     * @Method("DELETE")
-     */
-    public function deleteAction(Request $request, $id)
-    {
-        $form = $this->createDeleteForm($id);
-        $form->handleRequest($request);
-
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('BWCMSBundle:ThumbStyle')->find($id);
-
-            if (!$entity) {
-                throw $this->createNotFoundException('Unable to find ThumbStyle entity.');
-            }
-
-            $em->remove($entity);
-            $em->flush();
-        }
-
-        return $this->redirect($this->generateUrl('thumbstyle'));
-    }
-
-    /**
-     * Creates a form to delete a ThumbStyle entity by id.
-     *
-     * @param mixed $id The entity id
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm($id)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('thumbstyle_delete', array('id' => $id)))
-            ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
-            ->getForm()
-        ;
     }
 }

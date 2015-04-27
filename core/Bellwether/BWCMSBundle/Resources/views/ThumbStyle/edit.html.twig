@@ -1,16 +1,19 @@
-{% extends '::base.html.twig' %}
+{% extends "BWCMSBundle:Common:default.html.twig" %}
+
+{% block title %}Edit Style{% endblock %}
+{% block pageTitle %}
+    <h1>Edit Style</h1>
+{% endblock %}
 
 {% block body -%}
-    <h1>ThumbStyle edit</h1>
 
-    {{ form(edit_form) }}
+    {{ form(form, { 'style': 'horizontal' , 'label_col': 2, 'widget_col': 10 }) }}
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('thumbstyle') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
+    <ul class="record_actions">
+        <li>
+            <a href="{{ path('thumbstyle_home') }}">
+                Back to the list
+            </a>
+        </li>
+    </ul>
 {% endblock %}
