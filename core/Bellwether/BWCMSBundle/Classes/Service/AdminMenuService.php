@@ -98,7 +98,7 @@ class AdminMenuService extends BaseService
                 'type' => 'Widget'
             )
         ));
-        $menu['Manage']->addChild('Thumbnail Styles', array(
+        $menu['Manage']->addChild('Image Thumb Styles', array(
             'route' => 'thumbstyle_home'
         ));
 
