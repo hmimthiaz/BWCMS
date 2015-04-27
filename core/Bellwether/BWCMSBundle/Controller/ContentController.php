@@ -375,7 +375,7 @@ class ContentController extends BaseController
             }
             if ($parentFolder->getSortBy() == ContentSortByType::SortIndex) {
                 $uiSortEnabled = true;
-                $qb->add('orderBy', 'node.treeLeft' . $sortOrder);
+                $qb->add('orderBy', 'node.treeLeft' );
             } elseif ($parentFolder->getSortBy() == ContentSortByType::Created) {
                 $qb->add('orderBy', 'node.createdDate' . $sortOrder);
             } elseif ($parentFolder->getSortBy() == ContentSortByType::Published) {
@@ -405,9 +405,6 @@ class ContentController extends BaseController
             $qb->setParameter('query1', '%' . $searchString . '%');
             $qb->setParameter('query2', '%' . $searchString . '%');
         }
-//
-//        var_dump($qb->getDQL());
-//        exit;
 
         $result = $qb->getQuery()->getResult();
         $totalCount = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();

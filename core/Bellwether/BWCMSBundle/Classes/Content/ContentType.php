@@ -300,9 +300,9 @@ abstract class ContentType implements ContentTypeInterface
         if ($this->isSortEnabled) {
             $this->fb()->add('sortBy', 'choice', array(
                 'choices' => array(
+                    ContentSortByType::SortIndex => 'Sort',
                     ContentSortByType::Created => 'Created',
                     ContentSortByType::Published => 'Published',
-                    ContentSortByType::SortIndex => 'Sort',
                     ContentSortByType::Title => 'Title',
                     ContentSortByType::Size => 'Size',
                 ),

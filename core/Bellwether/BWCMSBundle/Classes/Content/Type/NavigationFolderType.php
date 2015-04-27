@@ -30,19 +30,51 @@ class NavigationFolderType Extends ContentType
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
         $this->setIsUploadEnabled(false);
-        $this->setIsSortEnabled(true);
-        $this->setIsSlugEnabled(true);
+        $this->setIsSortEnabled(false);
+        $this->setIsSlugEnabled(false);
     }
 
     public function buildFields()
     {
+        $this->addField('linkType', ContentFieldType::String);
+        $this->addField('linkContent', ContentFieldType::Content);
+        $this->addField('linkExternal', ContentFieldType::String);
 
+        $this->addField('linkTarget', ContentFieldType::String);
+        $this->addField('linkClass', ContentFieldType::String);
     }
 
     public function buildForm()
     {
+        $this->fb()->add('linkType', 'choice',
+            array(
+                'label' => 'Type',
+                'choices' => array('content' => 'Content', 'link' => 'Link'),
+            )
+        );
 
+        $this->fb()->add('linkContent', 'bwcms_content',
+            array(
+                'label' => 'Content'
+            )
+        );
 
+        $this->fb()->add('linkExternal', 'text',
+            array(
+                'label' => 'Link',
+            )
+        );
+        $this->fb()->add('linkTarget', 'choice',
+            array(
+                'label' => 'Target',
+                'choices' => array('_self' => 'Same Window', '_blank' => 'New Window'),
+            )
+        );
+        $this->fb()->add('linkClass', 'text',
+            array(
+                'label' => 'Class',
+            )
+        );
     }
 
     public function getTemplates()

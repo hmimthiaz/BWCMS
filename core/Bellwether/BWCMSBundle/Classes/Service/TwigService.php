@@ -155,10 +155,14 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         }
         $contentMenuItems = $this->cm()->getContentMenuItemsBySlug($contentEntity);
         /**
+         * @var \Knp\Menu\MenuItem $rootMenu
          * @var \Knp\Menu\MenuItem $menu
+         *
          */
         $menu = array();
-        $menu[$contentEntity->getId()] = $this->factory->createItem($contentEntity->getSlug() . rand(100, 999));
+        $rootMenu = $this->factory->createItem($contentEntity->getSlug());
+        $rootMenu->setChildrenAttribute('class','menu');
+        $menu[$contentEntity->getId()] = $rootMenu;
         /**
          * @var ContentEntity $content
          */
@@ -190,7 +194,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         $voter = new UriVoter($requestURL);
         $matcher->addVoter($voter);
 
-        $renderer = new TwigRenderer($this->getEnvironment(), $menuTemplate , $matcher);
+        $renderer = new TwigRenderer($this->getEnvironment(), $menuTemplate, $matcher);
         return $renderer->render($menu[$contentEntity->getId()]);
     }
 
