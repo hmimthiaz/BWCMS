@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping AS ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 
 
 
@@ -144,12 +145,12 @@ class ContentEntity
     /**
      * @ORM\Column(type="string", length=100, nullable=false)
      */
-    private $sortBy = ContentSortByType::Created;
+    private $sortBy = ContentSortByType::SortIndex;
 
     /**
      * @ORM\Column(type="string", length=100, nullable=false)
      */
-    private $sortOrder = ContentSortOrderType::DESC;
+    private $sortOrder = ContentSortOrderType::ASC;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -164,7 +165,7 @@ class ContentEntity
     /**
      * @ORM\Column(type="string", length=100, nullable=false)
      */
-    private $status = 'Draft';
+    private $status = ContentPublishType::Published;
 
     /**
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\UserEntity")
