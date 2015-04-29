@@ -253,6 +253,10 @@ class ContentService extends BaseService
     {
         $returnValue = array();
         $classInstance = $this->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
+        $loadedMeta = $contentEntity->getLoadedMeta();
+        if (!is_null($loadedMeta)) {
+            return $loadedMeta;
+        }
         $existingMeta = $contentEntity->getMeta();
         if (!empty($existingMeta)) {
             /**
@@ -271,7 +275,21 @@ class ContentService extends BaseService
                 $returnValue[$metaField] = $metaValue;
             }
         }
+        $contentEntity->setLoadedMeta($returnValue);
         return $returnValue;
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @param $metaKey
+     */
+    public function getContentMeta($contentEntity, $metaKey, $default = false)
+    {
+        $allMeta = $this->getContentAllMeta($contentEntity);
+        if(isset($allMeta[$metaKey])){
+            return $allMeta[$metaKey];
+        }
+        return $default;
     }
 
     private function loadSerializedData($value)

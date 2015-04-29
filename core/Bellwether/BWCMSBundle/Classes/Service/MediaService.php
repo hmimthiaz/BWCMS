@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Gregwar\Image\Image;
+use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Entity\ThumbStyle;
 
 class MediaService extends BaseService
 {
@@ -49,6 +51,25 @@ class MediaService extends BaseService
     }
 
     /**
+     * @param $thumbSlug
+     * @param null $site
+     * @return null|object
+     */
+    public function getThumbStyle($thumbSlug, $site = null)
+    {
+        $repo = $this->em()->getRepository('BWCMSBundle:ThumbStyle');
+        $criteria = array(
+            'slug' => $thumbSlug,
+            'site' => null
+        );
+        if (!empty($site)) {
+            $criteria['site'] = $site;
+        }
+        return $repo->findOneBy($criteria);
+    }
+
+
+    /**
      * @param UploadedFile $uploadedFile
      * @return array
      */
@@ -83,6 +104,54 @@ class MediaService extends BaseService
             }
         }
         return $data;
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return string
+     */
+    public function getContentFile($contentEntity)
+    {
+        if (empty($contentEntity->getFile())) {
+            return null;
+        }
+        if ($this->isImage($contentEntity->getFile(), $contentEntity->getMime())) {
+            $filename = $this->getFilePath($contentEntity->getFile());
+        } else {
+            $filename = $this->getMimeResourceImage($contentEntity->getExtension());
+        }
+        return $filename;
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @param ThumbStyle $thumbStyle
+     */
+    public function getContentThumbURLWithStyle($contentEntity, $thumbStyle)
+    {
+        $filename = $this->getContentFile($contentEntity);
+        if (empty($filename)) {
+            return null;
+        }
+        $thumb = $this->getThumbService()->open($filename);
+        switch ($thumbStyle->getMode()) {
+            case 'resize':
+                $thumb = $thumb->resize($thumbStyle->getWidth(), $thumbStyle->getHeight());
+                break;
+            case 'scaleResize':
+                $thumb = $thumb->scaleResize($thumbStyle->getWidth(), $thumbStyle->getHeight());
+                break;
+            case 'forceResize':
+                $thumb = $thumb->forceResize($thumbStyle->getWidth(), $thumbStyle->getHeight());
+                break;
+            case 'cropResize':
+                $thumb = $thumb->cropResize($thumbStyle->getWidth(), $thumbStyle->getHeight());
+                break;
+            case 'zoomCrop':
+                $thumb = $thumb->zoomCrop($thumbStyle->getWidth(), $thumbStyle->getHeight());
+                break;
+        }
+        return $thumb->cacheFile('guess');
     }
 
     public function getSystemThumbURL($filename, $mime, $extension, $width, $height)

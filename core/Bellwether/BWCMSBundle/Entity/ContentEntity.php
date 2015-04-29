@@ -70,6 +70,8 @@ class ContentEntity
      */
     private $meta;
 
+    private $loadedMeta = null;
+
     /**
      * @Gedmo\TreeParent
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="children")
@@ -679,6 +681,22 @@ class ContentEntity
     {
         $this->meta->removeElement($meta);
         return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getLoadedMeta()
+    {
+        return $this->loadedMeta;
+    }
+
+    /**
+     * @param null $loadedMeta
+     */
+    public function setLoadedMeta($loadedMeta)
+    {
+        $this->loadedMeta = $loadedMeta;
     }
 
 

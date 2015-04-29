@@ -26,27 +26,23 @@ class ThumbStyleType extends AbstractType
                         'forceResize' => 'Force Resize',
                         'cropResize' => 'Crop Resize',
                         'zoomCrop' => 'Zoom Crop'
-                    ),
-                    'data' => 'scaleResize',
+                    )
                 )
             )
             ->add('width', 'text',
                 array(
                     'label' => 'Width',
-                    'data' => '100'
                 )
             )
             ->add('height', 'text',
                 array(
                     'label' => 'Height',
-                    'data' => '100'
                 )
             )
             ->add('background')
             ->add('quality', 'text',
                 array(
                     'label' => 'Quality',
-                    'data' => '80'
                 )
             );
     }

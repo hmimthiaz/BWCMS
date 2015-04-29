@@ -14,6 +14,7 @@ use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\Matcher\Voter\UriVoter;
 use Knp\Menu\Renderer\ListRenderer;
 use Knp\Menu\Renderer\TwigRenderer;
+use Gregwar\Image\Image;
 
 
 class TwigService extends BaseService implements \Twig_ExtensionInterface
@@ -110,7 +111,9 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     {
         return array(
             'link' => new \Twig_Function_Method($this, 'getContentLink'),
-            'menu' => new \Twig_Function_Method($this, 'getContentMenuBySlug')
+            'menu' => new \Twig_Function_Method($this, 'getContentMenuBySlug'),
+            'meta' => new \Twig_Function_Method($this, 'getContentMeta'),
+            'thumb' => new \Twig_Function_Method($this, 'getThumbImage')
         );
     }
 
@@ -161,7 +164,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
          */
         $menu = array();
         $rootMenu = $this->factory->createItem($contentEntity->getSlug());
-        $rootMenu->setChildrenAttribute('class','menu');
+        $rootMenu->setChildrenAttribute('class', 'menu');
         $menu[$contentEntity->getId()] = $rootMenu;
         /**
          * @var ContentEntity $content
@@ -197,6 +200,33 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         $renderer = new TwigRenderer($this->getEnvironment(), $menuTemplate, $matcher);
         return $renderer->render($menu[$contentEntity->getId()]);
     }
+
+    /**
+     * @param $contentEntity
+     * @param $metaKey
+     * @param bool $default
+     * @return bool
+     */
+    public function getContentMeta($contentEntity, $metaKey, $default = false)
+    {
+        return $this->cm()->getContentMeta($contentEntity, $metaKey, $default);
+    }
+
+
+    public function getThumbImage($contentEntity, $thumbSlug)
+    {
+        $thumbInfo = $this->mm()->getThumbStyle($thumbSlug, $this->sm()->getCurrentSite());
+        return $this->mm()->getContentThumbURLWithStyle($contentEntity, $thumbInfo);
+    }
+
+    /**
+     * @return Image
+     */
+    public function getThumbService()
+    {
+        return $this->container->get('image.handling');
+    }
+
 
     /**
      * @param FactoryInterface $factory
