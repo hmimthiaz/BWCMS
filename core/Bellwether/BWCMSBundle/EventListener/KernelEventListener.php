@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
-use Bellwether\BWCMSBundle\Controller\FrontEndControllerInterface;
+use Bellwether\BWCMSBundle\Classes\Base\FrontEndControllerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class KernelEventListener extends BaseService

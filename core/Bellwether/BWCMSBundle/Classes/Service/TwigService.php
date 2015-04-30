@@ -5,6 +5,7 @@ namespace Bellwether\BWCMSBundle\Classes\Service;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManager;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Entity\ThumbStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
@@ -215,8 +216,19 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
 
     public function getThumbImage($contentEntity, $thumbSlug)
     {
-        $thumbInfo = $this->mm()->getThumbStyle($thumbSlug, $this->sm()->getCurrentSite());
-        return $this->mm()->getContentThumbURLWithStyle($contentEntity, $thumbInfo);
+        $thumbEntity = $this->mm()->getThumbStyle($thumbSlug, $this->sm()->getCurrentSite());
+        if (empty($thumbEntity)) {
+            $thumbEntity = new ThumbStyle();
+            $thumbEntity->setSite($this->sm()->getCurrentSite());
+            $thumbEntity->setName($thumbSlug);
+            $thumbEntity->setSlug($thumbSlug);
+            $thumbEntity->setMode('scaleResize');
+            $thumbEntity->setWidth(100);
+            $thumbEntity->setHeight(100);
+            $this->em()->persist($thumbEntity);
+            $this->em()->flush();
+        }
+        return $this->mm()->getContentThumbURLWithStyle($contentEntity, $thumbEntity);
     }
 
     /**

@@ -35,12 +35,12 @@ class ThumbStyle
     /**
      * @ORM\Column(type="integer")
      */
-    private $width;
+    private $width  = 100;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $height;
+    private $height = 100;
 
     /**
      * @ORM\Column(type="string", length=10, nullable=true)
@@ -55,7 +55,7 @@ class ThumbStyle
     /**
      * @ORM\Column(type="integer")
      */
-    private $quality;
+    private $quality = 80;
 
     /**
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity",cascade={"persist"})
