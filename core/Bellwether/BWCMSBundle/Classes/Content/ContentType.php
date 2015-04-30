@@ -2,6 +2,7 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Content;
 
+use Bellwether\BWCMSBundle\Classes\Base\ContentTypeInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;

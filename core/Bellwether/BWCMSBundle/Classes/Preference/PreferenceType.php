@@ -1,6 +1,7 @@
 <?php
 namespace Bellwether\BWCMSBundle\Classes\Preference;
 
+use Bellwether\BWCMSBundle\Classes\Base\PreferenceTypeInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Form;

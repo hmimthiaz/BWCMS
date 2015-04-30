@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes\Preference;
+namespace Bellwether\BWCMSBundle\Classes\Base;
 
 
 

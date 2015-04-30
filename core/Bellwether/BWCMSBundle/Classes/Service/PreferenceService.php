@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Bellwether\BWCMSBundle\Classes\Preference\PreferenceType;
-use Bellwether\BWCMSBundle\Classes\Preference\PreferenceTypeInterface;
+use Bellwether\BWCMSBundle\Classes\Base\PreferenceTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Preference\Type\GeneralType;
 use Bellwether\BWCMSBundle\Classes\Preference\Type\EmailSMTPType;
 use Symfony\Component\Form\Form;

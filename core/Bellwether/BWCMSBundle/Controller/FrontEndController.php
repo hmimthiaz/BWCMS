@@ -2,6 +2,7 @@
 
 namespace Bellwether\BWCMSBundle\Controller;
 
+use Bellwether\BWCMSBundle\Classes\Base\FrontEndControllerInterface;
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

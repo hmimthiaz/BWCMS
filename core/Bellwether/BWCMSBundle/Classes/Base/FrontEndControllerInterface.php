@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Controller;
+namespace Bellwether\BWCMSBundle\Classes\Base;
 
 
 interface FrontEndControllerInterface

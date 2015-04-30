@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 
-use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
+use Bellwether\BWCMSBundle\Classes\Base\ContentTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Content\Type\ContentFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\ContentPageType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\ContentArticleType;

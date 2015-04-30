@@ -1,6 +1,6 @@
 <?php
 
-namespace Bellwether\BWCMSBundle\Classes\Content;
+namespace Bellwether\BWCMSBundle\Classes\Base;
 
 use Symfony\Component\Form\Form;
 
