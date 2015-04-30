@@ -46,7 +46,8 @@
     "twbs/bootstrap": "3.0.*",
     "jquery/jquery": "1.11.*",
     "knplabs/knp-paginator-bundle": "~2.4",
-    "gregwar/image-bundle": "dev-master"
+    "gregwar/image-bundle": "dev-master",
+    "html2text/html2text": "~2.0"
   },
   "require-dev": {
     "sensio/generator-bundle": "~2.3"

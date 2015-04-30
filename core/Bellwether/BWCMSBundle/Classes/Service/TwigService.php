@@ -16,7 +16,7 @@ use Knp\Menu\Matcher\Voter\UriVoter;
 use Knp\Menu\Renderer\ListRenderer;
 use Knp\Menu\Renderer\TwigRenderer;
 use Gregwar\Image\Image;
-
+use Bellwether\Common\Pagination;
 
 class TwigService extends BaseService implements \Twig_ExtensionInterface
 {
@@ -90,7 +90,9 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      */
     public function getFilters()
     {
-        return array();
+        return array(
+            new \Twig_SimpleFilter('ellipse', array($this, 'getEllipse')),
+        );
     }
 
     /**
@@ -114,7 +116,8 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             'link' => new \Twig_Function_Method($this, 'getContentLink'),
             'menu' => new \Twig_Function_Method($this, 'getContentMenuBySlug'),
             'meta' => new \Twig_Function_Method($this, 'getContentMeta'),
-            'thumb' => new \Twig_Function_Method($this, 'getThumbImage')
+            'thumb' => new \Twig_Function_Method($this, 'getThumbImage'),
+            'pagination' => new \Twig_Function_Method($this, 'getPagination'),
         );
     }
 
@@ -145,6 +148,24 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     public function getContentLink($contentEntity)
     {
         return $this->cm()->getPublicURL($contentEntity);
+    }
+
+    function getEllipse($text, $limit = 300, $end = '...')
+    {
+        if (strlen($text) <= $limit) {
+            return $text;
+        }
+
+        $textArray = explode(' ', $text);
+        $newText = '';
+        foreach ($textArray as $word) {
+            $newText = $newText . $word . ' ';
+            if (strlen($newText) >= $limit) {
+                break;
+            }
+        }
+        $newText = $newText . $end;
+        return $newText;
     }
 
     /**
@@ -230,6 +251,20 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         }
         return $this->mm()->getContentThumbURLWithStyle($contentEntity, $thumbEntity);
     }
+
+    /**
+     * @param Pagination $pager
+     */
+    public function getPagination(Pagination $pager)
+    {
+
+        $paginationTemplate = $this->tp()->getCurrentSkin()->getPaginationTemplate();
+
+        $html = $this->container->get('templating')->render($paginationTemplate, array('cp' => $pager));
+
+        return $html;
+    }
+
 
     /**
      * @return Image

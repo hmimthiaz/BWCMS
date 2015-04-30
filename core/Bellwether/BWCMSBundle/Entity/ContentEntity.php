@@ -9,7 +9,6 @@ use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 
 
-
 /**
  * @Gedmo\Tree(type="nested")
  * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\ContentRepository")
@@ -363,7 +362,16 @@ class ContentEntity
      */
     public function getSummary()
     {
-        return $this->summary;
+        $summary = $this->summary;
+        if (empty($summary)) {
+            if (!empty($this->content)) {
+                $html = new \Html2Text\Html2Text($this->content);
+                $summary = $html->getText();
+                $summary = preg_replace('/\s+/', ' ', $summary);
+                $summary = trim($summary);
+            }
+        }
+        return $summary;
     }
 
     /**

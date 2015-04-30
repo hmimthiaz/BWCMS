@@ -20,6 +20,11 @@ class GenericSkin extends BaseSkin
         return $this->getTemplateName("Home/Home.html.twig");
     }
 
+    public function getPaginationTemplate()
+    {
+        return $this->getTemplateName("Home/Home.html.twig");
+    }
+
     public function getName()
     {
         return $this->getFolderName();

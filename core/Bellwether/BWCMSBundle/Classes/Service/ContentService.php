@@ -23,6 +23,7 @@ use Bellwether\BWCMSBundle\Classes\Content\Type\WidgetHtmlType;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Bellwether\Common\StringUtility;
+use Bellwether\Common\Pagination;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -286,7 +287,7 @@ class ContentService extends BaseService
     public function getContentMeta($contentEntity, $metaKey, $default = false)
     {
         $allMeta = $this->getContentAllMeta($contentEntity);
-        if(isset($allMeta[$metaKey])){
+        if (isset($allMeta[$metaKey])) {
             return $allMeta[$metaKey];
         }
         return $default;
@@ -522,12 +523,14 @@ class ContentService extends BaseService
 
     /**
      * @param ContentEntity $contentEntity
+     * @param Pagination $pager
      * @param string $type
-     * @param int $start
+     * @return Pagination
      */
-    public function getFolderItems($contentEntity = null, $start = 0, $type = 'Content')
+    public function getFolderItems($contentEntity = null, Pagination $pager, $type = 'Content')
     {
-        $limit = 5;
+        $start = $pager->getStart();
+        $limit = $pager->getLimit();
 
         $contentRepository = $this->getContentRepository();
         $qb = $contentRepository->getChildrenQueryBuilder($contentEntity, true);
@@ -561,14 +564,12 @@ class ContentService extends BaseService
         $qb->setMaxResults($limit);
 
         $result = $qb->getQuery()->getResult();
-        $totalCount = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+        $pager->setItems($result);
 
-        return array(
-            'start' => $start,
-            'limit' => $limit,
-            'items' => $result,
-            'count' => $totalCount
-        );
+        $totalCount = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+        $pager->setTotalItems($totalCount);
+
+        return $pager;
     }
 
     /**
