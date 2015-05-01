@@ -23,6 +23,8 @@ class Pagination
 
     private $items;
 
+    private $activeClass = 'active';
+
     /**
      * @var Request
      */
@@ -50,10 +52,16 @@ class Pagination
         if ($this->getCurrentPage() <= 1) {
             return null;
         }
-        return array(
-            'params' => $this->getURLParamsWithPage($this->getCurrentPage() - 1),
-            'route' => $this->request->get('_route')
-        );
+        return $this->getPageInfo($this->getCurrentPage() - 1, 'Previous');
+    }
+
+    public function pages()
+    {
+        $pages = array();
+        for ($page = 1; $page <= $this->getTotalPages(); $page++) {
+            $pages[] = $this->getPageInfo($page);
+        }
+        return $pages;
     }
 
     public function next()
@@ -61,10 +69,7 @@ class Pagination
         if ($this->getCurrentPage() >= $this->getTotalPages()) {
             return null;
         }
-        return array(
-            'params' => $this->getURLParamsWithPage($this->getCurrentPage() + 1),
-            'route' => $this->request->get('_route')
-        );
+        return $this->getPageInfo($this->getCurrentPage() + 1, 'Next');
     }
 
     private function calculatePages()
@@ -78,6 +83,23 @@ class Pagination
         } else {
             $this->totalPages = 1;
         }
+    }
+
+    private function getPageInfo($page, $text = null)
+    {
+        if (empty($text)) {
+            $text = $page;
+        }
+        $class = null;
+        if ($page == $this->getCurrentPage()) {
+            $class = $this->getActiveClass();
+        }
+        return array(
+            'text' => $text,
+            'class' => $class,
+            'params' => $this->getURLParamsWithPage($page),
+            'route' => $this->request->get('_route')
+        );
     }
 
     private function getURLParamsWithPage($page)
@@ -225,5 +247,20 @@ class Pagination
         $this->totalPages = $totalPages;
     }
 
+    /**
+     * @return string
+     */
+    public function getActiveClass()
+    {
+        return $this->activeClass;
+    }
+
+    /**
+     * @param string $activeClass
+     */
+    public function setActiveClass($activeClass)
+    {
+        $this->activeClass = $activeClass;
+    }
 
 }
