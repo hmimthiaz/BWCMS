@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Bellwether\BWCMSBundle\Classes\Base\FrontEndControllerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
 
 class KernelEventListener extends BaseService
 {
@@ -69,6 +70,30 @@ class KernelEventListener extends BaseService
 
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
+
+        $environment = $this->container->get('kernel')->getEnvironment();
+        if ($environment == 'dev') {
+            return;
+        }
+
+        $exception = $event->getException();
+
+        //SQL Exceptions
+        if ($exception instanceof \PDOException) {
+            $response = new Response($exception->getMessage());
+            $event->setResponse($response);
+            return;
+        }
+
+        //Handle 404
+        if ($exception instanceof NotFoundHttpException) {
+            $template404 = $this->tp()->getCurrentSkin()->get404Template();
+            $template = $this->container->get('templating');
+            $response = new Response($template->render($template404, array()));
+            $event->setResponse($response);
+            return;
+        }
+
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event)

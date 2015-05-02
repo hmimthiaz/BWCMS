@@ -15,6 +15,11 @@ class GenericSkin extends BaseSkin
         $this->setRequestStack($request_stack);
     }
 
+    public function get404Template()
+    {
+        return null;
+    }
+
     public function getHomePageTemplate()
     {
         return $this->getTemplateName("Home/Home.html.twig");
@@ -22,7 +27,7 @@ class GenericSkin extends BaseSkin
 
     public function getPaginationTemplate()
     {
-        return $this->getTemplateName("Home/Home.html.twig");
+        return null;
     }
 
     public function getName()

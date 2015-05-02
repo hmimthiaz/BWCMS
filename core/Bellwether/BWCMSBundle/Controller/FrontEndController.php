@@ -14,9 +14,8 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
      */
     public function homeAction($siteSlug)
     {
-        $template = $this->tp()->getCurrentSkin()->getHomePageTemplate();
         $templateVariables = array();
-
+        $template = $this->tp()->getCurrentSkin()->getHomePageTemplate();
         return $this->render($template, $templateVariables);
     }
 
@@ -26,8 +25,9 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
     public function contentFolderAction($siteSlug, $folderSlug)
     {
         $contentEntity = $this->cm()->getContentBySlugPath($folderSlug);
-
-        $template = $this->tp()->getCurrentSkin()->getContentTemplate($contentEntity);
+        if (empty($contentEntity)) {
+            throw new NotFoundHttpException('Folder does not exist');
+        }
 
         $contentItems = $this->cm()->getFolderItems($contentEntity);
 
@@ -35,7 +35,7 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
             'content' => $contentEntity,
             'items' => $contentItems['items']
         );
-
+        $template = $this->tp()->getCurrentSkin()->getContentTemplate($contentEntity);
         return $this->render($template, $templateVariables);
     }
 
@@ -44,14 +44,15 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
      */
     public function contentPageAction($siteSlug, $folderSlug, $pageSlug)
     {
-
         $contentEntity = $this->cm()->getContentBySlugPath($folderSlug.'/'.$pageSlug);
+        if (empty($contentEntity)) {
+            throw new NotFoundHttpException('Page does not exist');
+        }
 
-        $template = $this->tp()->getCurrentSkin()->getContentTemplate($contentEntity);
         $templateVariables = array(
             'content' => $contentEntity
         );
-
+        $template = $this->tp()->getCurrentSkin()->getContentTemplate($contentEntity);
         return $this->render($template, $templateVariables);
     }
 
