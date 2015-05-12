@@ -54,6 +54,16 @@ class SecurityController extends BaseController
     }
 
     /**
+     * @Route("/forgot",name="user_forgot")
+     * @Template()
+     */
+    public function forgotAction()
+    {
+        $template = $this->tp()->getCurrentSkin()->getForgotTemplate();
+        return $this->render($template, array());
+    }
+
+    /**
      * @Route("/login_check",name="user_login_check")
      * @Template()
      */
@@ -70,7 +80,6 @@ class SecurityController extends BaseController
     {
 
     }
-
 
 
 }

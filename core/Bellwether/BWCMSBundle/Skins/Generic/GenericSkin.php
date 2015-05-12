@@ -20,6 +20,12 @@ class GenericSkin extends BaseSkin
         return $this->getTemplateName("Extras/Login.html.twig");
     }
 
+    public function getForgotTemplate()
+    {
+        return $this->getTemplateName("Extras/Forgot.html.twig");
+    }
+
+
     public function get404Template()
     {
         return null;

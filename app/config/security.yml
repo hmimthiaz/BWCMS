@@ -18,7 +18,7 @@ security:
             security: false
 
         auth:
-            pattern:   (^/login$|^/register|^/resetting)
+            pattern:   (^/login$|^/forgot)
             anonymous: true
 
         main:
@@ -41,4 +41,4 @@ security:
         - { path: ^/admin, role: ROLE_ADMIN }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/, role: IS_AUTHENTICATED_ANONYMOUSLY}
+        - { path: ^/, role: ROLE_USER}

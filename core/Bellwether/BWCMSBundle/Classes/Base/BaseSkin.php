@@ -25,6 +25,8 @@ abstract class BaseSkin extends ContainerAware
 
     abstract public function getLoginTemplate();
 
+    abstract public function getForgotTemplate();
+
     abstract public function get404Template();
 
     abstract public function getPaginationTemplate();
