@@ -15,6 +15,11 @@ class GenericSkin extends BaseSkin
         $this->setRequestStack($request_stack);
     }
 
+    public function getLoginTemplate()
+    {
+        return $this->getTemplateName("Extras/Login.html.twig");
+    }
+
     public function get404Template()
     {
         return null;

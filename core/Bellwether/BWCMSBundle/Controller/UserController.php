@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Bellwether\BWCMSBundle\Entity\UserEntity;
 use Bellwether\BWCMSBundle\Form\NewUserEntityType;
 
-
 /**
  * User controller.
  *
@@ -19,6 +18,8 @@ use Bellwether\BWCMSBundle\Form\NewUserEntityType;
  */
 class UserController extends BaseController
 {
+
+
     /**
      * @Route("/",name="user_home")
      * @Template()

@@ -1,0 +1,18 @@
+{% if error %}
+    <div>{{ error }}</div>
+{% endif %}
+
+<form action="{{ path("user_login_check") }}" method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+
+    <label for="username">Email Id</label>
+    <input type="text" id="username" name="_username" value="{{ last_username }}" required="required" />
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="_password" required="required" />
+
+    <input type="checkbox" id="remember_me" name="_remember_me" value="on" />
+    <label for="remember_me">Remember Me</label>
+
+    <input type="submit" id="_submit" name="_submit" value="Login" />
+</form>

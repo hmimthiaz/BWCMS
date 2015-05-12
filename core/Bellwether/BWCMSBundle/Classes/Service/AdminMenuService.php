@@ -63,7 +63,7 @@ class AdminMenuService extends BaseService
                 'routeParameters' => array('_switch_user' => '_exit')
             ));
         }
-        $menu['Profile']->addChild('Logout', array('route' => 'fos_user_security_logout'));
+        $menu['Profile']->addChild('Logout', array('route' => 'user_logout'));
 
         return $menu;
     }
