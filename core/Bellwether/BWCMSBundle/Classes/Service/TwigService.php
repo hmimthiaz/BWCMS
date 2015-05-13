@@ -2,6 +2,7 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Service;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManager;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
@@ -116,6 +117,8 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             'link' => new \Twig_Function_Method($this, 'getContentLink'),
             'menu' => new \Twig_Function_Method($this, 'getContentMenuBySlug'),
             'meta' => new \Twig_Function_Method($this, 'getContentMeta'),
+            'pref' => new \Twig_Function_Method($this, 'getPreference'),
+            'image' => new \Twig_Function_Method($this, 'getImage'),
             'thumb' => new \Twig_Function_Method($this, 'getThumbImage'),
             'pagination' => new \Twig_Function_Method($this, 'getPagination'),
         );
@@ -234,6 +237,37 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         return $this->cm()->getContentMeta($contentEntity, $metaKey, $default);
     }
 
+
+    public function getPreference($type, $field = false, $default = false)
+    {
+        $allPreference = $this->pref()->getAllPreferenceByType($type);
+        if (empty($allPreference)) {
+            return $default;
+        }
+        if (empty($field)) {
+            return $allPreference;
+        }
+        if (isset($allPreference[$field])) {
+            return $allPreference[$field];
+        }
+        return $default;
+    }
+
+    public function getImage($contentEntity, $default = false)
+    {
+        $mediaPath = $this->mm()->getContentFile($contentEntity);
+        if (empty($mediaPath)) {
+            return $default;
+        }
+        $kernel = $this->container->get('kernel');
+        try {
+            $path = $kernel->locateResource($mediaPath);
+            $path = $this->getThumbService()->open($path)->resize(100, 100)->cacheFile('guess');
+        } catch (\InvalidArgumentException $e) {
+            $path = '/' . $mediaPath;
+        }
+        return $path;
+    }
 
     public function getThumbImage($contentEntity, $thumbSlug)
     {

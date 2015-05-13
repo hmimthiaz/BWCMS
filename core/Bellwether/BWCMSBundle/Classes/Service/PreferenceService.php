@@ -106,7 +106,16 @@ class PreferenceService extends BaseService
         $returnArray = array();
         if (!empty($preferenceResult)) {
             foreach ($preferenceResult as $preferenceEntity) {
-                $returnArray[$preferenceEntity->getField()] = $this->decodeDataFromDB($preferenceEntity->getFieldType(), $preferenceEntity->getValue());
+                $prefField = $preferenceEntity->getField();
+                $prefValue = $preferenceEntity->getValue();
+                $prefType = $preferenceEntity->getFieldType();
+                $prefValue = $this->decodeDataFromDB($prefType, $prefValue, $classInstance);
+                if ($prefType == PreferenceFieldType::Content) {
+                    if (!is_array($prefValue) && !is_null($prefValue)) {
+                        $prefValue = $this->cm()->getContentRepository()->find($prefValue);
+                    }
+                }
+                $returnArray[$prefField] = $prefValue;
             }
             $fields = $classInstance->getFields();
             $fieldsNames = array_keys($fields);

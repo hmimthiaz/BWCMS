@@ -27,10 +27,8 @@ class GeneralType Extends PreferenceType
         $this->addField('title', PreferenceFieldType::String);
         $this->addField('description', PreferenceFieldType::String);
         $this->addField('keywords', PreferenceFieldType::String);
+        $this->addField('brandLogo', PreferenceFieldType::Content);
         $this->addField('adminEmail', PreferenceFieldType::String, true);
-
-        $this->addField('fieldContent', PreferenceFieldType::Content);
-        $this->addField('gallery', PreferenceFieldType::Serialized);
     }
 
     protected function buildForm()
@@ -50,26 +48,17 @@ class GeneralType Extends PreferenceType
                 'label' => 'Keywords'
             )
         );
+        $this->fb()->add('brandLogo', 'bwcms_content',
+            array(
+                'label' => 'Content',
+                'contentType' => 'Media'
+            )
+        );
         $this->fb()->add('adminEmail', 'text',
             array(
                 'label' => 'Admin Email'
             )
         );
-
-        $this->fb()->add('fieldContent', 'bwcms_content',
-            array(
-                'label' => 'Content'
-            )
-        );
-
-        $this->fb()->add('gallery', 'bwcms_collection',
-            array(
-                'type' => new SampleForm(),
-                'label' => 'Content',
-                'allow_add' => true
-            )
-        );
-
     }
 
     function validateForm(FormEvent $event)
