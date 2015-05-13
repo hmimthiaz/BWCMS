@@ -27,6 +27,7 @@ use Bellwether\Common\Pagination;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Doctrine\ORM\NoResultException;
 
 
 class ContentService extends BaseService
@@ -500,7 +501,7 @@ class ContentService extends BaseService
         return $slug;
     }
 
-    public function getContentBySlugPath($pathSlug = null)
+    public function getContentBySlugPath($pathSlug = null, $contentTypes = array())
     {
         if ($pathSlug == null) {
             return null;
@@ -513,7 +514,7 @@ class ContentService extends BaseService
 
         $content = null;
         foreach ($pathList as $path) {
-            $content = $this->getContentBySlug($path, $content);
+            $content = $this->getContentBySlug($path, $content, $contentTypes);
             if ($content == null) {
                 return null;
             }
@@ -609,15 +610,28 @@ class ContentService extends BaseService
      * @param ContentEntity $parent
      * @return null|ContentEntity
      */
-    private function getContentBySlug($slug, $parent = null)
+    private function getContentBySlug($slug, $parent = null, $contentTypes = array())
     {
-        $criteria = array(
-            'slug' => $slug
-        );
-        if (!empty($parent)) {
-            $criteria['treeParent'] = $parent->getId();
+        $qb = $this->cm()->getContentRepository()->createQueryBuilder('node');
+        if(!empty($contentTypes)){
+            $condition = array();
+            foreach ($contentTypes as $cInfo) {
+                $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
+            }
+            if (!empty($condition)) {
+                $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
+            }
         }
-        return $this->getContentRepository()->findOneBy($criteria);
+        $qb->andWhere(" node.slug = '{$slug}' ");
+        if (!empty($parent)) {
+            $qb->andWhere(" node.treeParent = '".$parent->getId()."' ");
+        }
+        $qb->setMaxResults(1);
+        try{
+            return $qb->getQuery()->getSingleResult();
+        } catch(NoResultException $e){
+            return null;
+        }
     }
 
     private function getCleanedPathArray($pathSlug)

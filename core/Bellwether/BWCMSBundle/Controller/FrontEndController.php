@@ -24,13 +24,13 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
      */
     public function contentFolderAction($siteSlug, $folderSlug)
     {
-        $contentEntity = $this->cm()->getContentBySlugPath($folderSlug);
+        $contentTypes = $this->cm()->getRegisteredContentTypes();
+        $contentEntity = $this->cm()->getContentBySlugPath($folderSlug, $contentTypes);
         if (empty($contentEntity)) {
             throw new NotFoundHttpException('Folder does not exist');
         }
 
         $contentItems = $this->cm()->getFolderItems($contentEntity);
-
         $templateVariables = array(
             'content' => $contentEntity,
             'items' => $contentItems['items']
@@ -44,11 +44,11 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
      */
     public function contentPageAction($siteSlug, $folderSlug, $pageSlug)
     {
-        $contentEntity = $this->cm()->getContentBySlugPath($folderSlug.'/'.$pageSlug);
+        $contentTypes = $this->cm()->getRegisteredContentTypes();
+        $contentEntity = $this->cm()->getContentBySlugPath($folderSlug . '/' . $pageSlug, $contentTypes);
         if (empty($contentEntity)) {
             throw new NotFoundHttpException('Page does not exist');
         }
-
         $templateVariables = array(
             'content' => $contentEntity
         );
