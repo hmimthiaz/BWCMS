@@ -64,8 +64,11 @@ class ContentArticleType Extends ContentType
     {
         $templates = array();
 
-        $templates['Default.html.twig'] = 'Default';
-
+        $templates[] = array(
+            'template' => 'Default.html.twig',
+            'title' => 'Default',
+            'image' => '@DMBWebBundle/Skins/DMDefault/Content/Page/Default/template01.png'
+        );
         return $templates;
     }
 

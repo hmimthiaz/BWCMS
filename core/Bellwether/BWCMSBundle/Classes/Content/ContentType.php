@@ -323,20 +323,13 @@ abstract class ContentType implements ContentTypeInterface
     {
 
         $templates = $this->getTemplates();
-        if (count($templates) > 1) {
-            $this->fb()->add('template', 'choice',
-                array(
-                    'label' => 'Template',
-                    'choices' => $this->getTemplates()
-                )
-            );
-        } else {
-            reset($templates);
-            $template = key($templates);
-            $this->fb()->add('template', 'hidden', array(
-                'data' => $template,
-            ));
-        }
+        $slicedTemplates = array_column($templates, 'title', 'template');
+        $this->fb()->add('template', 'choice',
+            array(
+                'label' => 'Template',
+                'choices' => $slicedTemplates,
+            )
+        );
 
         $this->fb()->add('status', 'choice',
             array(

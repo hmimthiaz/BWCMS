@@ -43,10 +43,12 @@ class MediaFileType Extends ContentType
     public function getTemplates()
     {
         $templates = array();
-
-        $templates['Default.html.twig'] = 'Default';
-
-        return $templates;
+        $templates[] = array(
+            'template' => 'Default.html.twig',
+            'title' => 'Default',
+            'image' => '@DMBWebBundle/Skins/DMDefault/Content/Page/Default/template01.png'
+        );
+       return $templates;
     }
 
 

@@ -62,10 +62,11 @@ class ContentPageType Extends ContentType
     public function getTemplates()
     {
         $templates = array();
-
-        $templates['LeftImage.html.twig'] = 'Image Left';
-        $templates['RightImage.html.twig'] = 'Image Right';
-
+        $templates[] = array(
+            'template' => 'Default.html.twig',
+            'title' => 'Default',
+            'image' => '@DMBWebBundle/Skins/DMDefault/Content/Page/Default/template01.png'
+        );
         return $templates;
     }
 
