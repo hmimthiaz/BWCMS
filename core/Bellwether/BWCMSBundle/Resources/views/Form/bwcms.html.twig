@@ -55,3 +55,26 @@
         </div>
     {% endspaceless %}
 {% endblock bwcms_content_widget %}
+
+
+{% block bwcms_content_template_widget %}
+    {% spaceless %}
+        <div class="row">
+            {% for template in choices %}
+                <div class="col-xs-6 col-md-3">
+                    {% set radioId = id ~ loop.index %}
+                    <label for="{{ radioId }}">
+                        <div class="thumbnail">
+                            <img src="{{ template.image }}" />
+                            <div class="caption">
+                                <input id="{{ radioId }}" type="radio" name="{{ id }}_radio" class="{{ id }}_radio" value="{{ template.template }}" {% if value == template.template %} checked="checked" {% endif %} />
+                                {{ template.title }}
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            {% endfor %}
+            <input id="{{ id }}" type="hidden" name="{{ full_name }}" {% if value is not empty %}value="{{ value }}" {% endif %}>
+        </div>
+    {% endspaceless %}
+{% endblock bwcms_content_template_widget %}

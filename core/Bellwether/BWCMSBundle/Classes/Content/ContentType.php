@@ -60,6 +60,10 @@ abstract class ContentType implements ContentTypeInterface
 
     private $fields = null;
 
+    private $templates = null;
+
+    private $path = null;
+
     /**
      * @var bool
      */
@@ -132,7 +136,40 @@ abstract class ContentType implements ContentTypeInterface
      */
     abstract public function getImage();
 
-    abstract public function getTemplates();
+    public function addTemplate($templateName, $templateFile, $templateImage)
+    {
+        $templateImagePath = str_replace('.', DIRECTORY_SEPARATOR, $this->getType() . '.' . $this->getSchema());
+        $templateImagePath = $this->tp()->getCurrentSkin()->getPath(). DIRECTORY_SEPARATOR . $templateImagePath . DIRECTORY_SEPARATOR . $templateImage;
+        $templateImagePath = $this->getThumbService()->open($templateImagePath)->resize(240, 200)->cacheFile('guess');
+        $this->templates[] = array(
+            'title' => $templateName,
+            'template' => $templateFile,
+            'image' => $templateImagePath
+        );
+    }
+
+    public function getPath()
+    {
+        if (null === $this->path) {
+            $reflected = new \ReflectionObject($this);
+            $this->path = dirname($reflected->getFileName());
+        }
+        return $this->path;
+    }
+
+    abstract public function addTemplates();
+
+    /**
+     * @return array
+     */
+    public function getTemplates()
+    {
+        if (is_null($this->templates)) {
+            $this->templates = array();
+            $this->addTemplates();
+        }
+        return $this->templates;
+    }
 
     /**
      * @return null|RouteCollection
@@ -323,13 +360,13 @@ abstract class ContentType implements ContentTypeInterface
     {
 
         $templates = $this->getTemplates();
-        $slicedTemplates = array_column($templates, 'title', 'template');
-        $this->fb()->add('template', 'choice',
+        $this->fb()->add('template', 'bwcms_content_template',
             array(
                 'label' => 'Template',
-                'choices' => $slicedTemplates,
+                'choices' => $templates
             )
         );
+
 
         $this->fb()->add('status', 'choice',
             array(
@@ -430,6 +467,14 @@ abstract class ContentType implements ContentTypeInterface
     public function getContainer()
     {
         return $this->container;
+    }
+
+    /**
+     * @return Image
+     */
+    public function getThumbService()
+    {
+        return $this->container->get('image.handling');
     }
 
     /**

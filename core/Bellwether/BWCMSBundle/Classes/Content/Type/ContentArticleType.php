@@ -60,16 +60,9 @@ class ContentArticleType Extends ContentType
 
     }
 
-    public function getTemplates()
+    public function addTemplates()
     {
-        $templates = array();
-
-        $templates[] = array(
-            'template' => 'Default.html.twig',
-            'title' => 'Default',
-            'image' => '@DMBWebBundle/Skins/DMDefault/Content/Page/Default/template01.png'
-        );
-        return $templates;
+        $this->addTemplate('Default','Default.html.twig','Default.png');
     }
 
 

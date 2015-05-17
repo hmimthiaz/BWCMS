@@ -33,6 +33,11 @@ services:
     arguments: [@service_container]
     tags:
       - { name: form.type , alias: bwcms_content }
+  BWCMS.Form.Type.Content.Template:
+    class: Bellwether\BWCMSBundle\Form\Type\ContentTemplateType
+    arguments: [@service_container]
+    tags:
+      - { name: form.type , alias: bwcms_content_template }
   BWCMS.Form.Type.Collection:
     class: Bellwether\BWCMSBundle\Form\Type\CollectionType
     tags:

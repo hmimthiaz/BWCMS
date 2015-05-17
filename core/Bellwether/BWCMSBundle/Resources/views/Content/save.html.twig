@@ -17,4 +17,12 @@
     <script src="{{ asset('bundles/bwcms/tinymce/jquery.tinymce.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/tinymce/tinymce.min.js') }}"></script>
     <script src="{{ url('editor_init') }}"></script>
+    <script language="javascript">
+        $(document).ready(function () {
+            $('.BWCF_template_radio').click(function() {
+                $('#BWCF_template').val(this.value);
+            });
+        });
+    </script>
 {% endblock %}
+
