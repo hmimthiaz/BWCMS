@@ -42,3 +42,4 @@ composer.lock
 /src/*
 /app/BWBundleRegister.php
 
+/.idea/*
