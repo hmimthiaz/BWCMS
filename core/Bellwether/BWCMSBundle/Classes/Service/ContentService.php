@@ -211,7 +211,7 @@ class ContentService extends BaseService
                 } catch (\OutOfBoundsException $e) {
                     continue;
                 }
-                $fieldValue = $this->decodeDataFromDB($metaType, $metaValue, $classInstance);
+                $fieldValue = $this->decodeDataFromDB($metaType, $metaField, $metaValue, $classInstance);
                 $formField->setData($fieldValue);
             }
         }
@@ -219,7 +219,7 @@ class ContentService extends BaseService
         return $form;
     }
 
-    private function decodeDataFromDB($fieldType, $fieldValue, ContentTypeInterface $classInstance)
+    private function decodeDataFromDB($fieldType, $fieldName, $fieldValue, ContentTypeInterface $classInstance)
     {
         if (is_null($fieldValue)) {
             return null;
@@ -235,7 +235,7 @@ class ContentService extends BaseService
             $dateValue = new \DateTime($fieldValue);
             return $dateValue;
         }
-        if ($fieldType == ContentFieldType::Serialized) {
+        if ($fieldType == ContentFieldType::Serialized || $fieldType == ContentFieldType::Custom) {
             try {
                 $data = $this->getSerializer()->deserialize($fieldValue, 'ArrayCollection', 'json');
             } catch (\RuntimeException $exp) {
@@ -268,11 +268,14 @@ class ContentService extends BaseService
                 $metaField = $meta->getField();
                 $metaValue = $meta->getValue();
                 $metaType = $meta->getFieldType();
-                $metaValue = $this->decodeDataFromDB($metaType, $metaValue, $classInstance);
+                $metaValue = $this->decodeDataFromDB($metaType, $metaField, $metaValue, $classInstance);
                 if ($metaType == ContentFieldType::Content) {
                     if (!is_array($metaValue) && !is_null($metaValue)) {
                         $metaValue = $this->getContentRepository()->find($metaValue);
                     }
+                }
+                if ($metaType == ContentFieldType::Custom) {
+                    $metaValue = $classInstance->loadCustomField($metaField, $metaValue);
                 }
                 $returnValue[$metaField] = $metaValue;
             }
@@ -407,7 +410,7 @@ class ContentService extends BaseService
                     $dateString = $fieldValue->format(\DateTime::ISO8601);
                     $meta->setValue($dateString);
                 }
-                if ($fields[$fieldName]['type'] == ContentFieldType::Serialized) {
+                if ($fields[$fieldName]['type'] == ContentFieldType::Serialized || $fields[$fieldName]['type'] == ContentFieldType::Custom) {
                     $cleanedData = $this->prepareSerializedMeta($fieldValue);
                     $serializedString = $this->getSerializer()->serialize($cleanedData, 'json');
                     $meta->setValue($serializedString);
@@ -613,7 +616,7 @@ class ContentService extends BaseService
     private function getContentBySlug($slug, $parent = null, $contentTypes = array())
     {
         $qb = $this->cm()->getContentRepository()->createQueryBuilder('node');
-        if(!empty($contentTypes)){
+        if (!empty($contentTypes)) {
             $condition = array();
             foreach ($contentTypes as $cInfo) {
                 $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
@@ -624,12 +627,12 @@ class ContentService extends BaseService
         }
         $qb->andWhere(" node.slug = '{$slug}' ");
         if (!empty($parent)) {
-            $qb->andWhere(" node.treeParent = '".$parent->getId()."' ");
+            $qb->andWhere(" node.treeParent = '" . $parent->getId() . "' ");
         }
         $qb->setMaxResults(1);
-        try{
+        try {
             return $qb->getQuery()->getSingleResult();
-        } catch(NoResultException $e){
+        } catch (NoResultException $e) {
             return null;
         }
     }

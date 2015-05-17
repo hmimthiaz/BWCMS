@@ -139,7 +139,7 @@ abstract class ContentType implements ContentTypeInterface
     public function addTemplate($templateName, $templateFile, $templateImage)
     {
         $templateImagePath = str_replace('.', DIRECTORY_SEPARATOR, $this->getType() . '.' . $this->getSchema());
-        $templateImagePath = $this->tp()->getCurrentSkin()->getPath(). DIRECTORY_SEPARATOR . $templateImagePath . DIRECTORY_SEPARATOR . $templateImage;
+        $templateImagePath = $this->tp()->getCurrentSkin()->getPath() . DIRECTORY_SEPARATOR . $templateImagePath . DIRECTORY_SEPARATOR . $templateImage;
         $templateImagePath = $this->getThumbService()->open($templateImagePath)->resize(240, 200)->cacheFile('guess');
         $this->templates[] = array(
             'title' => $templateName,
@@ -282,6 +282,11 @@ abstract class ContentType implements ContentTypeInterface
     abstract public function loadFormData(ContentEntity $content = null, Form $form = null);
 
     abstract public function prepareEntity(ContentEntity $content = null, Form $form = null);
+
+    public function loadCustomField($fieldName, $fieldValue)
+    {
+        return $fieldValue;
+    }
 
 
     private function setDefaultFormFields()
