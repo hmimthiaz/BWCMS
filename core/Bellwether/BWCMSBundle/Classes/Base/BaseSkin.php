@@ -2,6 +2,7 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Base;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,11 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 abstract class BaseSkin extends ContainerAware
 {
 
+    private $thumbStyles = null;
+
+    private $path = null;
+
+
     abstract public function getHomePageTemplate();
 
     abstract public function getLoginTemplate();
@@ -33,9 +39,37 @@ abstract class BaseSkin extends ContainerAware
 
     abstract public function getName();
 
+    abstract public function initDefaultThumbStyles();
 
+    public function getThumbStyleDefault($thumbSlug)
+    {
+        if (is_null($this->thumbStyles)) {
+            $this->initDefaultThumbStyles();
+        }
+        if (!isset($this->thumbStyles[$thumbSlug])) {
+            return null;
+        }
+        return $this->thumbStyles[$thumbSlug];
+    }
 
-    private $path = null;
+    public function addThumbStyleDefault($thumbSlug, $title, $mode, $width, $height)
+    {
+        if (is_null($this->thumbStyles)) {
+            $this->thumbStyles = array();
+        }
+
+        $modes = array('resize', 'scaleResize', 'forceResize', 'cropResize', 'zoomCrop');
+        if (!in_array($mode, $modes)) {
+            throw new \InvalidArgumentException('Not supported mode. Available modes are ', join(', ', $modes));
+        }
+
+        $data = array();
+        $data['name'] = $title;
+        $data['mode'] = $mode;
+        $data['width'] = $width;
+        $data['height'] = $height;
+        $this->thumbStyles[$thumbSlug] = $data;
+    }
 
     /**
      * @return null|string

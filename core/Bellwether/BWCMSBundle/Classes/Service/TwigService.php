@@ -275,11 +275,20 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         if (empty($thumbEntity)) {
             $thumbEntity = new ThumbStyle();
             $thumbEntity->setSite($this->sm()->getCurrentSite());
-            $thumbEntity->setName($thumbSlug);
-            $thumbEntity->setSlug($thumbSlug);
-            $thumbEntity->setMode('scaleResize');
-            $thumbEntity->setWidth(100);
-            $thumbEntity->setHeight(100);
+            $thumbInfo = $this->tp()->getCurrentSkin()->getThumbStyleDefault($thumbSlug);
+            if (!is_null($thumbInfo)) {
+                $thumbEntity->setName($thumbInfo['name']);
+                $thumbEntity->setSlug($thumbSlug);
+                $thumbEntity->setMode($thumbInfo['mode']);
+                $thumbEntity->setWidth($thumbInfo['width']);
+                $thumbEntity->setHeight($thumbInfo['height']);
+            } else {
+                $thumbEntity->setName($thumbSlug);
+                $thumbEntity->setSlug($thumbSlug);
+                $thumbEntity->setMode('scaleResize');
+                $thumbEntity->setWidth(100);
+                $thumbEntity->setHeight(100);
+            }
             $this->em()->persist($thumbEntity);
             $this->em()->flush();
         }

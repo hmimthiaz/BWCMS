@@ -41,6 +41,11 @@ class GenericSkin extends BaseSkin
         return null;
     }
 
+    public function initDefaultThumbStyles()
+    {
+
+    }
+
     public function getName()
     {
         return $this->getFolderName();

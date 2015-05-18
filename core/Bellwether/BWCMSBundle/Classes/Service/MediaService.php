@@ -112,6 +112,9 @@ class MediaService extends BaseService
      */
     public function getContentFile($contentEntity)
     {
+        if (empty($contentEntity)) {
+            return null;
+        }
         if (empty($contentEntity->getFile())) {
             return null;
         }
