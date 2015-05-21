@@ -1,3 +1,10 @@
+$( document ).ajaxStart(function() {
+    $( "#loadingIndicatorHolder" ).show();
+});
+$( document ).ajaxComplete(function() {
+    $( "#loadingIndicatorHolder" ).hide();
+});
+
 $(document).ready(function () {
     $('div.FCHolder ul.FCList  button.FCRemove').click(function (e) {
         e.preventDefault();

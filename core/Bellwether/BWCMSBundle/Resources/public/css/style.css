@@ -8,6 +8,32 @@ body {
     margin-right: 0px;
 }
 
+#loadingIndicatorHolder{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999999999;
+}
+
+#loadingIndicator{
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    margin-top: -50px;
+    margin-left: -50px;
+    width: 120px;
+    height: 120px;
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 10px;
+    -webkit-box-shadow: 18px 18px 50px 0px rgba(0,0,0,0.7);
+    -moz-box-shadow: 18px 18px 50px 0px rgba(0,0,0,0.7);
+    box-shadow: 18px 18px 50px 0px rgba(0,0,0,0.7);
+}​
+
 .form-horizontal .form-group{
     margin-left: 0px;
     margin-right: 0px;

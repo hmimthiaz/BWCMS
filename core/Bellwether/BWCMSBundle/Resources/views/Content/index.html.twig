@@ -124,7 +124,6 @@
                         data: null,
                         className: "center",
                         render: function (data, type, full, meta) {
-                            console.log(data);
                             var ret = '<button type="button" class="btn btn-primary edit"><i class="glyphicon glyphicon-pencil"></i></button>';
                             if (data.download.length > 0) {
                                 ret = ret + ' <button type="button" class="btn btn-primary download" data-url="' + data.download + '"><i class="glyphicon glyphicon-download-alt"></i></button>';
@@ -163,7 +162,7 @@
                                 contentId: contentId
                             });
                             request.done(function (data) {
-                                contentTable.ajax.reload(null,false);
+                                contentTable.ajax.reload(null, false);
                             });
                             request.fail(function () {
                                 alert('Unable to delete media');
@@ -248,7 +247,40 @@
             $('#jstree_div').jstree({
                 'core': {
                     'data': {{ jsNodes|raw }},
-                    'check_callback': true
+                    'multiple': false,
+                    'check_callback': function (operation, node, node_parent, node_position, more) {
+                        if (ajaxRequestActive) {
+                            return false;
+                        }
+                        if (operation === "move_node") {
+                            if (node_parent.id == '#' || node.parent == node_parent.id) {
+                                return false;
+                            }
+                            if (typeof more.core === 'undefined') {
+                                return true;
+                            }
+                            var request = $.ajax({
+                                method: "POST",
+                                url: "{{ url('content_folder_move') }}",
+                                data: {contentId: node.id, targetId: node_parent.id},
+                                beforeSend: function () {
+                                    ajaxRequestActive = true;
+                                },
+                                error: function (xhr, ajaxOptions, thrownError) {
+                                    ajaxRequestActive = false;
+                                    alert(xhr.responseText);
+                                },
+                                complete: function () {
+                                    ajaxRequestActive = false;
+                                    if ($("#selectedContentFolderId").val() == node_parent.id) {
+                                        contentTable.ajax.reload(null, false);
+                                    }
+                                }
+                            });
+                        }
+                        return true;  //allow all other operations
+                    }
+
                 },
                 'contextmenu': {
                     'items': function (node, treeObj) {
@@ -312,8 +344,21 @@
                         }
                     }
                 },
-                'plugins': ['contextmenu']
+                'plugins': ['contextmenu', 'dnd']
             });
+//            $(document).on('dnd_start.vakata', function(e, data) {
+//                var t = $(data.event.target);
+//                var targetnode = t.closest('.jstree-node');
+//                var nodeID = targetnode.attr("id");
+////                console.log(nodeID);
+//            });
+//            $(document).on('dnd_stop.vakata', function(e, data) {
+//                node = data.data.origin.get_node(data.data.nodes[0]);
+//                if(node.parent=='Root'){
+//                    return false;
+//                }
+//                console.log(node);
+//            });
             $('#jstree_div').on('select_node.jstree', function (node, selected, event) {
                 $("#selectedContentFolderId").val(selected.node.id);
                 contentTable.ajax.reload();

@@ -28,8 +28,6 @@ class ContentController extends BaseController
      */
     public function indexAction(Request $request)
     {
-
-
         $type = $request->get('type', 'Content');
         $parentId = $request->get('parent', 'Root');
 
@@ -375,7 +373,7 @@ class ContentController extends BaseController
             }
             if ($parentFolder->getSortBy() == ContentSortByType::SortIndex) {
                 $uiSortEnabled = true;
-                $qb->add('orderBy', 'node.treeLeft' );
+                $qb->add('orderBy', 'node.treeLeft');
             } elseif ($parentFolder->getSortBy() == ContentSortByType::Created) {
                 $qb->add('orderBy', 'node.createdDate' . $sortOrder);
             } elseif ($parentFolder->getSortBy() == ContentSortByType::Published) {
@@ -471,6 +469,39 @@ class ContentController extends BaseController
         $publicFilename = $this->mm()->getFilePath($filename);
         $thumbURL = $this->mm()->getThumbService()->open($publicFilename)->cropResize($width, $height)->cacheFile('guess');
         return $thumbURL;
+    }
+
+    /**
+     * @Route("/folder-move.php",name="content_folder_move")
+     * @Method({"POST"})
+     */
+    public function folderMoveAction(Request $request)
+    {
+        $contentId = $request->get('contentId');
+        $targetId = $request->get('targetId');
+
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepo
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $parentContent
+         */
+        $contentRepo = $this->cm()->getContentRepository();
+        $content = $contentRepo->find($contentId);
+        if (empty($content)) {
+            return $this->returnErrorResponse('Invalid Data');
+        }
+        if ($targetId == 'Root') {
+            $content->setTreeParent(null);
+        } else {
+            $parentContent = $contentRepo->find($targetId);
+            if (empty($parentContent)) {
+                return $this->returnErrorResponse('Invalid Data');
+            }
+            $content->setTreeParent($parentContent);
+        }
+        $this->em()->persist($content);
+        $this->em()->flush();
+        return $this->returnJsonReponse($request, array());
     }
 
     /**
