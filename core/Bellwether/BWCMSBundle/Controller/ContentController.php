@@ -510,10 +510,14 @@ class ContentController extends BaseController
      */
     public function pasteAction(Request $request)
     {
+        $command = $request->get('command');
         $contentIds = $request->get('contentIds');
         $targetId = $request->get('targetId');
         //$sourceFolderId = $request->get('sourceFolderId');
 
+        if (empty($command)) {
+            return $this->returnErrorResponse('Invalid Data');
+        }
         if (empty($contentIds)) {
             return $this->returnErrorResponse('Invalid Data');
         }
@@ -530,19 +534,38 @@ class ContentController extends BaseController
             }
         }
         $contentIds = explode(',', $contentIds);
-        if (!empty($contentIds)) {
-            foreach ($contentIds as $contentId) {
-                if (!empty($contentId)) {
-                    $content = $contentRepo->find($contentId);
-                    if (empty($content)) {
-                        return $this->returnErrorResponse('Invalid Data');
+        if ($command == 'cut') {
+            if (!empty($contentIds)) {
+                foreach ($contentIds as $contentId) {
+                    if (!empty($contentId)) {
+                        $content = $contentRepo->find($contentId);
+                        if (empty($content)) {
+                            return $this->returnErrorResponse('Invalid Data');
+                        }
+                        $content->setTreeParent($parentContent);
+                        $this->em()->persist($content);
                     }
-                    $content->setTreeParent($parentContent);
-                    $this->em()->persist($content);
                 }
             }
+            $this->em()->flush();
         }
-        $this->em()->flush();
+        if ($command == 'cut') {
+            if (!empty($contentIds)) {
+                foreach ($contentIds as $contentId) {
+                    if (!empty($contentId)) {
+                        $content = $contentRepo->find($contentId);
+                        if (empty($content)) {
+                            return $this->returnErrorResponse('Invalid Data');
+                        }
+                        $content->setTreeParent($parentContent);
+                        $this->em()->persist($content);
+                    }
+                }
+            }
+            $this->em()->flush();
+        }
+
+
         return $this->returnJsonReponse($request, array());
     }
 
