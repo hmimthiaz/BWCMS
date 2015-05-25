@@ -694,7 +694,7 @@ class ContentService extends BaseService
             "schema", "template", "mime", "extension",
             "size", "height", "width",
             "modifiedDate", "createdDate", "status",
-            "author", "site", "parent");
+            "author", "site", "parent","sortBy","sortOrder");
     }
 
     /**

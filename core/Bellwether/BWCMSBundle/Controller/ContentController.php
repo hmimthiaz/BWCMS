@@ -564,6 +564,22 @@ class ContentController extends BaseController
             }
             $this->em()->flush();
         }
+        if ($command == 'copy') {
+            if (!empty($contentIds)) {
+                foreach ($contentIds as $contentId) {
+                    if (!empty($contentId)) {
+                        $content = $contentRepo->find($contentId);
+                        if (empty($content)) {
+                            return $this->returnErrorResponse('Invalid Data');
+                        }
+                        $newContent = clone $content;
+                        $newContent->setTreeParent($parentContent);
+                        $this->em()->persist($newContent);
+                    }
+                }
+            }
+            $this->em()->flush();
+        }
 
 
         return $this->returnJsonReponse($request, array());

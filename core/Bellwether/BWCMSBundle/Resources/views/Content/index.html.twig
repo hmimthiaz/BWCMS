@@ -161,12 +161,12 @@
             var currentFolderId = $("#selectedContentFolderId").val();
             var sourceFolderId = $("#sourceFolderId").val();
             var command = $('#toolbarCommand').val();
-            if (currentFolderId == sourceFolderId) {
+            if (command == 'cut' && currentFolderId == sourceFolderId) {
                 alert('You cannot paste the items in to the same folder');
                 resetToolBar();
                 return;
             }
-            if (contentIds.search(currentFolderId) != -1) {
+            if ( command == 'cut' &&  contentIds.search(currentFolderId) != -1) {
                 alert('You cannot paste the selected item into itself!');
                 resetToolBar();
                 return;
