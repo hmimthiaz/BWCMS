@@ -505,6 +505,49 @@ class ContentController extends BaseController
     }
 
     /**
+     * @Route("/paste.php",name="content_paste")
+     * @Method({"POST"})
+     */
+    public function pasteAction(Request $request)
+    {
+        $contentIds = $request->get('contentIds');
+        $targetId = $request->get('targetId');
+        //$sourceFolderId = $request->get('sourceFolderId');
+
+        if (empty($contentIds)) {
+            return $this->returnErrorResponse('Invalid Data');
+        }
+        if (empty($targetId)) {
+            return $this->returnErrorResponse('Invalid Data');
+        }
+        $contentRepo = $this->cm()->getContentRepository();
+        if ($targetId == 'Root') {
+            $parentContent = null;
+        } else {
+            $parentContent = $contentRepo->find($targetId);
+            if (empty($parentContent)) {
+                return $this->returnErrorResponse('Invalid Data');
+            }
+        }
+        $contentIds = explode(',', $contentIds);
+        if (!empty($contentIds)) {
+            foreach ($contentIds as $contentId) {
+                if (!empty($contentId)) {
+                    $content = $contentRepo->find($contentId);
+                    if (empty($content)) {
+                        return $this->returnErrorResponse('Invalid Data');
+                    }
+                    $content->setTreeParent($parentContent);
+                    $this->em()->persist($content);
+                }
+            }
+        }
+        $this->em()->flush();
+        return $this->returnJsonReponse($request, array());
+    }
+
+
+    /**
      * @Route("/sort.php",name="content_sort")
      * @Method({"POST"})
      */

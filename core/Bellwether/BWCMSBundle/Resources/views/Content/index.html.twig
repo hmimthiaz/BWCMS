@@ -18,10 +18,27 @@
             <div id="jstree_div" class="mediaPageLeft"></div>
         </div>
         <div class="col-md-9 mediaPageRight">
-            <input type="hidden" id="selectedContentFolderId" value="{{ parentId }}">
+            <div id="contentToolBarHolder" style="display: none;">
+                &nbsp;&nbsp;
+                <div id="contentToolBar" class="btn-group">
+                    <button type="button" id="tbCutButton" disabled="true" class="btn btn-default"><span
+                                class="fa fa-scissors"></span></button>
+                    <button type="button" id="tbCopyButton" disabled="true" class="btn btn-default"><span
+                                class="fa fa-files-o"></span></button>
+                    <button type="button" id="tbPasteButton" disabled="true" class="btn btn-default"><span
+                                class="fa fa-clipboard"></span></button>
+                    <button type="button" id="tbDeleteButton" disabled="true" class="btn btn-default"><span
+                                class="fa fa-times"></span></button>
+                </div>
+            </div>
+            <input type="text" id="selectedContentFolderId" value="{{ parentId }}">
+            <input type="text" id="toolbarCommand" value="">
+            <input type="text" id="sourceFolderId" value="">
+            <input type="text" id="selectedIds" value="">
             <table id="contentTable" class="table" border="0" width="100%">
                 <thead>
                 <tr>
+                    <th width="32"></th>
                     <th width="32">Icon</th>
                     <th>Title</th>
                     <th width="10">Type</th>
@@ -94,6 +111,84 @@
         var createURL = '{{ url('content_create') }}';
         var sortStartPosition, sortEndPosition = 0;
         var ajaxRequestActive = false;
+        function resetToolBar(){
+            $("#contentTable input:checked").prop('checked',false);
+            $("#contentTable tr.selected").removeClass('selected');
+            $("#contentTable tr.actioned").removeClass('actioned');
+            $('#tbCutButton').prop('disabled', true);
+            $('#tbCopyButton').prop('disabled', true);
+            $('#tbPasteButton').prop('disabled', true);
+            $('#tbDeleteButton').prop('disabled', true);
+            $('#selectedIds').val('');
+            $('#sourceFolderId').val('');
+            $('#toolbarCommand').val('');
+        }
+        function updateToolbar() {
+            var selCount = $("#contentTable input:checked").length;
+            if (selCount > 0) {
+                $('#tbCutButton').prop('disabled', false);
+                $('#tbCopyButton').prop('disabled', false);
+                $('#tbDeleteButton').prop('disabled', false);
+            } else {
+                $('#tbCutButton').prop('disabled', true);
+                $('#tbCopyButton').prop('disabled', true);
+                $('#tbDeleteButton').prop('disabled', true);
+            }
+        }
+        function doToolbarOperation() {
+            $("#contentTable tr.actioned").each(function () {
+                $(this).removeClass('actioned');
+            });
+            var selectedIds = [];
+            $("#contentTable tr.selected").each(function () {
+                $(this).addClass('actioned');
+                selectedIds.push($(this).prop('id'));
+            });
+            $('#selectedIds').val('');
+            $('#sourceFolderId').val('');
+            $('#tbPasteButton').prop('disabled', true);
+            var command = $('#toolbarCommand').val();
+            if (selectedIds.length > 0) {
+                $('#selectedIds').val(selectedIds.join(','));
+                $('#sourceFolderId').val($("#selectedContentFolderId").val());
+                if (command == 'cut' || command == 'copy') {
+                    $('#tbPasteButton').prop('disabled', false);
+                }
+            }
+        }
+        function doPasteOperation() {
+            var contentIds = $('#selectedIds').val();
+            var currentFolderId = $("#selectedContentFolderId").val();
+            var sourceFolderId = $("#sourceFolderId").val();
+            if (currentFolderId == sourceFolderId) {
+                alert('You cannot paste the items in to the same folder');
+                resetToolBar();
+                return;
+            }
+            if(contentIds.search(currentFolderId)!= -1){
+                alert('You cannot paste the selected item into itself!');
+                resetToolBar();
+                return;
+            }
+            var request = $.ajax({
+                method: "POST",
+                url: "{{ url('content_paste') }}",
+                data: {contentIds: contentIds, targetId: currentFolderId, sourceFolderId: sourceFolderId},
+                beforeSend: function () {
+                    ajaxRequestActive = true;
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    ajaxRequestActive = false;
+                    $("#contentTable tbody").sortable("cancel");
+                    alert(xhr.responseText);
+                },
+                complete: function () {
+                    ajaxRequestActive = false;
+                }
+            });
+
+
+        }
         $(document).ready(function () {
             var contentTable = $('#contentTable').DataTable({
                 ordering: false,
@@ -110,11 +205,17 @@
                         return params;
                     },
                     complete: function (e, d) {
-//                        console.log('json');
-//                        console.log(e.responseJSON);
+                        updateToolbar();
                     }
                 },
                 columns: [
+                    {
+                        data: null,
+                        className: "center",
+                        render: function (data, type, full, meta) {
+                            return '<input type="checkbox" class="cselector">';
+                        }
+                    },
                     {data: "thumbnail"},
                     {data: "title"},
                     {data: "type"},
@@ -170,6 +271,35 @@
                         });
                     });
                 }
+            });
+            var toolbarHTML = $('#contentToolBarHolder').html();
+            $('#contentToolBarHolder').remove();
+            $('#contentTable_length').append(toolbarHTML);
+            $('#contentTable tbody').on('click', 'tr', function () {
+                var checkbox = $(this).find('.cselector').first();
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                    checkbox.prop("checked", false);
+                } else {
+                    $(this).addClass('selected');
+                    checkbox.prop("checked", true);
+                }
+                updateToolbar();
+            });
+            $('#tbCutButton').click(function () {
+                $('#toolbarCommand').val('cut');
+                doToolbarOperation();
+            });
+            $('#tbCopyButton').click(function () {
+                $('#toolbarCommand').val('copy');
+                doToolbarOperation();
+            });
+            $('#tbDeleteButton').click(function () {
+                $('#toolbarCommand').val('delete');
+                doToolbarOperation();
+            });
+            $('#tbPasteButton').click(function () {
+                doPasteOperation();
             });
             $('#contentTable').on('draw.dt', function (e, settings) {
                 var parent = $("#selectedContentFolderId").val();
@@ -278,6 +408,7 @@
                                 }
                             });
                         }
+                        console.log(operation);
                         return true;  //allow all other operations
                     }
 
@@ -346,19 +477,6 @@
                 },
                 'plugins': ['contextmenu', 'dnd']
             });
-//            $(document).on('dnd_start.vakata', function(e, data) {
-//                var t = $(data.event.target);
-//                var targetnode = t.closest('.jstree-node');
-//                var nodeID = targetnode.attr("id");
-////                console.log(nodeID);
-//            });
-//            $(document).on('dnd_stop.vakata', function(e, data) {
-//                node = data.data.origin.get_node(data.data.nodes[0]);
-//                if(node.parent=='Root'){
-//                    return false;
-//                }
-//                console.log(node);
-//            });
             $('#jstree_div').on('select_node.jstree', function (node, selected, event) {
                 $("#selectedContentFolderId").val(selected.node.id);
                 contentTable.ajax.reload();

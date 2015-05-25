@@ -57,6 +57,11 @@ table.dataTable tr.even {
     background-color: #FFFFFF;
 }
 
+table.dataTable tbody tr.actioned{
+    color: #ffffff !important;
+    background-color: #111111 !important;
+}
+
 ul.FCList li{
     border: 1px solid #cccccc;
     border-radius: 25px;
