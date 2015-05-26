@@ -552,51 +552,86 @@ class ContentController extends BaseController
         }
         $contentIds = explode(',', $contentIds);
         if ($command == 'cut') {
-            if (!empty($contentIds)) {
-                foreach ($contentIds as $contentId) {
-                    if (!empty($contentId)) {
-                        $content = $contentRepo->find($contentId);
-                        if (empty($content)) {
-                            return $this->returnErrorResponse('Invalid Data');
-                        }
-                        $content->setTreeParent($parentContent);
-                        $this->em()->persist($content);
+            foreach ($contentIds as $contentId) {
+                if (!empty($contentId)) {
+                    $content = $contentRepo->find($contentId);
+                    if (empty($content)) {
+                        return $this->returnErrorResponse('Invalid Data');
                     }
-                }
-            }
-            $this->em()->flush();
-        }
-        if ($command == 'cut') {
-            if (!empty($contentIds)) {
-                foreach ($contentIds as $contentId) {
-                    if (!empty($contentId)) {
-                        $content = $contentRepo->find($contentId);
-                        if (empty($content)) {
-                            return $this->returnErrorResponse('Invalid Data');
-                        }
-                        $content->setTreeParent($parentContent);
-                        $this->em()->persist($content);
-                    }
+                    $content->setTreeParent($parentContent);
+                    $this->em()->persist($content);
                 }
             }
             $this->em()->flush();
         }
         if ($command == 'copy') {
-            if (!empty($contentIds)) {
-                foreach ($contentIds as $contentId) {
-                    if (!empty($contentId)) {
-                        $content = $contentRepo->find($contentId);
-                        if (empty($content)) {
-                            return $this->returnErrorResponse('Invalid Data');
-                        }
-                        $this->cm()->cloneContent($content,$parentContent);
+            foreach ($contentIds as $contentId) {
+                if (!empty($contentId)) {
+                    $content = $contentRepo->find($contentId);
+                    if (empty($content)) {
+                        return $this->returnErrorResponse('Invalid Data');
                     }
+                    $this->cm()->cloneContent($content, $parentContent);
                 }
             }
         }
 
         $jsNodes = $this->getFolderTree($type, $targetId);
+        return $this->returnJsonReponse($request, array('nodes' => $jsNodes));
+    }
 
+    /**
+     * @Route("/delete.php",name="content_delete")
+     * @Method({"GET", "POST"})
+     */
+    public function deleteAction(Request $request)
+    {
+        $contentIds = $request->get('contentIds');
+        $targetId = $request->get('targetId');
+        $type = $request->get('type', 'Content');
+        if (empty($contentIds)) {
+            return $this->returnErrorResponse('Invalid Data');
+        }
+        if (empty($targetId)) {
+            return $this->returnErrorResponse('Invalid Data');
+        }
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         */
+        $contentRepo = $this->cm()->getContentRepository();
+        $contentIds = explode(',', $contentIds);
+        $loadedContent = array();
+        foreach ($contentIds as $contentId) {
+            if (!empty($contentId)) {
+                $content = $contentRepo->find($contentId);
+                if (empty($content)) {
+                    return $this->returnErrorResponse('Invalid Data');
+                }
+                if ($contentRepo->childCount($content) > 0) {
+                    return $this->returnErrorResponse('Cannot delete when there are sub items inside the folder');
+                }
+                $loadedContent[] = $content;
+            }
+        }
+        foreach ($loadedContent as $content) {
+            $existingMeta = $content->getMeta();
+            if (!empty($existingMeta)) {
+                foreach ($existingMeta as $meta) {
+                    $this->em()->remove($meta);
+                }
+            }   
+            if ($content->getFile() == null) {
+                $this->em()->remove($content);
+            } else {
+                if ($this->mm()->deleteMedia($content->getFile()) == true) {
+                    $this->em()->remove($content);
+                }
+            }
+            $this->em()->flush();
+        }
+
+
+        $jsNodes = $this->getFolderTree($type, $targetId);
         return $this->returnJsonReponse($request, array('nodes' => $jsNodes));
     }
 
@@ -628,39 +663,6 @@ class ContentController extends BaseController
         return $this->returnJsonReponse($request, array());
     }
 
-    /**
-     * @Route("/delete.php",name="content_delete")
-     * @Method({"GET", "POST"})
-     */
-    public function deleteAction(Request $request)
-    {
-        $contentId = $request->get('contentId');
-        if ($contentId == null) {
-            return new Response('Invalid Params', 500);
-        }
-        /**
-         * @var \Bellwether\BWCMSBundle\Entity\ContentRepository $contentRepository
-         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
-         */
-        $contentRepository = $this->em()->getRepository('BWCMSBundle:ContentEntity');
-        $content = $contentRepository->find($contentId);
-        if ($content == null) {
-            return new Response('Content not available', 500);
-        }
-        if ($content->getFile() == null) {
-            $this->em()->remove($content);
-            $this->em()->flush();
-        } else {
-            if ($this->mm()->deleteMedia($content->getFile()) == true) {
-                $this->em()->remove($content);
-                $this->em()->flush();
-            } else {
-                return new Response('Media deletion error', 500);
-            }
-        }
-
-        return $this->returnJsonReponse($request, array('contentId' => $contentId));
-    }
 
     /**
      * @Route("/download.php",name="content_media_download")

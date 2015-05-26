@@ -21,6 +21,10 @@
             <div id="contentToolBarHolder" style="display: none;">
                 &nbsp;&nbsp;
                 <div id="contentToolBar" class="btn-group">
+                    <button type="button" id="tbselectNone" class="btn btn-default"><span
+                                class="fa fa-square-o"></span></button>
+                    <button type="button" id="tbselectAll" class="btn btn-default"><span
+                                class="fa fa-check-square"></span></button>
                     <button type="button" id="tbCutButton" disabled="true" class="btn btn-default"><span
                                 class="fa fa-scissors"></span></button>
                     <button type="button" id="tbCopyButton" disabled="true" class="btn btn-default"><span
@@ -31,10 +35,10 @@
                                 class="fa fa-times"></span></button>
                 </div>
             </div>
-            <input type="text" id="selectedContentFolderId" value="{{ parentId }}">
-            <input type="text" id="toolbarCommand" value="">
-            <input type="text" id="sourceFolderId" value="">
-            <input type="text" id="selectedIds" value="">
+            <input type="hidden" id="selectedContentFolderId" value="{{ parentId }}">
+            <input type="hidden" id="toolbarCommand" value="">
+            <input type="hidden" id="sourceFolderId" value="">
+            <input type="hidden" id="selectedIds" value="">
             <table id="contentTable" class="table" border="0" width="100%">
                 <thead>
                 <tr>
@@ -185,19 +189,59 @@
                 beforeSend: function () {
                     ajaxRequestActive = true;
                 },
-                error: function (xhr, ajaxOptions, thrownError) {
+                error: function (xhr, ajaxOptions, errorThrown) {
                     ajaxRequestActive = false;
+                    alert( 'Error: ' + xhr.responseText);
                 },
-                complete: function (data) {
-                    $('#jstree_div').jstree(true).settings.core.data = data.responseJSON.nodes;
+                success: function (data) {
+                    console.log(data);
+                    $('#jstree_div').jstree(true).settings.core.data = data.nodes;
                     $('#jstree_div').jstree(true).refresh();
                     resetToolBar();
+                },
+                complete: function (data) {
                     ajaxRequestActive = false;
-                    contentTable.ajax.reload();
                 }
             });
         }
-        function doDeleteOperation(){
+        function doDeleteOperation() {
+            var selectedIds = [];
+            var currentFolderId = $("#selectedContentFolderId").val();
+            $("#contentTable tr.selected").each(function () {
+                selectedIds.push($(this).prop('id'));
+            });
+            if (selectedIds.length == 0) {
+                return false;
+            }
+            if (!confirm("Do you want to delete selected and it's sub items? Please confirm?")) {
+                return;
+            }
+            var contentIds = selectedIds.join(',');
+            var request = $.ajax({
+                method: "POST",
+                url: "{{ url('content_delete') }}",
+                data: {
+                    contentIds: contentIds,
+                    targetId: currentFolderId,
+                    type: '{{ type }}'
+                },
+                beforeSend: function () {
+                    ajaxRequestActive = true;
+                },
+                error: function (xhr, ajaxOptions, errorThrown) {
+                    ajaxRequestActive = false;
+                    alert( 'Error: ' + xhr.responseText);
+                },
+                success: function (data) {
+                    console.log(data);
+                    $('#jstree_div').jstree(true).settings.core.data = data.nodes;
+                    $('#jstree_div').jstree(true).refresh();
+                    resetToolBar();
+                },
+                complete: function (data) {
+                    ajaxRequestActive = false;
+                }
+            });
 
         }
         $(document).ready(function () {
@@ -297,6 +341,23 @@
                 }
                 updateToolbar();
             });
+            $('#tbselectNone').click(function () {
+                $('#contentTable tbody tr').each(function () {
+                    var checkbox = $(this).find('.cselector').first();
+                    checkbox.prop("checked", false);
+                    $(this).removeClass('actioned');
+                    $(this).removeClass('selected');
+                    resetToolBar();
+                });
+            });
+            $('#tbselectAll').click(function () {
+                $('#contentTable tbody tr').each(function () {
+                    var checkbox = $(this).find('.cselector').first();
+                    checkbox.prop("checked", true);
+                    $(this).addClass('selected');
+                    updateToolbar();
+                });
+            });
             $('#tbCutButton').click(function () {
                 $('#toolbarCommand').val('cut');
                 doToolbarOperation();
@@ -307,7 +368,6 @@
             });
             $('#tbDeleteButton').click(function () {
                 $('#toolbarCommand').val('delete');
-                doToolbarOperation();
                 doDeleteOperation();
             });
             $('#tbPasteButton').click(function () {
@@ -339,10 +399,10 @@
                                 beforeSend: function () {
                                     ajaxRequestActive = true;
                                 },
-                                error: function (xhr, ajaxOptions, thrownError) {
+                                error: function (xhr, ajaxOptions, errorThrown) {
                                     ajaxRequestActive = false;
                                     $("#contentTable tbody").sortable("cancel");
-                                    alert(xhr.responseText);
+                                    alert( 'Error: ' + xhr.responseText);
                                 },
                                 complete: function () {
                                     ajaxRequestActive = false;
@@ -408,15 +468,17 @@
                                 beforeSend: function () {
                                     ajaxRequestActive = true;
                                 },
-                                error: function (xhr, ajaxOptions, thrownError) {
+                                error: function (xhr, ajaxOptions, errorThrown) {
                                     ajaxRequestActive = false;
-                                    alert(xhr.responseText);
+                                    alert( 'Error: ' + xhr.responseText);
                                 },
-                                complete: function () {
-                                    ajaxRequestActive = false;
+                                success: function (data) {
                                     if ($("#selectedContentFolderId").val() == node_parent.id) {
                                         contentTable.ajax.reload(null, false);
                                     }
+                                },
+                                complete: function () {
+                                    ajaxRequestActive = false;
                                 }
                             });
                         }
