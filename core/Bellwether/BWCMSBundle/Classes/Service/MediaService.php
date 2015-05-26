@@ -69,6 +69,25 @@ class MediaService extends BaseService
     }
 
 
+    function cloneMedia($fileToClone)
+    {
+        $sourceFile = $this->getFilePath($fileToClone, true);
+        $sourceInfo = pathinfo($sourceFile);
+        if (!isset($sourceInfo['extension'])) {
+            $sourceInfo['extension'] = '';
+        }
+
+        $finalFileName = $sourceInfo['filename'] . ((!empty ($sourceInfo['extension'])) ? '.' : '') . $sourceInfo['extension'];
+        $check = 1;
+        while (file_exists($sourceInfo['dirname'] . DIRECTORY_SEPARATOR . $finalFileName)) {
+            $finalFileName = $sourceInfo['filename'] . '_' . $check . ((!empty ($sourceInfo['extension'])) ? '.' : '') . $sourceInfo['extension'];
+            $check++;
+        }
+        $this->fs->copy($sourceFile,$sourceInfo['dirname'] . DIRECTORY_SEPARATOR . $finalFileName);
+
+        return $finalFileName;
+    }
+
     /**
      * @param UploadedFile $uploadedFile
      * @return array

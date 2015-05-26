@@ -163,6 +163,42 @@ class ContentService extends BaseService
 
     /**
      * @param ContentEntity $content
+     * @param ContentEntity $parentContent
+     */
+    function cloneContent(ContentEntity $content, ContentEntity $parentContent = null)
+    {
+        $newContent = clone $content;
+        $newContent->setTreeParent($parentContent);
+        $parentId = null;
+        if ($parentContent != null) {
+            $parentId = $parentContent->getId();
+        }
+        if ($content->getFile() != null) {
+            $newFile = $this->mm()->cloneMedia($content->getFile());
+            $newContent->setFile($newFile);
+        }
+        $existingSlug = $newContent->getSlug();
+        $newSlug = $this->generateSlug($newContent->getTitle(), $newContent->getType(), $parentId);
+        if ($newSlug != $existingSlug) {
+            $newContent->setTitle($content->getTitle() . ' Copy');
+        }
+
+        $this->em()->persist($newContent);
+
+        $existingMeta = $content->getMeta();
+        if (!empty($existingMeta)) {
+            foreach ($existingMeta as $meta) {
+                $newMeta = clone $meta;
+                $newMeta->setContent($newContent);
+                $newContent->addMeta($newMeta);
+                $this->em()->persist($newMeta);
+            }
+        }
+        $this->em()->flush();
+    }
+
+    /**
+     * @param ContentEntity $content
      * @param Form $form
      * @param ContentTypeInterface|BaseContentType $classInstance
      * @return Form|void
@@ -694,7 +730,7 @@ class ContentService extends BaseService
             "schema", "template", "mime", "extension",
             "size", "height", "width",
             "modifiedDate", "createdDate", "status",
-            "author", "site", "parent","sortBy","sortOrder");
+            "author", "site", "parent", "sortBy", "sortOrder");
     }
 
     /**

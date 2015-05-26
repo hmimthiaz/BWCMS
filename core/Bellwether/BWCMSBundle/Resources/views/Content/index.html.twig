@@ -111,6 +111,7 @@
         var createURL = '{{ url('content_create') }}';
         var sortStartPosition, sortEndPosition = 0;
         var ajaxRequestActive = false;
+        var contentTable = null;
         function resetToolBar() {
             $("#contentTable input:checked").prop('checked', false);
             $("#contentTable tr.selected").removeClass('selected');
@@ -166,7 +167,7 @@
                 resetToolBar();
                 return;
             }
-            if ( command == 'cut' &&  contentIds.search(currentFolderId) != -1) {
+            if (command == 'cut' && contentIds.search(currentFolderId) != -1) {
                 alert('You cannot paste the selected item into itself!');
                 resetToolBar();
                 return;
@@ -178,6 +179,7 @@
                     contentIds: contentIds,
                     targetId: currentFolderId,
                     command: command,
+                    type: '{{ type }}',
                     sourceFolderId: sourceFolderId
                 },
                 beforeSend: function () {
@@ -185,18 +187,21 @@
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                     ajaxRequestActive = false;
-                    $("#contentTable tbody").sortable("cancel");
-                    alert(xhr.responseText);
                 },
-                complete: function () {
+                complete: function (data) {
+                    $('#jstree_div').jstree(true).settings.core.data = data.responseJSON.nodes;
+                    $('#jstree_div').jstree(true).refresh();
+                    resetToolBar();
                     ajaxRequestActive = false;
+                    contentTable.ajax.reload();
                 }
             });
-
+        }
+        function doDeleteOperation(){
 
         }
         $(document).ready(function () {
-            var contentTable = $('#contentTable').DataTable({
+            contentTable = $('#contentTable').DataTable({
                 ordering: false,
                 processing: true,
                 serverSide: true,
@@ -303,6 +308,7 @@
             $('#tbDeleteButton').click(function () {
                 $('#toolbarCommand').val('delete');
                 doToolbarOperation();
+                doDeleteOperation();
             });
             $('#tbPasteButton').click(function () {
                 doPasteOperation();

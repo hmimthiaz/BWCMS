@@ -31,10 +31,26 @@ class ContentController extends BaseController
         $type = $request->get('type', 'Content');
         $parentId = $request->get('parent', 'Root');
 
+        $registeredContents = $this->cm()->getRegisteredContentTypes($type);
+        $mediaContentTypes = $this->cm()->getMediaContentTypes($type);
+
+        $jsNodes = $this->getFolderTree($type, $parentId);
+
+        return array(
+            'parentId' => $parentId,
+            'type' => $type,
+            'title' => ucfirst($type) . ' Manager',
+            'contentTypes' => $registeredContents,
+            'mediaContentTypes' => $mediaContentTypes,
+            'jsNodes' => json_encode($jsNodes),
+        );
+    }
+
+    function getFolderTree($type, $parentId)
+    {
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
 
         $registeredContents = $this->cm()->getRegisteredContentTypes($type);
-        $mediaContentTypes = $this->cm()->getMediaContentTypes($type);
 
         $condition = array();
         foreach ($registeredContents as $cInfo) {
@@ -82,15 +98,7 @@ class ContentController extends BaseController
                 $jsNodes[] = $jsNode;
             }
         }
-
-        return array(
-            'parentId' => $parentId,
-            'type' => $type,
-            'title' => ucfirst($type) . ' Manager',
-            'contentTypes' => $registeredContents,
-            'mediaContentTypes' => $mediaContentTypes,
-            'jsNodes' => json_encode($jsNodes),
-        );
+        return $jsNodes;
     }
 
     /**
@@ -331,7 +339,7 @@ class ContentController extends BaseController
             $content->setHeight($mediaInfo['height']);
             $content->setTemplate('');
 
-            $content->setSlug($this->cm()->generateSlug($content->getFile(), $content->getType(), $parentId));
+            $content->setSlug($this->cm()->generateSlug($content->getTitle(), $content->getType(), $parentId));
             $content->setStatus('Draft');
             $this->cm()->save($content);
         }
@@ -349,12 +357,19 @@ class ContentController extends BaseController
         $start = $request->get('start', 0);
         $length = $request->get('length', 10);
         $parentId = $request->get('parent', 'Root');
-
         $search = $request->get('search');
+        $searchString = null;
         if ($search != null && isset($search['value']) && !empty($search['value'])) {
             $searchString = $search['value'];
         }
 
+        $data = $this->queryContent($type, $parentId, $searchString, $draw, $start, $length);
+
+        return $this->returnJsonReponse($request, $data);
+    }
+
+    function queryContent($type, $parentId = 'Root', $searchString = null, $draw = 0, $start = 0, $length = 10)
+    {
         /**
          * Get All the root folders
          * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
@@ -461,7 +476,8 @@ class ContentController extends BaseController
                 $data['data'][] = $ca;
             }
         }
-        return $this->returnJsonReponse($request, $data);
+
+        return $data;
     }
 
     public function getImageThumbURL($filename, $width, $height)
@@ -514,6 +530,7 @@ class ContentController extends BaseController
         $contentIds = $request->get('contentIds');
         $targetId = $request->get('targetId');
         //$sourceFolderId = $request->get('sourceFolderId');
+        $type = $request->get('type', 'Content');
 
         if (empty($command)) {
             return $this->returnErrorResponse('Invalid Data');
@@ -572,17 +589,15 @@ class ContentController extends BaseController
                         if (empty($content)) {
                             return $this->returnErrorResponse('Invalid Data');
                         }
-                        $newContent = clone $content;
-                        $newContent->setTreeParent($parentContent);
-                        $this->em()->persist($newContent);
+                        $this->cm()->cloneContent($content,$parentContent);
                     }
                 }
             }
-            $this->em()->flush();
         }
 
+        $jsNodes = $this->getFolderTree($type, $targetId);
 
-        return $this->returnJsonReponse($request, array());
+        return $this->returnJsonReponse($request, array('nodes' => $jsNodes));
     }
 
 
