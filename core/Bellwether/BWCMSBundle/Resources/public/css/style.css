@@ -18,6 +18,10 @@ body {
     z-index: 999999999;
 }
 
+.page-content{
+    margin-bottom: 50px;
+}
+
 #loadingIndicator{
     position: absolute;
     top: 30%;

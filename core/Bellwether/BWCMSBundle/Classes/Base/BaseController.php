@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 
 use Bellwether\BWCMSBundle\Entity\UserEntity;
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
+use Bellwether\BWCMSBundle\Classes\Service\ACLService;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
 use Bellwether\BWCMSBundle\Classes\Service\MediaService;
@@ -58,6 +59,14 @@ abstract class BaseController extends Controller
     public function em()
     {
         return $this->container->get('doctrine')->getManager();
+    }
+
+    /**
+     * @return ACLService
+     */
+    public function acl()
+    {
+        return $this->container->get('BWCMS.ACL')->getManager();
     }
 
     /**

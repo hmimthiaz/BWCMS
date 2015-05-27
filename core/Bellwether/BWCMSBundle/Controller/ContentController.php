@@ -619,7 +619,7 @@ class ContentController extends BaseController
                 foreach ($existingMeta as $meta) {
                     $this->em()->remove($meta);
                 }
-            }   
+            }
             if ($content->getFile() == null) {
                 $this->em()->remove($content);
             } else {
