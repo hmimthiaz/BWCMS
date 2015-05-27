@@ -13,6 +13,8 @@ use Bellwether\BWCMSBundle\Entity\UserEntity;
 use Bellwether\BWCMSBundle\Form\User\NewType;
 use Bellwether\BWCMSBundle\Form\User\EditType;
 use Bellwether\BWCMSBundle\Form\User\ResetPasswordType;
+use Bellwether\BWCMSBundle\Form\User\ChangePasswordType;
+use Bellwether\BWCMSBundle\Form\User\ProfileType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -41,7 +43,7 @@ class UserController extends BaseController
      * Creates a new UserEntity entity.
      *
      * @Route("/create.php", name="user_create")
-     * @Template("BWCMSBundle:User:new.html.twig")
+     * @Template("BWCMSBundle:User:edit.html.twig")
      */
     public function createAction(Request $request)
     {
@@ -109,6 +111,7 @@ class UserController extends BaseController
         }
 
         return array(
+            'title' => 'New User',
             'form' => $form->createView(),
         );
     }
@@ -175,6 +178,7 @@ class UserController extends BaseController
         }
 
         return array(
+            'title' => 'Edit User',
             'form' => $form->createView(),
         );
 
@@ -184,7 +188,7 @@ class UserController extends BaseController
      * Creates a new UserEntity entity.
      *
      * @Route("/reset-password.php", name="user_reset_password")
-     * @Template("BWCMSBundle:User:reset-password.html.twig")
+     * @Template("BWCMSBundle:User:edit.html.twig")
      */
     public function resetPasswordAction(Request $request)
     {
@@ -218,7 +222,7 @@ class UserController extends BaseController
 
                 $newPassword = $formData['password'];
                 $manipulator = $this->container->get('fos_user.util.user_manipulator');
-                $manipulator->changePassword($existingUser->getUsername(),$newPassword);
+                $manipulator->changePassword($existingUser->getUsername(), $newPassword);
 
                 $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
                 if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
@@ -231,7 +235,7 @@ class UserController extends BaseController
                                 'BWCMSBundle:User:reset-password.email.txt.twig',
                                 array(
                                     'firstName' => $existingUser->getFirstName(),
-                                    'username' =>$existingUser->getEmail(),
+                                    'username' => $existingUser->getEmail(),
                                     'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
                                     'password' => $newPassword,
                                 )
@@ -239,17 +243,116 @@ class UserController extends BaseController
                         );
                     $this->mailer()->getMailer()->send($message);
                 }
-
-
                 return $this->redirect($this->generateUrl('user_home'));
             }
         }
 
         return array(
+            'title' => 'Reset Password',
+            'form' => $form->createView(),
+        );
+    }
+
+    /**
+     * Creates a new UserEntity entity.
+     *
+     * @Route("/profile.php", name="user_profile")
+     * @Template("BWCMSBundle:User:edit.html.twig")
+     */
+    public function profileAction(Request $request)
+    {
+        $userRepo = $this->em()->getRepository('BWCMSBundle:UserEntity');
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\UserEntity $existingUser
+         */
+        $existingUser = $this->getUser();
+        if (empty($existingUser)) {
+            throw $this->createNotFoundException('Unable to find user entity.');
+        }
+        $form = $this->createForm(new ProfileType($existingUser), null, array(
+            'action' => $this->generateUrl('user_profile'),
+            'method' => 'POST',
+        ));
+        $form->add('submit', 'submit', array('label' => 'Save'));
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $formData = $form->getData();
+            if ($form->isValid()) {
+                $existingUser->setFirstname($formData['firstName']);
+                $existingUser->setLastname($formData['lastName']);
+                $existingUser->setMobile($formData['mobile']);
+                $this->em()->persist($existingUser);
+                $this->em()->flush();
+                return $this->redirect($this->generateUrl('user_profile'));
+            }
+        }
+
+        return array(
+            'title' => 'My Profile',
+            'form' => $form->createView(),
+        );
+
+    }
+
+
+    /**
+     * Creates a new UserEntity entity.
+     *
+     * @Route("/change-password.php", name="user_change_password")
+     * @Template("BWCMSBundle:User:edit.html.twig")
+     */
+    public function changePasswordAction(Request $request)
+    {
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\UserEntity $existingUser
+         */
+        $existingUser = $this->getUser();
+        if (empty($existingUser)) {
+            throw $this->createNotFoundException('Unable to find user entity.');
+        }
+
+        $form = $this->createForm(new ChangePasswordType(), null, array(
+            'action' => $this->generateUrl('user_change_password'),
+            'method' => 'POST',
+        ));
+        $form->add('submit', 'submit', array('label' => 'Update Password'));
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $formData = $form->getData();
+            if ($form->get('oldpassword')->isValid()) {
+                /**
+                 * @var \Symfony\Component\Security\Core\Encoder\EncoderFactory $factory
+                 */
+                $factory = $this->get('security.encoder_factory');
+                $encoder = $factory->getEncoder($existingUser);
+                if (!$encoder->isPasswordValid($existingUser->getPassword(), $formData['oldpassword'], $existingUser->getSalt())) {
+                    $form->get('oldpassword')->addError(new FormError('Old password does not match.'));
+                }
+            }
+
+            if ($form->isValid()) {
+                /**
+                 * @var \FOS\UserBundle\Util\UserManipulator $manipulator
+                 */
+                $manipulator = $this->container->get('fos_user.util.user_manipulator');
+                $manipulator->changePassword($existingUser->getUsername(), $formData['password']);
+
+                $this->get('security.token_storage')->setToken(null);
+                $this->get('request')->getSession()->invalidate();
+
+                return $this->redirect($this->generateUrl('dashboard_home'));
+            }
+        }
+
+        return array(
+            'title' => 'Update Password',
             'form' => $form->createView(),
         );
 
 
     }
+
 
 }

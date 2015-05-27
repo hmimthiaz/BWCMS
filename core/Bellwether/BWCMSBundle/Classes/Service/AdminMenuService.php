@@ -56,7 +56,8 @@ class AdminMenuService extends BaseService
 
 
         $menu->addChild('Profile', array('uri' => '#', 'label' => $this->getUser()->getEmail()))->setAttribute('dropdown', true);
-        $menu['Profile']->addChild('Profile', array('uri' => '#'));
+        $menu['Profile']->addChild('Profile', array('route' => 'user_profile'));
+        $menu['Profile']->addChild('Change Password', array('route' => 'user_change_password'));
         if ($this->getSecurityContext()->isGranted('ROLE_PREVIOUS_ADMIN')) {
             $menu['Profile']->addChild('Exit User', array(
                 'route' => 'Homepage',
