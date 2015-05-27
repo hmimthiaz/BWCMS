@@ -10,16 +10,19 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Count;
-use Symfony\Component\Security\Core\Util\SecureRandom;
+use Bellwether\BWCMSBundle\Entity\UserEntity;
 
-class NewType extends AbstractType
+class ResetPasswordType extends AbstractType
 {
-    private $roles;
+    /**
+     * @var UserEntity
+     */
+    private $existingUser;
     private $password;
 
-    function __construct($roles, $password)
+    function __construct(UserEntity $existingUser, $password)
     {
-        $this->roles = $roles;
+        $this->existingUser = $existingUser;
         $this->password = $password;
     }
 
@@ -33,30 +36,24 @@ class NewType extends AbstractType
         $builder->add('firstName', 'text',
             array(
                 'label' => 'First Name',
-                'constraints' => array(
-                    new NotBlank(),
-                    new Length(array('min' => 3))
-                )
+                'read_only' => true,
+                'data' => $this->existingUser->getFirstName()
             )
         );
 
         $builder->add('lastName', 'text',
             array(
                 'label' => 'Last Name',
-                'constraints' => array(
-                    new NotBlank(),
-                    new Length(array('min' => 3))
-                )
+                'read_only' => true,
+                'data' => $this->existingUser->getLastName()
             )
         );
 
         $builder->add('email', 'email',
             array(
                 'label' => 'Email',
-                'constraints' => array(
-                    new NotBlank(),
-                    new Email(),
-                )
+                'read_only' => true,
+                'data' => $this->existingUser->getEmail()
             )
         );
 
@@ -71,28 +68,7 @@ class NewType extends AbstractType
             )
         );
 
-        $builder->add('mobile', 'text',
-            array(
-                'max_length' => 20,
-                'required' => false,
-                'label' => 'Mobile',
-                'constraints' => array(
-                    new NotBlank(),
-                    new Length(array('min' => 3)),
-                    new Regex(array('pattern' => '/[0-9]/', 'message' => 'Please enter only numbers and not any other characters.')),
-                ),
-            )
-        );
 
-        $builder->add('user_roles', 'choice',
-            array(
-                'choices' => $this->roles,
-                'label' => 'Roles',
-                'expanded' => true,
-                'multiple' => true,
-                'constraints' => new Count(array('min' => 1, 'minMessage' => 'You need to select minimum one role.'))
-            )
-        );
     }
 
     /**

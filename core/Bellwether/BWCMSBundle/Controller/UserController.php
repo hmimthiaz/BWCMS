@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormError;
 use Bellwether\BWCMSBundle\Entity\UserEntity;
 use Bellwether\BWCMSBundle\Form\User\NewType;
 use Bellwether\BWCMSBundle\Form\User\EditType;
+use Bellwether\BWCMSBundle\Form\User\ResetPasswordType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -47,7 +48,6 @@ class UserController extends BaseController
         $roles = $this->acl()->getRoles();
         $tokenGenerator = $this->container->get('fos_user.util.token_generator');
         $password = substr($tokenGenerator->generateToken(), 0, 10);
-
         $form = $this->createForm(new NewType($roles, $password), null, array(
             'action' => $this->generateUrl('user_create'),
             'method' => 'POST',
@@ -180,5 +180,76 @@ class UserController extends BaseController
 
     }
 
+    /**
+     * Creates a new UserEntity entity.
+     *
+     * @Route("/reset-password.php", name="user_reset_password")
+     * @Template("BWCMSBundle:User:reset-password.html.twig")
+     */
+    public function resetPasswordAction(Request $request)
+    {
+
+        $userId = $request->get('id');
+        if (empty($userId)) {
+            throw $this->createNotFoundException('Invalid argument');
+        }
+
+        $userRepo = $this->em()->getRepository('BWCMSBundle:UserEntity');
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\UserEntity $existingUser
+         */
+        $existingUser = $userRepo->find($userId);
+        if (empty($existingUser)) {
+            throw $this->createNotFoundException('Unable to find user entity.');
+        }
+
+        $tokenGenerator = $this->container->get('fos_user.util.token_generator');
+        $password = substr($tokenGenerator->generateToken(), 0, 10);
+        $form = $this->createForm(new ResetPasswordType($existingUser, $password), null, array(
+            'action' => $this->generateUrl('user_reset_password', array('id' => $userId)),
+            'method' => 'POST',
+        ));
+        $form->add('submit', 'submit', array('label' => 'Reset Password'));
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $formData = $form->getData();
+            if ($form->isValid()) {
+
+                $newPassword = $formData['password'];
+                $manipulator = $this->container->get('fos_user.util.user_manipulator');
+                $manipulator->changePassword($existingUser->getUsername(),$newPassword);
+
+                $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
+                if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject('Reset Password')
+                        ->setFrom($emailSettings['sender_address'])
+                        ->setTo($formData['email'], $formData['firstName'])
+                        ->setBody(
+                            $this->renderView(
+                                'BWCMSBundle:User:reset-password.email.txt.twig',
+                                array(
+                                    'firstName' => $existingUser->getFirstName(),
+                                    'username' =>$existingUser->getEmail(),
+                                    'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
+                                    'password' => $newPassword,
+                                )
+                            )
+                        );
+                    $this->mailer()->getMailer()->send($message);
+                }
+
+
+                return $this->redirect($this->generateUrl('user_home'));
+            }
+        }
+
+        return array(
+            'form' => $form->createView(),
+        );
+
+
+    }
 
 }

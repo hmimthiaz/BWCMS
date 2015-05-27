@@ -60,7 +60,10 @@ class EditType extends AbstractType
             array(
                 'label' => 'Email',
                 'data' => $this->existingUser->getEmail(),
-                'constraints' => new Email()
+                'constraints' => array(
+                    new NotBlank(),
+                    new Email(),
+                )
             )
         );
 
