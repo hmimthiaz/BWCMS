@@ -4,6 +4,7 @@ namespace Bellwether\BWCMSBundle\Controller;
 
 
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -17,7 +18,7 @@ use Bellwether\BWCMSBundle\Form\SiteEntityType;
  *
  * @Route("/admin/site")
  */
-class SiteController extends BaseController
+class SiteController extends BaseController  implements BackEndControllerInterface
 {
 
     /**

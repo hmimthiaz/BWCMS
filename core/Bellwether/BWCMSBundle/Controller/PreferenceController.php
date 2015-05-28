@@ -3,6 +3,7 @@
 namespace Bellwether\BWCMSBundle\Controller;
 
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @Route("/admin/preference")
  */
-class PreferenceController extends BaseController
+class PreferenceController extends BaseController  implements BackEndControllerInterface
 {
     /**
      * @Route("/{type}/index.php",name="preference_page")

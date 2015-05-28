@@ -1,0 +1,26 @@
+{% extends "BWCMSBundle:Common:base.html.twig" %}
+
+{% block bodyContainer %}
+    <div class="row">
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-8">
+            <div class="jumbotron">
+                <div class="row">
+                    <div class="col-md-2">
+                        <img src="{{ asset('bundles/bwcms/images/warning-icon.png') }}" />
+                    </div>
+                    <div class="col-md-10">
+                        <h2>404 - Page not found</h2>
+                        <p>{{ message }}</p>
+                        {% if securityExitURL is defined %}
+                            <p><a class="btn btn-primary btn-lg" href="{{ securityExitURL }}" role="button">Exit User</a></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+        </div>
+    </div>
+{% endblock %}

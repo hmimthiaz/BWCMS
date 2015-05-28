@@ -17,6 +17,7 @@ use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
 abstract class BaseService  extends ContainerAware
@@ -204,6 +205,22 @@ abstract class BaseService  extends ContainerAware
         }
 
         return $this->container->get('security.authorization_checker')->isGranted($attributes, $object);
+    }
+
+    /**
+     * Generates a URL from the given parameters.
+     *
+     * @param string      $route         The name of the route
+     * @param mixed       $parameters    An array of parameters
+     * @param bool|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     *
+     * @return string The generated URL
+     *
+     * @see UrlGeneratorInterface
+     */
+    public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
 
 }

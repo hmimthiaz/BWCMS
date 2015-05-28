@@ -3,6 +3,7 @@
 namespace Bellwether\BWCMSBundle\Controller;
 
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -19,7 +20,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @Route("/admin/thumbstyle")
  */
-class ThumbStyleController extends BaseController
+class ThumbStyleController extends BaseController  implements BackEndControllerInterface
 {
 
     /**

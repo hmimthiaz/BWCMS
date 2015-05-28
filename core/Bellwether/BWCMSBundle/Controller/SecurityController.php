@@ -7,9 +7,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\Security\Core\SecurityContext;
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 
 
-class SecurityController extends BaseController
+class SecurityController extends BaseController implements BackEndControllerInterface
 {
 
     /**

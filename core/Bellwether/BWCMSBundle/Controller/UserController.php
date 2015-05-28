@@ -3,6 +3,7 @@
 namespace Bellwether\BWCMSBundle\Controller;
 
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @Route("/admin/user")
  */
-class UserController extends BaseController
+class UserController extends BaseController  implements BackEndControllerInterface
 {
 
 

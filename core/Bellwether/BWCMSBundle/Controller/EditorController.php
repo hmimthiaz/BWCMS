@@ -3,6 +3,7 @@
 namespace Bellwether\BWCMSBundle\Controller;
 
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @Route("/admin/editor")
  */
-class EditorController extends BaseController
+class EditorController extends BaseController  implements BackEndControllerInterface
 {
     /**
      * @Route("/init.js",name="editor_init")

@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AdminService extends BaseService
 {
+    private $isAdmin;
+
     private $factory;
 
     function __construct(FactoryInterface $factory = null, ContainerInterface $container = null, RequestStack $request_stack = null)
@@ -26,6 +28,14 @@ class AdminService extends BaseService
     public function getManager()
     {
         return $this;
+    }
+
+    /**
+     * Service Init.
+     */
+    public function init()
+    {
+        $this->setIsAdmin(false);
     }
 
     /**
@@ -112,7 +122,7 @@ class AdminService extends BaseService
         ));
 
 
-        if($this->isGranted('ROLE_PREFERENCE')){
+        if ($this->isGranted('ROLE_PREFERENCE')) {
             $menu->addChild('Preference', array('uri' => '#', 'label' => 'Preference'))->setAttribute('dropdown', true);
             $registeredOptionTypes = $this->pref()->getRegisteredOptionTypes();
             foreach ($registeredOptionTypes as $optionType) {
@@ -136,6 +146,22 @@ class AdminService extends BaseService
 
 
         return $menu;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsAdmin()
+    {
+        return $this->isAdmin;
+    }
+
+    /**
+     * @param bool $isAdmin
+     */
+    public function setIsAdmin($isAdmin)
+    {
+        $this->isAdmin = $isAdmin;
     }
 
 

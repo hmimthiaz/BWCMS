@@ -3,6 +3,7 @@
 namespace Bellwether\BWCMSBundle\Controller;
 
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
@@ -20,7 +21,7 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
  *
  * @Route("/admin/manage")
  */
-class ContentController extends BaseController
+class ContentController extends BaseController implements BackEndControllerInterface
 {
     /**
      * @Route("/{type}/index.php",name="content_home")
