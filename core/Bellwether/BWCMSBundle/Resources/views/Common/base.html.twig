@@ -5,7 +5,7 @@
     <title>{% block title %}BWCMS!{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="/include/js/jquery.js"></script>
-    <link rel="stylesheet" href="{{ asset('bundles/bwcms/jquery-ui/jquery-ui.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/js/jquery-ui/jquery-ui.min.css') }}"/>
     <link href="/include/css/bootstrap.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/css/style.css') }}" />
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/font-awesome/css/font-awesome.min.css') }}">
@@ -15,9 +15,10 @@
 <body {% block bodyAttr '' %}>
     <div id="loadingIndicatorHolder" style="display: none;"><div id="loadingIndicator" ><img src="{{ asset('bundles/bwcms/images/clock.svg') }}"></div></div>
     {% block bodyContainer %}{% endblock %}
-    <script src="{{ asset('bundles/bwcms/jquery-ui/jquery-ui.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/js/jquery-ui/jquery-ui.min.js') }}"></script>
     <script src="/include/js/bootstrap.js"></script>
     <script src="{{ asset('bundles/bwcms/js/bootbox.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/js/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/js/script.js') }}"></script>
     {% block footer %}{% endblock %}
 </body>

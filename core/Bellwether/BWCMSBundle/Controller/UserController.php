@@ -32,6 +32,7 @@ class UserController extends BaseController
      */
     public function indexAction()
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $em = $this->getDoctrine()->getManager();
         $entities = $em->getRepository('BWCMSBundle:UserEntity')->findAll();
         return array(

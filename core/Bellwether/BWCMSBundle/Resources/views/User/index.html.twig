@@ -29,11 +29,11 @@
                     <td>{% if entity.locked %}<i class="fa fa-check-square-o"></i>{% else %}<i class="fa fa-square-o"></i>{% endif %}</td>
                     <td>
                         <div class="btn-group">
-                            {#{% if is_granted('ROLE_ALLOWED_TO_SWITCH') %}#}
-                            {#<a class="btn btn-default btn-sm" href="{{ path('user_home', {'_switch_user': entity.username}) }}">#}
-                            {#<i class="fa fa-file"></i>Switch#}
-                            {#</a>#}
-                            {#{% endif %}#}
+                            {% if is_granted('ROLE_ALLOWED_TO_SWITCH') %}
+                            <a class="btn btn-default btn-sm" href="{{ path('dashboard_home', {'_switch_user': entity.username}) }}">
+                            <i class="fa fa-file"></i> Switch
+                            </a>
+                            {% endif %}
                             <a class="btn btn-default btn-sm" href="{{ path('user_edit', {'id': entity.id}) }}">
                                 <i class="fa fa-edit"></i> {{ 'edit'|trans({}, 'admin') }}
                             </a>

@@ -38,8 +38,13 @@ class AdminMenuService extends BaseService
 
         $currentSite = $this->sm()->getAdminCurrentSite();
         $allSites = $this->sm()->getAllSites();
+        $menu->addChild('Site', array('uri' => '#', 'label' => 'Site: ' . $currentSite->getName()))->setAttribute('dropdown', true);
+        $menu['Site']->addChild('View Site', array(
+            'route' => 'home',
+            'routeParameters' => array('siteSlug' => $currentSite->getSlug())
+        ))->setLinkAttributes(array('target' => '_blank'));
         if (count($allSites) > 1) {
-            $menu->addChild('Site', array('uri' => '#', 'label' => 'Site: ' . $currentSite->getName()))->setAttribute('dropdown', true);
+            $menu['Site']->addChild('-', array('uri' => '#'))->setAttribute('divider', true);
             foreach ($allSites as $siteInfo) {
                 /**
                  * @var \Knp\Menu\MenuItem $siteMenu
@@ -54,13 +59,16 @@ class AdminMenuService extends BaseService
             }
         }
 
-
-        $menu->addChild('Profile', array('uri' => '#', 'label' => $this->getUser()->getEmail()))->setAttribute('dropdown', true);
+        $displayName = $this->getUser()->getFirstName();
+        if (empty($displayName)) {
+            $displayName = $this->getUser()->getEmail();
+        }
+        $menu->addChild('Profile', array('uri' => '#', 'label' => $displayName))->setAttribute('dropdown', true);
         $menu['Profile']->addChild('Profile', array('route' => 'user_profile'));
         $menu['Profile']->addChild('Change Password', array('route' => 'user_change_password'));
         if ($this->getSecurityContext()->isGranted('ROLE_PREVIOUS_ADMIN')) {
             $menu['Profile']->addChild('Exit User', array(
-                'route' => 'Homepage',
+                'route' => 'user_home',
                 'routeParameters' => array('_switch_user' => '_exit')
             ));
         }
@@ -104,17 +112,18 @@ class AdminMenuService extends BaseService
         ));
 
 
-        $menu->addChild('Preference', array('uri' => '#', 'label' => 'Preference'))->setAttribute('dropdown', true);
-        $registeredOptionTypes = $this->pref()->getRegisteredOptionTypes();
-        foreach ($registeredOptionTypes as $optionType) {
-            $menu['Preference']->addChild($optionType['name'], array(
-                'route' => 'preference_page',
-                'routeParameters' => array(
-                    'type' => $optionType['type']
-                )
-            ));
+        if($this->isGranted('ROLE_PREFERENCE')){
+            $menu->addChild('Preference', array('uri' => '#', 'label' => 'Preference'))->setAttribute('dropdown', true);
+            $registeredOptionTypes = $this->pref()->getRegisteredOptionTypes();
+            foreach ($registeredOptionTypes as $optionType) {
+                $menu['Preference']->addChild($optionType['name'], array(
+                    'route' => 'preference_page',
+                    'routeParameters' => array(
+                        'type' => $optionType['type']
+                    )
+                ));
+            }
         }
-
 
         $menu->addChild('Admin', array('uri' => '#', 'label' => 'Admin'))->setAttribute('dropdown', true);
 
