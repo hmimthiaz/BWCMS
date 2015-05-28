@@ -9,7 +9,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Symfony\Component\HttpFoundation\Request;
 
 
-class AdminMenuService extends BaseService
+class AdminService extends BaseService
 {
     private $factory;
 
@@ -21,7 +21,7 @@ class AdminMenuService extends BaseService
     }
 
     /**
-     * @return AdminMenuService
+     * @return AdminService
      */
     public function getManager()
     {

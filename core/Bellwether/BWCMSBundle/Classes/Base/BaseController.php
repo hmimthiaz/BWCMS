@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 
 use Bellwether\BWCMSBundle\Entity\UserEntity;
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
+use Bellwether\BWCMSBundle\Classes\Service\AdminService;
 use Bellwether\BWCMSBundle\Classes\Service\ACLService;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
@@ -59,6 +60,14 @@ abstract class BaseController extends Controller
     public function em()
     {
         return $this->container->get('doctrine')->getManager();
+    }
+
+    /**
+     * @return AdminService
+     */
+    public function admin()
+    {
+        return $this->container->get('BWCMS.Admin')->getManager();
     }
 
     /**
@@ -128,14 +137,16 @@ abstract class BaseController extends Controller
     /**
      * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
      */
-    public function getEventDispatcher(){
+    public function getEventDispatcher()
+    {
         return $this->container->get('event_dispatcher');
     }
 
     /**
      * @return \JMS\Serializer\Serializer
      */
-    public function getSerializer(){
+    public function getSerializer()
+    {
         return $this->container->get('serializer');
     }
 

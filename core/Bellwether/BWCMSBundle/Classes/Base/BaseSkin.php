@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\SecurityContext;
 use Bellwether\BWCMSBundle\Entity\UserEntity;
+use Bellwether\BWCMSBundle\Classes\Service\AdminService;
 use Bellwether\BWCMSBundle\Classes\Service\ACLService;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
@@ -140,6 +141,14 @@ abstract class BaseSkin extends ContainerAware
     public function em()
     {
         return $this->container->get('doctrine')->getManager();
+    }
+
+    /**
+     * @return AdminService
+     */
+    public function admin()
+    {
+        return $this->container->get('BWCMS.Admin')->getManager();
     }
 
     /**

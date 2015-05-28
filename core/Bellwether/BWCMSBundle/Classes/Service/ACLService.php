@@ -21,7 +21,7 @@ class ACLService extends BaseService
     }
 
     /**
-     * @return AdminMenuService
+     * @return AdminService
      */
     public function getManager()
     {
