@@ -30,6 +30,11 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
 
+web_profiler:
+    toolbar:              false
+    position:             bottom
+    intercept_redirects:  false
+    excluded_ajax_paths:  ^/bundles|^/_wdt
 
 #braincrafted_bootstrap
 braincrafted_bootstrap:
