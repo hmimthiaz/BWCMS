@@ -24,15 +24,6 @@ $(document).ready(function () {
         });
     });
     $('ul.FCList').sortable();
-
-    $.notify({
-        // options
-        message: 'Hello World'
-    },{
-        // settings
-        type: 'danger'
-    });
-
 });
 
 function showContentBrowser(ele) {

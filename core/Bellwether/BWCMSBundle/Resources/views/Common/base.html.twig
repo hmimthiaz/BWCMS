@@ -21,6 +21,27 @@
     <script src="{{ asset('bundles/bwcms/js/bootstrap-notify.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/js/script.js') }}"></script>
     {% block footer %}{% endblock %}
+    <script language="JavaScript">
+        $(document).ready(function () {
+            {% set flashDelay = 3000 %}
+            {% for flashMessage in app.session.flashbag.get('Notify.Success') %}
+                $.notify({message: '{{ flashMessage }}'},{type: 'success', delay: {{  flashDelay }} });
+                {% set flashDelay = flashDelay + 1000 %}
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('Notify.Info') %}
+                $.notify({message: '{{ flashMessage }}'},{type: 'info', delay: {{  flashDelay }} });
+                {% set flashDelay = flashDelay + 1000 %}
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('Notify.Warning') %}
+                $.notify({message: '{{ flashMessage }}'},{type: 'warning', delay: {{  flashDelay }} });
+                {% set flashDelay = flashDelay + 1000 %}
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('Notify.Danger') %}
+                $.notify({message: '{{ flashMessage }}'},{type: 'danger', delay: {{  flashDelay }} });
+                {% set flashDelay = flashDelay + 1000 %}
+            {% endfor %}
+        });
+    </script>
 </body>
 </html>
 

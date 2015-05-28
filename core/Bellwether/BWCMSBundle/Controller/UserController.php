@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @Route("/admin/user")
  */
-class UserController extends BaseController  implements BackEndControllerInterface
+class UserController extends BaseController implements BackEndControllerInterface
 {
 
 
@@ -108,6 +108,7 @@ class UserController extends BaseController  implements BackEndControllerInterfa
                         );
                     $this->mailer()->getMailer()->send($message);
                 }
+                $this->addSuccessFlash('Added new user!');
                 return $this->redirect($this->generateUrl('user_home'));
             }
         }
@@ -165,6 +166,7 @@ class UserController extends BaseController  implements BackEndControllerInterfa
             if ($form->isValid()) {
                 $existingUser->setFirstname($formData['firstName']);
                 $existingUser->setLastname($formData['lastName']);
+                $existingUser->setEmail($formData['email']);
                 $existingUser->setMobile($formData['mobile']);
                 foreach ($roles as $roleKey => $roleValue) {
                     $existingUser->removeRole($roleKey);
@@ -175,6 +177,7 @@ class UserController extends BaseController  implements BackEndControllerInterfa
                 $existingUser->setLocked((bool)$formData['locked']);
                 $this->em()->persist($existingUser);
                 $this->em()->flush();
+                $this->addSuccessFlash('Updated user information!');
                 return $this->redirect($this->generateUrl('user_home'));
             }
         }
@@ -245,6 +248,7 @@ class UserController extends BaseController  implements BackEndControllerInterfa
                         );
                     $this->mailer()->getMailer()->send($message);
                 }
+                $this->addSuccessFlash('Updated user password!');
                 return $this->redirect($this->generateUrl('user_home'));
             }
         }
@@ -286,15 +290,14 @@ class UserController extends BaseController  implements BackEndControllerInterfa
                 $existingUser->setMobile($formData['mobile']);
                 $this->em()->persist($existingUser);
                 $this->em()->flush();
+                $this->addSuccessFlash('Updated profile information!');
                 return $this->redirect($this->generateUrl('user_profile'));
             }
         }
-
         return array(
             'title' => 'My Profile',
             'form' => $form->createView(),
         );
-
     }
 
 
@@ -340,10 +343,8 @@ class UserController extends BaseController  implements BackEndControllerInterfa
                  */
                 $manipulator = $this->container->get('fos_user.util.user_manipulator');
                 $manipulator->changePassword($existingUser->getUsername(), $formData['password']);
-
                 $this->get('security.token_storage')->setToken(null);
                 $this->get('request')->getSession()->invalidate();
-
                 return $this->redirect($this->generateUrl('dashboard_home'));
             }
         }
@@ -353,8 +354,6 @@ class UserController extends BaseController  implements BackEndControllerInterfa
             'form' => $form->createView(),
         );
 
-
     }
-
 
 }

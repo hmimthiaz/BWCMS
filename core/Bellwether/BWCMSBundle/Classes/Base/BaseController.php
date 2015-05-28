@@ -24,6 +24,14 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class BaseController extends Controller
 {
 
+    const NotifySuccess = 'Notify.Success';
+
+    const NotifyInfo = 'Notify.Info';
+
+    const NotifyWarning = 'Notify.Warning';
+
+    const NotifyDanger = 'Notify.Danger';
+
     private $path;
 
     /**
@@ -148,6 +156,38 @@ abstract class BaseController extends Controller
     public function getSerializer()
     {
         return $this->container->get('serializer');
+    }
+
+    /**
+     * @param string $message
+     */
+    public function addSuccessFlash($message)
+    {
+        $this->addFlash(self::NotifySuccess, $message);
+    }
+
+    /**
+     * @param string $message
+     */
+    public function addInfoFlash($message)
+    {
+        $this->addFlash(self::NotifyInfo, $message);
+    }
+
+    /**
+     * @param string $message
+     */
+    public function addWarningFlash($message)
+    {
+        $this->addFlash(self::NotifyWarning, $message);
+    }
+
+    /**
+     * @param string $message
+     */
+    public function addDangerFlash($message)
+    {
+        $this->addFlash(self::NotifyDanger, $message);
     }
 
     /**

@@ -18,19 +18,31 @@ use AppKernel;
 /**
  * Dashboard controller.
  *
- * @Route("/admin/dashboard")
+ * @Route("/admin")
  */
 class DashboardController extends BaseController implements BackEndControllerInterface
 {
+
     /**
-     * @Route("/index",name="dashboard_home")
+     * @Route("/")
+     * @Route("/index.php")
+     * @Template()
+     */
+    public function homeRedirectAction()
+    {
+        return $this->redirectToRoute('dashboard_home');
+    }
+
+    /**
+     * @Route("/dashboard/index.php",name="dashboard_home")
      * @Template()
      */
     public function indexAction()
     {
-
-//        $x = new TestSampleLoad();
-
+        $this->addSuccessFlash('Success Message');
+        $this->addInfoFlash('Information Message');
+        $this->addWarningFlash('Warning Message');
+        $this->addDangerFlash('Danger');
         return array();
     }
 
