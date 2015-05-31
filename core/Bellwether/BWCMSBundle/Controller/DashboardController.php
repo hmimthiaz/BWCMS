@@ -39,10 +39,10 @@ class DashboardController extends BaseController implements BackEndControllerInt
      */
     public function indexAction()
     {
-        $this->addSuccessFlash('Success Message');
-        $this->addInfoFlash('Information Message');
-        $this->addWarningFlash('Warning Message');
-        $this->addDangerFlash('Danger');
+//        $this->addSuccessFlash('Success Message');
+//        $this->addInfoFlash('Information Message');
+//        $this->addWarningFlash('Warning Message');
+//        $this->addDangerFlash('Danger');
         return array();
     }
 
