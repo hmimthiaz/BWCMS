@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Bellwether\BWCMSBundle\Classes\ContentService;
+use Bellwether\BWCMSBundle\Classes\Service\ContentService;
 use Bellwether\BWCMSBundle\Entity\ContentRepository;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 

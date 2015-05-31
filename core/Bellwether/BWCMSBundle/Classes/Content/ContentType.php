@@ -365,13 +365,18 @@ abstract class ContentType implements ContentTypeInterface
     {
 
         $templates = $this->getTemplates();
-        $this->fb()->add('template', 'bwcms_content_template',
-            array(
-                'label' => 'Template',
-                'choices' => $templates
-            )
-        );
-
+        if (count($templates) == 1) {
+            $this->fb()->add('template', 'hidden', array(
+                'data' => $templates[0]['template'],
+            ));
+        }else{
+            $this->fb()->add('template', 'bwcms_content_template',
+                array(
+                    'label' => 'Template',
+                    'choices' => $templates
+                )
+            );
+        }
 
         $this->fb()->add('status', 'choice',
             array(
