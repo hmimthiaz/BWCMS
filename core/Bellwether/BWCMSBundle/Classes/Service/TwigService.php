@@ -18,6 +18,7 @@ use Knp\Menu\Renderer\ListRenderer;
 use Knp\Menu\Renderer\TwigRenderer;
 use Gregwar\Image\Image;
 use Bellwether\Common\Pagination;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TwigService extends BaseService implements \Twig_ExtensionInterface
 {
@@ -175,8 +176,15 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      * @param string $slug
      * @return string
      */
-    public function getContentMenuBySlug($slug)
+    public function getContentMenuBySlug($slug, $options = array())
     {
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults(array(
+            'class' => 'menu-' . $slug,
+            'id' => 'menu-' . $slug,
+        ));
+
+        $menuOptions = $resolver->resolve($options);
         $contentEntity = $this->cm()->getContentBySlugPath($slug);
         if (is_null($contentEntity)) {
             return '';
@@ -189,7 +197,8 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
          */
         $menu = array();
         $rootMenu = $this->factory->createItem($contentEntity->getSlug());
-        $rootMenu->setChildrenAttribute('class', 'menu');
+        $rootMenu->setChildrenAttribute('id', $menuOptions['id']);
+        $rootMenu->setChildrenAttribute('class', $menuOptions['class']);
         $menu[$contentEntity->getId()] = $rootMenu;
         /**
          * @var ContentEntity $content

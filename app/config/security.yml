@@ -42,4 +42,4 @@ security:
         - { path: ^/admin, role: IS_AUTHENTICATED_REMEMBERED }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/, role: ROLE_USER}
+        - { path: ^/, role: IS_AUTHENTICATED_ANONYMOUSLY}
