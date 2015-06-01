@@ -181,6 +181,8 @@ class ContentService extends BaseService
         $newSlug = $this->generateSlug($newContent->getTitle(), $newContent->getType(), $parentId);
         if ($newSlug != $existingSlug) {
             $newContent->setTitle($content->getTitle() . ' Copy');
+            $newSlug = $this->generateSlug($newContent->getTitle(), $newContent->getType(), $parentId);
+            $newContent->setSlug($newSlug);
         }
 
         $this->em()->persist($newContent);
@@ -535,7 +537,7 @@ class ContentService extends BaseService
     {
         $slug = StringUtility::sanitizeTitle($title);
         while ($this->checkSlugExists($slug, $type, $parentId, $contentId)) {
-            $slug = $slug + '-1';
+            $slug = $slug . '-1';
         }
         return $slug;
     }
