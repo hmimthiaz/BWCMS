@@ -615,16 +615,30 @@ class ContentService extends BaseService
     }
 
     /**
-     * @param ContentEntity $slug
+     * @param ContentEntity $contentEntity
      * @return array
      */
-    public function getContentMenuItemsBySlug($contentEntity)
+    public function getContentMenuItems($contentEntity)
     {
         $contentRepository = $this->cm()->getContentRepository();
         $qb = $contentRepository->getChildrenQueryBuilder($contentEntity, false);
         $result = $qb->getQuery()->getResult();
         return $result;
     }
+
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return array
+     */
+    public function getContentWidgetItems($contentEntity)
+    {
+        $contentRepository = $this->cm()->getContentRepository();
+        $qb = $contentRepository->getChildrenQueryBuilder($contentEntity, false);
+        $result = $qb->getQuery()->getResult();
+        return $result;
+    }
+
 
     /**
      * @param ContentEntity $contentEntity

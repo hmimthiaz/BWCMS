@@ -28,6 +28,8 @@ use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Symfony\Component\Routing\RouteCollection;
 
+use Symfony\Bundle\TwigBundle\TwigEngine;
+
 abstract class ContentType implements ContentTypeInterface
 {
 
@@ -283,6 +285,17 @@ abstract class ContentType implements ContentTypeInterface
 
     abstract public function prepareEntity(ContentEntity $content = null, Form $form = null);
 
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @param array $options
+     * @return null
+     */
+    public function render($contentEntity, $options = array())
+    {
+        return null;
+    }
+
     public function loadCustomField($fieldName, $fieldValue)
     {
         return $fieldValue;
@@ -365,7 +378,7 @@ abstract class ContentType implements ContentTypeInterface
             $this->fb()->add('template', 'hidden', array(
                 'data' => $templates[0]['template'],
             ));
-        }else{
+        } else {
             $this->fb()->add('template', 'bwcms_content_template',
                 array(
                     'label' => 'Template',
@@ -401,6 +414,21 @@ abstract class ContentType implements ContentTypeInterface
         $this->fb()->add('save', 'submit', array(
             'attr' => array('class' => 'save'),
         ));
+    }
+
+    /**
+     * @return TwigEngine
+     */
+    public function getTwigEngine(){
+        return $this->container->get('templating');
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return string
+     */
+    public function getContentTemplate($contentEntity){
+        return $this->tp()->getCurrentSkin()->getTemplateName($this->cm()->getContentTemplate($contentEntity));
     }
 
     /**

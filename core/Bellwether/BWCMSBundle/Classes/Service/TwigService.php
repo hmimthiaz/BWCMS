@@ -12,13 +12,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
 use Knp\Menu\FactoryInterface;
-use Knp\Menu\Matcher\Matcher;
-use Knp\Menu\Matcher\Voter\UriVoter;
-use Knp\Menu\Renderer\ListRenderer;
-use Knp\Menu\Renderer\TwigRenderer;
 use Gregwar\Image\Image;
 use Bellwether\Common\Pagination;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
 
 class TwigService extends BaseService implements \Twig_ExtensionInterface
 {
@@ -116,7 +113,8 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     {
         return array(
             'link' => new \Twig_Function_Method($this, 'getContentLink'),
-            'menu' => new \Twig_Function_Method($this, 'getContentMenuBySlug'),
+            'menu' => new \Twig_Function_Method($this, 'getContentMenu'),
+            'widget' => new \Twig_Function_Method($this, 'getContentWidget'),
             'meta' => new \Twig_Function_Method($this, 'getContentMeta'),
             'pref' => new \Twig_Function_Method($this, 'getPreference'),
             'image' => new \Twig_Function_Method($this, 'getImage'),
@@ -173,66 +171,49 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     }
 
     /**
-     * @param string $slug
+     * @param ContentEntity $contentEntity
+     * @param array $options
      * @return string
      */
-    public function getContentMenuBySlug($slug, $options = array())
+    public function getContentMenu($contentEntity, $options = array())
     {
+        if (!($contentEntity instanceof ContentEntity)) {
+            $contentEntity = $this->cm()->getContentBySlugPath($contentEntity);
+            if (is_null($contentEntity)) {
+                return '';
+            }
+        }
+
         $resolver = new OptionsResolver();
         $resolver->setDefaults(array(
-            'class' => 'menu-' . $slug,
-            'id' => 'menu-' . $slug,
+            'factory' => $this->factory,
+            'environment' => $this->environment,
+            'class' => 'menu-' . $contentEntity->getSlug(),
+            'id' => 'menu-' . $contentEntity->getSlug(),
         ));
-
         $menuOptions = $resolver->resolve($options);
-        $contentEntity = $this->cm()->getContentBySlugPath($slug);
-        if (is_null($contentEntity)) {
-            return '';
-        }
-        $contentMenuItems = $this->cm()->getContentMenuItemsBySlug($contentEntity);
-        /**
-         * @var \Knp\Menu\MenuItem $rootMenu
-         * @var \Knp\Menu\MenuItem $menu
-         *
-         */
-        $menu = array();
-        $rootMenu = $this->factory->createItem($contentEntity->getSlug());
-        $rootMenu->setChildrenAttribute('id', $menuOptions['id']);
-        $rootMenu->setChildrenAttribute('class', $menuOptions['class']);
-        $menu[$contentEntity->getId()] = $rootMenu;
-        /**
-         * @var ContentEntity $content
-         */
-        foreach ($contentMenuItems as $content) {
-            $menu[$content->getId()] = $menu[$content->getTreeParent()->getId()]->addChild($content->getTitle(), array('uri' => '#'));
-            $contentMeta = $this->cm()->getContentAllMeta($content);
-            if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'link') {
-                if (isset($contentMeta['linkExternal']) && !empty($contentMeta['linkExternal'])) {
-                    $menu[$content->getId()]->setUri($contentMeta['linkExternal']);
-                }
-            }
-            if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'content') {
-                if (isset($contentMeta['linkContent']) && ($contentMeta['linkContent'] instanceof ContentEntity)) {
-                    $contentLinkURL = $this->cm()->getPublicURL($contentMeta['linkContent']);
-                    $menu[$content->getId()]->setUri($contentLinkURL);
-                }
-            }
-            if (isset($contentMeta['linkTarget']) && !empty($contentMeta['linkTarget'])) {
-                $menu[$content->getId()]->setLinkAttribute('target', $contentMeta['linkTarget']);
-            }
-            if (isset($contentMeta['linkClass']) && !empty($contentMeta['linkClass'])) {
-                $menu[$content->getId()]->setLinkAttribute('class', $contentMeta['linkClass']);
+        $contentClass = $this->cm()->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
+        return $contentClass->render($contentEntity, $menuOptions);
+
+
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @param array $options
+     * @return string
+     */
+    public function getContentWidget($contentEntity, $options = array())
+    {
+        if (!($contentEntity instanceof ContentEntity)) {
+            $contentEntity = $this->cm()->getContentBySlugPath($contentEntity);
+            if (is_null($contentEntity)) {
+                return '';
             }
         }
 
-        $requestURL = $this->getRequest()->getRequestUri();
-        $menuTemplate = $this->tp()->getCurrentSkin()->getTemplateName($this->cm()->getContentTemplate($contentEntity));
-        $matcher = new Matcher();
-        $voter = new UriVoter($requestURL);
-        $matcher->addVoter($voter);
-
-        $renderer = new TwigRenderer($this->getEnvironment(), $menuTemplate, $matcher);
-        return $renderer->render($menu[$contentEntity->getId()]);
+        $contentClass = $this->cm()->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
+        return $contentClass->render($contentEntity);
     }
 
     /**
