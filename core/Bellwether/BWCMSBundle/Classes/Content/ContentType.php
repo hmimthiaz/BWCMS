@@ -293,7 +293,6 @@ abstract class ContentType implements ContentTypeInterface
     {
         $this->fb()->add('title', 'text',
             array(
-                'max_length' => 100,
                 'required' => true,
                 'label' => 'Title'
             )
@@ -302,7 +301,6 @@ abstract class ContentType implements ContentTypeInterface
         if ($this->isSummaryEnabled) {
             $this->fb()->add('summary', 'textarea',
                 array(
-                    'max_length' => 100,
                     'required' => false,
                     'label' => 'Summary'
                 )
@@ -312,7 +310,6 @@ abstract class ContentType implements ContentTypeInterface
         if ($this->isContentEnabled) {
             $this->fb()->add('content', 'textarea',
                 array(
-                    'max_length' => 100,
                     'required' => false,
                     'label' => 'Content',
                     'attr' => array(
@@ -325,7 +322,6 @@ abstract class ContentType implements ContentTypeInterface
         if ($this->isSlugEnabled) {
             $this->fb()->add('slug', 'text',
                 array(
-                    'max_length' => 100,
                     'required' => true,
                     'label' => 'Page Slug'
                 )
