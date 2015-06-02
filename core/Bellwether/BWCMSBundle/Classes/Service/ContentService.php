@@ -3,6 +3,7 @@
 namespace Bellwether\BWCMSBundle\Classes\Service;
 
 use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -601,6 +602,7 @@ class ContentService extends BaseService
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
         $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
+        $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
 
         $qb->setFirstResult($start);
         $qb->setMaxResults($limit);
