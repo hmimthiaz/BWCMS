@@ -30,6 +30,7 @@
 /web/media/
 /web/include/
 /web/skins/
+/web/.htaccess
 
 # PHPUnit
 /app/phpunit.xml
