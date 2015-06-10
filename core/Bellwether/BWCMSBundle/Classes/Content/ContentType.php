@@ -419,7 +419,8 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return TwigEngine
      */
-    public function getTwigEngine(){
+    public function getTwigEngine()
+    {
         return $this->container->get('templating');
     }
 
@@ -427,7 +428,8 @@ abstract class ContentType implements ContentTypeInterface
      * @param ContentEntity $contentEntity
      * @return string
      */
-    public function getContentTemplate($contentEntity){
+    public function getContentTemplate($contentEntity)
+    {
         return $this->tp()->getCurrentSkin()->getTemplateName($this->cm()->getContentTemplate($contentEntity));
     }
 
@@ -569,8 +571,7 @@ abstract class ContentType implements ContentTypeInterface
 
     public function isType($type = 'Content')
     {
-        $contentType = strtoupper($this->getType());
-        if (strpos($contentType, strtoupper($type) . '.') !== false) {
+        if (strtoupper($this->getType()) == strtoupper($type)) {
             return true;
         }
         return false;

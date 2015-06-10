@@ -47,15 +47,14 @@ class ContentController extends BaseController implements BackEndControllerInter
         );
     }
 
-    function getFolderTree($type, $parentId)
+        function getFolderTree($type, $parentId)
     {
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
-
         $registeredContents = $this->cm()->getRegisteredContentTypes($type);
-
         $condition = array();
         foreach ($registeredContents as $cInfo) {
-            if ($cInfo['isHierarchy']) {
+            $class = $cInfo['class'];
+            if($class->isHierarchy()){
                 $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
             }
         }
