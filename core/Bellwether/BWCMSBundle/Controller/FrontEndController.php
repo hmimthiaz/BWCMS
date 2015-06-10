@@ -24,8 +24,8 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
      */
     public function contentFolderAction($siteSlug, $folderSlug)
     {
-        $contentTypes = $this->cm()->getRegisteredContentTypes();
-        $contentEntity = $this->cm()->getContentBySlugPath($folderSlug, $contentTypes);
+        $folderTypes = $this->cm()->getRegisteredContentTypes('Content', 'Folder');
+        $contentEntity = $this->cm()->getContentBySlugPath($folderSlug, $folderTypes);
         if (empty($contentEntity)) {
             throw new NotFoundHttpException('Folder does not exist');
         }
@@ -44,15 +44,22 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
      */
     public function contentPageAction($siteSlug, $folderSlug, $pageSlug)
     {
-        $contentTypes = $this->cm()->getRegisteredContentTypes();
-        $contentEntity = $this->cm()->getContentBySlugPath($folderSlug . '/' . $pageSlug, $contentTypes);
-        if (empty($contentEntity)) {
+
+        $folderTypes = $this->cm()->getRegisteredContentTypes('Content', 'Folder');
+        $folderEntity = $this->cm()->getContentBySlugPath($folderSlug, $folderTypes);
+        if (empty($folderEntity)) {
+            throw new NotFoundHttpException('Page does not exist');
+        }
+
+        $pageTypes = $this->cm()->getRegisteredContentTypes('Content', 'Page');
+        $pageEntity = $this->cm()->getContentBySlug($pageSlug, $folderEntity, $pageTypes);
+        if (empty($pageEntity)) {
             throw new NotFoundHttpException('Page does not exist');
         }
         $templateVariables = array(
-            'content' => $contentEntity
+            'content' => $pageEntity
         );
-        $template = $this->tp()->getCurrentSkin()->getContentTemplate($contentEntity);
+        $template = $this->tp()->getCurrentSkin()->getContentTemplate($pageEntity);
         return $this->render($template, $templateVariables);
     }
 
