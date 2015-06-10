@@ -35,7 +35,7 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
             'content' => $contentEntity,
             'items' => $contentItems['items']
         );
-        $template = $this->tp()->getCurrentSkin()->getContentTemplate($contentEntity);
+        $template = $this->getContentTemplate($contentEntity);
         return $this->render($template, $templateVariables);
     }
 
@@ -59,7 +59,7 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
         $templateVariables = array(
             'content' => $pageEntity
         );
-        $template = $this->tp()->getCurrentSkin()->getContentTemplate($pageEntity);
+        $template = $this->getContentTemplate($pageEntity);
         return $this->render($template, $templateVariables);
     }
 
