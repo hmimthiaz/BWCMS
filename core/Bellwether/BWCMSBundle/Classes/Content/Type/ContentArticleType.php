@@ -132,7 +132,7 @@ class ContentArticleType Extends ContentType
 
     public function getType()
     {
-        return "Content.Page";
+        return "Content";
     }
 
     public function getSchema()
