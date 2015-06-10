@@ -47,14 +47,14 @@ class ContentController extends BaseController implements BackEndControllerInter
         );
     }
 
-        function getFolderTree($type, $parentId)
+    function getFolderTree($type, $parentId)
     {
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
         $registeredContents = $this->cm()->getRegisteredContentTypes($type);
         $condition = array();
         foreach ($registeredContents as $cInfo) {
             $class = $cInfo['class'];
-            if($class->isHierarchy()){
+            if ($class->isHierarchy()) {
                 $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
             }
         }
@@ -111,10 +111,18 @@ class ContentController extends BaseController implements BackEndControllerInter
         $type = $request->get('type', 'Content');
         $parentId = $request->get('parent', 'Root');
         $holder = $request->get('holder', '');
+        $schema = $request->get('schema', '');
+        $onlyImage = $request->get('onlyImage');
         $selectedContentId = $request->get('selectedContentId', null);
 
-        $contentRepo = $this->cm()->getContentRepository();
+        if (is_null($onlyImage)) {
+            $onlyImage = 'no';
+        } else {
+            $onlyImage = 'yes';
+        }
 
+
+        $contentRepo = $this->cm()->getContentRepository();
         $selectContentPath = null;
         if (!is_null($selectedContentId)) {
             $selectedContent = $contentRepo->find($selectedContentId);
@@ -128,7 +136,6 @@ class ContentController extends BaseController implements BackEndControllerInter
 
         $qb = $contentRepo->getChildrenQueryBuilder(null, false);
         $registeredContents = $this->cm()->getRegisteredContentTypes($type);
-
         $condition = array();
         foreach ($registeredContents as $cInfo) {
             if ($cInfo['isHierarchy']) {
@@ -180,6 +187,8 @@ class ContentController extends BaseController implements BackEndControllerInter
             'parentId' => $parentId,
             'holder' => $holder,
             'type' => $type,
+            'onlyImage' => $onlyImage,
+            'schema' => $schema,
             'selectContentPath' => $selectContentPath,
             'contentTypes' => $this->cm()->getRegisteredContentTypes(),
             'jsNodes' => json_encode($jsNodes),
@@ -357,19 +366,14 @@ class ContentController extends BaseController implements BackEndControllerInter
         $start = $request->get('start', 0);
         $length = $request->get('length', 10);
         $parentId = $request->get('parent', 'Root');
+        $onlyImage = strtolower($request->get('onlyImage', 'no'));
         $search = $request->get('search');
         $searchString = null;
+        $schema = $request->get('schema');
         if ($search != null && isset($search['value']) && !empty($search['value'])) {
             $searchString = $search['value'];
         }
 
-        $data = $this->queryContent($type, $parentId, $searchString, $draw, $start, $length);
-
-        return $this->returnJsonReponse($request, $data);
-    }
-
-    function queryContent($type, $parentId = 'Root', $searchString = null, $draw = 0, $start = 0, $length = 10)
-    {
         /**
          * Get All the root folders
          * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
@@ -400,7 +404,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             }
         }
 
-        $registeredContents = $this->cm()->getRegisteredContentTypes($type);
+        $registeredContents = $this->cm()->getRegisteredContentTypes($type, $schema);
         $condition = array();
         foreach ($registeredContents as $cInfo) {
             $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
@@ -414,9 +418,13 @@ class ContentController extends BaseController implements BackEndControllerInter
         $qb->setMaxResults($length);
 
         if (!empty($searchString)) {
-            $qb->andWhere(" node.title LIKE :query1 OR node.file LIKE :query2 ");
+            $qb->andWhere(" ( node.title LIKE :query1 OR node.file LIKE :query2  ) ");
             $qb->setParameter('query1', '%' . $searchString . '%');
             $qb->setParameter('query2', '%' . $searchString . '%');
+        }
+
+        if ($onlyImage == 'yes') {
+            $qb->andWhere(" ( node.height > 0 AND node.width > 0 ) ");
         }
 
         $result = $qb->getQuery()->getResult();
@@ -477,7 +485,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             }
         }
 
-        return $data;
+        return $this->returnJsonReponse($request, $data);
     }
 
     public function getImageThumbURL($filename, $width, $height)

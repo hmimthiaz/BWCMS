@@ -572,7 +572,7 @@ abstract class ContentType implements ContentTypeInterface
     public function isType($type = 'Content', $schema = null)
     {
         if (strtoupper($this->getType()) == strtoupper($type)) {
-            if (is_null($schema)) {
+            if (is_null($schema) || empty($schema)) {
                 return true;
             }
             if (strtoupper($this->getSchema()) == strtoupper($schema)) {

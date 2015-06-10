@@ -48,6 +48,12 @@ class ContentType extends AbstractType
         if (isset($options['contentType']) && !empty($options['contentType'])) {
             $browserURLOptions['type'] = $options['contentType'];
         }
+        if (isset($options['schema']) && !empty($options['schema'])) {
+            $browserURLOptions['schema'] = $options['schema'];
+        }
+        if (isset($options['onlyImage']) && $options['onlyImage'] === true) {
+            $browserURLOptions['onlyImage'] = 'true';
+        }
         $view->vars['browserURL'] = $this->generateUrl('content_browser', $browserURLOptions, true);
     }
 
@@ -55,6 +61,8 @@ class ContentType extends AbstractType
     {
         $resolver->setDefaults(array(
             'contentType' => 'Content',
+            'schema' => false,
+            'onlyImage' => false,
             'required' => false,
             'compound' => false,
         ));

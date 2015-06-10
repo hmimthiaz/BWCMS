@@ -18,7 +18,10 @@
 {% block body %}
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Content Browser</h3>
+            <h3 class="panel-title">
+                {{ type | title}} Browser
+                {% if onlyImage == 'yes'%} - Showing Only Images{% endif %}
+            </h3>
         </div>
         {% if selectContentPath is not null %}
             <div class="panel-heading">
@@ -69,6 +72,8 @@
                     type: 'GET',
                     'data': function (params) {
                         params.type = '{{ type }}';
+                        params.schema = '{{ schema }}';
+                        params.onlyImage = '{{ onlyImage }}';
                         params.length = '5';
                         params.parent = $("#selectedContentFolderId").val();
                         return params;
