@@ -1,0 +1,16 @@
+Version 0.1 Changes
+
+UPDATE `BWContent` SET `type`='Content',`schemaType`='Folder' WHERE `type`='Content.Folder' AND `schemaType`='Default';
+UPDATE `BWContent` SET `type`='Content',`schemaType`='Page' WHERE `type`='Content.Page' AND `schemaType`='Default';
+UPDATE `BWContent` SET `type`='Content',`schemaType`='Article' WHERE `type`='Content.Page' AND `schemaType`='Article';
+
+UPDATE `BWContent` SET `type`='Media',`schemaType`='Folder' WHERE `type`='Media.Folder' AND `schemaType`='Default';
+UPDATE `BWContent` SET `type`='Media',`schemaType`='File' WHERE `type`='Media.Files' AND `schemaType`='Default';
+
+UPDATE `BWContent` SET `type`='Navigation',`schemaType`='Folder' WHERE `type`='Navigation.Folder' AND `schemaType`='Default';
+UPDATE `BWContent` SET `type`='Navigation',`schemaType`='Link' WHERE `type`='Navigation.Link' AND `schemaType`='Default';
+
+UPDATE `BWContent` SET `type`='Widget',`schemaType`='Folder' WHERE `type`='Widget.Folder' AND `schemaType`='Default';
+UPDATE `BWContent` SET `type`='Widget',`schemaType`='HTML' WHERE `type`='Widget.Item' AND `schemaType`='HTML';
+UPDATE `BWContent` SET `type`='Widget',`schemaType`='Spotlight' WHERE `type`='Widget.Item' AND `schemaType`='Spotlight';
+
