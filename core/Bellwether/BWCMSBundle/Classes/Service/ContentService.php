@@ -14,7 +14,6 @@ use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 use Bellwether\BWCMSBundle\Classes\Base\ContentTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Content\Type\ContentFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\ContentPageType;
-use Bellwether\BWCMSBundle\Classes\Content\Type\ContentArticleType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\MediaFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\MediaFileType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationFolderType;
@@ -64,7 +63,6 @@ class ContentService extends BaseService
 
         $this->registerContentType(new ContentFolderType($this->container, $this->requestStack));
         $this->registerContentType(new ContentPageType($this->container, $this->requestStack));
-        $this->registerContentType(new ContentArticleType($this->container, $this->requestStack));
 
         $this->registerContentType(new MediaFolderType($this->container, $this->requestStack));
         $this->registerContentType(new MediaFileType($this->container, $this->requestStack));
@@ -112,14 +110,14 @@ class ContentService extends BaseService
     /**
      * @return array
      */
-    public function getRegisteredContentTypes($type = 'Content')
+    public function getRegisteredContentTypes($type = 'Content', $schema = null)
     {
         $retVal = array();
         /**
          * @var ContentType $class
          */
         foreach ($this->contentType as $key => $class) {
-            if ($class->isType($type)) {
+            if ($class->isType($type, $schema)) {
                 $retVal[$key] = array(
                     'name' => $class->getName(),
                     'type' => $class->getType(),
@@ -667,7 +665,7 @@ class ContentService extends BaseService
      * @param ContentEntity $parent
      * @return null|ContentEntity
      */
-    private function getContentBySlug($slug, $parent = null, $contentTypes = array())
+    public function getContentBySlug($slug, $parent = null, $contentTypes = array())
     {
         $qb = $this->cm()->getContentRepository()->createQueryBuilder('node');
         if (!empty($contentTypes)) {

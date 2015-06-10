@@ -116,7 +116,7 @@ class ContentFolderType Extends ContentType
 
     public function getSchema()
     {
-        return "Default";
+        return "Folder";
     }
 
     public function getName()

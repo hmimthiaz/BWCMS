@@ -4,16 +4,17 @@ namespace Bellwether\BWCMSBundle\Classes\Content\Type;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Classes\Content\ContentType;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Form\FormEvent;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
-use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
+use Knp\Menu\Matcher\Matcher;
+use Knp\Menu\Matcher\Voter\UriVoter;
+use Knp\Menu\Renderer\TwigRenderer;
 
 
 class NavigationFolderType Extends ContentType
@@ -30,8 +31,8 @@ class NavigationFolderType Extends ContentType
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
         $this->setIsUploadEnabled(false);
-        $this->setIsSortEnabled(false);
-        $this->setIsSlugEnabled(false);
+        $this->setIsSortEnabled(true);
+        $this->setIsSlugEnabled(true);
     }
 
     public function buildFields()
@@ -81,6 +82,67 @@ class NavigationFolderType Extends ContentType
     {
         $this->addTemplate('Default','Default.html.twig','Default.png');
     }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @param array $options
+     * @return string
+     */
+    public function render($contentEntity, $options = array())
+    {
+        $contentMenuItems = $this->cm()->getContentMenuItems($contentEntity);
+        /**
+         * @var \Knp\Menu\MenuItem $rootMenu
+         * @var \Knp\Menu\MenuItem $menu
+         *
+         */
+        $menu = array();
+        $rootMenu = $options['factory']->createItem($contentEntity->getSlug());
+        $rootMenu->setChildrenAttribute('id', $options['id']);
+        $rootMenu->setChildrenAttribute('class', $options['class']);
+        $menu[$contentEntity->getId()] = $rootMenu;
+        /**
+         * @var ContentEntity $content
+         */
+        foreach ($contentMenuItems as $content) {
+            $menu[$content->getId()] = $menu[$content->getTreeParent()->getId()]->addChild($content->getTitle(), array('uri' => '#'));
+            $contentMeta = $this->cm()->getContentAllMeta($content);
+            if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'link') {
+                if (isset($contentMeta['linkExternal']) && !empty($contentMeta['linkExternal'])) {
+                    $menu[$content->getId()]->setUri($contentMeta['linkExternal']);
+                }
+            }
+            if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'content') {
+                if (isset($contentMeta['linkContent']) && ($contentMeta['linkContent'] instanceof ContentEntity)) {
+                    $contentLinkURL = $this->cm()->getPublicURL($contentMeta['linkContent']);
+                    $menu[$content->getId()]->setUri($contentLinkURL);
+                }
+            }
+            if (isset($contentMeta['linkTarget']) && !empty($contentMeta['linkTarget'])) {
+                $menu[$content->getId()]->setLinkAttribute('target', $contentMeta['linkTarget']);
+            }
+            if (isset($contentMeta['linkClass']) && !empty($contentMeta['linkClass'])) {
+                $menu[$content->getId()]->setLinkAttribute('class', $contentMeta['linkClass']);
+            }
+        }
+
+        $requestURL = $this->getRequest()->getRequestUri();
+        $menuTemplate = $this->getContentTemplate($contentEntity);
+        $matcher = new Matcher();
+        $voter = new UriVoter($requestURL);
+        $matcher->addVoter($voter);
+
+        $renderer = new TwigRenderer($options['environment'], $menuTemplate, $matcher);
+        return $renderer->render($menu[$contentEntity->getId()]);
+    }
+
+    /**
+     * @return Request|null
+     */
+    public function getRequest(){
+        return $this->requestStack->getCurrentRequest();
+    }
+
 
     public function validateForm(FormEvent $event)
     {

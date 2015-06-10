@@ -17,6 +17,9 @@ use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
+
+use Bellwether\BWCMSBundle\Entity\ContentEntity;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -44,6 +47,15 @@ abstract class BaseController extends Controller
             $this->path = dirname($reflected->getFileName());
         }
         return $this->path;
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return string
+     */
+    public function getContentTemplate($contentEntity)
+    {
+        return $this->tp()->getCurrentSkin()->getContentTemplate($contentEntity);
     }
 
     /**

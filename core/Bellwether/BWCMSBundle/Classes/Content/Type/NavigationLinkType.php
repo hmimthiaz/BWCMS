@@ -15,7 +15,6 @@ use Symfony\Component\Form\FormEvent;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Classes\Content\ContentTypeInterface;
 
-
 class NavigationLinkType Extends ContentType
 {
 
