@@ -123,6 +123,7 @@ class ContentService extends BaseService
                     'type' => $class->getType(),
                     'schema' => $class->getSchema(),
                     'isHierarchy' => $class->isHierarchy(),
+                    'isIsTaxonomy' => $class->isIsTaxonomy(),
                     'isRootItem' => $class->isRootItem(),
                     'class' => $class
                 );
@@ -131,7 +132,7 @@ class ContentService extends BaseService
         return $retVal;
     }
 
-    public function getMediaContentTypes($type = 'Content')
+    public function getMediaContentTypes($type = 'Media')
     {
         $mediaContentTypes = array();
         $registeredContents = $this->getRegisteredContentTypes($type);
@@ -139,6 +140,21 @@ class ContentService extends BaseService
             foreach ($registeredContents as $content) {
                 $class = $content['class'];
                 if ($class->isUploadEnabled()) {
+                    $mediaContentTypes[] = $content;
+                }
+            }
+        }
+        return $mediaContentTypes;
+    }
+
+    public function getTaxonomyContentTypes($type = 'Taxonomy')
+    {
+        $mediaContentTypes = array();
+        $registeredContents = $this->getRegisteredContentTypes($type);
+        if (!empty($registeredContents)) {
+            foreach ($registeredContents as $content) {
+                $class = $content['class'];
+                if ($class->isIsTaxonomy()) {
                     $mediaContentTypes[] = $content;
                 }
             }
@@ -622,6 +638,7 @@ class ContentService extends BaseService
     {
         $contentRepository = $this->cm()->getContentRepository();
         $qb = $contentRepository->getChildrenQueryBuilder($contentEntity, false);
+        $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
         $result = $qb->getQuery()->getResult();
         return $result;
     }
@@ -635,6 +652,7 @@ class ContentService extends BaseService
     {
         $contentRepository = $this->cm()->getContentRepository();
         $qb = $contentRepository->getChildrenQueryBuilder($contentEntity, false);
+        $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
         $result = $qb->getQuery()->getResult();
         return $result;
     }
@@ -681,6 +699,7 @@ class ContentService extends BaseService
         if (!empty($parent)) {
             $qb->andWhere(" node.treeParent = '" . $parent->getId() . "' ");
         }
+        $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
         $qb->setMaxResults(1);
         try {
             return $qb->getQuery()->getSingleResult();

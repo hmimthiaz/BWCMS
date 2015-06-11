@@ -79,6 +79,11 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @var bool
      */
+    private $isTaxonomy = false;
+
+    /**
+     * @var bool
+     */
     private $isSummaryEnabled = true;
 
     /**
@@ -567,6 +572,22 @@ abstract class ContentType implements ContentTypeInterface
     public function setIsRootItem($isRootItem)
     {
         $this->isRootItem = $isRootItem;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIsTaxonomy()
+    {
+        return $this->isTaxonomy;
+    }
+
+    /**
+     * @param boolean $isTaxonomy
+     */
+    public function setIsTaxonomy($isTaxonomy)
+    {
+        $this->isTaxonomy = $isTaxonomy;
     }
 
     public function isType($type = 'Content', $schema = null)

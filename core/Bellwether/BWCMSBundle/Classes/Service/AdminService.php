@@ -96,27 +96,29 @@ class AdminService extends BaseService
         $menu['Manage']->addChild('Content', array(
             'route' => 'content_home',
             'routeParameters' => array(
-                'type' => 'Content'
+                'type' => 'content'
             )
         ));
         $menu['Manage']->addChild('Media', array(
             'route' => 'content_home',
             'routeParameters' => array(
-                'type' => 'Media'
+                'type' => 'media'
             )
         ));
         $menu['Manage']->addChild('Navigation', array(
             'route' => 'content_home',
             'routeParameters' => array(
-                'type' => 'Navigation'
+                'type' => 'navigation'
             )
         ));
         $menu['Manage']->addChild('Widget', array(
             'route' => 'content_home',
             'routeParameters' => array(
-                'type' => 'Widget'
+                'type' => 'widget'
             )
         ));
+        $menu['Manage']->addChild('-', array('uri' => '#'))->setAttribute('divider', true);
+
         $menu['Manage']->addChild('Image Thumb Styles', array(
             'route' => 'thumbstyle_home'
         ));
