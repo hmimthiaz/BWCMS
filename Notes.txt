@@ -1,21 +1,6 @@
-Version 0.1 Changes
+Version 0.2
+* Changed the content type and schema naming structure
 
-UPDATE `BWContent` SET `type`='Content',`schemaType`='Folder' WHERE `type`='Content.Folder' AND `schemaType`='Default';
-UPDATE `BWContent` SET `type`='Content',`schemaType`='Page' WHERE `type`='Content.Page' AND `schemaType`='Default';
-UPDATE `BWContent` SET `type`='Content',`schemaType`='Article' WHERE `type`='Content.Page' AND `schemaType`='Article';
-
-UPDATE `BWContent` SET `type`='Content',`schemaType`='Client' WHERE `type`='Content.Page' AND `schemaType`='Client';
-UPDATE `BWContent` SET `type`='Content',`schemaType`='Work' WHERE `type`='Content.Page' AND `schemaType`='Work';
-
-
-UPDATE `BWContent` SET `type`='Media',`schemaType`='Folder' WHERE `type`='Media.Folder' AND `schemaType`='Default';
-UPDATE `BWContent` SET `type`='Media',`schemaType`='File' WHERE `type`='Media.Files' AND `schemaType`='Default';
-
-UPDATE `BWContent` SET `type`='Navigation',`schemaType`='Folder' WHERE `type`='Navigation.Folder' AND `schemaType`='Default';
-UPDATE `BWContent` SET `type`='Navigation',`schemaType`='Link' WHERE `type`='Navigation.Link' AND `schemaType`='Default';
-
-UPDATE `BWContent` SET `type`='Widget',`schemaType`='Folder' WHERE `type`='Widget.Region' AND `schemaType`='Default';
-UPDATE `BWContent` SET `type`='Widget',`schemaType`='Folder' WHERE `type`='Widget.Region' AND `schemaType`='Folder';
-UPDATE `BWContent` SET `type`='Widget',`schemaType`='HTML' WHERE `type`='Widget.Item' AND `schemaType`='HTML';
-UPDATE `BWContent` SET `type`='Widget',`schemaType`='Spotlight' WHERE `type`='Widget.Item' AND `schemaType`='Spotlight';
+Version 0.1
+* First public crappy beta
 
