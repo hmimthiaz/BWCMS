@@ -106,6 +106,8 @@ abstract class ContentType implements ContentTypeInterface
      */
     private $isUploadEnabled = false;
 
+    private $taxonomyRelations = null;
+
     public function getType()
     {
         return "Content";
@@ -240,6 +242,19 @@ abstract class ContentType implements ContentTypeInterface
         return $this->fields;
     }
 
+    final public function addTaxonomyRelation($name, $schema)
+    {
+        if (is_null($this->taxonomyRelations)) {
+            $this->taxonomyRelations = array();
+        }
+        $this->taxonomyRelations[$name] = array(
+            'title' => $name,
+            'name' => strtolower('Taxonomy_' . $name),
+            'type' => 'Taxonomy',
+            'schema' => $schema
+        );
+    }
+
     /**
      * @return FormBuilder
      */
@@ -337,6 +352,28 @@ abstract class ContentType implements ContentTypeInterface
             );
         }
 
+    }
+
+    private function setDefaultHiddenFormFields()
+    {
+
+        $relations = $this->getTaxonomyRelations();
+        if (!empty($relations)) {
+            foreach ($relations as $relation) {
+                $taxonomyClass = $this->cm()->getContentClass($relation['type'], $relation['schema']);
+                $terms = $this->cm()->getTaxonomyTerms($taxonomyClass);
+                $this->fb()->add($relation['name'], 'choice',
+                    array(
+                        'choices' => $terms,
+                        'label' => $relation['title'],
+                        'required' => false,
+                        'expanded' => true,
+                        'multiple' => true
+                    )
+                );
+            }
+        }
+
         if ($this->isSlugEnabled) {
             $this->fb()->add('slug', 'text',
                 array(
@@ -373,10 +410,6 @@ abstract class ContentType implements ContentTypeInterface
                 'label' => 'Sort Order'
             ));
         }
-    }
-
-    private function setDefaultHiddenFormFields()
-    {
 
         $templates = $this->getTemplates();
         if (count($templates) == 1) {
@@ -682,6 +715,15 @@ abstract class ContentType implements ContentTypeInterface
     {
         $this->isSortEnabled = $isSortEnabled;
     }
+
+    /**
+     * @return null
+     */
+    public function getTaxonomyRelations()
+    {
+        return $this->taxonomyRelations;
+    }
+
 
     public function dump($var, $maxDepth = 2, $stripTags = true)
     {

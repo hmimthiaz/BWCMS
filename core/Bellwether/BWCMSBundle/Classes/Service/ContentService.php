@@ -592,6 +592,34 @@ class ContentService extends BaseService
     }
 
     /**
+     * @param ContentType $taxonomyClass
+     */
+    public function getTaxonomyTerms($taxonomyClass)
+    {
+        if (!$taxonomyClass->isIsTaxonomy()) {
+            throw new \InvalidArgumentException('Invalid Schema');
+        }
+        $returnTerms = array();
+
+        /**
+         * Get All the root folders
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         */
+        $contentRepository = $this->cm()->getContentRepository();
+        $qb = $contentRepository->getChildrenQueryBuilder(null, true);
+        $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' ) ");
+        $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $entities = $qb->getQuery()->getResult();
+        if (!empty($entities)) {
+            foreach ($entities as $content) {
+                $returnTerms[$content->getId()] = $content->getTitle();
+            }
+        }
+        return $returnTerms;
+    }
+
+
+    /**
      * @param ContentEntity $contentEntity
      * @param Pagination $pager
      * @param string $type
