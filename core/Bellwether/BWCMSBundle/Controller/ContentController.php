@@ -7,6 +7,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
+use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -99,6 +100,27 @@ class ContentController extends BaseController implements BackEndControllerInter
             }
         }
         return $jsNodes;
+    }
+
+    /**
+     * @Route("/taxonomy.php",name="taxonomy_home")
+     * @Template()
+     */
+    public function taxonomyAction(Request $request)
+    {
+        $schema = $request->get('schema');
+        if (is_null($schema)) {
+            throw new \InvalidArgumentException('Invalid Schema');
+        }
+        $taxonomyClass = $this->cm()->getContentClass('Taxonomy', $schema);
+        if (empty($taxonomyClass)) {
+            throw new \InvalidArgumentException('Invalid Schema');
+        }
+
+        return array(
+            'title' => $taxonomyClass->getName() . ' Manager',
+        );
+
     }
 
     /**

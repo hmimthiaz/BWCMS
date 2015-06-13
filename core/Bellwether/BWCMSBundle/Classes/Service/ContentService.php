@@ -20,6 +20,7 @@ use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationLinkType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\WidgetFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\WidgetHtmlType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\TaxonomyTagType;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Bellwether\Common\StringUtility;
@@ -73,6 +74,8 @@ class ContentService extends BaseService
         $this->registerContentType(new WidgetFolderType($this->container, $this->requestStack));
         $this->registerContentType(new WidgetHtmlType($this->container, $this->requestStack));
 
+        $this->registerContentType(new TaxonomyTagType($this->container, $this->requestStack));
+
         //Call other Content Types
         $this->getEventDispatcher()->dispatch('BWCMS.Content.Register');
     }
@@ -82,8 +85,18 @@ class ContentService extends BaseService
      */
     public function registerContentType(ContentTypeInterface $classInstance)
     {
-        $slug = $classInstance->getType() . '.' . $classInstance->getSchema();
+        $slug = $this->getClassSlug($classInstance->getType(), $classInstance->getSchema());
         $this->contentType[$slug] = $classInstance;
+    }
+
+    /**
+     * @param string $type
+     * @param string $schema
+     * @return string
+     */
+    public function getClassSlug($type, $schema)
+    {
+        return strtoupper($type) . '.' . strtoupper($schema);
     }
 
     /**
@@ -92,7 +105,7 @@ class ContentService extends BaseService
      */
     public function removeContentType($type, $schema)
     {
-        $slug = $type . '.' . $schema;
+        $slug = $this->getClassSlug($type, $schema);
         if (isset($this->contentType[$slug])) {
             unset($this->contentType[$slug]);
         }
@@ -169,7 +182,7 @@ class ContentService extends BaseService
      */
     public function getContentClass($type, $schema = 'Default')
     {
-        $slug = $type . '.' . $schema;
+        $slug = $this->getClassSlug($type, $schema);
         if (!isset($this->contentType[$slug])) {
             throw new \RuntimeException("ContentType: `{$slug}` does not exists.");
         }

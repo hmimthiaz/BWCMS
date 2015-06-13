@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Symfony\Component\HttpFoundation\Request;
+use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 
 
 class AdminService extends BaseService
@@ -118,6 +119,21 @@ class AdminService extends BaseService
             )
         ));
         $menu['Manage']->addChild('-', array('uri' => '#'))->setAttribute('divider', true);
+
+
+        $taxonomyContentTypes = $this->cm()->getTaxonomyContentTypes();
+        if (!empty($taxonomyContentTypes)) {
+            foreach ($taxonomyContentTypes as $cType) {
+                $class = $cType['class'];
+                $menu['Manage']->addChild($class->getName(), array(
+                    'route' => 'taxonomy_home',
+                    'routeParameters' => array(
+                        'schema' => $class->getSchema()
+                    )
+                ));
+            }
+            $menu['Manage']->addChild('--', array('uri' => '#'))->setAttribute('divider', true);
+        }
 
         $menu['Manage']->addChild('Image Thumb Styles', array(
             'route' => 'thumbstyle_home'
