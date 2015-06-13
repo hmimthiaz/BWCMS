@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 
 /**
  * Page controller.
@@ -108,16 +109,40 @@ class ContentController extends BaseController implements BackEndControllerInter
      */
     public function taxonomyAction(Request $request)
     {
+        $type = 'Taxonomy';
         $schema = $request->get('schema');
+        $start = $request->get('start', 0);
+        $length = $request->get('length', 10);
+
         if (is_null($schema)) {
             throw new \InvalidArgumentException('Invalid Schema');
         }
-        $taxonomyClass = $this->cm()->getContentClass('Taxonomy', $schema);
+        $taxonomyClass = $this->cm()->getContentClass($type, $schema);
         if (empty($taxonomyClass)) {
             throw new \InvalidArgumentException('Invalid Schema');
         }
 
+        /**
+         * Get All the root folders
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $parentFolder
+         */
+        $uiSortEnabled = false;
+        $contentRepository = $this->cm()->getContentRepository();
+        $qb = $contentRepository->getChildrenQueryBuilder(null, true);
+        $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' ) ");
+        $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->setFirstResult($start);
+        $qb->setMaxResults($length);
+
+        $entities = $qb->getQuery()->getResult();
+        $totalCount = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+
         return array(
+            'type' => 'Taxonomy',
+            'entities' => $entities,
+            'totalCount' => $totalCount,
+            'schema' => $schema,
             'title' => $taxonomyClass->getName() . ' Manager',
         );
 
@@ -292,6 +317,9 @@ class ContentController extends BaseController implements BackEndControllerInter
             return $this->returnErrorResponse();
         }
 
+        /**
+         * @var ContentType $class
+         */
         $class = $this->cm()->getContentClass($type, $schema);
         $form = $class->getForm();
         $form->handleRequest($request);
@@ -313,7 +341,10 @@ class ContentController extends BaseController implements BackEndControllerInter
             if ($contentEntity->getTreeParent() != null) {
                 $parentId = $contentEntity->getTreeParent()->getId();
             }
-            list($type) = explode('.', $contentEntity->getType());
+
+            if ($class->isIsTaxonomy()) {
+                return $this->redirect($this->generateUrl('taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
+            }
             return $this->redirect($this->generateUrl('content_home', array('type' => $type, 'parent' => $parentId)));
         }
 
@@ -371,7 +402,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             $content->setTemplate('');
 
             $content->setSlug($this->cm()->generateSlug($content->getTitle(), $content->getType(), $parentId));
-            $content->setStatus('Draft');
+            $content->setStatus(ContentPublishType::Published);
             $this->cm()->save($content);
         }
         return new Response('Ok', 200);
