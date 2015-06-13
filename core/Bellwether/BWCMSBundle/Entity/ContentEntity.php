@@ -69,6 +69,11 @@ class ContentEntity
      */
     private $meta;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Bellwether\BWCMSBundle\Entity\ContentRelationEntity", mappedBy="content")
+     */
+    private $relation;
+
     private $loadedMeta = null;
 
     /**
