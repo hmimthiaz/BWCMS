@@ -368,18 +368,29 @@ abstract class ContentType implements ContentTypeInterface
                 $taxonomyClass = $this->cm()->getContentClass($relation['type'], $relation['schema']);
                 $terms = $this->cm()->getTaxonomyTerms($taxonomyClass);
                 $constraints = array();
-                if($relation['required']){
+                if ($relation['required']) {
                     $constraints[] = new NotBlank(array('message' => 'Please select an item.'));
                 }
-                $this->fb()->add($relation['fieldName'], 'choice',
-                    array(
-                        'choices' => $terms,
-                        'label' => $relation['title'],
-                        'expanded' => $relation['multiple'],
-                        'multiple' => $relation['multiple'],
-                        'constraints' => $constraints
-                    )
-                );
+                if ($taxonomyClass->isHierarchy()) {
+                    $this->fb()->add($relation['fieldName'], 'bwcms_taxonomy_tree',
+                        array(
+                            'label' => $relation['title'],
+                            'nodes' => $terms,
+                            'constraints' => $constraints
+                        )
+                    );
+
+                } else {
+                    $this->fb()->add($relation['fieldName'], 'choice',
+                        array(
+                            'choices' => $terms,
+                            'label' => $relation['title'],
+                            'expanded' => $relation['multiple'],
+                            'multiple' => $relation['multiple'],
+                            'constraints' => $constraints
+                        )
+                    );
+                }
             }
         }
 

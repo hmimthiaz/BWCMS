@@ -224,8 +224,8 @@ class ContentService extends BaseService
         $this->em()->persist($newContent);
 
         $existingRelation = $content->getRelation();
-        if(!empty($existingRelation)){
-            foreach($existingRelation as $relation){
+        if (!empty($existingRelation)) {
+            foreach ($existingRelation as $relation) {
                 $newRelation = clone $relation;
                 $newRelation->setContent($newContent);
                 $newContent->addRelation($newRelation);
@@ -301,7 +301,7 @@ class ContentService extends BaseService
                         $formField->setData($fieldValues[$fieldName]);
                     } else {
                         $singleValue = array_pop($fieldValues[$fieldName]);
-                        if(!is_null($singleValue)){
+                        if (!is_null($singleValue)) {
                             $formField->setData($singleValue);
                         }
                     }
@@ -508,26 +508,32 @@ class ContentService extends BaseService
             foreach ($taxonomyRelations as $taxonomyRelation) {
                 $fieldName = $taxonomyRelation['fieldName'];
                 if (isset($data[$fieldName])) {
-                    $fieldValues = (array)$data[$fieldName];
-                    foreach ($fieldValues as $fieldValue) {
-                        $relatedContent = $this->cm()->getContentRepository()->find($fieldValue);
-                        if (!empty($relatedContent)) {
-                            $relation = $this->getRelationForContent($existingRelation, $taxonomyRelation['name'], $relatedContent);
-                            if (is_null($relation)) {
-                                $relation = new ContentRelationEntity();
-                                $relation->setContent($content);
-                                $relation->setRelation($taxonomyRelation['name']);
-                                $relation->setRelatedContent($relatedContent);
-                                $this->em()->persist($relation);
-                            } else {
-                                $relationId = $relation->getId();
-                                if (isset($relationsToRemove[$relationId])) {
-                                    unset($relationsToRemove[$relationId]);
+                    $fieldValues = $data[$fieldName];
+                    if (!is_array($fieldValues)) {
+                        preg_match_all('/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/', $fieldValues, $uuidMatches, PREG_PATTERN_ORDER);
+                        $fieldValues = $uuidMatches[0];
+                    }
+                    if (!empty($fieldValues)) {
+                        foreach ($fieldValues as $fieldValue) {
+                            $relatedContent = $this->cm()->getContentRepository()->find($fieldValue);
+                            if (!empty($relatedContent)) {
+                                $relation = $this->getRelationForContent($existingRelation, $taxonomyRelation['name'], $relatedContent);
+                                if (is_null($relation)) {
+                                    $relation = new ContentRelationEntity();
+                                    $relation->setContent($content);
+                                    $relation->setRelation($taxonomyRelation['name']);
+                                    $relation->setRelatedContent($relatedContent);
+                                    $this->em()->persist($relation);
+                                } else {
+                                    $relationId = $relation->getId();
+                                    if (isset($relationsToRemove[$relationId])) {
+                                        unset($relationsToRemove[$relationId]);
+                                    }
                                 }
                             }
                         }
+                        unset($data[$fieldName]);
                     }
-                    unset($data[$fieldName]);
                 }
             }
 
@@ -709,18 +715,44 @@ class ContentService extends BaseService
         }
         $returnTerms = array();
 
-        /**
-         * Get All the root folders
-         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
-         */
-        $contentRepository = $this->cm()->getContentRepository();
-        $qb = $contentRepository->getChildrenQueryBuilder(null, true);
-        $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' ) ");
-        $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
-        $entities = $qb->getQuery()->getResult();
-        if (!empty($entities)) {
-            foreach ($entities as $content) {
-                $returnTerms[$content->getId()] = $content->getTitle();
+        if ($taxonomyClass->isHierarchy()) {
+
+            $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
+            $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' )");
+            $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+            $rootFolders = $qb->getQuery()->getResult();
+
+            if (!empty($rootFolders)) {
+                /** @var ContentEntity $content */
+                foreach ($rootFolders as $content) {
+                    $node['id'] = $content->getId();
+                    $node['text'] = $content->getTitle();
+                    $node['icon'] = 'glyphicon glyphicon-folder-open';
+                    if ($content->getTreeParent() != null) {
+                        $node['parent'] = $content->getTreeParent()->getId();
+                    } else {
+                        $node['parent'] = '#';
+                    }
+                    $node['state'] = array(
+                        'opened' => true
+                    );
+                    $returnTerms[] = $node;
+                }
+            }
+        } else {
+            /**
+             * Get All the root folders
+             * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+             */
+            $contentRepository = $this->cm()->getContentRepository();
+            $qb = $contentRepository->getChildrenQueryBuilder(null, true);
+            $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' ) ");
+            $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+            $entities = $qb->getQuery()->getResult();
+            if (!empty($entities)) {
+                foreach ($entities as $content) {
+                    $returnTerms[$content->getId()] = $content->getTitle();
+                }
             }
         }
         return $returnTerms;
