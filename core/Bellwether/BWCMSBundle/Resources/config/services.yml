@@ -44,6 +44,11 @@ services:
     arguments: [@service_container]
     tags:
       - { name: form.type , alias: bwcms_content_template }
+  BWCMS.Form.Type.Taxonomy.Tree:
+    class: Bellwether\BWCMSBundle\Form\Type\TaxonomyTreeType
+    arguments: [@service_container]
+    tags:
+      - { name: form.type , alias: bwcms_taxonomy_tree }
   BWCMS.Form.Type.Collection:
     class: Bellwether\BWCMSBundle\Form\Type\CollectionType
     tags:

@@ -7,6 +7,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
+use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 
 /**
  * Page controller.
@@ -47,10 +49,10 @@ class ContentController extends BaseController implements BackEndControllerInter
         );
     }
 
-    function getFolderTree($type, $parentId)
+    function getFolderTree($type, $parentId, $schema = null, $rootFolderCaption = 'Folders')
     {
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
-        $registeredContents = $this->cm()->getRegisteredContentTypes($type);
+        $registeredContents = $this->cm()->getRegisteredContentTypes($type, $schema);
         $condition = array();
         foreach ($registeredContents as $cInfo) {
             $class = $cInfo['class'];
@@ -68,7 +70,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         $jsNodes = array(
             array(
                 'id' => 'Root',
-                'text' => 'Folders',
+                'text' => $rootFolderCaption,
                 'icon' => 'glyphicon glyphicon-folder-open',
                 'parent' => '#',
                 'state' => array(
@@ -99,6 +101,59 @@ class ContentController extends BaseController implements BackEndControllerInter
             }
         }
         return $jsNodes;
+    }
+
+    /**
+     * @Route("/taxonomy.php",name="taxonomy_home")
+     * @Template()
+     */
+    public function taxonomyAction(Request $request)
+    {
+        $type = 'Taxonomy';
+        $schema = $request->get('schema');
+        $start = $request->get('start', 0);
+        $length = $request->get('length', 10);
+
+        if (is_null($schema)) {
+            throw new \InvalidArgumentException('Invalid Schema');
+        }
+        $taxonomyClass = $this->cm()->getContentClass($type, $schema);
+        if (empty($taxonomyClass)) {
+            throw new \InvalidArgumentException('Invalid Schema');
+        }
+
+        $isHierarchy = $taxonomyClass->isHierarchy();
+        $returnVars = array(
+            'type' => 'Taxonomy',
+            'isHierarchy' => $isHierarchy,
+            'schema' => $schema,
+            'title' => $taxonomyClass->getName() . ' Manager',
+        );
+
+
+        if ($isHierarchy) {
+            $jsNodes = $this->getFolderTree($type, 'Root', $schema, $taxonomyClass->getName());
+            $returnVars['jsNodes'] = json_encode($jsNodes);
+        } else {
+            /**
+             * Get All the root folders
+             * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+             * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $parentFolder
+             */
+            $uiSortEnabled = false;
+            $contentRepository = $this->cm()->getContentRepository();
+            $qb = $contentRepository->getChildrenQueryBuilder(null, true);
+            $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' ) ");
+            $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+            $qb->setFirstResult($start);
+            $qb->setMaxResults($length);
+
+            $returnVars['entities'] = $qb->getQuery()->getResult();
+            $returnVars['totalCount'] = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+        }
+
+        return $returnVars;
+
     }
 
     /**
@@ -270,6 +325,9 @@ class ContentController extends BaseController implements BackEndControllerInter
             return $this->returnErrorResponse();
         }
 
+        /**
+         * @var ContentType $class
+         */
         $class = $this->cm()->getContentClass($type, $schema);
         $form = $class->getForm();
         $form->handleRequest($request);
@@ -291,7 +349,10 @@ class ContentController extends BaseController implements BackEndControllerInter
             if ($contentEntity->getTreeParent() != null) {
                 $parentId = $contentEntity->getTreeParent()->getId();
             }
-            list($type) = explode('.', $contentEntity->getType());
+
+            if ($class->isIsTaxonomy()) {
+                return $this->redirect($this->generateUrl('taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
+            }
             return $this->redirect($this->generateUrl('content_home', array('type' => $type, 'parent' => $parentId)));
         }
 
@@ -349,7 +410,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             $content->setTemplate('');
 
             $content->setSlug($this->cm()->generateSlug($content->getTitle(), $content->getType(), $parentId));
-            $content->setStatus('Draft');
+            $content->setStatus(ContentPublishType::Published);
             $this->cm()->save($content);
         }
         return new Response('Ok', 200);

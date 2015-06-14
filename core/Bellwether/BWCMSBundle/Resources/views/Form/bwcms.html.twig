@@ -35,6 +35,32 @@
     {% endspaceless %}
 {% endblock bwcms_collection_widget %}
 
+{% block bwcms_taxonomy_tree_widget %}
+    {% spaceless %}
+    <div id="{{ holderId }}"  class="taxonomyTree"></div>
+    <input id="{{ id }}" type="hidden" name="{{ full_name }}" class="value" {% if value is not empty %}value="{{ value }}" {% endif %}>
+    <script language="JavaScript">
+        $(document).ready(function () {
+            $("#{{ holderId }}").jstree({
+                'core': {
+                    'data': {{ nodes|raw }},
+                    'multiple': false,
+                    'check_callback': function (operation, node, node_parent, node_position, more) {
+                        return true;
+                    }
+                },
+                'checkbox':{
+                    'three_state': false,
+                    'tie_selection': false
+                },
+                'plugins': ['checkbox']
+            });
+            $("#{{ holderId }}").on('check_node.jstree', function (node, selected, event) {$("#{{ id }}").val(selected.selected.join());});
+            $("#{{ holderId }}").on('uncheck_node.jstree', function (node, selected, event) {$("#{{ id }}").val(selected.selected.join());});
+        });
+    </script>
+    {% endspaceless %}
+{% endblock bwcms_taxonomy_tree_widget %}
 
 {% block bwcms_content_widget %}
     {% spaceless %}

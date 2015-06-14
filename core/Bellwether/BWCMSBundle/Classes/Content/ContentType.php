@@ -28,6 +28,8 @@ use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Symfony\Component\Routing\RouteCollection;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
 abstract class ContentType implements ContentTypeInterface
@@ -105,6 +107,18 @@ abstract class ContentType implements ContentTypeInterface
      * @var bool
      */
     private $isUploadEnabled = false;
+
+    /**
+     * @var bool
+     */
+    private $isPublishDateEnabled = false;
+
+    /**
+     * @var bool
+     */
+    private $isExpireDateEnabled = false;
+
+    private $taxonomyRelations = null;
 
     public function getType()
     {
@@ -209,13 +223,11 @@ abstract class ContentType implements ContentTypeInterface
     {
         if ($this->fields == null) {
             $this->fields = array();
-
             $this->addField('id', ContentFieldType::Internal);
             $this->addField('type', ContentFieldType::Internal);
             $this->addField('schema', ContentFieldType::Internal);
             $this->addField('template', ContentFieldType::Internal);
             $this->addField('parent', ContentFieldType::Internal);
-
             $this->addField('title', ContentFieldType::Internal);
             if ($this->isSummaryEnabled) {
                 $this->addField('summary', ContentFieldType::Internal);
@@ -233,11 +245,32 @@ abstract class ContentType implements ContentTypeInterface
                 $this->addField('sortBy', ContentFieldType::Internal);
                 $this->addField('sortOrder', ContentFieldType::Internal);
             }
-
             $this->addField('status', ContentFieldType::Internal);
+            if ($this->isPublishDateEnabled()) {
+                $this->addField('publishDate', ContentFieldType::Internal);
+            }
+            if ($this->isExpireDateEnabled()) {
+                $this->addField('expireDate', ContentFieldType::Internal);
+            }
             $this->buildFields();
         }
         return $this->fields;
+    }
+
+    final public function addTaxonomyRelation($name, $schema, $isMultiple = true, $required = true)
+    {
+        if (is_null($this->taxonomyRelations)) {
+            $this->taxonomyRelations = array();
+        }
+        $this->taxonomyRelations[$name] = array(
+            'title' => ucwords(strtolower($name)),
+            'name' => $name,
+            'fieldName' => strtolower('Taxonomy_' . $name),
+            'multiple' => $isMultiple,
+            'required' => $required,
+            'type' => 'Taxonomy',
+            'schema' => $schema
+        );
     }
 
     /**
@@ -337,6 +370,43 @@ abstract class ContentType implements ContentTypeInterface
             );
         }
 
+    }
+
+    private function setDefaultHiddenFormFields()
+    {
+
+        $relations = $this->getTaxonomyRelations();
+        if (!empty($relations)) {
+            foreach ($relations as $relation) {
+                $taxonomyClass = $this->cm()->getContentClass($relation['type'], $relation['schema']);
+                $terms = $this->cm()->getTaxonomyTerms($taxonomyClass);
+                $constraints = array();
+                if ($relation['required']) {
+                    $constraints[] = new NotBlank(array('message' => 'Please select an item.'));
+                }
+                if ($taxonomyClass->isHierarchy()) {
+                    $this->fb()->add($relation['fieldName'], 'bwcms_taxonomy_tree',
+                        array(
+                            'label' => $relation['title'],
+                            'nodes' => $terms,
+                            'constraints' => $constraints
+                        )
+                    );
+
+                } else {
+                    $this->fb()->add($relation['fieldName'], 'choice',
+                        array(
+                            'choices' => $terms,
+                            'label' => $relation['title'],
+                            'expanded' => $relation['multiple'],
+                            'multiple' => $relation['multiple'],
+                            'constraints' => $constraints
+                        )
+                    );
+                }
+            }
+        }
+
         if ($this->isSlugEnabled) {
             $this->fb()->add('slug', 'text',
                 array(
@@ -373,10 +443,6 @@ abstract class ContentType implements ContentTypeInterface
                 'label' => 'Sort Order'
             ));
         }
-    }
-
-    private function setDefaultHiddenFormFields()
-    {
 
         $templates = $this->getTemplates();
         if (count($templates) == 1) {
@@ -402,6 +468,22 @@ abstract class ContentType implements ContentTypeInterface
                 )
             )
         );
+
+        if ($this->isPublishDateEnabled()) {
+            $this->fb()->add('publishDate', 'datetime',
+                array(
+                    'label' => 'Publish Time',
+                )
+            );
+        }
+
+        if ($this->isExpireDateEnabled()) {
+            $this->fb()->add('expireDate', 'datetime',
+                array(
+                    'label' => 'Expire Time',
+                )
+            );
+        }
 
         $this->fb()->add('id', 'hidden');
 
@@ -682,6 +764,48 @@ abstract class ContentType implements ContentTypeInterface
     {
         $this->isSortEnabled = $isSortEnabled;
     }
+
+    /**
+     * @return boolean
+     */
+    public function isPublishDateEnabled()
+    {
+        return $this->isPublishDateEnabled;
+    }
+
+    /**
+     * @param boolean $isPublishDateEnabled
+     */
+    public function setIsPublishDateEnabled($isPublishDateEnabled)
+    {
+        $this->isPublishDateEnabled = $isPublishDateEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isExpireDateEnabled()
+    {
+        return $this->isExpireDateEnabled;
+    }
+
+    /**
+     * @param boolean $isExpireDateEnabled
+     */
+    public function setIsExpireDateEnabled($isExpireDateEnabled)
+    {
+        $this->isExpireDateEnabled = $isExpireDateEnabled;
+    }
+
+
+    /**
+     * @return null
+     */
+    public function getTaxonomyRelations()
+    {
+        return $this->taxonomyRelations;
+    }
+
 
     public function dump($var, $maxDepth = 2, $stripTags = true)
     {

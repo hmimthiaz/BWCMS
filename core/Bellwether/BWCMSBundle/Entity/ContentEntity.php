@@ -72,6 +72,13 @@ class ContentEntity
     private $loadedMeta = null;
 
     /**
+     * @ORM\OneToMany(targetEntity="Bellwether\BWCMSBundle\Entity\ContentRelationEntity", mappedBy="content")
+     */
+    private $relation;
+
+    private $loadedRelation = null;
+
+    /**
      * @Gedmo\TreeParent
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="children")
      * @ORM\JoinColumn(name="treeParentId", referencedColumnName="id", onDelete="CASCADE")
@@ -184,9 +191,10 @@ class ContentEntity
     public function __construct()
     {
         $this->meta = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->relation = new \Doctrine\Common\Collections\ArrayCollection();
         $this->sortBy = ContentSortByType::Created;
         $this->sortOrder = ContentSortOrderType::DESC;
-        $this->status = 'Draft';
+        $this->status = ContentPublishType::Draft;
     }
 
     /**
@@ -196,6 +204,15 @@ class ContentEntity
     {
         return $this->meta;
     }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getRelation()
+    {
+        return $this->relation;
+    }
+
 
     /**
      * @return mixed
@@ -675,7 +692,7 @@ class ContentEntity
      * @param ContentMetaEntity $meta
      * @return $this
      */
-    public function addMeta(\Bellwether\BWCMSBundle\Entity\ContentMetaEntity $meta)
+    public function addMeta(ContentMetaEntity $meta)
     {
         $this->meta->add($meta);
         return $this;
@@ -685,7 +702,7 @@ class ContentEntity
      * @param ContentMetaEntity $meta
      * @return $this
      */
-    public function removeMeta(\Bellwether\BWCMSBundle\Entity\ContentMetaEntity $meta)
+    public function removeMeta(ContentMetaEntity $meta)
     {
         $this->meta->removeElement($meta);
         return $this;
@@ -707,5 +724,40 @@ class ContentEntity
         $this->loadedMeta = $loadedMeta;
     }
 
+    /**
+     * @param ContentRelationEntity $relation
+     * @return $this
+     */
+    public function addRelation(ContentRelationEntity $relation)
+    {
+        $this->relation->add($relation);
+        return $this;
+    }
+
+    /**
+     * @param ContentRelationEntity $relation
+     * @return $this
+     */
+    public function removeRelation(ContentRelationEntity $relation)
+    {
+        $this->relation->removeElement($relation);
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getLoadedRelation()
+    {
+        return $this->loadedRelation;
+    }
+
+    /**
+     * @param null $loadedRelation
+     */
+    public function setLoadedRelation($loadedRelation)
+    {
+        $this->loadedRelation = $loadedRelation;
+    }
 
 }

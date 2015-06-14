@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block header %}
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/js/jstree/themes/default/style.min.css') }}"/>
 {% endblock %}
 
 {% block body %}
@@ -14,6 +15,7 @@
 
 
 {% block footer %}
+    <script src="{{ asset('bundles/bwcms/js/jstree/jstree.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/js/tinymce/jquery.tinymce.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/js/tinymce/tinymce.min.js') }}"></script>
     <script src="{{ url('editor_init') }}"></script>

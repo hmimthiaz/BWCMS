@@ -6,6 +6,7 @@ use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
+use Bellwether\BWCMSBundle\Entity\ContentRelationEntity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
@@ -14,12 +15,19 @@ use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 use Bellwether\BWCMSBundle\Classes\Base\ContentTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Content\Type\ContentFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\ContentPageType;
+
 use Bellwether\BWCMSBundle\Classes\Content\Type\MediaFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\MediaFileType;
+
 use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationLinkType;
+
 use Bellwether\BWCMSBundle\Classes\Content\Type\WidgetFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\WidgetHtmlType;
+
+use Bellwether\BWCMSBundle\Classes\Content\Type\TaxonomyCategoryType;
+use Bellwether\BWCMSBundle\Classes\Content\Type\TaxonomyTagType;
+
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Bellwether\Common\StringUtility;
@@ -73,6 +81,9 @@ class ContentService extends BaseService
         $this->registerContentType(new WidgetFolderType($this->container, $this->requestStack));
         $this->registerContentType(new WidgetHtmlType($this->container, $this->requestStack));
 
+        $this->registerContentType(new TaxonomyCategoryType($this->container, $this->requestStack));
+        $this->registerContentType(new TaxonomyTagType($this->container, $this->requestStack));
+
         //Call other Content Types
         $this->getEventDispatcher()->dispatch('BWCMS.Content.Register');
     }
@@ -82,8 +93,18 @@ class ContentService extends BaseService
      */
     public function registerContentType(ContentTypeInterface $classInstance)
     {
-        $slug = $classInstance->getType() . '.' . $classInstance->getSchema();
+        $slug = $this->getClassSlug($classInstance->getType(), $classInstance->getSchema());
         $this->contentType[$slug] = $classInstance;
+    }
+
+    /**
+     * @param string $type
+     * @param string $schema
+     * @return string
+     */
+    public function getClassSlug($type, $schema)
+    {
+        return strtoupper($type) . '.' . strtoupper($schema);
     }
 
     /**
@@ -92,7 +113,7 @@ class ContentService extends BaseService
      */
     public function removeContentType($type, $schema)
     {
-        $slug = $type . '.' . $schema;
+        $slug = $this->getClassSlug($type, $schema);
         if (isset($this->contentType[$slug])) {
             unset($this->contentType[$slug]);
         }
@@ -169,7 +190,7 @@ class ContentService extends BaseService
      */
     public function getContentClass($type, $schema = 'Default')
     {
-        $slug = $type . '.' . $schema;
+        $slug = $this->getClassSlug($type, $schema);
         if (!isset($this->contentType[$slug])) {
             throw new \RuntimeException("ContentType: `{$slug}` does not exists.");
         }
@@ -201,6 +222,16 @@ class ContentService extends BaseService
         }
 
         $this->em()->persist($newContent);
+
+        $existingRelation = $content->getRelation();
+        if (!empty($existingRelation)) {
+            foreach ($existingRelation as $relation) {
+                $newRelation = clone $relation;
+                $newRelation->setContent($newContent);
+                $newContent->addRelation($newRelation);
+                $this->em()->persist($newRelation);
+            }
+        }
 
         $existingMeta = $content->getMeta();
         if (!empty($existingMeta)) {
@@ -248,6 +279,39 @@ class ContentService extends BaseService
         if ($classInstance->isSortEnabled()) {
             $form->get('sortBy')->setData($content->getSortBy());
             $form->get('sortOrder')->setData($content->getSortOrder());
+        }
+        if ($classInstance->isPublishDateEnabled()) {
+            $form->get('publishDate')->setData($content->getPublishDate());
+        }
+        if ($classInstance->isExpireDateEnabled()) {
+            $form->get('expireDate')->setData($content->getExpireDate());
+        }
+        $taxonomyRelations = $classInstance->getTaxonomyRelations();
+        if (!empty($taxonomyRelations)) {
+            $existingRelation = $content->getRelation();
+            $fieldValues = array();
+            foreach ($existingRelation as $relation) {
+                $formFieldName = $taxonomyRelations[$relation->getRelation()]['fieldName'];
+                $fieldValues[$formFieldName][] = $relation->getRelatedContent()->getId();
+            }
+            foreach ($taxonomyRelations as $taxonomyRelation) {
+                $fieldName = $taxonomyRelation['fieldName'];
+                if (isset($fieldValues[$fieldName]) && !empty($fieldValues[$fieldName])) {
+                    try {
+                        $formField = $form->get($fieldName);
+                    } catch (\OutOfBoundsException $e) {
+                        continue;
+                    }
+                    if ($taxonomyRelation['multiple']) {
+                        $formField->setData($fieldValues[$fieldName]);
+                    } else {
+                        $singleValue = array_pop($fieldValues[$fieldName]);
+                        if (!is_null($singleValue)) {
+                            $formField->setData($singleValue);
+                        }
+                    }
+                }
+            }
         }
 
         $existingMeta = $content->getMeta();
@@ -418,6 +482,16 @@ class ContentService extends BaseService
             if ($fieldName == 'sortOrder') {
                 $content->setSortOrder($data['sortOrder']);
             }
+            if ($fieldName == 'publishDate') {
+                if ($data['publishDate'] instanceof \DateTime) {
+                    $content->setPublishDate($data['publishDate']);
+                }
+            }
+            if ($fieldName == 'expireDate') {
+                if ($data['expireDate'] instanceof \DateTime) {
+                    $content->setExpireDate($data['expireDate']);
+                }
+            }
             if ($fieldName == 'attachment') {
                 $mediaInfo = $this->mm()->handleUpload($data['attachment']);
                 $content->setMime($mediaInfo['mimeType']);
@@ -437,6 +511,56 @@ class ContentService extends BaseService
         } else {
             $content->setSlug(StringUtility::sanitizeTitle($content->getSlug()));
         }
+
+        $taxonomyRelations = $classInstance->getTaxonomyRelations();
+        if (!empty($taxonomyRelations)) {
+            $existingRelation = $content->getRelation();
+            $relationsToRemove = array();
+            foreach ($existingRelation as $relation) {
+                $relationsToRemove[$relation->getId()] = 'Yes';
+            }
+
+            foreach ($taxonomyRelations as $taxonomyRelation) {
+                $fieldName = $taxonomyRelation['fieldName'];
+                if (isset($data[$fieldName])) {
+                    $fieldValues = $data[$fieldName];
+                    if (!is_array($fieldValues)) {
+                        preg_match_all('/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/', $fieldValues, $uuidMatches, PREG_PATTERN_ORDER);
+                        $fieldValues = $uuidMatches[0];
+                    }
+                    if (!empty($fieldValues)) {
+                        foreach ($fieldValues as $fieldValue) {
+                            $relatedContent = $this->cm()->getContentRepository()->find($fieldValue);
+                            if (!empty($relatedContent)) {
+                                $relation = $this->getRelationForContent($existingRelation, $taxonomyRelation['name'], $relatedContent);
+                                if (is_null($relation)) {
+                                    $relation = new ContentRelationEntity();
+                                    $relation->setContent($content);
+                                    $relation->setRelation($taxonomyRelation['name']);
+                                    $relation->setRelatedContent($relatedContent);
+                                    $this->em()->persist($relation);
+                                } else {
+                                    $relationId = $relation->getId();
+                                    if (isset($relationsToRemove[$relationId])) {
+                                        unset($relationsToRemove[$relationId]);
+                                    }
+                                }
+                            }
+                        }
+                        unset($data[$fieldName]);
+                    }
+                }
+            }
+
+            foreach ($existingRelation as $relation) {
+                $relationId = $relation->getId();
+                if (array_key_exists($relationId, $relationsToRemove) === true) {
+                    $this->em()->remove($relation);
+                }
+            }
+
+        }
+
         $metaData = $this->removeNonMetaData($data);
         if (!empty($metaData)) {
             $existingMeta = $content->getMeta();
@@ -527,6 +651,24 @@ class ContentService extends BaseService
     }
 
     /**
+     * @param array $existingRelation
+     * @param string $relation
+     * @param ContentEntity $relatedContent
+     * @return ContentRelationEntity
+     */
+    private function getRelationForContent($existingRelation, $relation, $relatedContent)
+    {
+        if (!empty($existingRelation)) {
+            foreach ($existingRelation as $eRelation) {
+                if ($eRelation->getRelation() == $relation && $eRelation->getRelatedContent()->getId() == $relatedContent->getId()) {
+                    return $eRelation;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * @param ContentEntity $content
      * @return ContentEntity|void
      */
@@ -542,6 +684,9 @@ class ContentService extends BaseService
         $content->setModifiedDate(new \DateTime());
         if ($content->getAuthor() == null) {
             $content->setAuthor($this->getUser());
+        }
+        if ($content->getPublishDate() == null && $content->getStatus() == ContentPublishType::Published) {
+            $content->setPublishDate(new \DateTime());
         }
         $this->em()->persist($content);
         $this->em()->flush();
@@ -577,6 +722,60 @@ class ContentService extends BaseService
         }
         return $content;
     }
+
+    /**
+     * @param ContentType $taxonomyClass
+     */
+    public function getTaxonomyTerms($taxonomyClass)
+    {
+        if (!$taxonomyClass->isIsTaxonomy()) {
+            throw new \InvalidArgumentException('Invalid Schema');
+        }
+        $returnTerms = array();
+
+        if ($taxonomyClass->isHierarchy()) {
+
+            $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
+            $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' )");
+            $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+            $rootFolders = $qb->getQuery()->getResult();
+
+            if (!empty($rootFolders)) {
+                /** @var ContentEntity $content */
+                foreach ($rootFolders as $content) {
+                    $node['id'] = $content->getId();
+                    $node['text'] = $content->getTitle();
+                    $node['icon'] = 'glyphicon glyphicon-folder-open';
+                    if ($content->getTreeParent() != null) {
+                        $node['parent'] = $content->getTreeParent()->getId();
+                    } else {
+                        $node['parent'] = '#';
+                    }
+                    $node['state'] = array(
+                        'opened' => true
+                    );
+                    $returnTerms[] = $node;
+                }
+            }
+        } else {
+            /**
+             * Get All the root folders
+             * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+             */
+            $contentRepository = $this->cm()->getContentRepository();
+            $qb = $contentRepository->getChildrenQueryBuilder(null, true);
+            $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' ) ");
+            $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+            $entities = $qb->getQuery()->getResult();
+            if (!empty($entities)) {
+                foreach ($entities as $content) {
+                    $returnTerms[$content->getId()] = $content->getTitle();
+                }
+            }
+        }
+        return $returnTerms;
+    }
+
 
     /**
      * @param ContentEntity $contentEntity
