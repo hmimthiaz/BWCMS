@@ -49,10 +49,10 @@ class ContentController extends BaseController implements BackEndControllerInter
         );
     }
 
-    function getFolderTree($type, $parentId)
+    function getFolderTree($type, $parentId, $schema = null, $rootFolderCaption = 'Folders')
     {
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
-        $registeredContents = $this->cm()->getRegisteredContentTypes($type);
+        $registeredContents = $this->cm()->getRegisteredContentTypes($type, $schema);
         $condition = array();
         foreach ($registeredContents as $cInfo) {
             $class = $cInfo['class'];
@@ -70,7 +70,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         $jsNodes = array(
             array(
                 'id' => 'Root',
-                'text' => 'Folders',
+                'text' => $rootFolderCaption,
                 'icon' => 'glyphicon glyphicon-folder-open',
                 'parent' => '#',
                 'state' => array(
@@ -122,29 +122,37 @@ class ContentController extends BaseController implements BackEndControllerInter
             throw new \InvalidArgumentException('Invalid Schema');
         }
 
-        /**
-         * Get All the root folders
-         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
-         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $parentFolder
-         */
-        $uiSortEnabled = false;
-        $contentRepository = $this->cm()->getContentRepository();
-        $qb = $contentRepository->getChildrenQueryBuilder(null, true);
-        $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' ) ");
-        $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
-        $qb->setFirstResult($start);
-        $qb->setMaxResults($length);
-
-        $entities = $qb->getQuery()->getResult();
-        $totalCount = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
-
-        return array(
+        $isHierarchy = $taxonomyClass->isHierarchy();
+        $returnVars = array(
             'type' => 'Taxonomy',
-            'entities' => $entities,
-            'totalCount' => $totalCount,
+            'isHierarchy' => $isHierarchy,
             'schema' => $schema,
             'title' => $taxonomyClass->getName() . ' Manager',
         );
+
+
+        if ($isHierarchy) {
+            $jsNodes = $this->getFolderTree($type, 'Root', $schema, $taxonomyClass->getName());
+            $returnVars['jsNodes'] = json_encode($jsNodes);
+        } else {
+            /**
+             * Get All the root folders
+             * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+             * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $parentFolder
+             */
+            $uiSortEnabled = false;
+            $contentRepository = $this->cm()->getContentRepository();
+            $qb = $contentRepository->getChildrenQueryBuilder(null, true);
+            $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' ) ");
+            $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+            $qb->setFirstResult($start);
+            $qb->setMaxResults($length);
+
+            $returnVars['entities'] = $qb->getQuery()->getResult();
+            $returnVars['totalCount'] = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+        }
+
+        return $returnVars;
 
     }
 

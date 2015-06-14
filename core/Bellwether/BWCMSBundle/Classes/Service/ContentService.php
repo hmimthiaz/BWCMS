@@ -15,13 +15,19 @@ use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 use Bellwether\BWCMSBundle\Classes\Base\ContentTypeInterface;
 use Bellwether\BWCMSBundle\Classes\Content\Type\ContentFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\ContentPageType;
+
 use Bellwether\BWCMSBundle\Classes\Content\Type\MediaFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\MediaFileType;
+
 use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\NavigationLinkType;
+
 use Bellwether\BWCMSBundle\Classes\Content\Type\WidgetFolderType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\WidgetHtmlType;
+
+use Bellwether\BWCMSBundle\Classes\Content\Type\TaxonomyCategoryType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\TaxonomyTagType;
+
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Bellwether\Common\StringUtility;
@@ -75,6 +81,7 @@ class ContentService extends BaseService
         $this->registerContentType(new WidgetFolderType($this->container, $this->requestStack));
         $this->registerContentType(new WidgetHtmlType($this->container, $this->requestStack));
 
+        $this->registerContentType(new TaxonomyCategoryType($this->container, $this->requestStack));
         $this->registerContentType(new TaxonomyTagType($this->container, $this->requestStack));
 
         //Call other Content Types
