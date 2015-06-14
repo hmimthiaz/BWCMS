@@ -280,7 +280,12 @@ class ContentService extends BaseService
             $form->get('sortBy')->setData($content->getSortBy());
             $form->get('sortOrder')->setData($content->getSortOrder());
         }
-
+        if ($classInstance->isPublishDateEnabled()) {
+            $form->get('publishDate')->setData($content->getPublishDate());
+        }
+        if ($classInstance->isExpireDateEnabled()) {
+            $form->get('expireDate')->setData($content->getExpireDate());
+        }
         $taxonomyRelations = $classInstance->getTaxonomyRelations();
         if (!empty($taxonomyRelations)) {
             $existingRelation = $content->getRelation();
@@ -477,6 +482,16 @@ class ContentService extends BaseService
             if ($fieldName == 'sortOrder') {
                 $content->setSortOrder($data['sortOrder']);
             }
+            if ($fieldName == 'publishDate') {
+                if ($data['publishDate'] instanceof \DateTime) {
+                    $content->setPublishDate($data['publishDate']);
+                }
+            }
+            if ($fieldName == 'expireDate') {
+                if ($data['expireDate'] instanceof \DateTime) {
+                    $content->setExpireDate($data['expireDate']);
+                }
+            }
             if ($fieldName == 'attachment') {
                 $mediaInfo = $this->mm()->handleUpload($data['attachment']);
                 $content->setMime($mediaInfo['mimeType']);
@@ -669,6 +684,9 @@ class ContentService extends BaseService
         $content->setModifiedDate(new \DateTime());
         if ($content->getAuthor() == null) {
             $content->setAuthor($this->getUser());
+        }
+        if ($content->getPublishDate() == null && $content->getStatus() == ContentPublishType::Published) {
+            $content->setPublishDate(new \DateTime());
         }
         $this->em()->persist($content);
         $this->em()->flush();

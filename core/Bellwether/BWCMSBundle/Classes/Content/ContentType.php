@@ -108,6 +108,16 @@ abstract class ContentType implements ContentTypeInterface
      */
     private $isUploadEnabled = false;
 
+    /**
+     * @var bool
+     */
+    private $isPublishDateEnabled = false;
+
+    /**
+     * @var bool
+     */
+    private $isExpireDateEnabled = false;
+
     private $taxonomyRelations = null;
 
     public function getType()
@@ -213,13 +223,11 @@ abstract class ContentType implements ContentTypeInterface
     {
         if ($this->fields == null) {
             $this->fields = array();
-
             $this->addField('id', ContentFieldType::Internal);
             $this->addField('type', ContentFieldType::Internal);
             $this->addField('schema', ContentFieldType::Internal);
             $this->addField('template', ContentFieldType::Internal);
             $this->addField('parent', ContentFieldType::Internal);
-
             $this->addField('title', ContentFieldType::Internal);
             if ($this->isSummaryEnabled) {
                 $this->addField('summary', ContentFieldType::Internal);
@@ -237,8 +245,13 @@ abstract class ContentType implements ContentTypeInterface
                 $this->addField('sortBy', ContentFieldType::Internal);
                 $this->addField('sortOrder', ContentFieldType::Internal);
             }
-
             $this->addField('status', ContentFieldType::Internal);
+            if ($this->isPublishDateEnabled()) {
+                $this->addField('publishDate', ContentFieldType::Internal);
+            }
+            if ($this->isExpireDateEnabled()) {
+                $this->addField('expireDate', ContentFieldType::Internal);
+            }
             $this->buildFields();
         }
         return $this->fields;
@@ -455,6 +468,22 @@ abstract class ContentType implements ContentTypeInterface
                 )
             )
         );
+
+        if ($this->isPublishDateEnabled()) {
+            $this->fb()->add('publishDate', 'datetime',
+                array(
+                    'label' => 'Publish Time',
+                )
+            );
+        }
+
+        if ($this->isExpireDateEnabled()) {
+            $this->fb()->add('expireDate', 'datetime',
+                array(
+                    'label' => 'Expire Time',
+                )
+            );
+        }
 
         $this->fb()->add('id', 'hidden');
 
@@ -735,6 +764,39 @@ abstract class ContentType implements ContentTypeInterface
     {
         $this->isSortEnabled = $isSortEnabled;
     }
+
+    /**
+     * @return boolean
+     */
+    public function isPublishDateEnabled()
+    {
+        return $this->isPublishDateEnabled;
+    }
+
+    /**
+     * @param boolean $isPublishDateEnabled
+     */
+    public function setIsPublishDateEnabled($isPublishDateEnabled)
+    {
+        $this->isPublishDateEnabled = $isPublishDateEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isExpireDateEnabled()
+    {
+        return $this->isExpireDateEnabled;
+    }
+
+    /**
+     * @param boolean $isExpireDateEnabled
+     */
+    public function setIsExpireDateEnabled($isExpireDateEnabled)
+    {
+        $this->isExpireDateEnabled = $isExpireDateEnabled;
+    }
+
 
     /**
      * @return null
