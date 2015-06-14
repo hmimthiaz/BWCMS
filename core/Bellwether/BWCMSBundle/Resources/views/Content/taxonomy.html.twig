@@ -37,7 +37,6 @@
                 {% endfor %}
                 </tbody>
             </table>
-
             <ul>
                 <li>
                     <a href="{{ path('content_create', { 'type' : type , 'schema' : schema , 'parent': 'Root' } ) }}">
@@ -47,13 +46,11 @@
             </ul>
         </div>
     {% else %}
-
         <div class="row">
             <div class="col-md-12">
                 <div id="jstree_div" class="mediaPageLeft"></div>
             </div>
         </div>
-
         <script language="JavaScript">
             var ajaxRequestActive = false;
             $(document).ready(function () {
@@ -135,15 +132,8 @@
                     },
                     'plugins': ['contextmenu', 'dnd']
                 });
-//            $('#jstree_div').on('select_node.jstree', function (node, selected, event) {
-//                $("#selectedContentFolderId").val(selected.node.id);
-//                contentTable.ajax.reload();
-//            });
-
             });
         </script>
-
-
     {% endif %}
 {% endblock %}
 
