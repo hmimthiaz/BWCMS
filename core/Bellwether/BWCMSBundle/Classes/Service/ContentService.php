@@ -6,6 +6,7 @@ use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
+use Bellwether\BWCMSBundle\Entity\ContentRelationEntity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
@@ -263,6 +264,27 @@ class ContentService extends BaseService
             $form->get('sortOrder')->setData($content->getSortOrder());
         }
 
+        $taxonomyRelations = $classInstance->getTaxonomyRelations();
+        if (!empty($taxonomyRelations)) {
+            $existingRelation = $content->getRelation();
+            $fieldValues = array();
+            foreach ($existingRelation as $relation) {
+                $formFieldName = $taxonomyRelations[$relation->getRelation()]['fieldName'];
+                $fieldValues[$formFieldName][] = $relation->getRelatedContent()->getId();
+            }
+            foreach ($taxonomyRelations as $taxonomyRelation) {
+                $fieldName = $taxonomyRelation['fieldName'];
+                if (isset($fieldValues[$fieldName]) && !empty($fieldValues[$fieldName])) {
+                    try {
+                        $formField = $form->get($fieldName);
+                    } catch (\OutOfBoundsException $e) {
+                        continue;
+                    }
+                    $formField->setData($fieldValues[$fieldName]);
+                }
+            }
+        }
+
         $existingMeta = $content->getMeta();
         if (!empty($existingMeta)) {
             /**
@@ -450,6 +472,50 @@ class ContentService extends BaseService
         } else {
             $content->setSlug(StringUtility::sanitizeTitle($content->getSlug()));
         }
+
+        $taxonomyRelations = $classInstance->getTaxonomyRelations();
+        if (!empty($taxonomyRelations)) {
+            $existingRelation = $content->getRelation();
+            $relationsToRemove = array();
+            foreach ($existingRelation as $relation) {
+                $relationsToRemove[$relation->getId()] = 'Yes';
+            }
+
+            foreach ($taxonomyRelations as $taxonomyRelation) {
+                $fieldName = $taxonomyRelation['fieldName'];
+                if (isset($data[$fieldName])) {
+                    $fieldValues = (array)$data[$fieldName];
+                    foreach ($fieldValues as $fieldValue) {
+                        $relatedContent = $this->cm()->getContentRepository()->find($fieldValue);
+                        if (!empty($relatedContent)) {
+                            $relation = $this->getRelationForContent($existingRelation, $taxonomyRelation['name'], $relatedContent);
+                            if (is_null($relation)) {
+                                $relation = new ContentRelationEntity();
+                                $relation->setContent($content);
+                                $relation->setRelation($taxonomyRelation['name']);
+                                $relation->setRelatedContent($relatedContent);
+                                $this->em()->persist($relation);
+                            } else {
+                                $relationId = $relation->getId();
+                                if (isset($relationsToRemove[$relationId])) {
+                                    unset($relationsToRemove[$relationId]);
+                                }
+                            }
+                        }
+                    }
+                    unset($data[$fieldName]);
+                }
+            }
+            
+            foreach ($existingRelation as $relation) {
+                $relationId = $relation->getId();
+                if (array_key_exists($relationId, $relationsToRemove) === true) {
+                    $this->em()->remove($relation);
+                }
+            }
+
+        }
+
         $metaData = $this->removeNonMetaData($data);
         if (!empty($metaData)) {
             $existingMeta = $content->getMeta();
@@ -537,6 +603,24 @@ class ContentService extends BaseService
         $meta = new ContentMetaEntity();
         $this->em()->persist($meta);
         return $meta;
+    }
+
+    /**
+     * @param array $existingRelation
+     * @param string $relation
+     * @param ContentEntity $relatedContent
+     * @return ContentRelationEntity
+     */
+    private function getRelationForContent($existingRelation, $relation, $relatedContent)
+    {
+        if (!empty($existingRelation)) {
+            foreach ($existingRelation as $eRelation) {
+                if ($eRelation->getRelation() == $relation && $eRelation->getRelatedContent()->getId() == $relatedContent->getId()) {
+                    return $eRelation;
+                }
+            }
+        }
+        return null;
     }
 
     /**

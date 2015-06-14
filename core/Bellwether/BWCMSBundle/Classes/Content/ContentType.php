@@ -242,14 +242,16 @@ abstract class ContentType implements ContentTypeInterface
         return $this->fields;
     }
 
-    final public function addTaxonomyRelation($name, $schema)
+    final public function addTaxonomyRelation($name, $schema, $isMultiple = true)
     {
         if (is_null($this->taxonomyRelations)) {
             $this->taxonomyRelations = array();
         }
         $this->taxonomyRelations[$name] = array(
-            'title' => $name,
-            'name' => strtolower('Taxonomy_' . $name),
+            'title' => ucwords(strtolower($name)),
+            'name' => $name,
+            'fieldName' => strtolower('Taxonomy_' . $name),
+            'multiple' => $isMultiple,
             'type' => 'Taxonomy',
             'schema' => $schema
         );
@@ -362,7 +364,7 @@ abstract class ContentType implements ContentTypeInterface
             foreach ($relations as $relation) {
                 $taxonomyClass = $this->cm()->getContentClass($relation['type'], $relation['schema']);
                 $terms = $this->cm()->getTaxonomyTerms($taxonomyClass);
-                $this->fb()->add($relation['name'], 'choice',
+                $this->fb()->add($relation['fieldName'], 'choice',
                     array(
                         'choices' => $terms,
                         'label' => $relation['title'],
