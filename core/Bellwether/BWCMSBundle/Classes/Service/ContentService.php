@@ -216,6 +216,16 @@ class ContentService extends BaseService
 
         $this->em()->persist($newContent);
 
+        $existingRelation = $content->getRelation();
+        if(!empty($existingRelation)){
+            foreach($existingRelation as $relation){
+                $newRelation = clone $relation;
+                $newRelation->setContent($newContent);
+                $newContent->addRelation($newRelation);
+                $this->em()->persist($newRelation);
+            }
+        }
+
         $existingMeta = $content->getMeta();
         if (!empty($existingMeta)) {
             foreach ($existingMeta as $meta) {
@@ -280,7 +290,14 @@ class ContentService extends BaseService
                     } catch (\OutOfBoundsException $e) {
                         continue;
                     }
-                    $formField->setData($fieldValues[$fieldName]);
+                    if ($taxonomyRelation['multiple']) {
+                        $formField->setData($fieldValues[$fieldName]);
+                    } else {
+                        $singleValue = array_pop($fieldValues[$fieldName]);
+                        if(!is_null($singleValue)){
+                            $formField->setData($singleValue);
+                        }
+                    }
                 }
             }
         }
@@ -506,7 +523,7 @@ class ContentService extends BaseService
                     unset($data[$fieldName]);
                 }
             }
-            
+
             foreach ($existingRelation as $relation) {
                 $relationId = $relation->getId();
                 if (array_key_exists($relationId, $relationsToRemove) === true) {

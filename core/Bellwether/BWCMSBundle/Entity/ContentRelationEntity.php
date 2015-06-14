@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\ContentRelationRepository")
  * @ORM\Table(name="BWContentRelation",
  *      uniqueConstraints={
- *         @ORM\UniqueConstraint(name="ix_relation_relatedContentId", columns={"relation","relatedContentId"}),
+ *         @ORM\UniqueConstraint(name="ix_contentId_relation_relatedContentId", columns={"contentId","relation","relatedContentId"}),
  *     }
  *  )
  **/

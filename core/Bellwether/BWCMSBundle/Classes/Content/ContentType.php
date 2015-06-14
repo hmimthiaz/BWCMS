@@ -28,6 +28,8 @@ use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Symfony\Component\Routing\RouteCollection;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
 abstract class ContentType implements ContentTypeInterface
@@ -242,7 +244,7 @@ abstract class ContentType implements ContentTypeInterface
         return $this->fields;
     }
 
-    final public function addTaxonomyRelation($name, $schema, $isMultiple = true)
+    final public function addTaxonomyRelation($name, $schema, $isMultiple = true, $required = true)
     {
         if (is_null($this->taxonomyRelations)) {
             $this->taxonomyRelations = array();
@@ -252,6 +254,7 @@ abstract class ContentType implements ContentTypeInterface
             'name' => $name,
             'fieldName' => strtolower('Taxonomy_' . $name),
             'multiple' => $isMultiple,
+            'required' => $required,
             'type' => 'Taxonomy',
             'schema' => $schema
         );
@@ -364,13 +367,17 @@ abstract class ContentType implements ContentTypeInterface
             foreach ($relations as $relation) {
                 $taxonomyClass = $this->cm()->getContentClass($relation['type'], $relation['schema']);
                 $terms = $this->cm()->getTaxonomyTerms($taxonomyClass);
+                $constraints = array();
+                if($relation['required']){
+                    $constraints[] = new NotBlank(array('message' => 'Please select an item.'));
+                }
                 $this->fb()->add($relation['fieldName'], 'choice',
                     array(
                         'choices' => $terms,
                         'label' => $relation['title'],
-                        'required' => false,
-                        'expanded' => true,
-                        'multiple' => true
+                        'expanded' => $relation['multiple'],
+                        'multiple' => $relation['multiple'],
+                        'constraints' => $constraints
                     )
                 );
             }
