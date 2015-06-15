@@ -272,6 +272,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             $class->setParent($parent);
         }
         $form = $class->getForm();
+        $form = $this->cm()->loadFormData($class->getNewContent(), $form, $class);
 
         return array(
             'title' => 'Create ' . $class->getName(),

@@ -228,10 +228,6 @@ abstract class ContentType implements ContentTypeInterface
             if ($this->isUploadEnabled) {
                 $this->addField('attachment', ContentFieldType::Internal);
             }
-            if ($this->isSortEnabled) {
-                $this->addField('sortBy', ContentFieldType::Internal);
-                $this->addField('sortOrder', ContentFieldType::Internal);
-            }
             if ($this->isPublishDateEnabled()) {
                 $this->addField('publishDate', ContentFieldType::Internal);
             }
@@ -240,6 +236,8 @@ abstract class ContentType implements ContentTypeInterface
             }
             $this->addField('status', ContentFieldType::Internal);
             $this->addField('slug', ContentFieldType::Internal);
+            $this->addField('sortBy', ContentFieldType::Internal);
+            $this->addField('sortOrder', ContentFieldType::Internal);
             $this->buildFields();
         }
         return $this->fields;
@@ -299,6 +297,18 @@ abstract class ContentType implements ContentTypeInterface
             }
         }
         $this->validateForm($event);
+    }
+
+    /**
+     * @return ContentEntity
+     */
+    public function getNewContent()
+    {
+        $contentEntity = new ContentEntity();
+        $contentEntity->setSortBy(ContentSortByType::SortIndex);
+        $contentEntity->setSortOrder(ContentSortOrderType::ASC);
+        $contentEntity->setStatus(ContentPublishType::Draft);
+        return $contentEntity;
     }
 
     abstract function validateForm(FormEvent $event);
@@ -398,6 +408,8 @@ abstract class ContentType implements ContentTypeInterface
                     'label' => 'Page Slug'
                 )
             );
+        }else{
+            $this->fb()->add('slug', 'hidden');
         }
 
         if ($this->isUploadEnabled) {
@@ -408,7 +420,7 @@ abstract class ContentType implements ContentTypeInterface
             );
         }
 
-        if ($this->isSortEnabled) {
+        if ($isEditMode) {
             $this->fb()->add('sortBy', 'choice', array(
                 'choices' => array(
                     ContentSortByType::SortIndex => 'Sort',
@@ -426,6 +438,9 @@ abstract class ContentType implements ContentTypeInterface
                 ),
                 'label' => 'Sort Order'
             ));
+        } else {
+            $this->fb()->add('sortBy', 'hidden');
+            $this->fb()->add('sortOrder', 'hidden');
         }
 
         $templates = $this->getTemplates();

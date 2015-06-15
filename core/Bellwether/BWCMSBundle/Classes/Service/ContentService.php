@@ -273,13 +273,9 @@ class ContentService extends BaseService
         if ($classInstance->isContentEnabled()) {
             $form->get('content')->setData($content->getContent());
         }
-        if ($classInstance->isSlugEnabled()) {
-            $form->get('slug')->setData($content->getSlug());
-        }
-        if ($classInstance->isSortEnabled()) {
-            $form->get('sortBy')->setData($content->getSortBy());
-            $form->get('sortOrder')->setData($content->getSortOrder());
-        }
+        $form->get('slug')->setData($content->getSlug());
+        $form->get('sortBy')->setData($content->getSortBy());
+        $form->get('sortOrder')->setData($content->getSortOrder());
         if ($classInstance->isPublishDateEnabled()) {
             $form->get('publishDate')->setData($content->getPublishDate());
         }
