@@ -31,7 +31,6 @@ class ContentFolderType Extends ContentType
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
         $this->setIsUploadEnabled(false);
-        $this->setIsSortEnabled(true);
     }
 
     public function buildFields()
@@ -39,7 +38,7 @@ class ContentFolderType Extends ContentType
 
     }
 
-    public function buildForm()
+    public function buildForm($isEditMode = false)
     {
 
     }

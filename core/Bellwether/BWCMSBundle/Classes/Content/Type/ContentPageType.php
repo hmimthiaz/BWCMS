@@ -29,7 +29,6 @@ class ContentPageType Extends ContentType
 
         $this->setIsSummaryEnabled(true);
         $this->setIsContentEnabled(true);
-        $this->setIsSlugEnabled(false);
         $this->setIsUploadEnabled(false);
     }
 
@@ -39,7 +38,7 @@ class ContentPageType Extends ContentType
         $this->addField('gallery', ContentFieldType::Serialized);
     }
 
-    public function buildForm()
+    public function buildForm($isEditMode = false)
     {
         $this->fb()->add('fieldContent', 'bwcms_content',
             array(
@@ -55,8 +54,6 @@ class ContentPageType Extends ContentType
                 'allow_add' => true
             )
         );
-
-
     }
 
     public function addTemplates()

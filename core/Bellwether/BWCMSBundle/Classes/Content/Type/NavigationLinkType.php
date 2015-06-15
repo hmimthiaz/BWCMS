@@ -29,7 +29,6 @@ class NavigationLinkType Extends ContentType
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
         $this->setIsUploadEnabled(false);
-        $this->setIsSortEnabled(false);
     }
 
     public function buildFields()
@@ -42,7 +41,7 @@ class NavigationLinkType Extends ContentType
         $this->addField('linkClass', ContentFieldType::String);
     }
 
-    public function buildForm()
+    public function buildForm($isEditMode = false)
     {
         $this->fb()->add('linkType', 'choice',
             array(

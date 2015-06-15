@@ -96,16 +96,6 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @var bool
      */
-    private $isSlugEnabled = false;
-
-    /**
-     * @var bool
-     */
-    private $isSortEnabled = false;
-
-    /**
-     * @var bool
-     */
     private $isUploadEnabled = false;
 
     /**
@@ -150,7 +140,7 @@ abstract class ContentType implements ContentTypeInterface
 
     abstract protected function buildFields();
 
-    abstract protected function buildForm();
+    abstract protected function buildForm($isEditMode = false);
 
     /**
      * @return string
@@ -206,12 +196,12 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return Form
      */
-    final public function getForm()
+    final public function getForm($isEditMode = false)
     {
         if ($this->form == null) {
-            $this->setDefaultFormFields();
+            $this->setDefaultFormFields($isEditMode);
             $this->buildForm();
-            $this->setDefaultHiddenFormFields();
+            $this->setDefaultHiddenFormFields($isEditMode);
             $this->fb()->setAction($this->generateUrl('content_save'));
             $this->fb()->setMethod('POST');
             $this->form = $this->fb()->getForm();
@@ -235,9 +225,6 @@ abstract class ContentType implements ContentTypeInterface
             if ($this->isContentEnabled) {
                 $this->addField('content', ContentFieldType::Internal);
             }
-            if ($this->isSlugEnabled) {
-                $this->addField('slug', ContentFieldType::Internal);
-            }
             if ($this->isUploadEnabled) {
                 $this->addField('attachment', ContentFieldType::Internal);
             }
@@ -245,13 +232,14 @@ abstract class ContentType implements ContentTypeInterface
                 $this->addField('sortBy', ContentFieldType::Internal);
                 $this->addField('sortOrder', ContentFieldType::Internal);
             }
-            $this->addField('status', ContentFieldType::Internal);
             if ($this->isPublishDateEnabled()) {
                 $this->addField('publishDate', ContentFieldType::Internal);
             }
             if ($this->isExpireDateEnabled()) {
                 $this->addField('expireDate', ContentFieldType::Internal);
             }
+            $this->addField('status', ContentFieldType::Internal);
+            $this->addField('slug', ContentFieldType::Internal);
             $this->buildFields();
         }
         return $this->fields;
@@ -305,13 +293,9 @@ abstract class ContentType implements ContentTypeInterface
                 }
             }
         }
-        if ($this->isSlugEnabled) {
-            if (empty($data['slug'])) {
-                $form->get('slug')->addError(new FormError('Slug cannot be empty!'));
-            } else {
-                if ($this->cm()->checkSlugExists($data['slug'], $this->getType(), $data['parent'], $data['id'])) {
-                    $form->get('slug')->addError(new FormError('Slug already exists!'));
-                }
+        if (!empty($data['slug'])) {
+            if ($this->cm()->checkSlugExists($data['slug'], $this->getType(), $data['parent'], $data['id'])) {
+                $form->get('slug')->addError(new FormError('Slug already exists!'));
             }
         }
         $this->validateForm($event);
@@ -340,7 +324,7 @@ abstract class ContentType implements ContentTypeInterface
     }
 
 
-    private function setDefaultFormFields()
+    private function setDefaultFormFields($isEditMode = false)
     {
         $this->fb()->add('title', 'text',
             array(
@@ -372,7 +356,7 @@ abstract class ContentType implements ContentTypeInterface
 
     }
 
-    private function setDefaultHiddenFormFields()
+    private function setDefaultHiddenFormFields($isEditMode = false)
     {
 
         $relations = $this->getTaxonomyRelations();
@@ -407,7 +391,7 @@ abstract class ContentType implements ContentTypeInterface
             }
         }
 
-        if ($this->isSlugEnabled) {
+        if ($isEditMode) {
             $this->fb()->add('slug', 'text',
                 array(
                     'required' => true,
@@ -731,38 +715,6 @@ abstract class ContentType implements ContentTypeInterface
     public function setIsUploadEnabled($isUploadEnabled)
     {
         $this->isUploadEnabled = $isUploadEnabled;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isSlugEnabled()
-    {
-        return $this->isSlugEnabled;
-    }
-
-    /**
-     * @param boolean $isSlugEnabled
-     */
-    public function setIsSlugEnabled($isSlugEnabled)
-    {
-        $this->isSlugEnabled = $isSlugEnabled;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isSortEnabled()
-    {
-        return $this->isSortEnabled;
-    }
-
-    /**
-     * @param boolean $isSortEnabled
-     */
-    public function setIsSortEnabled($isSortEnabled)
-    {
-        $this->isSortEnabled = $isSortEnabled;
     }
 
     /**
