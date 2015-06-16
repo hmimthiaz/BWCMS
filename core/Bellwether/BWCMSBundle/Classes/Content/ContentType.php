@@ -368,6 +368,17 @@ abstract class ContentType implements ContentTypeInterface
             )
         );
 
+        if ($isEditMode) {
+            $this->fb()->add('slug', 'text',
+                array(
+                    'required' => true,
+                    'label' => 'URL Slug'
+                )
+            );
+        } else {
+            $this->fb()->add('slug', 'hidden');
+        }
+
         if ($this->isSummaryEnabled) {
             $this->fb()->add('summary', 'textarea',
                 array(
@@ -426,17 +437,6 @@ abstract class ContentType implements ContentTypeInterface
             }
         }
 
-        if ($isEditMode) {
-            $this->fb()->add('slug', 'text',
-                array(
-                    'required' => true,
-                    'label' => 'Page Slug'
-                )
-            );
-        } else {
-            $this->fb()->add('slug', 'hidden');
-        }
-
         if ($this->isUploadEnabled) {
             $this->fb()->add('attachment', 'file',
                 array(
@@ -482,17 +482,6 @@ abstract class ContentType implements ContentTypeInterface
             );
         }
 
-        $this->fb()->add('status', 'choice',
-            array(
-                'label' => 'Status',
-                'choices' => array(
-                    ContentPublishType::Draft => 'Draft',
-                    ContentPublishType::Published => 'Published',
-                    ContentPublishType::Expired => 'Expired'
-                )
-            )
-        );
-
         if ($this->isPublishDateEnabled()) {
             $this->fb()->add('publishDate', 'datetime',
                 array(
@@ -518,6 +507,17 @@ abstract class ContentType implements ContentTypeInterface
                 )
             );
         }
+
+        $this->fb()->add('status', 'choice',
+            array(
+                'label' => 'Status',
+                'choices' => array(
+                    ContentPublishType::Draft => 'Draft',
+                    ContentPublishType::Published => 'Published',
+                    ContentPublishType::Expired => 'Expired'
+                )
+            )
+        );
 
         $this->fb()->add('id', 'hidden');
 
