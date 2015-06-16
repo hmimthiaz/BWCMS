@@ -7,6 +7,7 @@
 
 {% block header %}
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/js/jstree/themes/default/style.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/js/datetimepicker/bootstrap-datetimepicker.min.css') }}"/>
 {% endblock %}
 
 {% block body %}
@@ -16,6 +17,8 @@
 
 {% block footer %}
     <script src="{{ asset('bundles/bwcms/js/jstree/jstree.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/js/datetimepicker/moment.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/js/datetimepicker/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/js/tinymce/jquery.tinymce.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/js/tinymce/tinymce.min.js') }}"></script>
     <script src="{{ url('editor_init') }}"></script>
@@ -23,6 +26,9 @@
         $(document).ready(function () {
             $('.BWCF_template_radio').click(function() {
                 $('#BWCF_template').val(this.value);
+            });
+            $('.contentDate').datetimepicker({
+                'format': 'YYYY-MM-DD HH:mm'
             });
         });
     </script>

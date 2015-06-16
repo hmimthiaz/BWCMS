@@ -673,16 +673,21 @@ class ContentService extends BaseService
         if (null === $content) {
             return;
         }
-
+        $currentUser = $this->getUser();
         if ($content->getId() == null) {
             $content->setCreatedDate(new \DateTime());
-        }
-        $content->setModifiedDate(new \DateTime());
-        if ($content->getAuthor() == null) {
-            $content->setAuthor($this->getUser());
+            if ($content->getAuthor() == null) {
+                $content->setAuthor($currentUser);
+            }
+        } else {
+            $content->setLastModifiedAuthor($currentUser);
+            $content->setModifiedDate(new \DateTime());
         }
         if ($content->getPublishDate() == null && $content->getStatus() == ContentPublishType::Published) {
             $content->setPublishDate(new \DateTime());
+        }
+        if ($content->getExpireDate() == null && $content->getStatus() == ContentPublishType::Expired) {
+            $content->setExpireDate(new \DateTime());
         }
         $this->em()->persist($content);
         $this->em()->flush();

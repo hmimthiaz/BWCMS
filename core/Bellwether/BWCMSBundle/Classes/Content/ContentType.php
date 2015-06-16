@@ -96,6 +96,16 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @var bool
      */
+    private $isSlugEnabled = false;
+
+    /**
+     * @var bool
+     */
+    private $isSortEnabled = false;
+
+    /**
+     * @var bool
+     */
     private $isUploadEnabled = false;
 
     /**
@@ -305,9 +315,24 @@ abstract class ContentType implements ContentTypeInterface
     public function getNewContent()
     {
         $contentEntity = new ContentEntity();
-        $contentEntity->setSortBy(ContentSortByType::SortIndex);
-        $contentEntity->setSortOrder(ContentSortOrderType::ASC);
-        $contentEntity->setStatus(ContentPublishType::Draft);
+        if ($this->isHierarchy()) {
+            $contentEntity->setSortBy(ContentSortByType::SortIndex);
+            $contentEntity->setSortOrder(ContentSortOrderType::ASC);
+        } else {
+            $contentEntity->setSortBy(ContentSortByType::Published);
+            $contentEntity->setSortOrder(ContentSortOrderType::DESC);
+        }
+        if ($this->isUploadEnabled() || $this->isHierarchy()) {
+            $contentEntity->setStatus(ContentPublishType::Published);
+        } else {
+            $contentEntity->setStatus(ContentPublishType::Draft);
+        }
+        if ($this->isPublishDateEnabled()) {
+            $contentEntity->setPublishDate(new \DateTime());
+        }
+        if ($this->isExpireDateEnabled()) {
+            $contentEntity->setExpireDate(new \DateTime());
+        }
         return $contentEntity;
     }
 
@@ -408,7 +433,7 @@ abstract class ContentType implements ContentTypeInterface
                     'label' => 'Page Slug'
                 )
             );
-        }else{
+        } else {
             $this->fb()->add('slug', 'hidden');
         }
 
@@ -420,7 +445,7 @@ abstract class ContentType implements ContentTypeInterface
             );
         }
 
-        if ($isEditMode) {
+        if ($isEditMode && $this->isHierarchy() && $this->isSortEnabled()) {
             $this->fb()->add('sortBy', 'choice', array(
                 'choices' => array(
                     ContentSortByType::SortIndex => 'Sort',
@@ -472,6 +497,11 @@ abstract class ContentType implements ContentTypeInterface
             $this->fb()->add('publishDate', 'datetime',
                 array(
                     'label' => 'Publish Time',
+                    'widget' => 'single_text',
+                    'format' => 'yyyy-MM-dd HH:mm',
+                    'attr' => array(
+                        'class' => 'contentDate'
+                    )
                 )
             );
         }
@@ -480,6 +510,11 @@ abstract class ContentType implements ContentTypeInterface
             $this->fb()->add('expireDate', 'datetime',
                 array(
                     'label' => 'Expire Time',
+                    'widget' => 'single_text',
+                    'format' => 'yyyy-MM-dd HH:mm',
+                    'attr' => array(
+                        'class' => 'contentDate'
+                    )
                 )
             );
         }
@@ -764,6 +799,21 @@ abstract class ContentType implements ContentTypeInterface
         $this->isExpireDateEnabled = $isExpireDateEnabled;
     }
 
+    /**
+     * @return boolean
+     */
+    public function isSortEnabled()
+    {
+        return $this->isSortEnabled;
+    }
+
+    /**
+     * @param boolean $isSortEnabled
+     */
+    public function setIsSortEnabled($isSortEnabled)
+    {
+        $this->isSortEnabled = $isSortEnabled;
+    }
 
     /**
      * @return null
