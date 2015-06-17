@@ -10,4 +10,6 @@ class ContentScopeType
 
     const CPrivate = 'CS.CPrivate';
 
+    const CPageBuilder = 'CS.CPB';
+
 }

@@ -1,0 +1,166 @@
+{% extends "BWCMSBundle:Common:default.html.twig" %}
+
+{% block title %} {{ title }} {% endblock %}
+{% block pageTitle %}
+    <h1>{{ title }}</h1>
+{% endblock %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/js/jstree/themes/default/style.min.css') }}"/>
+{% endblock %}
+
+{% block body %}
+    <script language="JavaScript">
+        $(document).ready(function () {
+            var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+            if ((h - 225) > 400) {
+                $('div.contentPageLeft').height(h - 225);
+            }
+        });
+        $(window).resize(function () {
+            var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+            if ((h - 225) > 400) {
+                $('div.contentPageLeft').height(h - 225);
+            }
+        })
+    </script>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="jstree_div" class="contentPageLeft"></div>
+        </div>
+    </div>
+    <script language="JavaScript">
+        var ajaxRequestActive = false;
+        $(document).ready(function () {
+            $('#jstree_div').jstree({
+                'core': {
+                    'data': {{ jsNodes|raw }},
+                    'multiple': false,
+                    'check_callback': function (operation, node, node_parent, node_position, more) {
+                        if (ajaxRequestActive) {
+                            return false;
+                        }
+                        if (operation === "move_node") {
+                            if (node_parent.id == '#' || node.parent == node_parent.id) {
+                                return false;
+                            }
+                            if (typeof more.core === 'undefined') {
+                                return true;
+                            }
+                            var request = $.ajax({
+                                method: "POST",
+                                url: "{{ url('content_folder_move') }}",
+                                data: {contentId: node.id, targetId: node_parent.id},
+                                beforeSend: function () {
+                                    ajaxRequestActive = true;
+                                },
+                                error: function (xhr, ajaxOptions, errorThrown) {
+                                    ajaxRequestActive = false;
+                                    alert('Error: ' + xhr.responseText);
+                                },
+                                success: function (data) {
+                                    if ($("#selectedContentFolderId").val() == node_parent.id) {
+                                        contentTable.ajax.reload(null, false);
+                                    }
+                                },
+                                complete: function () {
+                                    ajaxRequestActive = false;
+                                }
+                            });
+                        }
+                        return true;  //allow all other operations
+                    }
+
+                },
+                'contextmenu': {
+                    'items': function (node, treeObj) {
+                        return {
+                            "Create": {
+                                "separator_before": false,
+                                "separator_after": false,
+                                "label": "Create",
+                                "icon": "glyphicon glyphicon-file",
+                                "submenu": {
+                                    {% for typeKey,type in contentTypes %}
+                                    "{{ typeKey }}": {
+                                        "label": "{{ type.name }}",
+                                        "icon": "glyphicon glyphicon-plus",
+                                        "_disabled": function () {
+                                            var isRootItem = {{ type.isRootItem ? 'true' : 'false' }};
+                                            if (node.parent == '#' && !isRootItem) {
+                                                return true;
+                                            }
+                                            return false;
+                                        },
+                                        "action": function () {
+                                            window.location = '{{ url('content_create') }}' + '?parent=' + node.id + '&type={{ type.type }}&schema={{ type.schema }}&scope={{ scope }}';
+                                            return false;
+                                        }
+                                    },
+                                    {% endfor %}
+                                }
+                            },
+                            "Edit": {
+                                "separator_before": false,
+                                "separator_after": false,
+                                "label": "Edit",
+                                "icon": "glyphicon glyphicon-pencil",
+                                "action": function () {
+                                    window.location = '{{ url('content_edit') }}' + '?contentId=' + node.id;
+                                    return false;
+                                },
+                                "_disabled": function () {
+                                    if (node.id == 'Root') {
+                                        return true;
+                                    }
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                },
+                {#'contextmenu': {#}
+                    {#'items': function (node, treeObj) {#}
+                        {#return {#}
+                            {#"Create": {#}
+                                {#"separator_before": false,#}
+                                {#"separator_after": false,#}
+                                {#"label": "Add",#}
+                                {#"icon": "glyphicon glyphicon-plus",#}
+                                {#"action": function () {#}
+                                    {#window.location = '{{ url('content_create') }}' + '?parent=' + node.id + '&type={{ type }}&schema={{ schema }}';#}
+                                    {#return false;#}
+                                {#},#}
+                                {#"_disabled": function () {#}
+                                    {#return false;#}
+                                {#}#}
+                            {#},#}
+                            {#"Edit": {#}
+                                {#"separator_before": false,#}
+                                {#"separator_after": false,#}
+                                {#"label": "Edit",#}
+                                {#"icon": "glyphicon glyphicon-pencil",#}
+                                {#"action": function () {#}
+                                    {#window.location = '{{ url('content_edit') }}' + '?contentId=' + node.id;#}
+                                    {#return false;#}
+                                {#},#}
+                                {#"_disabled": function () {#}
+                                    {#if (node.id == 'Root') {#}
+                                        {#return true;#}
+                                    {#}#}
+                                    {#return false;#}
+                                {#}#}
+                            {#}#}
+
+                        {#}#}
+                    {#}#}
+                {#},#}
+                'plugins': ['contextmenu', 'dnd']
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block footer %}
+    <script src="{{ asset('bundles/bwcms/js/jstree/jstree.min.js') }}"></script>
+{% endblock %}

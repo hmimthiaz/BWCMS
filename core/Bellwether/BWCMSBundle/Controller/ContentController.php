@@ -66,7 +66,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         if (is_null($type) || is_null($schema) || is_null($parent)) {
             return $this->returnErrorResponse();
         }
-        if ($scope != ContentScopeType::CPublic && $scope != ContentScopeType::CPrivate) {
+        if ($scope != ContentScopeType::CPublic && $scope != ContentScopeType::CPrivate && $scope != ContentScopeType::CPageBuilder) {
             return $this->returnErrorResponse();
         }
 
@@ -122,8 +122,68 @@ class ContentController extends BaseController implements BackEndControllerInter
     public function pageBuilderAction(Request $request)
     {
         $contentId = $request->get('contentId');
+        if ($contentId == null) {
+            return $this->returnErrorResponse();
+        }
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         */
+        $content = $this->cm()->getContentRepository()->find($contentId);
+        if ($content == null) {
+            return $this->returnErrorResponse();
+        }
 
-        return array();
+        $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder($content, false);
+        $registeredContents = $this->cm()->getRegisteredContentTypes('Widget');
+        $condition = array();
+        foreach ($registeredContents as $cInfo) {
+            $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
+        }
+        if (!empty($condition)) {
+            $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
+        }
+        $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->andWhere(" node.scope ='" . ContentScopeType::CPageBuilder . "' ");
+        $pageContents = $qb->getQuery()->getResult();
+
+        $jsNodes = array(
+            array(
+                'id' => $content->getId(),
+                'text' => $content->getTitle(),
+                'icon' => 'glyphicon glyphicon-folder-open',
+                'parent' => '#',
+                'state' => array(
+                    'opened' => true
+                )
+            )
+        );
+        if (!empty($pageContents)) {
+            /** @var ContentEntity $pContent */
+            foreach ($pageContents as $pContent) {
+                $jsNode = array();
+                $jsNode['id'] = $pContent->getId();
+                $jsNode['text'] = $pContent->getTitle();
+                $class = $this->cm()->getContentClass($pContent->getType(), $pContent->getSchema());
+                if($class->isHierarchy()){
+                    $jsNode['icon'] = 'glyphicon glyphicon-folder-open';
+                }else{
+                    $jsNode['icon'] = 'glyphicon glyphicon-file';
+                }
+                $jsNode['parent'] = $pContent->getTreeParent()->getId();
+                $jsNode['state'] = array(
+                    'opened' => true,
+                );
+                $jsNodes[] = $jsNode;
+            }
+        }
+
+        return array(
+            'title' => 'Page Builder',
+            'pageTitle' => 'Page Builder',
+            'scope' => ContentScopeType::CPageBuilder,
+            'contentTypes' => $registeredContents,
+            'jsNodes' => json_encode($jsNodes),
+        );
     }
 
     /**
@@ -162,11 +222,21 @@ class ContentController extends BaseController implements BackEndControllerInter
             $contentEntity = $this->cm()->prepareEntity($contentEntity, $form, $class);
             $this->cm()->save($contentEntity);
 
+            if ($contentEntity->getScope() == ContentScopeType::CPageBuilder) {
+                $parents = $this->cm()->getContentRepository()->getPath($contentEntity);
+                $parents = array_reverse($parents);
+                foreach ($parents as $parent) {
+                    if ($parent->getScope() == ContentScopeType::CPublic) {
+                        return $this->redirect($this->generateUrl('content_pb', array('contentId' => $parent->getId())));
+                    }
+                }
+                return $this->returnErrorResponse();
+            }
+
             $parentId = 'Root';
             if ($contentEntity->getTreeParent() != null) {
                 $parentId = $contentEntity->getTreeParent()->getId();
             }
-
             if ($class->isIsTaxonomy()) {
                 return $this->redirect($this->generateUrl('taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
             }

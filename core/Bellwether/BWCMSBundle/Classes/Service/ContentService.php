@@ -456,6 +456,9 @@ class ContentService extends BaseService
             if ($fieldName == 'schema') {
                 $content->setSchema($data['schema']);
             }
+            if ($fieldName == 'scope') {
+                $content->setScope($data['scope']);
+            }
             if ($fieldName == 'status') {
                 $content->setStatus($data['status']);
             }
