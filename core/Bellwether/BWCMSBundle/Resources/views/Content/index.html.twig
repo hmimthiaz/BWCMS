@@ -64,7 +64,7 @@
                     <th width="10">Type</th>
                     <th width="10">Status</th>
                     <th width="100">Date</th>
-                    <th width="100">Action</th>
+                    <th width="200">Action</th>
                 </tr>
                 </thead>
             </table>
@@ -298,6 +298,9 @@
                         className: "center",
                         render: function (data, type, full, meta) {
                             var ret = '<button type="button" class="btn btn-primary edit"><i class="glyphicon glyphicon-pencil"></i></button>';
+                            if (data.pbLink.length > 0) {
+                                ret = ret + ' <button type="button" class="btn btn-primary pageBuilder" data-url="' + data.pbLink + '"><i class="glyphicon glyphicon-list-alt"></i></button>';
+                            }
                             if (data.download.length > 0) {
                                 ret = ret + ' <button type="button" class="btn btn-primary download" data-url="' + data.download + '"><i class="glyphicon glyphicon-download-alt"></i></button>';
                             }
@@ -319,6 +322,10 @@
                     $('#contentTable a.lightBox').click(function (e) {
                         e.preventDefault();
                         $(this).ekkoLightbox();
+                    });
+                    $('#contentTable button.pageBuilder').click(function (e) {
+                        e.preventDefault();
+                        window.location = $(this).data('url');
                     });
                     $('#contentTable button.download').click(function (e) {
                         e.preventDefault();

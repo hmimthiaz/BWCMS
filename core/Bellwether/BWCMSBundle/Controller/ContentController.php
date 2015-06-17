@@ -51,6 +51,135 @@ class ContentController extends BaseController implements BackEndControllerInter
         );
     }
 
+    /**
+     * @Route("/create.php",name="content_create")
+     * @Template("BWCMSBundle:Content:save.html.twig")
+     */
+    public function createAction(Request $request)
+    {
+
+        $type = $request->get('type', null);
+        $schema = $request->get('schema', null);
+        $parent = $request->get('parent', null);
+        $scope = $request->get('scope', ContentScopeType::CPublic);
+
+        if (is_null($type) || is_null($schema) || is_null($parent)) {
+            return $this->returnErrorResponse();
+        }
+        if ($scope != ContentScopeType::CPublic && $scope != ContentScopeType::CPrivate) {
+            return $this->returnErrorResponse();
+        }
+
+        $class = $this->cm()->getContentClass($type, $schema);
+        if ($parent != 'Root') {
+            $class->setParent($parent);
+        }
+        $form = $class->getForm();
+        $content = $class->getNewContent();
+        $content->setScope($scope);
+        $form = $this->cm()->loadFormData($content, $form, $class);
+
+        return array(
+            'title' => 'Create ' . $class->getName(),
+            'form' => $form->createView()
+        );
+    }
+
+    /**
+     * @Route("/edit.php",name="content_edit")
+     * @Template("BWCMSBundle:Content:save.html.twig")
+     */
+    public function editAction(Request $request)
+    {
+        $contentId = $request->get('contentId');
+        if ($contentId == null) {
+            return $this->returnErrorResponse();
+        }
+
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         */
+        $content = $this->cm()->getContentRepository()->find($contentId);
+
+        $class = $this->cm()->getContentClass($content->getType(), $content->getSchema());
+        if ($content->getTreeParent() != null) {
+            $class->setParent($content->getTreeParent()->getId());
+        }
+        $form = $class->getForm(true);
+        $form = $this->cm()->loadFormData($content, $form, $class);
+
+        return array(
+            'title' => 'Edit ' . $class->getName(),
+            'form' => $form->createView()
+        );
+    }
+
+
+    /**
+     * @Route("/pb.php",name="content_pb")
+     * @Template()
+     */
+    public function pageBuilderAction(Request $request)
+    {
+        $contentId = $request->get('contentId');
+
+        return array();
+    }
+
+    /**
+     * @Route("/save.php",name="content_save")
+     * @Method({"POST"})
+     * @Template("BWCMSBundle:Content:save.html.twig")
+     */
+    public function saveAction(Request $request)
+    {
+
+        $contentFormData = $request->request->get('BWCF');
+        $type = $contentFormData['type'];
+        $schema = $contentFormData['schema'];
+
+        if (is_null($type) || is_null($schema)) {
+            return $this->returnErrorResponse();
+        }
+
+        /**
+         * @var ContentType $class
+         */
+        $class = $this->cm()->getContentClass($type, $schema);
+        $form = $class->getForm(true);
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+
+            $contentId = $form->get('id')->getData();
+            if (empty($contentId)) {
+                $contentEntity = new ContentEntity();
+                $contentEntity->setSite($this->getSite());
+            } else {
+                $contentEntity = $this->cm()->getContentRepository()->find($contentId);
+            }
+
+            $contentEntity = $this->cm()->prepareEntity($contentEntity, $form, $class);
+            $this->cm()->save($contentEntity);
+
+            $parentId = 'Root';
+            if ($contentEntity->getTreeParent() != null) {
+                $parentId = $contentEntity->getTreeParent()->getId();
+            }
+
+            if ($class->isIsTaxonomy()) {
+                return $this->redirect($this->generateUrl('taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
+            }
+            return $this->redirect($this->generateUrl('content_home', array('type' => $type, 'parent' => $parentId)));
+        }
+
+        return array(
+            'title' => 'Edit ' . $class->getName(),
+            'pageTitle' => 'Edit ' . $class->getName(),
+            'form' => $form->createView()
+        );
+    }
+
     function getFolderTree($type, $parentId, $schema = null, $rootFolderCaption = 'Folders', $scope = ContentScopeType::CPublic)
     {
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
@@ -256,125 +385,6 @@ class ContentController extends BaseController implements BackEndControllerInter
 
 
     /**
-     * @Route("/create.php",name="content_create")
-     * @Template("BWCMSBundle:Content:save.html.twig")
-     */
-    public function createAction(Request $request)
-    {
-
-        $type = $request->get('type', null);
-        $schema = $request->get('schema', null);
-        $parent = $request->get('parent', null);
-        $scope = $request->get('scope', ContentScopeType::CPublic);
-
-        if (is_null($type) || is_null($schema) || is_null($parent)) {
-            return $this->returnErrorResponse();
-        }
-        if ($scope != ContentScopeType::CPublic && $scope != ContentScopeType::CPrivate) {
-            return $this->returnErrorResponse();
-        }
-
-        $class = $this->cm()->getContentClass($type, $schema);
-        if ($parent != 'Root') {
-            $class->setParent($parent);
-        }
-        $form = $class->getForm();
-        $content = $class->getNewContent();
-        $content->setScope($scope);
-        $form = $this->cm()->loadFormData($content, $form, $class);
-
-        return array(
-            'title' => 'Create ' . $class->getName(),
-            'form' => $form->createView()
-        );
-    }
-
-    /**
-     * @Route("/edit.php",name="content_edit")
-     * @Template("BWCMSBundle:Content:save.html.twig")
-     */
-    public function editAction(Request $request)
-    {
-        $contentId = $request->get('contentId');
-        if ($contentId == null) {
-            return $this->returnErrorResponse();
-        }
-
-        /**
-         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
-         */
-        $content = $this->cm()->getContentRepository()->find($contentId);
-
-        $class = $this->cm()->getContentClass($content->getType(), $content->getSchema());
-        if ($content->getTreeParent() != null) {
-            $class->setParent($content->getTreeParent()->getId());
-        }
-        $form = $class->getForm(true);
-        $form = $this->cm()->loadFormData($content, $form, $class);
-
-        return array(
-            'title' => 'Edit ' . $class->getName(),
-            'form' => $form->createView()
-        );
-    }
-
-
-    /**
-     * @Route("/save.php",name="content_save")
-     * @Method({"POST"})
-     * @Template("BWCMSBundle:Content:save.html.twig")
-     */
-    public function saveAction(Request $request)
-    {
-
-        $contentFormData = $request->request->get('BWCF');
-        $type = $contentFormData['type'];
-        $schema = $contentFormData['schema'];
-
-        if (is_null($type) || is_null($schema)) {
-            return $this->returnErrorResponse();
-        }
-
-        /**
-         * @var ContentType $class
-         */
-        $class = $this->cm()->getContentClass($type, $schema);
-        $form = $class->getForm(true);
-        $form->handleRequest($request);
-
-        if ($form->isValid()) {
-
-            $contentId = $form->get('id')->getData();
-            if (empty($contentId)) {
-                $contentEntity = new ContentEntity();
-                $contentEntity->setSite($this->getSite());
-            } else {
-                $contentEntity = $this->cm()->getContentRepository()->find($contentId);
-            }
-
-            $contentEntity = $this->cm()->prepareEntity($contentEntity, $form, $class);
-            $this->cm()->save($contentEntity);
-
-            $parentId = 'Root';
-            if ($contentEntity->getTreeParent() != null) {
-                $parentId = $contentEntity->getTreeParent()->getId();
-            }
-
-            if ($class->isIsTaxonomy()) {
-                return $this->redirect($this->generateUrl('taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
-            }
-            return $this->redirect($this->generateUrl('content_home', array('type' => $type, 'parent' => $parentId)));
-        }
-
-        return array(
-            'title' => 'Edit ' . $class->getName(),
-            'pageTitle' => 'Edit ' . $class->getName(),
-            'form' => $form->createView()
-        );
-    }
-
-
-    /**
      * @Route("/upload.php",name="content_media_upload")
      * @Method({"POST"})
      */
@@ -543,6 +553,10 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $contentPublicURL = $contentClass->getPublicURL($content);
                 if (!is_null($contentPublicURL)) {
                     $ca['link'] = $contentPublicURL;
+                }
+                $ca['pbLink'] = '';
+                if ($contentClass->isPageBuilderSupported()) {
+                    $ca['pbLink'] = $this->generateUrl('content_pb', array('contentId' => $content->getId()));
                 }
 
                 $ca['download'] = '';

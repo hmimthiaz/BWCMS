@@ -77,7 +77,7 @@ table.dataTable tbody tr.actioned{
 
 ul.FCList li{
     border: 1px solid #cccccc;
-    border-radius: 25px;
+    border-radius: 4px;
     margin-bottom: 3px;
     padding-top: 5px;
     cursor: move;

@@ -120,6 +120,11 @@ abstract class ContentType implements ContentTypeInterface
      */
     private $isExpireDateEnabled = false;
 
+    /**
+     * @var bool
+     */
+    private $isPageBuilderSupported = false;
+
     private $taxonomyRelations = null;
 
     public function getType()
@@ -842,6 +847,22 @@ abstract class ContentType implements ContentTypeInterface
     public function setIsSlugEnabled($isSlugEnabled)
     {
         $this->isSlugEnabled = $isSlugEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isPageBuilderSupported()
+    {
+        return $this->isPageBuilderSupported;
+    }
+
+    /**
+     * @param boolean $isPageBuilderSupported
+     */
+    public function setIsPageBuilderSupported($isPageBuilderSupported)
+    {
+        $this->isPageBuilderSupported = $isPageBuilderSupported;
     }
 
     /**

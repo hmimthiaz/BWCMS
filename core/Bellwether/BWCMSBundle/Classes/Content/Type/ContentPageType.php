@@ -30,6 +30,9 @@ class ContentPageType Extends ContentType
         $this->setIsSummaryEnabled(true);
         $this->setIsContentEnabled(true);
         $this->setIsUploadEnabled(false);
+
+        $this->setIsSlugEnabled(true);
+        $this->setIsPageBuilderSupported(true);
     }
 
     public function buildFields()
@@ -58,7 +61,7 @@ class ContentPageType Extends ContentType
 
     public function addTemplates()
     {
-        $this->addTemplate('Default','Default.html.twig','Default.png');
+        $this->addTemplate('Default', 'Default.html.twig', 'Default.png');
     }
 
     public function validateForm(FormEvent $event)
