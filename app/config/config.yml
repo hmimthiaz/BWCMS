@@ -97,6 +97,12 @@ stof_doctrine_extensions:
         default:
             tree: true
 
+doctrine_migrations:
+    dir_name: %kernel.root_dir%/DoctrineMigrations
+    namespace: Application\Migrations
+    table_name: BWMigrationsLog
+    name: BWCMSMigrations
+
 # Swiftmailer Configuration
 swiftmailer:
     host:      "%mailer_host%"

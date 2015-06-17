@@ -113,12 +113,17 @@ class ContentEntity
     /**
      * @ORM\Column(type="string", length=100, nullable=false)
      */
-    private $type = 'Folder';
+    private $type = 'Content';
 
     /**
      * @ORM\Column(type="string", length=100, nullable=false, name="schemaType")
      */
-    private $schema = "Default";
+    private $schema = "Folder";
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=false, name="scope")
+     */
+    private $scope = "Public";
 
     /**
      * @ORM\Column(type="string", length=100, nullable=false)
@@ -435,6 +440,22 @@ class ContentEntity
     public function setSchema($schema)
     {
         $this->schema = $schema;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getScope()
+    {
+        return $this->scope;
+    }
+
+    /**
+     * @param mixed $scope
+     */
+    public function setScope($scope)
+    {
+        $this->scope = $scope;
     }
 
     /**
