@@ -14,6 +14,9 @@ services:
   BWCMS.Content:
     class: Bellwether\BWCMSBundle\Classes\Service\ContentService
     arguments: [@service_container,@request_stack]
+  BWCMS.ContentQuery:
+    class: Bellwether\BWCMSBundle\Classes\Service\ContentQueryService
+    arguments: [@service_container,@request_stack]
   BWCMS.Media:
     class: Bellwether\BWCMSBundle\Classes\Service\MediaService
     arguments: [@service_container,@request_stack]

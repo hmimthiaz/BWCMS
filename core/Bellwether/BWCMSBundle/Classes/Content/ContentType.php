@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilder;
 
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
+use Bellwether\BWCMSBundle\Classes\Service\ContentQueryService;
 use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
@@ -150,7 +151,7 @@ abstract class ContentType implements ContentTypeInterface
 
     abstract protected function buildFields();
 
-    abstract protected function buildForm();
+    abstract protected function buildForm($isEditMode = false);
 
     /**
      * @return string
@@ -206,12 +207,12 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return Form
      */
-    final public function getForm()
+    final public function getForm($isEditMode = false)
     {
         if ($this->form == null) {
-            $this->setDefaultFormFields();
+            $this->setDefaultFormFields($isEditMode);
             $this->buildForm();
-            $this->setDefaultHiddenFormFields();
+            $this->setDefaultHiddenFormFields($isEditMode);
             $this->fb()->setAction($this->generateUrl('content_save'));
             $this->fb()->setMethod('POST');
             $this->form = $this->fb()->getForm();
@@ -235,23 +236,19 @@ abstract class ContentType implements ContentTypeInterface
             if ($this->isContentEnabled) {
                 $this->addField('content', ContentFieldType::Internal);
             }
-            if ($this->isSlugEnabled) {
-                $this->addField('slug', ContentFieldType::Internal);
-            }
             if ($this->isUploadEnabled) {
                 $this->addField('attachment', ContentFieldType::Internal);
             }
-            if ($this->isSortEnabled) {
-                $this->addField('sortBy', ContentFieldType::Internal);
-                $this->addField('sortOrder', ContentFieldType::Internal);
-            }
-            $this->addField('status', ContentFieldType::Internal);
             if ($this->isPublishDateEnabled()) {
                 $this->addField('publishDate', ContentFieldType::Internal);
             }
             if ($this->isExpireDateEnabled()) {
                 $this->addField('expireDate', ContentFieldType::Internal);
             }
+            $this->addField('status', ContentFieldType::Internal);
+            $this->addField('slug', ContentFieldType::Internal);
+            $this->addField('sortBy', ContentFieldType::Internal);
+            $this->addField('sortOrder', ContentFieldType::Internal);
             $this->buildFields();
         }
         return $this->fields;
@@ -305,16 +302,39 @@ abstract class ContentType implements ContentTypeInterface
                 }
             }
         }
-        if ($this->isSlugEnabled) {
-            if (empty($data['slug'])) {
-                $form->get('slug')->addError(new FormError('Slug cannot be empty!'));
-            } else {
-                if ($this->cm()->checkSlugExists($data['slug'], $this->getType(), $data['parent'], $data['id'])) {
-                    $form->get('slug')->addError(new FormError('Slug already exists!'));
-                }
+        if (!empty($data['slug'])) {
+            if ($this->cm()->checkSlugExists($data['slug'], $this->getType(), $data['parent'], $data['id'])) {
+                $form->get('slug')->addError(new FormError('Slug already exists!'));
             }
         }
         $this->validateForm($event);
+    }
+
+    /**
+     * @return ContentEntity
+     */
+    public function getNewContent()
+    {
+        $contentEntity = new ContentEntity();
+        if ($this->isHierarchy()) {
+            $contentEntity->setSortBy(ContentSortByType::SortIndex);
+            $contentEntity->setSortOrder(ContentSortOrderType::ASC);
+        } else {
+            $contentEntity->setSortBy(ContentSortByType::Published);
+            $contentEntity->setSortOrder(ContentSortOrderType::DESC);
+        }
+        if ($this->isUploadEnabled() || $this->isHierarchy()) {
+            $contentEntity->setStatus(ContentPublishType::Published);
+        } else {
+            $contentEntity->setStatus(ContentPublishType::Draft);
+        }
+        if ($this->isPublishDateEnabled()) {
+            $contentEntity->setPublishDate(new \DateTime());
+        }
+        if ($this->isExpireDateEnabled()) {
+            $contentEntity->setExpireDate(new \DateTime());
+        }
+        return $contentEntity;
     }
 
     abstract function validateForm(FormEvent $event);
@@ -340,7 +360,7 @@ abstract class ContentType implements ContentTypeInterface
     }
 
 
-    private function setDefaultFormFields()
+    private function setDefaultFormFields($isEditMode = false)
     {
         $this->fb()->add('title', 'text',
             array(
@@ -348,6 +368,17 @@ abstract class ContentType implements ContentTypeInterface
                 'label' => 'Title'
             )
         );
+
+        if ($isEditMode) {
+            $this->fb()->add('slug', 'text',
+                array(
+                    'required' => true,
+                    'label' => 'URL Slug'
+                )
+            );
+        } else {
+            $this->fb()->add('slug', 'hidden');
+        }
 
         if ($this->isSummaryEnabled) {
             $this->fb()->add('summary', 'textarea',
@@ -372,7 +403,7 @@ abstract class ContentType implements ContentTypeInterface
 
     }
 
-    private function setDefaultHiddenFormFields()
+    private function setDefaultHiddenFormFields($isEditMode = false)
     {
 
         $relations = $this->getTaxonomyRelations();
@@ -407,15 +438,6 @@ abstract class ContentType implements ContentTypeInterface
             }
         }
 
-        if ($this->isSlugEnabled) {
-            $this->fb()->add('slug', 'text',
-                array(
-                    'required' => true,
-                    'label' => 'Page Slug'
-                )
-            );
-        }
-
         if ($this->isUploadEnabled) {
             $this->fb()->add('attachment', 'file',
                 array(
@@ -424,7 +446,7 @@ abstract class ContentType implements ContentTypeInterface
             );
         }
 
-        if ($this->isSortEnabled) {
+        if ($isEditMode && $this->isHierarchy() && $this->isSortEnabled()) {
             $this->fb()->add('sortBy', 'choice', array(
                 'choices' => array(
                     ContentSortByType::SortIndex => 'Sort',
@@ -442,6 +464,9 @@ abstract class ContentType implements ContentTypeInterface
                 ),
                 'label' => 'Sort Order'
             ));
+        } else {
+            $this->fb()->add('sortBy', 'hidden');
+            $this->fb()->add('sortOrder', 'hidden');
         }
 
         $templates = $this->getTemplates();
@@ -458,6 +483,32 @@ abstract class ContentType implements ContentTypeInterface
             );
         }
 
+        if ($this->isPublishDateEnabled()) {
+            $this->fb()->add('publishDate', 'datetime',
+                array(
+                    'label' => 'Publish Time',
+                    'widget' => 'single_text',
+                    'format' => 'yyyy-MM-dd HH:mm',
+                    'attr' => array(
+                        'class' => 'contentDate'
+                    )
+                )
+            );
+        }
+
+        if ($this->isExpireDateEnabled()) {
+            $this->fb()->add('expireDate', 'datetime',
+                array(
+                    'label' => 'Expire Time',
+                    'widget' => 'single_text',
+                    'format' => 'yyyy-MM-dd HH:mm',
+                    'attr' => array(
+                        'class' => 'contentDate'
+                    )
+                )
+            );
+        }
+
         $this->fb()->add('status', 'choice',
             array(
                 'label' => 'Status',
@@ -468,22 +519,6 @@ abstract class ContentType implements ContentTypeInterface
                 )
             )
         );
-
-        if ($this->isPublishDateEnabled()) {
-            $this->fb()->add('publishDate', 'datetime',
-                array(
-                    'label' => 'Publish Time',
-                )
-            );
-        }
-
-        if ($this->isExpireDateEnabled()) {
-            $this->fb()->add('expireDate', 'datetime',
-                array(
-                    'label' => 'Expire Time',
-                )
-            );
-        }
 
         $this->fb()->add('id', 'hidden');
 
@@ -517,7 +552,7 @@ abstract class ContentType implements ContentTypeInterface
      */
     public function getContentTemplate($contentEntity)
     {
-        return $this->tp()->getCurrentSkin()->getTemplateName($this->cm()->getContentTemplate($contentEntity));
+        return $this->tp()->getCurrentSkin()->getTemplateName($this->cq()->getContentTemplate($contentEntity));
     }
 
     /**
@@ -550,6 +585,14 @@ abstract class ContentType implements ContentTypeInterface
     public function cm()
     {
         return $this->container->get('BWCMS.Content')->getManager();
+    }
+
+    /**
+     * @return ContentQueryService
+     */
+    public function cq()
+    {
+        return $this->container->get('BWCMS.ContentQuery')->getManager();
     }
 
     /**
@@ -736,38 +779,6 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return boolean
      */
-    public function isSlugEnabled()
-    {
-        return $this->isSlugEnabled;
-    }
-
-    /**
-     * @param boolean $isSlugEnabled
-     */
-    public function setIsSlugEnabled($isSlugEnabled)
-    {
-        $this->isSlugEnabled = $isSlugEnabled;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isSortEnabled()
-    {
-        return $this->isSortEnabled;
-    }
-
-    /**
-     * @param boolean $isSortEnabled
-     */
-    public function setIsSortEnabled($isSortEnabled)
-    {
-        $this->isSortEnabled = $isSortEnabled;
-    }
-
-    /**
-     * @return boolean
-     */
     public function isPublishDateEnabled()
     {
         return $this->isPublishDateEnabled;
@@ -797,6 +808,21 @@ abstract class ContentType implements ContentTypeInterface
         $this->isExpireDateEnabled = $isExpireDateEnabled;
     }
 
+    /**
+     * @return boolean
+     */
+    public function isSortEnabled()
+    {
+        return $this->isSortEnabled;
+    }
+
+    /**
+     * @param boolean $isSortEnabled
+     */
+    public function setIsSortEnabled($isSortEnabled)
+    {
+        $this->isSortEnabled = $isSortEnabled;
+    }
 
     /**
      * @return null

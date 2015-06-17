@@ -149,7 +149,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      */
     public function getContentLink($contentEntity)
     {
-        return $this->cm()->getPublicURL($contentEntity);
+        return $this->cq()->getPublicURL($contentEntity);
     }
 
     function getEllipse($text, $limit = 300, $end = '...')

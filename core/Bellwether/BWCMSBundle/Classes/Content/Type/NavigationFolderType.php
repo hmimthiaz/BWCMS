@@ -31,8 +31,6 @@ class NavigationFolderType Extends ContentType
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
         $this->setIsUploadEnabled(false);
-        $this->setIsSortEnabled(true);
-        $this->setIsSlugEnabled(true);
     }
 
     public function buildFields()
@@ -45,7 +43,7 @@ class NavigationFolderType Extends ContentType
         $this->addField('linkClass', ContentFieldType::String);
     }
 
-    public function buildForm()
+    public function buildForm($isEditMode = false)
     {
         $this->fb()->add('linkType', 'choice',
             array(
@@ -90,7 +88,7 @@ class NavigationFolderType Extends ContentType
      */
     public function render($contentEntity, $options = array())
     {
-        $contentMenuItems = $this->cm()->getContentMenuItems($contentEntity);
+        $contentMenuItems = $this->cq()->getContentMenuItems($contentEntity);
         /**
          * @var \Knp\Menu\MenuItem $rootMenu
          * @var \Knp\Menu\MenuItem $menu
@@ -114,7 +112,7 @@ class NavigationFolderType Extends ContentType
             }
             if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'content') {
                 if (isset($contentMeta['linkContent']) && ($contentMeta['linkContent'] instanceof ContentEntity)) {
-                    $contentLinkURL = $this->cm()->getPublicURL($contentMeta['linkContent']);
+                    $contentLinkURL = $this->cq()->getPublicURL($contentMeta['linkContent']);
                     $menu[$content->getId()]->setUri($contentLinkURL);
                 }
             }

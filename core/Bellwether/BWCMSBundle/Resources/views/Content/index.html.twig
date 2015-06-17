@@ -13,11 +13,27 @@
 {% endblock %}
 
 {% block body %}
+    <script language="JavaScript">
+        $(document).ready(function () {
+            var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+            if ((h - 200) > 400) {
+                $('div.contentPageLeft').height(h - 200);
+                $('div.contentPageRight').height(h - 200);
+            }
+        });
+        $(window).resize(function () {
+            var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+            if ((h - 200) > 400) {
+                $('div.contentPageLeft').height(h - 200);
+                $('div.contentPageRight').height(h - 200);
+            }
+        })
+    </script>
     <div class="row">
         <div class="col-md-3">
-            <div id="jstree_div" class="mediaPageLeft"></div>
+            <div id="jstree_div" class="contentPageLeft"></div>
         </div>
-        <div class="col-md-9 mediaPageRight">
+        <div class="col-md-9 contentPageRight">
             <div id="contentToolBarHolder" style="display: none;">
                 &nbsp;&nbsp;
                 <div id="contentToolBar" class="btn-group">
@@ -191,7 +207,7 @@
                 },
                 error: function (xhr, ajaxOptions, errorThrown) {
                     ajaxRequestActive = false;
-                    alert( 'Error: ' + xhr.responseText);
+                    alert('Error: ' + xhr.responseText);
                 },
                 success: function (data) {
                     console.log(data);
@@ -230,7 +246,7 @@
                 },
                 error: function (xhr, ajaxOptions, errorThrown) {
                     ajaxRequestActive = false;
-                    alert( 'Error: ' + xhr.responseText);
+                    alert('Error: ' + xhr.responseText);
                 },
                 success: function (data) {
                     console.log(data);
@@ -403,7 +419,7 @@
                                 error: function (xhr, ajaxOptions, errorThrown) {
                                     ajaxRequestActive = false;
                                     $("#contentTable tbody").sortable("cancel");
-                                    alert( 'Error: ' + xhr.responseText);
+                                    alert('Error: ' + xhr.responseText);
                                 },
                                 complete: function () {
                                     ajaxRequestActive = false;
@@ -471,7 +487,7 @@
                                 },
                                 error: function (xhr, ajaxOptions, errorThrown) {
                                     ajaxRequestActive = false;
-                                    alert( 'Error: ' + xhr.responseText);
+                                    alert('Error: ' + xhr.responseText);
                                 },
                                 success: function (data) {
                                     if ($("#selectedContentFolderId").val() == node_parent.id) {

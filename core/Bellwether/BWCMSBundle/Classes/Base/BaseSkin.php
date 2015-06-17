@@ -13,6 +13,7 @@ use Bellwether\BWCMSBundle\Classes\Service\AdminService;
 use Bellwether\BWCMSBundle\Classes\Service\ACLService;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
+use Bellwether\BWCMSBundle\Classes\Service\ContentQueryService;
 use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
@@ -100,7 +101,7 @@ abstract class BaseSkin extends ContainerAware
      */
     public function getContentTemplate($contentEntity)
     {
-        return $this->getTemplateName($this->cm()->getContentTemplate($contentEntity));
+        return $this->getTemplateName($this->cq()->getContentTemplate($contentEntity));
     }
 
     public function getTemplateName($templateFilename)
@@ -174,6 +175,14 @@ abstract class BaseSkin extends ContainerAware
     public function cm()
     {
         return $this->container->get('BWCMS.Content')->getManager();
+    }
+
+    /**
+     * @return ContentQueryService
+     */
+    public function cq()
+    {
+        return $this->container->get('BWCMS.ContentQuery')->getManager();
     }
 
     /**

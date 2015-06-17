@@ -272,6 +272,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             $class->setParent($parent);
         }
         $form = $class->getForm();
+        $form = $this->cm()->loadFormData($class->getNewContent(), $form, $class);
 
         return array(
             'title' => 'Create ' . $class->getName(),
@@ -299,7 +300,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         if ($content->getTreeParent() != null) {
             $class->setParent($content->getTreeParent()->getId());
         }
-        $form = $class->getForm();
+        $form = $class->getForm(true);
         $form = $this->cm()->loadFormData($content, $form, $class);
 
         return array(
@@ -329,7 +330,7 @@ class ContentController extends BaseController implements BackEndControllerInter
          * @var ContentType $class
          */
         $class = $this->cm()->getContentClass($type, $schema);
-        $form = $class->getForm();
+        $form = $class->getForm(true);
         $form->handleRequest($request);
 
         if ($form->isValid()) {

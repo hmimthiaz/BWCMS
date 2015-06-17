@@ -30,7 +30,6 @@ class MediaFolderType Extends ContentType
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
         $this->setIsUploadEnabled(false);
-        $this->setIsSortEnabled(false);
     }
 
     public function buildFields()
@@ -38,7 +37,7 @@ class MediaFolderType Extends ContentType
 
     }
 
-    public function buildForm()
+    public function buildForm($isEditMode = false)
     {
 
     }

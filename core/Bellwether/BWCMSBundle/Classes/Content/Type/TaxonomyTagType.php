@@ -32,8 +32,6 @@ class TaxonomyTagType Extends ContentType
         $this->setIsSummaryEnabled(false);
         $this->setIsContentEnabled(false);
         $this->setIsUploadEnabled(false);
-        $this->setIsSortEnabled(false);
-        $this->setIsSlugEnabled(true);
     }
 
     public function buildFields()
@@ -41,7 +39,7 @@ class TaxonomyTagType Extends ContentType
 
     }
 
-    public function buildForm()
+    public function buildForm($isEditMode = false)
     {
 
     }

@@ -182,6 +182,12 @@ class ContentEntity
     private $author;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\UserEntity")
+     * @ORM\JoinColumn(name="lastModifiedAuthorId", referencedColumnName="id", nullable=true)
+     */
+    private $lastModifiedAuthor;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity")
      * @ORM\JoinColumn(name="siteId", referencedColumnName="id", nullable=false)
      */
@@ -670,6 +676,22 @@ class ContentEntity
     public function setAuthor($author)
     {
         $this->author = $author;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastModifiedAuthor()
+    {
+        return $this->lastModifiedAuthor;
+    }
+
+    /**
+     * @param mixed $lastModifiedAuthor
+     */
+    public function setLastModifiedAuthor($lastModifiedAuthor)
+    {
+        $this->lastModifiedAuthor = $lastModifiedAuthor;
     }
 
     /**

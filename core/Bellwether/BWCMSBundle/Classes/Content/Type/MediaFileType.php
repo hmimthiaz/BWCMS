@@ -35,7 +35,7 @@ class MediaFileType Extends ContentType
 
     }
 
-    public function buildForm()
+    public function buildForm($isEditMode = false)
     {
 
     }
