@@ -4,6 +4,7 @@ namespace Bellwether\BWCMSBundle\Classes\Service;
 
 use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentScopeType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Bellwether\BWCMSBundle\Entity\ContentRelationEntity;
@@ -263,6 +264,7 @@ class ContentService extends BaseService
         $form->get('id')->setData($content->getId());
         $form->get('type')->setData($content->getType());
         $form->get('schema')->setData($content->getSchema());
+        $form->get('scope')->setData($content->getScope());
         $form->get('template')->setData($content->getTemplate());
         $form->get('status')->setData($content->getStatus());
         $form->get('title')->setData($content->getTitle());
@@ -796,7 +798,7 @@ class ContentService extends BaseService
         return array(
             "id", "expireDate", "publishDate",
             "title", "summary", "content",
-            "slug", "file", "type",
+            "slug", "file", "type", "scope",
             "schema", "template", "mime", "extension",
             "size", "height", "width",
             "modifiedDate", "createdDate", "status",

@@ -46,9 +46,23 @@
             </ul>
         </div>
     {% else %}
+        <script language="JavaScript">
+            $(document).ready(function () {
+                var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                if ((h - 200) > 400) {
+                    $('div.contentPageLeft').height(h - 200);
+                }
+            });
+            $(window).resize(function () {
+                var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                if ((h - 200) > 400) {
+                    $('div.contentPageLeft').height(h - 200);
+                }
+            })
+        </script>
         <div class="row">
             <div class="col-md-12">
-                <div id="jstree_div" class="mediaPageLeft"></div>
+                <div id="jstree_div" class="contentPageLeft"></div>
             </div>
         </div>
         <script language="JavaScript">

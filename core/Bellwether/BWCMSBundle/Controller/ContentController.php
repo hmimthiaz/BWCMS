@@ -7,6 +7,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentScopeType;
 use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -42,6 +43,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         return array(
             'parentId' => $parentId,
             'type' => $type,
+            'scope' => ContentScopeType::CPublic,
             'title' => ucfirst($type) . ' Manager',
             'contentTypes' => $registeredContents,
             'mediaContentTypes' => $mediaContentTypes,
@@ -49,7 +51,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         );
     }
 
-    function getFolderTree($type, $parentId, $schema = null, $rootFolderCaption = 'Folders')
+    function getFolderTree($type, $parentId, $schema = null, $rootFolderCaption = 'Folders', $scope = ContentScopeType::CPublic)
     {
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
         $registeredContents = $this->cm()->getRegisteredContentTypes($type, $schema);
@@ -64,6 +66,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
         $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->andWhere(" node.scope ='" . ContentScopeType::CPublic . "' ");
 
         $rootFolders = $qb->getQuery()->getResult();
 
@@ -262,8 +265,12 @@ class ContentController extends BaseController implements BackEndControllerInter
         $type = $request->get('type', null);
         $schema = $request->get('schema', null);
         $parent = $request->get('parent', null);
+        $scope = $request->get('scope', ContentScopeType::CPublic);
 
         if (is_null($type) || is_null($schema) || is_null($parent)) {
+            return $this->returnErrorResponse();
+        }
+        if ($scope != ContentScopeType::CPublic && $scope != ContentScopeType::CPrivate) {
             return $this->returnErrorResponse();
         }
 
@@ -272,7 +279,9 @@ class ContentController extends BaseController implements BackEndControllerInter
             $class->setParent($parent);
         }
         $form = $class->getForm();
-        $form = $this->cm()->loadFormData($class->getNewContent(), $form, $class);
+        $content = $class->getNewContent();
+        $content->setScope($scope);
+        $form = $this->cm()->loadFormData($content, $form, $class);
 
         return array(
             'title' => 'Create ' . $class->getName(),
@@ -474,7 +483,8 @@ class ContentController extends BaseController implements BackEndControllerInter
         if (!empty($condition)) {
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
-        $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->andWhere(" node.site = '" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->andWhere(" node.scope = '" . ContentScopeType::CPublic . "' ");
 
         $qb->setFirstResult($start);
         $qb->setMaxResults($length);

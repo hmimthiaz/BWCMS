@@ -18,7 +18,7 @@ class Version20150617125433 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE BWContent ADD scope VARCHAR(100) NOT NULL DEFAULT \'Public\'');
+        $this->addSql('ALTER TABLE BWContent ADD scope VARCHAR(100) NOT NULL DEFAULT \'CS.CPublic\'');
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Bellwether\BWCMSBundle\Entity;
 use Doctrine\ORM\Mapping AS ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentScopeType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 
@@ -123,7 +124,7 @@ class ContentEntity
     /**
      * @ORM\Column(type="string", length=100, nullable=false, name="scope")
      */
-    private $scope = "Public";
+    private $scope = ContentScopeType::CPublic;
 
     /**
      * @ORM\Column(type="string", length=100, nullable=false)
@@ -203,6 +204,7 @@ class ContentEntity
     {
         $this->meta = new \Doctrine\Common\Collections\ArrayCollection();
         $this->relation = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->scope = ContentScopeType::CPublic;
         $this->sortBy = ContentSortByType::Created;
         $this->sortOrder = ContentSortOrderType::DESC;
         $this->status = ContentPublishType::Draft;
