@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilder;
 
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
+use Bellwether\BWCMSBundle\Classes\Service\ContentQueryService;
 use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
@@ -551,7 +552,7 @@ abstract class ContentType implements ContentTypeInterface
      */
     public function getContentTemplate($contentEntity)
     {
-        return $this->tp()->getCurrentSkin()->getTemplateName($this->cm()->getContentTemplate($contentEntity));
+        return $this->tp()->getCurrentSkin()->getTemplateName($this->cq()->getContentTemplate($contentEntity));
     }
 
     /**
@@ -584,6 +585,14 @@ abstract class ContentType implements ContentTypeInterface
     public function cm()
     {
         return $this->container->get('BWCMS.Content')->getManager();
+    }
+
+    /**
+     * @return ContentQueryService
+     */
+    public function cq()
+    {
+        return $this->container->get('BWCMS.ContentQuery')->getManager();
     }
 
     /**

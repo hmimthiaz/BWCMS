@@ -12,6 +12,7 @@ use Bellwether\BWCMSBundle\Classes\Service\AdminService;
 use Bellwether\BWCMSBundle\Classes\Service\ACLService;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
+use Bellwether\BWCMSBundle\Classes\Service\ContentQueryService;
 use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
@@ -112,6 +113,14 @@ abstract class BaseService  extends ContainerAware
     public function cm()
     {
         return $this->container->get('BWCMS.Content')->getManager();
+    }
+
+    /**
+     * @return ContentQueryService
+     */
+    public function cq()
+    {
+        return $this->container->get('BWCMS.ContentQuery')->getManager();
     }
 
     /**
