@@ -70,6 +70,11 @@ class ContentEntity
      */
     private $meta;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Bellwether\BWCMSBundle\Entity\ContentMediaEntity", mappedBy="content")
+     */
+    private $media;
+
     private $loadedMeta = null;
 
     /**
@@ -203,6 +208,7 @@ class ContentEntity
     public function __construct()
     {
         $this->meta = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->media = new \Doctrine\Common\Collections\ArrayCollection();
         $this->relation = new \Doctrine\Common\Collections\ArrayCollection();
         $this->scope = ContentScopeType::CPublic;
         $this->sortBy = ContentSortByType::Created;
@@ -221,11 +227,18 @@ class ContentEntity
     /**
      * @return \Doctrine\Common\Collections\ArrayCollection
      */
+    public function getMedia()
+    {
+        return $this->media;
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
     public function getRelation()
     {
         return $this->relation;
     }
-
 
     /**
      * @return mixed
@@ -748,6 +761,26 @@ class ContentEntity
      * @return $this
      */
     public function removeMeta(ContentMetaEntity $meta)
+    {
+        $this->meta->removeElement($meta);
+        return $this;
+    }
+
+    /**
+     * @param ContentMediaEntity $meta
+     * @return $this
+     */
+    public function addMedia(ContentMediaEntity $meta)
+    {
+        $this->meta->add($meta);
+        return $this;
+    }
+
+    /**
+     * @param ContentMediaEntity $meta
+     * @return $this
+     */
+    public function removeMedia(ContentMediaEntity $meta)
     {
         $this->meta->removeElement($meta);
         return $this;
