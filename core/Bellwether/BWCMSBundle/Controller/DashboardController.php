@@ -47,4 +47,13 @@ class DashboardController extends BaseController implements BackEndControllerInt
     }
 
 
+    /**
+     * @Route("/about.php",name="about_home")
+     * @Template()
+     */
+    public function aboutAction()
+    {
+        return array();
+    }
+
 }

@@ -4,6 +4,7 @@ namespace Bellwether\BWCMSBundle\Classes\Service;
 
 use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentScopeType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Bellwether\BWCMSBundle\Entity\ContentRelationEntity;
@@ -29,6 +30,7 @@ use Bellwether\BWCMSBundle\Classes\Content\Type\TaxonomyCategoryType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\TaxonomyTagType;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Bellwether\Common\StringUtility;
 use Bellwether\Common\Pagination;
@@ -263,6 +265,7 @@ class ContentService extends BaseService
         $form->get('id')->setData($content->getId());
         $form->get('type')->setData($content->getType());
         $form->get('schema')->setData($content->getSchema());
+        $form->get('scope')->setData($content->getScope());
         $form->get('template')->setData($content->getTemplate());
         $form->get('status')->setData($content->getStatus());
         $form->get('title')->setData($content->getTitle());
@@ -454,6 +457,9 @@ class ContentService extends BaseService
             if ($fieldName == 'schema') {
                 $content->setSchema($data['schema']);
             }
+            if ($fieldName == 'scope') {
+                $content->setScope($data['scope']);
+            }
             if ($fieldName == 'status') {
                 $content->setStatus($data['status']);
             }
@@ -490,12 +496,20 @@ class ContentService extends BaseService
             }
             if ($fieldName == 'attachment') {
                 $mediaInfo = $this->mm()->handleUpload($data['attachment']);
-                $content->setMime($mediaInfo['mimeType']);
-                $content->setFile($mediaInfo['filename']);
-                $content->setSize($mediaInfo['size']);
-                $content->setExtension($mediaInfo['extension']);
-                $content->setWidth($mediaInfo['width']);
-                $content->setHeight($mediaInfo['height']);
+                if (!empty($mediaInfo)) {
+                    $contentMedia = new ContentMediaEntity();
+                    $contentMedia->setFile($mediaInfo['filename']);
+                    $contentMedia->setExtension($mediaInfo['extension']);
+                    $contentMedia->setMime($mediaInfo['mimeType']);
+                    $contentMedia->setSize($mediaInfo['size']);
+                    $contentMedia->setHeight($mediaInfo['height']);
+                    $contentMedia->setWidth($mediaInfo['width']);
+                    if (!is_null($mediaInfo['binary'])) {
+                        $contentMedia->setData($mediaInfo['binary']);
+                    }
+                    $contentMedia->setContent($content);
+                    $this->em()->persist($contentMedia);
+                }
             }
         }
         if ($content->getSlug() == null) {
@@ -796,7 +810,7 @@ class ContentService extends BaseService
         return array(
             "id", "expireDate", "publishDate",
             "title", "summary", "content",
-            "slug", "file", "type",
+            "slug", "file", "type", "scope",
             "schema", "template", "mime", "extension",
             "size", "height", "width",
             "modifiedDate", "createdDate", "status",
@@ -818,47 +832,6 @@ class ContentService extends BaseService
     public function getContentRepository()
     {
         return $this->em()->getRepository('BWCMSBundle:ContentEntity');
-    }
-
-
-    public function getSystemThumbURL(ContentEntity $content = null, $width, $height)
-    {
-        $contentClass = $this->getContentClass($content->getType(), $content->getSchema());
-        if (!$contentClass->isUploadEnabled()) {
-            $thumbURL = $this->getThumbService()
-                ->open($contentClass->getImage())
-                ->resize($width, $height)
-                ->cacheFile('guess');
-            return $thumbURL;
-        }
-        return $this->mm()->getSystemThumbURL($content->getFile(), $content->getMime(), $content->getExtension(), $width, $height);
-    }
-
-    private function getContentTypeResourceImage($type)
-    {
-        if (in_array($type, $this->getContentTypeIcons())) {
-            return '@BWCMSBundle/Resources/icons/content/' . $type . '.png';
-        }
-        return '@BWCMSBundle/Resources/icons/content/Unknown.png';
-    }
-
-    private function getContentTypeIcons()
-    {
-        if ($this->contentTypeIcons == null) {
-            $this->contentTypeIcons = array();
-            /**
-             * @var \Symfony\Component\HttpKernel\Config\FileLocator $fileLocator
-             * @var \Symfony\Component\Finder\SplFileInfo $file
-             */
-            $fileLocator = $this->container->get('file_locator');
-            $iconLocation = $fileLocator->locate('@BWCMSBundle/Resources/icons/content');
-            $finder = new \Symfony\Component\Finder\Finder();
-            $finder->files()->in($iconLocation);
-            foreach ($finder as $file) {
-                $this->contentTypeIcons[] = $file->getBasename('.' . $file->getExtension());
-            }
-        }
-        return $this->contentTypeIcons;
     }
 
 }

@@ -6,6 +6,7 @@ use Bellwether\BWCMSBundle\Classes\Base\ContentTypeInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentScopeType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Symfony\Component\Form\Form;
@@ -119,6 +120,11 @@ abstract class ContentType implements ContentTypeInterface
      */
     private $isExpireDateEnabled = false;
 
+    /**
+     * @var bool
+     */
+    private $isPageBuilderSupported = false;
+
     private $taxonomyRelations = null;
 
     public function getType()
@@ -227,6 +233,7 @@ abstract class ContentType implements ContentTypeInterface
             $this->addField('id', ContentFieldType::Internal);
             $this->addField('type', ContentFieldType::Internal);
             $this->addField('schema', ContentFieldType::Internal);
+            $this->addField('scope', ContentFieldType::Internal);
             $this->addField('template', ContentFieldType::Internal);
             $this->addField('parent', ContentFieldType::Internal);
             $this->addField('title', ContentFieldType::Internal);
@@ -334,6 +341,7 @@ abstract class ContentType implements ContentTypeInterface
         if ($this->isExpireDateEnabled()) {
             $contentEntity->setExpireDate(new \DateTime());
         }
+        $contentEntity->setScope(ContentScopeType::CPublic);
         return $contentEntity;
     }
 
@@ -369,7 +377,7 @@ abstract class ContentType implements ContentTypeInterface
             )
         );
 
-        if ($isEditMode) {
+        if ($isEditMode && $this->isSlugEnabled()) {
             $this->fb()->add('slug', 'text',
                 array(
                     'required' => true,
@@ -380,7 +388,7 @@ abstract class ContentType implements ContentTypeInterface
             $this->fb()->add('slug', 'hidden');
         }
 
-        if ($this->isSummaryEnabled) {
+        if ($this->isSummaryEnabled()) {
             $this->fb()->add('summary', 'textarea',
                 array(
                     'required' => false,
@@ -389,7 +397,7 @@ abstract class ContentType implements ContentTypeInterface
             );
         }
 
-        if ($this->isContentEnabled) {
+        if ($this->isContentEnabled()) {
             $this->fb()->add('content', 'textarea',
                 array(
                     'required' => false,
@@ -438,7 +446,7 @@ abstract class ContentType implements ContentTypeInterface
             }
         }
 
-        if ($this->isUploadEnabled) {
+        if ($this->isUploadEnabled()) {
             $this->fb()->add('attachment', 'file',
                 array(
                     'label' => 'Attachment'
@@ -521,6 +529,7 @@ abstract class ContentType implements ContentTypeInterface
         );
 
         $this->fb()->add('id', 'hidden');
+        $this->fb()->add('scope', 'hidden');
 
         $this->fb()->add('parent', 'hidden', array(
             'data' => $this->parentId,
@@ -822,6 +831,38 @@ abstract class ContentType implements ContentTypeInterface
     public function setIsSortEnabled($isSortEnabled)
     {
         $this->isSortEnabled = $isSortEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isSlugEnabled()
+    {
+        return $this->isSlugEnabled;
+    }
+
+    /**
+     * @param boolean $isSlugEnabled
+     */
+    public function setIsSlugEnabled($isSlugEnabled)
+    {
+        $this->isSlugEnabled = $isSlugEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isPageBuilderSupported()
+    {
+        return $this->isPageBuilderSupported;
+    }
+
+    /**
+     * @param boolean $isPageBuilderSupported
+     */
+    public function setIsPageBuilderSupported($isPageBuilderSupported)
+    {
+        $this->isPageBuilderSupported = $isPageBuilderSupported;
     }
 
     /**

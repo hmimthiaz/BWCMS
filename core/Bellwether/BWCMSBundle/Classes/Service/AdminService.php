@@ -161,8 +161,10 @@ class AdminService extends BaseService
         $menu['Admin']->addChild('User', array(
             'route' => 'user_home'
         ));
-
-
+        $menu['Admin']->addChild('-*-', array('uri' => '#'))->setAttribute('divider', true);
+        $menu['Admin']->addChild('About', array(
+            'route' => 'about_home'
+        ));
         return $menu;
     }
 

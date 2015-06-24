@@ -71,6 +71,9 @@ abstract class BaseService  extends ContainerAware
         return $this->requestStack->getCurrentRequest();
     }
 
+    /**
+     * @return \AppKernel
+     */
     public function getKernel(){
         return $this->container->get( 'kernel' );
     }

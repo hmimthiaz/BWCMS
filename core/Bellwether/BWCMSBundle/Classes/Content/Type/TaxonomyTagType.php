@@ -69,7 +69,7 @@ class TaxonomyTagType Extends ContentType
      */
     public function getImage()
     {
-        return '@BWCMSBundle/Resources/icons/content/Folder.png';
+        return '@BWCMSBundle/Resources/icons/content/Page.png';
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Bellwether\BWCMSBundle\Entity;
 use Doctrine\ORM\Mapping AS ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentScopeType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 
@@ -69,6 +70,11 @@ class ContentEntity
      */
     private $meta;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Bellwether\BWCMSBundle\Entity\ContentMediaEntity", mappedBy="content")
+     */
+    private $media;
+
     private $loadedMeta = null;
 
     /**
@@ -113,12 +119,17 @@ class ContentEntity
     /**
      * @ORM\Column(type="string", length=100, nullable=false)
      */
-    private $type = 'Folder';
+    private $type = 'Content';
 
     /**
      * @ORM\Column(type="string", length=100, nullable=false, name="schemaType")
      */
-    private $schema = "Default";
+    private $schema = "Folder";
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=false, name="scope")
+     */
+    private $scope = ContentScopeType::CPublic;
 
     /**
      * @ORM\Column(type="string", length=100, nullable=false)
@@ -197,7 +208,9 @@ class ContentEntity
     public function __construct()
     {
         $this->meta = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->media = new \Doctrine\Common\Collections\ArrayCollection();
         $this->relation = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->scope = ContentScopeType::CPublic;
         $this->sortBy = ContentSortByType::Created;
         $this->sortOrder = ContentSortOrderType::DESC;
         $this->status = ContentPublishType::Draft;
@@ -214,11 +227,18 @@ class ContentEntity
     /**
      * @return \Doctrine\Common\Collections\ArrayCollection
      */
+    public function getMedia()
+    {
+        return $this->media;
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
     public function getRelation()
     {
         return $this->relation;
     }
-
 
     /**
      * @return mixed
@@ -435,6 +455,22 @@ class ContentEntity
     public function setSchema($schema)
     {
         $this->schema = $schema;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getScope()
+    {
+        return $this->scope;
+    }
+
+    /**
+     * @param mixed $scope
+     */
+    public function setScope($scope)
+    {
+        $this->scope = $scope;
     }
 
     /**
@@ -725,6 +761,26 @@ class ContentEntity
      * @return $this
      */
     public function removeMeta(ContentMetaEntity $meta)
+    {
+        $this->meta->removeElement($meta);
+        return $this;
+    }
+
+    /**
+     * @param ContentMediaEntity $meta
+     * @return $this
+     */
+    public function addMedia(ContentMediaEntity $meta)
+    {
+        $this->meta->add($meta);
+        return $this;
+    }
+
+    /**
+     * @param ContentMediaEntity $meta
+     * @return $this
+     */
+    public function removeMedia(ContentMediaEntity $meta)
     {
         $this->meta->removeElement($meta);
         return $this;

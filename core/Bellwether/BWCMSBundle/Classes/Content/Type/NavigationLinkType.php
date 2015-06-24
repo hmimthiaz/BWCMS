@@ -100,7 +100,7 @@ class NavigationLinkType Extends ContentType
      */
     public function getImage()
     {
-        return '@BWCMSBundle/Resources/icons/content/Unknown.png';
+        return '@BWCMSBundle/Resources/icons/content/Page.png';
     }
 
     /**

@@ -11,44 +11,60 @@
 
 {% block body %}
     {% if not isHierarchy %}
-        <div class="col-md-12">
-            <table class="table table-striped table-hover table-bordered records_list">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Slug</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for entity in entities %}
-                    <tr>
-                        <td>{{ entity.title }}</td>
-                        <td>{{ entity.slug }}</td>
-                        <td>
-                            <div class="btn-group">
-                                <a class="btn btn-default btn-sm"
-                                   href="{{ path('content_edit', {'contentId': entity.id}) }}">
-                                    <i class="fa fa-edit"></i> Edit
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            <ul>
-                <li>
-                    <a href="{{ path('content_create', { 'type' : type , 'schema' : schema , 'parent': 'Root' } ) }}">
-                        Add New
-                    </a>
-                </li>
-            </ul>
-        </div>
-    {% else %}
         <div class="row">
             <div class="col-md-12">
-                <div id="jstree_div" class="mediaPageLeft"></div>
+                <table class="table table-striped table-hover table-bordered records_list">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for entity in entities %}
+                        <tr>
+                            <td>{{ entity.title }}</td>
+                            <td>{{ entity.slug }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a class="btn btn-default btn-sm"
+                                       href="{{ path('content_edit', {'contentId': entity.id}) }}">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <ul>
+                    <li>
+                        <a href="{{ path('content_create', { 'type' : type , 'schema' : schema , 'parent': 'Root' } ) }}">
+                            Add New
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    {% else %}
+        <script language="JavaScript">
+            $(document).ready(function () {
+                var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                if ((h - 200) > 400) {
+                    $('div.contentPageLeft').height(h - 200);
+                }
+            });
+            $(window).resize(function () {
+                var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                if ((h - 200) > 400) {
+                    $('div.contentPageLeft').height(h - 200);
+                }
+            })
+        </script>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="jstree_div" class="contentPageLeft"></div>
             </div>
         </div>
         <script language="JavaScript">

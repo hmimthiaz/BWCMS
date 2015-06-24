@@ -7,6 +7,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentScopeType;
 use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
 use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 
 /**
@@ -42,6 +44,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         return array(
             'parentId' => $parentId,
             'type' => $type,
+            'scope' => ContentScopeType::CPublic,
             'title' => ucfirst($type) . ' Manager',
             'contentTypes' => $registeredContents,
             'mediaContentTypes' => $mediaContentTypes,
@@ -49,7 +52,206 @@ class ContentController extends BaseController implements BackEndControllerInter
         );
     }
 
-    function getFolderTree($type, $parentId, $schema = null, $rootFolderCaption = 'Folders')
+    /**
+     * @Route("/create.php",name="content_create")
+     * @Template("BWCMSBundle:Content:save.html.twig")
+     */
+    public function createAction(Request $request)
+    {
+
+        $type = $request->get('type', null);
+        $schema = $request->get('schema', null);
+        $parent = $request->get('parent', null);
+        $scope = $request->get('scope', ContentScopeType::CPublic);
+
+        if (is_null($type) || is_null($schema) || is_null($parent)) {
+            return $this->returnErrorResponse();
+        }
+        if ($scope != ContentScopeType::CPublic && $scope != ContentScopeType::CPrivate && $scope != ContentScopeType::CPageBuilder) {
+            return $this->returnErrorResponse();
+        }
+
+        $class = $this->cm()->getContentClass($type, $schema);
+        if ($parent != 'Root') {
+            $class->setParent($parent);
+        }
+        $form = $class->getForm();
+        $content = $class->getNewContent();
+        $content->setScope($scope);
+        $form = $this->cm()->loadFormData($content, $form, $class);
+
+        return array(
+            'title' => 'Create ' . $class->getName(),
+            'form' => $form->createView()
+        );
+    }
+
+    /**
+     * @Route("/edit.php",name="content_edit")
+     * @Template("BWCMSBundle:Content:save.html.twig")
+     */
+    public function editAction(Request $request)
+    {
+        $contentId = $request->get('contentId');
+        if ($contentId == null) {
+            return $this->returnErrorResponse();
+        }
+
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         */
+        $content = $this->cm()->getContentRepository()->find($contentId);
+
+        $class = $this->cm()->getContentClass($content->getType(), $content->getSchema());
+        if ($content->getTreeParent() != null) {
+            $class->setParent($content->getTreeParent()->getId());
+        }
+        $form = $class->getForm(true);
+        $form = $this->cm()->loadFormData($content, $form, $class);
+
+        return array(
+            'title' => 'Edit ' . $class->getName(),
+            'form' => $form->createView()
+        );
+    }
+
+
+    /**
+     * @Route("/pb.php",name="content_pb")
+     * @Template()
+     */
+    public function pageBuilderAction(Request $request)
+    {
+        $contentId = $request->get('contentId');
+        if ($contentId == null) {
+            return $this->returnErrorResponse();
+        }
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+         */
+        $content = $this->cm()->getContentRepository()->find($contentId);
+        if ($content == null) {
+            return $this->returnErrorResponse();
+        }
+
+        $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder($content, false);
+        $registeredContents = $this->cm()->getRegisteredContentTypes('Widget');
+        $condition = array();
+        foreach ($registeredContents as $cInfo) {
+            $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
+        }
+        if (!empty($condition)) {
+            $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
+        }
+        $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->andWhere(" node.scope ='" . ContentScopeType::CPageBuilder . "' ");
+        $pageContents = $qb->getQuery()->getResult();
+
+        $jsNodes = array(
+            array(
+                'id' => $content->getId(),
+                'text' => $content->getTitle(),
+                'icon' => 'glyphicon glyphicon-folder-open',
+                'parent' => '#',
+                'state' => array(
+                    'opened' => true
+                )
+            )
+        );
+        if (!empty($pageContents)) {
+            /** @var ContentEntity $pContent */
+            foreach ($pageContents as $pContent) {
+                $jsNode = array();
+                $jsNode['id'] = $pContent->getId();
+                $jsNode['text'] = $pContent->getTitle();
+                $class = $this->cm()->getContentClass($pContent->getType(), $pContent->getSchema());
+                if ($class->isHierarchy()) {
+                    $jsNode['icon'] = 'glyphicon glyphicon-folder-open';
+                } else {
+                    $jsNode['icon'] = 'glyphicon glyphicon-file';
+                }
+                $jsNode['parent'] = $pContent->getTreeParent()->getId();
+                $jsNode['state'] = array(
+                    'opened' => true,
+                );
+                $jsNodes[] = $jsNode;
+            }
+        }
+
+        return array(
+            'title' => 'Page Builder',
+            'pageTitle' => 'Page Builder',
+            'scope' => ContentScopeType::CPageBuilder,
+            'contentTypes' => $registeredContents,
+            'jsNodes' => json_encode($jsNodes),
+        );
+    }
+
+    /**
+     * @Route("/save.php",name="content_save")
+     * @Method({"POST"})
+     * @Template("BWCMSBundle:Content:save.html.twig")
+     */
+    public function saveAction(Request $request)
+    {
+
+        $contentFormData = $request->request->get('BWCF');
+        $type = $contentFormData['type'];
+        $schema = $contentFormData['schema'];
+
+        if (is_null($type) || is_null($schema)) {
+            return $this->returnErrorResponse();
+        }
+
+        /**
+         * @var ContentType $class
+         */
+        $class = $this->cm()->getContentClass($type, $schema);
+        $form = $class->getForm(true);
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+
+            $contentId = $form->get('id')->getData();
+            if (empty($contentId)) {
+                $contentEntity = new ContentEntity();
+                $contentEntity->setSite($this->getSite());
+            } else {
+                $contentEntity = $this->cm()->getContentRepository()->find($contentId);
+            }
+
+            $contentEntity = $this->cm()->prepareEntity($contentEntity, $form, $class);
+            $this->cm()->save($contentEntity);
+
+            if ($contentEntity->getScope() == ContentScopeType::CPageBuilder) {
+                $parents = $this->cm()->getContentRepository()->getPath($contentEntity);
+                $parents = array_reverse($parents);
+                foreach ($parents as $parent) {
+                    if ($parent->getScope() == ContentScopeType::CPublic) {
+                        return $this->redirect($this->generateUrl('content_pb', array('contentId' => $parent->getId())));
+                    }
+                }
+                return $this->returnErrorResponse();
+            }
+
+            $parentId = 'Root';
+            if ($contentEntity->getTreeParent() != null) {
+                $parentId = $contentEntity->getTreeParent()->getId();
+            }
+            if ($class->isIsTaxonomy()) {
+                return $this->redirect($this->generateUrl('taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
+            }
+            return $this->redirect($this->generateUrl('content_home', array('type' => $type, 'parent' => $parentId)));
+        }
+
+        return array(
+            'title' => 'Edit ' . $class->getName(),
+            'pageTitle' => 'Edit ' . $class->getName(),
+            'form' => $form->createView()
+        );
+    }
+
+    function getFolderTree($type, $parentId, $schema = null, $rootFolderCaption = 'Folders', $scope = ContentScopeType::CPublic)
     {
         $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
         $registeredContents = $this->cm()->getRegisteredContentTypes($type, $schema);
@@ -64,6 +266,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
         $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->andWhere(" node.scope ='" . ContentScopeType::CPublic . "' ");
 
         $rootFolders = $qb->getQuery()->getResult();
 
@@ -253,119 +456,6 @@ class ContentController extends BaseController implements BackEndControllerInter
 
 
     /**
-     * @Route("/create.php",name="content_create")
-     * @Template("BWCMSBundle:Content:save.html.twig")
-     */
-    public function createAction(Request $request)
-    {
-
-        $type = $request->get('type', null);
-        $schema = $request->get('schema', null);
-        $parent = $request->get('parent', null);
-
-        if (is_null($type) || is_null($schema) || is_null($parent)) {
-            return $this->returnErrorResponse();
-        }
-
-        $class = $this->cm()->getContentClass($type, $schema);
-        if ($parent != 'Root') {
-            $class->setParent($parent);
-        }
-        $form = $class->getForm();
-        $form = $this->cm()->loadFormData($class->getNewContent(), $form, $class);
-
-        return array(
-            'title' => 'Create ' . $class->getName(),
-            'form' => $form->createView()
-        );
-    }
-
-    /**
-     * @Route("/edit.php",name="content_edit")
-     * @Template("BWCMSBundle:Content:save.html.twig")
-     */
-    public function editAction(Request $request)
-    {
-        $contentId = $request->get('contentId');
-        if ($contentId == null) {
-            return $this->returnErrorResponse();
-        }
-
-        /**
-         * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
-         */
-        $content = $this->cm()->getContentRepository()->find($contentId);
-
-        $class = $this->cm()->getContentClass($content->getType(), $content->getSchema());
-        if ($content->getTreeParent() != null) {
-            $class->setParent($content->getTreeParent()->getId());
-        }
-        $form = $class->getForm(true);
-        $form = $this->cm()->loadFormData($content, $form, $class);
-
-        return array(
-            'title' => 'Edit ' . $class->getName(),
-            'form' => $form->createView()
-        );
-    }
-
-
-    /**
-     * @Route("/save.php",name="content_save")
-     * @Method({"POST"})
-     * @Template("BWCMSBundle:Content:save.html.twig")
-     */
-    public function saveAction(Request $request)
-    {
-
-        $contentFormData = $request->request->get('BWCF');
-        $type = $contentFormData['type'];
-        $schema = $contentFormData['schema'];
-
-        if (is_null($type) || is_null($schema)) {
-            return $this->returnErrorResponse();
-        }
-
-        /**
-         * @var ContentType $class
-         */
-        $class = $this->cm()->getContentClass($type, $schema);
-        $form = $class->getForm(true);
-        $form->handleRequest($request);
-
-        if ($form->isValid()) {
-
-            $contentId = $form->get('id')->getData();
-            if (empty($contentId)) {
-                $contentEntity = new ContentEntity();
-                $contentEntity->setSite($this->getSite());
-            } else {
-                $contentEntity = $this->cm()->getContentRepository()->find($contentId);
-            }
-
-            $contentEntity = $this->cm()->prepareEntity($contentEntity, $form, $class);
-            $this->cm()->save($contentEntity);
-
-            $parentId = 'Root';
-            if ($contentEntity->getTreeParent() != null) {
-                $parentId = $contentEntity->getTreeParent()->getId();
-            }
-
-            if ($class->isIsTaxonomy()) {
-                return $this->redirect($this->generateUrl('taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
-            }
-            return $this->redirect($this->generateUrl('content_home', array('type' => $type, 'parent' => $parentId)));
-        }
-
-        return array(
-            'title' => 'Edit ' . $class->getName(),
-            'pageTitle' => 'Edit ' . $class->getName(),
-            'form' => $form->createView()
-        );
-    }
-
-
-    /**
      * @Route("/upload.php",name="content_media_upload")
      * @Method({"POST"})
      */
@@ -402,13 +492,20 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $content->setTreeParent($parentEntity);
             }
             $content->setTitle($mediaInfo['originalName']);
-            $content->setMime($mediaInfo['mimeType']);
-            $content->setFile($mediaInfo['filename']);
-            $content->setSize($mediaInfo['size']);
-            $content->setExtension($mediaInfo['extension']);
-            $content->setWidth($mediaInfo['width']);
-            $content->setHeight($mediaInfo['height']);
             $content->setTemplate('');
+
+            $contentMedia = new ContentMediaEntity();
+            $contentMedia->setFile($mediaInfo['filename']);
+            $contentMedia->setExtension($mediaInfo['extension']);
+            $contentMedia->setMime($mediaInfo['mimeType']);
+            $contentMedia->setSize($mediaInfo['size']);
+            $contentMedia->setHeight($mediaInfo['height']);
+            $contentMedia->setWidth($mediaInfo['width']);
+            if (!is_null($mediaInfo['binary'])) {
+                $contentMedia->setData($mediaInfo['binary']);
+            }
+            $contentMedia->setContent($content);
+            $this->em()->persist($contentMedia);
 
             $content->setSlug($this->cm()->generateSlug($content->getTitle(), $content->getType(), $parentId));
             $content->setStatus(ContentPublishType::Published);
@@ -474,7 +571,8 @@ class ContentController extends BaseController implements BackEndControllerInter
         if (!empty($condition)) {
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
-        $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->andWhere(" node.site = '" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->andWhere(" node.scope = '" . ContentScopeType::CPublic . "' ");
 
         $qb->setFirstResult($start);
         $qb->setMaxResults($length);
@@ -486,7 +584,8 @@ class ContentController extends BaseController implements BackEndControllerInter
         }
 
         if ($onlyImage == 'yes') {
-            $qb->andWhere(" ( node.height > 0 AND node.width > 0 ) ");
+            $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentMediaEntity', 'media',\Doctrine\ORM\Query\Expr\Join::WITH,' node.id = media.content ');
+            $qb->andWhere(" ( media.height > 0 AND media.width > 0 ) ");
         }
 
         $result = $qb->getQuery()->getResult();
@@ -526,7 +625,7 @@ class ContentController extends BaseController implements BackEndControllerInter
                         $ca['status'] = 'Custom';
                 }
                 $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');
-                $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content, 32, 32);
+                $ca['thumbnail'] = $this->mm()->getContentThumbURL($content, 32, 32);
                 $ca['thumbnail'] = '<img class="contentThumb" src="' . $ca['thumbnail'] . '"/>';
 
                 $ca['link'] = '';
@@ -534,13 +633,17 @@ class ContentController extends BaseController implements BackEndControllerInter
                 if (!is_null($contentPublicURL)) {
                     $ca['link'] = $contentPublicURL;
                 }
+                $ca['pbLink'] = '';
+                if ($contentClass->isPageBuilderSupported()) {
+                    $ca['pbLink'] = $this->generateUrl('content_pb', array('contentId' => $content->getId()));
+                }
 
                 $ca['download'] = '';
-                if ($content->getFile() != null) {
+                if ($this->mm()->isMedia($content)) {
                     $ca['download'] = $this->generateUrl('content_media_download', array('contentId' => $content->getId()));
                 }
-                if ($this->mm()->isImage($content->getFile(), $content->getMime())) {
-                    $imageThumb = $this->getImageThumbURL($content->getFile(), 800, 800);
+                if ($this->mm()->isImage($content)) {
+                    $imageThumb = $this->mm()->getContentThumbURL($content, 800, 800);
                     $ca['thumbnail'] = '<a href="' . $imageThumb . '" data-title="' . $content->getTitle() . '" class="lightBox">' . $ca['thumbnail'] . '</a>';
                 }
                 $data['data'][] = $ca;
