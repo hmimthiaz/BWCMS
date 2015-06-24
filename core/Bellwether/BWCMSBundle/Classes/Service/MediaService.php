@@ -222,12 +222,14 @@ class MediaService extends BaseService
         if (empty($contentEntity)) {
             return null;
         }
-        if (!$this->mm()->isMedia($contentEntity)) {
+        if (!$this->isMedia($contentEntity)) {
             return null;
         }
-        if ($this->isImage($contentEntity->getFile(), $contentEntity->getMime())) {
-            $filename = $this->getFilePath($contentEntity->getFile());
-        } else {
+        $media = $contentEntity->getMedia()->first();
+        $this->checkAndCreateMediaCacheFile($media);
+        if ($this->isImage($contentEntity)) {
+            $filename = $this->getMediaCachePath($media);
+        }else{
             $filename = $this->getMimeResourceImage($contentEntity->getExtension());
         }
         return $filename;
@@ -274,7 +276,7 @@ class MediaService extends BaseService
         return true;
     }
 
-    private function getMimeResourceImage($extension)
+    public function getMimeResourceImage($extension)
     {
         if (in_array($extension, $this->getMimeIconsExtensions())) {
             return '@BWCMSBundle/Resources/icons/mime/' . $extension . '.png';

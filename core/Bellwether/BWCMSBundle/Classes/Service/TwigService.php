@@ -6,6 +6,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManager;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
 use Bellwether\BWCMSBundle\Entity\ThumbStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -217,7 +218,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     }
 
     /**
-     * @param $contentEntity
+     * @param ContentEntity $contentEntity
      * @param $metaKey
      * @param bool $default
      * @return bool
@@ -243,18 +244,30 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         return $default;
     }
 
+    /**
+     * @param ContentEntity $contentEntity
+     * @param bool $default
+     * @return bool|string
+     */
     public function getImage($contentEntity, $default = false)
     {
-        $mediaPath = $this->mm()->getContentFile($contentEntity);
-        if (empty($mediaPath)) {
+        /**
+         * @var ContentMediaEntity $media
+         */
+        if (empty($contentEntity)) {
             return $default;
         }
-        $kernel = $this->container->get('kernel');
-        try {
-            $path = $kernel->locateResource($mediaPath);
-            $path = $this->getThumbService()->open($path)->resize(100, 100)->cacheFile('guess');
-        } catch (\InvalidArgumentException $e) {
-            $path = '/' . $mediaPath;
+        if (!$this->mm()->isMedia($contentEntity)) {
+            return $default;
+        }
+        $media = $contentEntity->getMedia()->first();
+        $this->mm()->checkAndCreateMediaCacheFile($media);
+        if ($this->mm()->isImage($contentEntity)) {
+            $filename = $this->mm()->getMediaCachePath($media);
+            $path = $this->getThumbService()->open($filename)->resize($media->getWidth(), $media->getHeight())->cacheFile('guess');
+        }else{
+            $filename = $this->mm()->getMimeResourceImage($media->getExtension());
+            $path = $this->getThumbService()->open($filename)->resize(128, 128)->cacheFile('guess');
         }
         return $path;
     }
