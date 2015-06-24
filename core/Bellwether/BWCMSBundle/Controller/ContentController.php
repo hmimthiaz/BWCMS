@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
 use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 
 /**
@@ -164,9 +165,9 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $jsNode['id'] = $pContent->getId();
                 $jsNode['text'] = $pContent->getTitle();
                 $class = $this->cm()->getContentClass($pContent->getType(), $pContent->getSchema());
-                if($class->isHierarchy()){
+                if ($class->isHierarchy()) {
                     $jsNode['icon'] = 'glyphicon glyphicon-folder-open';
-                }else{
+                } else {
                     $jsNode['icon'] = 'glyphicon glyphicon-file';
                 }
                 $jsNode['parent'] = $pContent->getTreeParent()->getId();
@@ -491,13 +492,20 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $content->setTreeParent($parentEntity);
             }
             $content->setTitle($mediaInfo['originalName']);
-            $content->setMime($mediaInfo['mimeType']);
-            $content->setFile($mediaInfo['filename']);
-            $content->setSize($mediaInfo['size']);
-            $content->setExtension($mediaInfo['extension']);
-            $content->setWidth($mediaInfo['width']);
-            $content->setHeight($mediaInfo['height']);
             $content->setTemplate('');
+
+            $contentMedia = new ContentMediaEntity();
+            $contentMedia->setFile($mediaInfo['filename']);
+            $contentMedia->setExtension($mediaInfo['extension']);
+            $contentMedia->setMime($mediaInfo['mimeType']);
+            $contentMedia->setSize($mediaInfo['size']);
+            $contentMedia->setHeight($mediaInfo['height']);
+            $contentMedia->setWidth($mediaInfo['width']);
+            if (!is_null($mediaInfo['binary'])) {
+                $contentMedia->setData($mediaInfo['binary']);
+            }
+            $contentMedia->setContent($content);
+            $this->em()->persist($contentMedia);
 
             $content->setSlug($this->cm()->generateSlug($content->getTitle(), $content->getType(), $parentId));
             $content->setStatus(ContentPublishType::Published);
@@ -630,7 +638,7 @@ class ContentController extends BaseController implements BackEndControllerInter
                 }
 
                 $ca['download'] = '';
-                if ($content->getFile() != null) {
+                if ($this->mm()->isMedia($content)) {
                     $ca['download'] = $this->generateUrl('content_media_download', array('contentId' => $content->getId()));
                 }
                 if ($this->mm()->isImage($content->getFile(), $content->getMime())) {

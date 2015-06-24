@@ -10,11 +10,13 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Gregwar\Image\Image;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
 use Bellwether\BWCMSBundle\Entity\ThumbStyle;
 
 class MediaService extends BaseService
 {
 
+    private $mediaFolder;
     private $uploadFolder;
     private $webPath;
     private $extensionMimeIcons = null;
@@ -43,12 +45,72 @@ class MediaService extends BaseService
         if (!$this->loaded) {
             $rootDirectory = $this->getKernel()->getRootDir();
             $webRoot = realpath($rootDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'web');
+
             $this->webPath = $this->container->getParameter('media.path');
             $this->uploadFolder = $webRoot . DIRECTORY_SEPARATOR . $this->webPath;
+            $this->mediaFolder = $rootDirectory . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . $this->getKernel()->getEnvironment() . DIRECTORY_SEPARATOR . 'media';
             $this->fs = new Filesystem();
         }
         $this->loaded = true;
     }
+
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return bool
+     */
+    public function isMedia($contentEntity)
+    {
+        /**
+         * @var ContentMediaEntity $media
+         */
+        if ($contentEntity->getMedia()->count() == 0) {
+            return false;
+        }
+        $media = $contentEntity->getMedia()->first();
+        $cacheFile = $this->getMediaCachePath($media);
+        if (!file_exists($cacheFile)) {
+            $this->fs->mkdir(dirname($cacheFile));
+            $localFile = fopen($cacheFile, 'wb');
+            fwrite($localFile, stream_get_contents($media->getData()));
+            fclose($localFile);
+        }
+        return true;
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return bool
+     */
+    public function isImaged($contentEntity)
+    {
+        /**
+         * @var ContentMediaEntity $media
+         */
+        if (!$this->isMedia($contentEntity)) {
+            return false;
+        }
+        $media = $contentEntity->getMedia()->first();
+        $imageExtension = array('jpg', 'jpeg', 'jpe', 'gif', 'png');
+        if ('image/' == substr($media->getMime(), 0, 6) || in_array($media->getExtension(), $imageExtension)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param ContentMediaEntity $contentMediaEntity
+     * @return string|null
+     */
+    public function getMediaCachePath($contentMediaEntity)
+    {
+        $folderHash = md5($contentMediaEntity->getId());
+        $folderName = substr($folderHash, 0, 2) . DIRECTORY_SEPARATOR . substr($folderHash, 2, 2) . DIRECTORY_SEPARATOR . substr($folderHash, 4, 2) . DIRECTORY_SEPARATOR . substr($folderHash, 6, 2);
+        $path = $this->mediaFolder . DIRECTORY_SEPARATOR . $folderName . DIRECTORY_SEPARATOR;
+        $path .= $contentMediaEntity->getId() . DIRECTORY_SEPARATOR . $contentMediaEntity->getFile() . '.' . $contentMediaEntity->getExtension();
+        return $path;
+    }
+
 
     /**
      * @param $thumbSlug
@@ -83,7 +145,7 @@ class MediaService extends BaseService
             $finalFileName = $sourceInfo['filename'] . '_' . $check . ((!empty ($sourceInfo['extension'])) ? '.' : '') . $sourceInfo['extension'];
             $check++;
         }
-        $this->fs->copy($sourceFile,$sourceInfo['dirname'] . DIRECTORY_SEPARATOR . $finalFileName);
+        $this->fs->copy($sourceFile, $sourceInfo['dirname'] . DIRECTORY_SEPARATOR . $finalFileName);
 
         return $finalFileName;
     }
@@ -96,30 +158,29 @@ class MediaService extends BaseService
     {
         $data = array();
         if (null !== $uploadedFile && $uploadedFile->isValid()) {
-
-            $uploadFolder = $this->getUploadDir();
-            if (!$this->fs->exists($uploadFolder)) {
-                $this->fs->mkdir($uploadFolder);
-            }
-            $filename = $this->generateFileName($uploadedFile);
-            $uploadedFile->move($uploadFolder, $filename);
-
+            $uploadedTempFile = $uploadedFile->getPathname();
             $data['originalName'] = $uploadedFile->getClientOriginalName();
+            $data['filename'] = $this->sanitizeFilename($uploadedFile->getClientOriginalName());
             $data['mimeType'] = $uploadedFile->getClientMimeType();
             $data['size'] = $uploadedFile->getClientSize();
             $data['extension'] = $uploadedFile->getClientOriginalExtension();
             if (empty($data['extension'])) {
                 $data['extension'] = $uploadedFile->guessClientExtension();
             }
-            $data['filename'] = $filename;
             $data['width'] = 0;
             $data['height'] = 0;
             if ($this->isImage($uploadedFile->getClientOriginalExtension(), $uploadedFile->getClientMimeType())) {
-                $imageInfo = getimagesize($uploadFolder . DIRECTORY_SEPARATOR . $filename);
+                $imageInfo = getimagesize($uploadedTempFile);
                 if (!empty($imageInfo)) {
                     $data['width'] = $imageInfo[0];
                     $data['height'] = $imageInfo[1];
                 }
+            }
+            $data['binary'] = null;
+            if (file_exists($uploadedTempFile)) {
+                $mediaStream = fopen($uploadedTempFile, 'rb');
+                $data['binary'] = stream_get_contents($mediaStream);
+                fclose($mediaStream);
             }
         }
         return $data;
@@ -134,7 +195,7 @@ class MediaService extends BaseService
         if (empty($contentEntity)) {
             return null;
         }
-        if (empty($contentEntity->getFile())) {
+        if (!$this->mm()->isMedia($contentEntity)) {
             return null;
         }
         if ($this->isImage($contentEntity->getFile(), $contentEntity->getMime())) {

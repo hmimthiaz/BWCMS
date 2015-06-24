@@ -30,6 +30,7 @@ use Bellwether\BWCMSBundle\Classes\Content\Type\TaxonomyCategoryType;
 use Bellwether\BWCMSBundle\Classes\Content\Type\TaxonomyTagType;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Bellwether\Common\StringUtility;
 use Bellwether\Common\Pagination;
@@ -495,12 +496,20 @@ class ContentService extends BaseService
             }
             if ($fieldName == 'attachment') {
                 $mediaInfo = $this->mm()->handleUpload($data['attachment']);
-                $content->setMime($mediaInfo['mimeType']);
-                $content->setFile($mediaInfo['filename']);
-                $content->setSize($mediaInfo['size']);
-                $content->setExtension($mediaInfo['extension']);
-                $content->setWidth($mediaInfo['width']);
-                $content->setHeight($mediaInfo['height']);
+                if (!empty($mediaInfo)) {
+                    $contentMedia = new ContentMediaEntity();
+                    $contentMedia->setFile($mediaInfo['filename']);
+                    $contentMedia->setExtension($mediaInfo['extension']);
+                    $contentMedia->setMime($mediaInfo['mimeType']);
+                    $contentMedia->setSize($mediaInfo['size']);
+                    $contentMedia->setHeight($mediaInfo['height']);
+                    $contentMedia->setWidth($mediaInfo['width']);
+                    if (!is_null($mediaInfo['binary'])) {
+                        $contentMedia->setData($mediaInfo['binary']);
+                    }
+                    $contentMedia->setContent($content);
+                    $this->em()->persist($contentMedia);
+                }
             }
         }
         if ($content->getSlug() == null) {
