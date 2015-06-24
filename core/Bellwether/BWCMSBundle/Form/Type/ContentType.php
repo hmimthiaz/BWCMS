@@ -40,7 +40,7 @@ class ContentType extends AbstractType
             $content = $cr->find($value);
             if (!empty($content)) {
                 $view->vars['selectedText'] = $content->getTitle();
-                $view->vars['selectedThumb'] = $this->cm()->getSystemThumbURL($content, 32, 32);
+                $view->vars['selectedThumb'] = $this->mm()->getContentThumbURL($content, 32, 32);
             }
         }
         $browserURLOptions = array();
@@ -90,6 +90,14 @@ class ContentType extends AbstractType
     public function cm()
     {
         return $this->container->get('BWCMS.Content')->getManager();
+    }
+
+    /**
+     * @return MediaService
+     */
+    public function mm()
+    {
+        return $this->container->get('BWCMS.Media')->getManager();
     }
 
 

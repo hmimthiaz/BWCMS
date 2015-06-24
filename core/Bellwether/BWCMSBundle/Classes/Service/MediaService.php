@@ -59,21 +59,10 @@ class MediaService extends BaseService
      * @param ContentEntity $contentEntity
      * @return bool
      */
-    public function isMedia($contentEntity)
+    public function isMedia(ContentEntity $contentEntity)
     {
-        /**
-         * @var ContentMediaEntity $media
-         */
         if ($contentEntity->getMedia()->count() == 0) {
             return false;
-        }
-        $media = $contentEntity->getMedia()->first();
-        $cacheFile = $this->getMediaCachePath($media);
-        if (!file_exists($cacheFile)) {
-            $this->fs->mkdir(dirname($cacheFile));
-            $localFile = fopen($cacheFile, 'wb');
-            fwrite($localFile, stream_get_contents($media->getData()));
-            fclose($localFile);
         }
         return true;
     }
@@ -82,7 +71,7 @@ class MediaService extends BaseService
      * @param ContentEntity $contentEntity
      * @return bool
      */
-    public function isImaged($contentEntity)
+    public function isImage(ContentEntity $contentEntity)
     {
         /**
          * @var ContentMediaEntity $media
@@ -111,6 +100,48 @@ class MediaService extends BaseService
         return $path;
     }
 
+    /**
+     * @param ContentMediaEntity $contentMediaEntity
+     */
+    public function checkAndCreateMediaCacheFile($contentMediaEntity)
+    {
+        $cacheFile = $this->getMediaCachePath($contentMediaEntity);
+        if (!file_exists($cacheFile)) {
+            $this->fs->mkdir(dirname($cacheFile));
+            $localFile = fopen($cacheFile, 'wb');
+            fwrite($localFile, stream_get_contents($contentMediaEntity->getData()));
+            fclose($localFile);
+        }
+        return true;
+    }
+
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @param int $width
+     * @param int $height
+     * @return string|null
+     */
+    public function getContentThumbURL($contentEntity, $width = 128, $height = 128)
+    {
+        $contentClass = $this->cm()->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
+        if (!$contentClass->isUploadEnabled()) {
+            $thumbURL = $this->getThumbService()->open($contentClass->getImage())->resize($width, $height)->cacheFile('guess');
+            return $thumbURL;
+        }
+        if (!$this->isMedia($contentEntity)) {
+            return null;
+        }
+        $media = $contentEntity->getMedia()->first();
+        $this->checkAndCreateMediaCacheFile($media);
+        if ($this->isImage($contentEntity)) {
+            $thumbURL = $this->getThumbService()->open($this->getMediaCachePath($media))->resize($width, $height)->cacheFile('guess');
+        } else {
+            $thumbURL = $this->getThumbService()->open($this->getMimeResourceImage($media->getMime()))->resize($width, $height)->cacheFile('guess');
+        }
+        return $thumbURL;
+    }
+
 
     /**
      * @param $thumbSlug
@@ -128,26 +159,6 @@ class MediaService extends BaseService
             $criteria['site'] = $site;
         }
         return $repo->findOneBy($criteria);
-    }
-
-
-    function cloneMedia($fileToClone)
-    {
-        $sourceFile = $this->getFilePath($fileToClone, true);
-        $sourceInfo = pathinfo($sourceFile);
-        if (!isset($sourceInfo['extension'])) {
-            $sourceInfo['extension'] = '';
-        }
-
-        $finalFileName = $sourceInfo['filename'] . ((!empty ($sourceInfo['extension'])) ? '.' : '') . $sourceInfo['extension'];
-        $check = 1;
-        while (file_exists($sourceInfo['dirname'] . DIRECTORY_SEPARATOR . $finalFileName)) {
-            $finalFileName = $sourceInfo['filename'] . '_' . $check . ((!empty ($sourceInfo['extension'])) ? '.' : '') . $sourceInfo['extension'];
-            $check++;
-        }
-        $this->fs->copy($sourceFile, $sourceInfo['dirname'] . DIRECTORY_SEPARATOR . $finalFileName);
-
-        return $finalFileName;
     }
 
     /**
@@ -169,7 +180,7 @@ class MediaService extends BaseService
             }
             $data['width'] = 0;
             $data['height'] = 0;
-            if ($this->isImage($uploadedFile->getClientOriginalExtension(), $uploadedFile->getClientMimeType())) {
+            if ($this->checkIfImage($uploadedFile->getClientOriginalExtension(), $uploadedFile->getClientMimeType())) {
                 $imageInfo = getimagesize($uploadedTempFile);
                 if (!empty($imageInfo)) {
                     $data['width'] = $imageInfo[0];
@@ -185,6 +196,22 @@ class MediaService extends BaseService
         }
         return $data;
     }
+
+    /**
+     * @param $filename
+     * @param $mime
+     * @return bool
+     */
+    private function checkIfImage($filename, $mime)
+    {
+        $ext = preg_match('/\.([^.]+)$/', $filename, $matches) ? strtolower($matches[1]) : false;
+        $imageExtension = array('jpg', 'jpeg', 'jpe', 'gif', 'png');
+        if ('image/' == substr($mime, 0, 6) || in_array($ext, $imageExtension)) {
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * @param ContentEntity $contentEntity
@@ -237,40 +264,13 @@ class MediaService extends BaseService
         return $thumb->cacheFile('guess');
     }
 
-    public function getSystemThumbURL($filename, $mime, $extension, $width, $height)
-    {
-        if ($this->isImage($filename, $mime)) {
-            $publicFilename = $this->getFilePath($filename);
-            $thumbURL = $this->getThumbService()->open($publicFilename)->resize($width, $height)->cacheFile('guess');
-        } else {
-            $thumbURL = $this->getThumbService()->open($this->getMimeResourceImage($extension))->resize($width, $height)->cacheFile('guess');
-        }
-        return $thumbURL;
-    }
-
     /**
+     * @deprecated
      * @param $filename
-     * @param $mime
      * @return bool
      */
-    public function isImage($filename, $mime)
-    {
-        $ext = preg_match('/\.([^.]+)$/', $filename, $matches) ? strtolower($matches[1]) : false;
-        $imageExtension = array('jpg', 'jpeg', 'jpe', 'gif', 'png');
-        if ('image/' == substr($mime, 0, 6) || in_array($ext, $imageExtension)) {
-            return true;
-        }
-        return false;
-    }
-
     public function deleteMedia($filename)
     {
-        $filePath = $this->getFilePath($filename, true);
-        try {
-            $this->fs->remove($filePath);
-        } catch (\Exception $e) {
-            return false;
-        }
         return true;
     }
 
@@ -308,61 +308,6 @@ class MediaService extends BaseService
     public function getThumbService()
     {
         return $this->container->get('image.handling');
-    }
-
-
-    private function generateFileName(UploadedFile $file)
-    {
-        $filename = $this->sanitizeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-        $extension = $file->getClientOriginalExtension();
-
-        $currentYear = ( string )gmdate('Y', time());
-        $currentMonth = ( string )gmdate('m', time());
-        $currentDay = ( string )gmdate('d', time());
-        $filenameWithDate = "{$currentYear}{$currentMonth}{$currentDay}_{$filename}";
-
-        $uploadFolder = $this->getUploadDir();
-
-        $finalFileName = $filenameWithDate . ((!empty ($extension)) ? '.' : '') . $extension;
-        $check = 1;
-        while (file_exists($uploadFolder . $finalFileName)) {
-            $finalFileName = $filenameWithDate . '_' . $check . ((!empty ($extension)) ? '.' : '') . $extension;
-            $check++;
-        }
-
-        return $finalFileName;
-    }
-
-
-    private function getUploadDir()
-    {
-        $uploadFolder = $this->uploadFolder;
-        $currentYear = ( string )gmdate('Y', time());
-        $currentMonth = ( string )gmdate('m', time());
-        $currentDay = ( string )gmdate('d', time());
-        return $uploadFolder . DIRECTORY_SEPARATOR . $currentYear . DIRECTORY_SEPARATOR . $currentMonth . DIRECTORY_SEPARATOR . $currentDay . DIRECTORY_SEPARATOR;
-    }
-
-    /**
-     * @param $filename
-     * @return bool|string
-     */
-    public function getFilePath($filename, $fullPath = false)
-    {
-        if (empty ($filename)) {
-            return false;
-        }
-        if (preg_match("/^([0-9]{4})([0-9]{2})([0-9]{2})_/", $filename, $regs)) {
-            $filePath = $regs [1] . DIRECTORY_SEPARATOR .
-                $regs [2] . DIRECTORY_SEPARATOR .
-                $regs [3] . DIRECTORY_SEPARATOR . $filename;
-            if ($fullPath) {
-                return $this->uploadFolder . DIRECTORY_SEPARATOR . $filePath;
-            }
-            return $this->webPath . DIRECTORY_SEPARATOR . $filePath;
-        } else {
-            return false;
-        }
     }
 
     private function sanitizeFilename($filename)

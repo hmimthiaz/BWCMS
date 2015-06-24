@@ -584,7 +584,8 @@ class ContentController extends BaseController implements BackEndControllerInter
         }
 
         if ($onlyImage == 'yes') {
-            $qb->andWhere(" ( node.height > 0 AND node.width > 0 ) ");
+            $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentMediaEntity', 'media',\Doctrine\ORM\Query\Expr\Join::WITH,' node.id = media.content ');
+            $qb->andWhere(" ( media.height > 0 AND media.width > 0 ) ");
         }
 
         $result = $qb->getQuery()->getResult();
@@ -624,7 +625,7 @@ class ContentController extends BaseController implements BackEndControllerInter
                         $ca['status'] = 'Custom';
                 }
                 $ca['createdDate'] = $content->getCreatedDate()->format('Y-m-d H:i:s');
-                $ca['thumbnail'] = $this->cm()->getSystemThumbURL($content, 32, 32);
+                $ca['thumbnail'] = $this->mm()->getContentThumbURL($content, 32, 32);
                 $ca['thumbnail'] = '<img class="contentThumb" src="' . $ca['thumbnail'] . '"/>';
 
                 $ca['link'] = '';
@@ -641,8 +642,8 @@ class ContentController extends BaseController implements BackEndControllerInter
                 if ($this->mm()->isMedia($content)) {
                     $ca['download'] = $this->generateUrl('content_media_download', array('contentId' => $content->getId()));
                 }
-                if ($this->mm()->isImage($content->getFile(), $content->getMime())) {
-                    $imageThumb = $this->getImageThumbURL($content->getFile(), 800, 800);
+                if ($this->mm()->isImage($content)) {
+                    $imageThumb = $this->mm()->getContentThumbURL($content, 800, 800);
                     $ca['thumbnail'] = '<a href="' . $imageThumb . '" data-title="' . $content->getTitle() . '" class="lightBox">' . $ca['thumbnail'] . '</a>';
                 }
                 $data['data'][] = $ca;

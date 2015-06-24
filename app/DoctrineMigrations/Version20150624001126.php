@@ -23,10 +23,17 @@ class Version20150624001126 extends AbstractMigration implements ContainerAwareI
 {
 
     private $container;
+    private $uploadFolder;
+    private $webPath;
 
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
+
+        $rootDirectory = $this->getKernel()->getRootDir();
+        $webRoot = realpath($rootDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'web');
+        $this->webPath = $this->container->getParameter('media.path');
+        $this->uploadFolder = $webRoot . DIRECTORY_SEPARATOR . $this->webPath;
     }
 
     /**
@@ -46,7 +53,6 @@ class Version20150624001126 extends AbstractMigration implements ContainerAwareI
     public function postUp(Schema $schema)
     {
         $this->cm()->init();
-        $this->mm()->init();
         $contentRepo = $this->cm()->getContentRepository();
         $allContent = $contentRepo->findAll();
         if (!empty($allContent)) {
@@ -63,7 +69,7 @@ class Version20150624001126 extends AbstractMigration implements ContainerAwareI
                     $contentMedia->setSize($content->getSize());
                     $contentMedia->setHeight($content->getHeight());
                     $contentMedia->setWidth($content->getWidth());
-                    $mediaFile = $this->mm()->getFilePath($content->getFile(), true);
+                    $mediaFile = $this->getFilePath($content->getFile(), true);
                     if (file_exists($mediaFile)) {
                         $mediaStream = fopen($mediaFile, 'rb');
                         $contentMedia->setData(stream_get_contents($mediaStream));
@@ -72,12 +78,35 @@ class Version20150624001126 extends AbstractMigration implements ContainerAwareI
                     }
                     $contentMedia->setContent($content);
                     $this->em()->persist($contentMedia);
+                    $this->em()->flush();
                     print " Ok\n";
                 }
             }
             $this->em()->flush();
         }
 
+    }
+
+    /**
+     * @param $filename
+     * @return bool|string
+     */
+    public function getFilePath($filename, $fullPath = false)
+    {
+        if (empty ($filename)) {
+            return false;
+        }
+        if (preg_match("/^([0-9]{4})([0-9]{2})([0-9]{2})_/", $filename, $regs)) {
+            $filePath = $regs [1] . DIRECTORY_SEPARATOR .
+                $regs [2] . DIRECTORY_SEPARATOR .
+                $regs [3] . DIRECTORY_SEPARATOR . $filename;
+            if ($fullPath) {
+                return $this->uploadFolder . DIRECTORY_SEPARATOR . $filePath;
+            }
+            return $this->webPath . DIRECTORY_SEPARATOR . $filePath;
+        } else {
+            return false;
+        }
     }
 
 
@@ -110,11 +139,10 @@ class Version20150624001126 extends AbstractMigration implements ContainerAwareI
     }
 
     /**
-     * @return MediaService
+     * @return \AppKernel
      */
-    public function mm()
-    {
-        return $this->container->get('BWCMS.Media')->getManager();
+    public function getKernel(){
+        return $this->container->get( 'kernel' );
     }
 
 }

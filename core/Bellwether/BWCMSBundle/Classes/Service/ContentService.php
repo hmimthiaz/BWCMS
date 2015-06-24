@@ -834,45 +834,4 @@ class ContentService extends BaseService
         return $this->em()->getRepository('BWCMSBundle:ContentEntity');
     }
 
-
-    public function getSystemThumbURL(ContentEntity $content = null, $width, $height)
-    {
-        $contentClass = $this->getContentClass($content->getType(), $content->getSchema());
-        if (!$contentClass->isUploadEnabled()) {
-            $thumbURL = $this->getThumbService()
-                ->open($contentClass->getImage())
-                ->resize($width, $height)
-                ->cacheFile('guess');
-            return $thumbURL;
-        }
-        return $this->mm()->getSystemThumbURL($content->getFile(), $content->getMime(), $content->getExtension(), $width, $height);
-    }
-
-    private function getContentTypeResourceImage($type)
-    {
-        if (in_array($type, $this->getContentTypeIcons())) {
-            return '@BWCMSBundle/Resources/icons/content/' . $type . '.png';
-        }
-        return '@BWCMSBundle/Resources/icons/content/Unknown.png';
-    }
-
-    private function getContentTypeIcons()
-    {
-        if ($this->contentTypeIcons == null) {
-            $this->contentTypeIcons = array();
-            /**
-             * @var \Symfony\Component\HttpKernel\Config\FileLocator $fileLocator
-             * @var \Symfony\Component\Finder\SplFileInfo $file
-             */
-            $fileLocator = $this->container->get('file_locator');
-            $iconLocation = $fileLocator->locate('@BWCMSBundle/Resources/icons/content');
-            $finder = new \Symfony\Component\Finder\Finder();
-            $finder->files()->in($iconLocation);
-            foreach ($finder as $file) {
-                $this->contentTypeIcons[] = $file->getBasename('.' . $file->getExtension());
-            }
-        }
-        return $this->contentTypeIcons;
-    }
-
 }
