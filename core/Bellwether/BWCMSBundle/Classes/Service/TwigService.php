@@ -179,7 +179,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     public function getContentMenu($contentEntity, $options = array())
     {
         if (!($contentEntity instanceof ContentEntity)) {
-            $contentEntity = $this->cm()->getContentBySlugPath($contentEntity);
+            $contentEntity = $this->cq()->getContentBySlugPath($contentEntity);
             if (is_null($contentEntity)) {
                 return '';
             }
@@ -207,7 +207,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     public function getContentWidget($contentEntity, $options = array())
     {
         if (!($contentEntity instanceof ContentEntity)) {
-            $contentEntity = $this->cm()->getContentBySlugPath($contentEntity);
+            $contentEntity = $this->cq()->getContentBySlugPath($contentEntity);
             if (is_null($contentEntity)) {
                 return '';
             }
