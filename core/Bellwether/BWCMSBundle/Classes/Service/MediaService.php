@@ -94,9 +94,12 @@ class MediaService extends BaseService
     public function getMediaCachePath($contentMediaEntity)
     {
         $folderHash = md5($contentMediaEntity->getId());
-        $folderName = substr($folderHash, 0, 2) . DIRECTORY_SEPARATOR . substr($folderHash, 2, 2) . DIRECTORY_SEPARATOR . substr($folderHash, 4, 2) . DIRECTORY_SEPARATOR . substr($folderHash, 6, 2);
+        $folderName = substr($folderHash, 0, 1) . DIRECTORY_SEPARATOR .
+            substr($folderHash, 1, 1) . DIRECTORY_SEPARATOR .
+            substr($folderHash, 2, 1) . DIRECTORY_SEPARATOR .
+            substr($folderHash, 3, 1);
         $path = $this->mediaFolder . DIRECTORY_SEPARATOR . $folderName . DIRECTORY_SEPARATOR;
-        $path .= $contentMediaEntity->getId() . DIRECTORY_SEPARATOR . $contentMediaEntity->getFile() . '.' . $contentMediaEntity->getExtension();
+        $path .= $contentMediaEntity->getId() . '.bin';
         return $path;
     }
 
@@ -229,7 +232,7 @@ class MediaService extends BaseService
         $this->checkAndCreateMediaCacheFile($media);
         if ($this->isImage($contentEntity)) {
             $filename = $this->getMediaCachePath($media);
-        }else{
+        } else {
             $filename = $this->getMimeResourceImage($contentEntity->getExtension());
         }
         return $filename;
