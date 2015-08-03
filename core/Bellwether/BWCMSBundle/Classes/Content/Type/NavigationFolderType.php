@@ -78,7 +78,7 @@ class NavigationFolderType Extends ContentType
 
     public function addTemplates()
     {
-        $this->addTemplate('Default','Default.html.twig','Default.png');
+        $this->addTemplate('Default', 'Default.html.twig', 'Default.png');
     }
 
     /**
@@ -103,7 +103,12 @@ class NavigationFolderType Extends ContentType
          * @var ContentEntity $content
          */
         foreach ($contentMenuItems as $content) {
-            $menu[$content->getId()] = $menu[$content->getTreeParent()->getId()]->addChild($content->getTitle(), array('uri' => '#'));
+            $menu[$content->getId()] = $menu[$content->getTreeParent()->getId()]->addChild($content->getSlug(), array('uri' => '#'));
+            if (isset($options['emptyTitle']) && $options['emptyTitle'] === true) {
+                $menu[$content->getId()]->setLabel('');
+            }else{
+                $menu[$content->getId()]->setLabel($content->getTitle());
+            }
             $contentMeta = $this->cm()->getContentAllMeta($content);
             if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'link') {
                 if (isset($contentMeta['linkExternal']) && !empty($contentMeta['linkExternal'])) {
@@ -137,7 +142,8 @@ class NavigationFolderType Extends ContentType
     /**
      * @return Request|null
      */
-    public function getRequest(){
+    public function getRequest()
+    {
         return $this->requestStack->getCurrentRequest();
     }
 

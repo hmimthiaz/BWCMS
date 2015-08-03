@@ -189,6 +189,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         $resolver->setDefaults(array(
             'factory' => $this->factory,
             'environment' => $this->environment,
+            'emptyTitle' => false ,
             'class' => 'menu-' . $contentEntity->getSlug(),
             'id' => 'menu-' . $contentEntity->getSlug(),
         ));
