@@ -36,6 +36,7 @@ class NavigationLinkType Extends ContentType
         $this->addField('linkType', ContentFieldType::String);
         $this->addField('linkContent', ContentFieldType::Content);
         $this->addField('linkExternal', ContentFieldType::String);
+        $this->addField('linkRoute', ContentFieldType::String);
 
         $this->addField('linkTarget', ContentFieldType::String);
         $this->addField('linkClass', ContentFieldType::String);
@@ -43,10 +44,13 @@ class NavigationLinkType Extends ContentType
 
     public function buildForm($isEditMode = false)
     {
+        $routes = $this->tp()->getCurrentSkin()->getNavigationRoutes();
+        $routes = array_merge(array('' => ''), $routes);
+
         $this->fb()->add('linkType', 'choice',
             array(
                 'label' => 'Type',
-                'choices' => array('content' => 'Content', 'link' => 'Link'),
+                'choices' => array('content' => 'Content', 'link' => 'Link', 'route' => 'Route Rule'),
             )
         );
 
@@ -61,12 +65,21 @@ class NavigationLinkType Extends ContentType
                 'label' => 'Link',
             )
         );
+
+        $this->fb()->add('linkRoute', 'choice',
+            array(
+                'label' => 'Route',
+                'choices' => $routes,
+            )
+        );
+
         $this->fb()->add('linkTarget', 'choice',
             array(
                 'label' => 'Target',
                 'choices' => array('_self' => 'Same Window', '_blank' => 'New Window'),
             )
         );
+
         $this->fb()->add('linkClass', 'text',
             array(
                 'label' => 'Class',
@@ -77,7 +90,7 @@ class NavigationLinkType Extends ContentType
 
     public function addTemplates()
     {
-        $this->addTemplate('Default','Default.html.twig','Default.png');
+        $this->addTemplate('Default', 'Default.html.twig', 'Default.png');
     }
 
     public function validateForm(FormEvent $event)

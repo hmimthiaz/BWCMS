@@ -45,6 +45,10 @@ abstract class BaseSkin extends ContainerAware
 
     abstract public function initDefaultThumbStyles();
 
+    abstract public function getNavigationRoutes();
+
+    abstract public function getNavigationRoute($routeName);
+
     public function getThumbStyleDefault($thumbSlug)
     {
         if (is_null($this->thumbStyles)) {
@@ -270,7 +274,7 @@ abstract class BaseSkin extends ContainerAware
      * Checks if the attributes are granted against the current authentication token and optionally supplied object.
      *
      * @param mixed $attributes The attributes
-     * @param mixed $object     The object
+     * @param mixed $object The object
      *
      * @throws \LogicException
      * @return bool
@@ -287,8 +291,8 @@ abstract class BaseSkin extends ContainerAware
     /**
      * Generates a URL from the given parameters.
      *
-     * @param string      $route         The name of the route
-     * @param mixed       $parameters    An array of parameters
+     * @param string $route The name of the route
+     * @param mixed $parameters An array of parameters
      * @param bool|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
      *
      * @return string The generated URL

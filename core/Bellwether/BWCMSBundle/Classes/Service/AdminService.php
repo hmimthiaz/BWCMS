@@ -51,7 +51,7 @@ class AdminService extends BaseService
         $allSites = $this->sm()->getAllSites();
         $menu->addChild('Site', array('uri' => '#', 'label' => 'Site: ' . $currentSite->getName()))->setAttribute('dropdown', true);
         $menu['Site']->addChild('View Site', array(
-            'route' => 'home',
+            'route' => 'home_page',
             'routeParameters' => array('siteSlug' => $currentSite->getSlug())
         ))->setLinkAttributes(array('target' => '_blank'));
         if (count($allSites) > 1) {
@@ -163,7 +163,7 @@ class AdminService extends BaseService
         ));
         $menu['Admin']->addChild('-*-', array('uri' => '#'))->setAttribute('divider', true);
         $menu['Admin']->addChild('About', array(
-            'route' => 'about_home'
+            'route' => 'admin_about'
         ));
         return $menu;
     }

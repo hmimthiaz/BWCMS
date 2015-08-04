@@ -42,7 +42,7 @@ class RoutingService extends BaseService implements LoaderInterface
         ), array(
             'siteSlug' => '[a-zA-Z0-9-]+'
         ));
-        $routes->add('home', $homeRedirectRoute);
+        $routes->add('home_page', $homeRedirectRoute);
 
         //make sure all content types are initialized.
         $this->cm()->init();

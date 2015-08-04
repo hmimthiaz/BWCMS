@@ -5,6 +5,7 @@ namespace Bellwether\BWCMSBundle\Skins\Generic;
 use Bellwether\BWCMSBundle\Classes\Base\BaseSkin;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class GenericSkin extends BaseSkin
 {
@@ -45,6 +46,22 @@ class GenericSkin extends BaseSkin
     {
 
     }
+
+    public function getNavigationRoutes()
+    {
+        $routes = array();
+        $routes['home'] = 'Language Home';
+        return $routes;
+    }
+
+    public function getNavigationRoute($routeName)
+    {
+        $routeParams = array(
+            'siteSlug' => $this->sm()->getCurrentSite()->getSlug()
+        );
+        return $this->generateUrl($routeName, $routeParams, UrlGeneratorInterface::ABSOLUTE_URL);
+    }
+
 
     public function getName()
     {

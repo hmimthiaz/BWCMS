@@ -38,6 +38,7 @@ class NavigationFolderType Extends ContentType
         $this->addField('linkType', ContentFieldType::String);
         $this->addField('linkContent', ContentFieldType::Content);
         $this->addField('linkExternal', ContentFieldType::String);
+        $this->addField('linkRoute', ContentFieldType::String);
 
         $this->addField('linkTarget', ContentFieldType::String);
         $this->addField('linkClass', ContentFieldType::String);
@@ -45,10 +46,13 @@ class NavigationFolderType Extends ContentType
 
     public function buildForm($isEditMode = false)
     {
+        $routes = $this->tp()->getCurrentSkin()->getNavigationRoutes();
+        $routes = array_merge(array('' => ''), $routes);
+
         $this->fb()->add('linkType', 'choice',
             array(
                 'label' => 'Type',
-                'choices' => array('content' => 'Content', 'link' => 'Link'),
+                'choices' => array('content' => 'Content', 'link' => 'Link', 'route' => 'Route Rule'),
             )
         );
 
@@ -63,6 +67,14 @@ class NavigationFolderType Extends ContentType
                 'label' => 'Link',
             )
         );
+
+        $this->fb()->add('linkRoute', 'choice',
+            array(
+                'label' => 'Route',
+                'choices' => $routes,
+            )
+        );
+
         $this->fb()->add('linkTarget', 'choice',
             array(
                 'label' => 'Target',
@@ -106,10 +118,16 @@ class NavigationFolderType Extends ContentType
             $menu[$content->getId()] = $menu[$content->getTreeParent()->getId()]->addChild($content->getSlug(), array('uri' => '#'));
             if (isset($options['emptyTitle']) && $options['emptyTitle'] === true) {
                 $menu[$content->getId()]->setLabel('');
-            }else{
+            } else {
                 $menu[$content->getId()]->setLabel($content->getTitle());
             }
             $contentMeta = $this->cm()->getContentAllMeta($content);
+            if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'route') {
+                if (isset($contentMeta['linkRoute']) && !empty($contentMeta['linkRoute'])) {
+                    $linkURL = $this->tp()->getCurrentSkin()->getNavigationRoute($contentMeta['linkRoute']);
+                    $menu[$content->getId()]->setUri($linkURL);
+                }
+            }
             if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'link') {
                 if (isset($contentMeta['linkExternal']) && !empty($contentMeta['linkExternal'])) {
                     $menu[$content->getId()]->setUri($contentMeta['linkExternal']);
