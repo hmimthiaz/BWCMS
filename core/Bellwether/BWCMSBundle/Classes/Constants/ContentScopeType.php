@@ -12,4 +12,17 @@ class ContentScopeType
 
     const CPageBuilder = 'CS.CPB';
 
+    public static function getList()
+    {
+        static $list = null;
+        if ($list === null) {
+            $list = array(
+                self::CPublic,
+                self::CPrivate,
+                self::CPageBuilder
+            );
+        }
+        return $list;
+    }
+
 }

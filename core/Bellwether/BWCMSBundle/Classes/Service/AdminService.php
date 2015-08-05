@@ -2,13 +2,16 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Service;
 
+use Bellwether\BWCMSBundle\Classes\Constants\AuditActionType;
 use Knp\Menu\FactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Symfony\Component\HttpFoundation\Request;
-use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 
+use Bellwether\BWCMSBundle\Entity\UserEntity;
+use Bellwether\BWCMSBundle\Entity\AuditEntity;
+use Bellwether\BWCMSBundle\Classes\Constants\AuditLevelType;
 
 class AdminService extends BaseService
 {
@@ -38,6 +41,37 @@ class AdminService extends BaseService
     {
         $this->setIsAdmin(false);
     }
+
+    public function addAudit($level, $module, $action, $guid, $description)
+    {
+        $auditLevels = AuditLevelType::getList();
+        if (!in_array($level, $auditLevels)) {
+            throw new \InvalidArgumentException("Invalid audit level");
+        }
+
+        $auditActions = AuditActionType::getList();
+        if (!in_array($action, $auditActions)) {
+            throw new \InvalidArgumentException("Invalid action level");
+        }
+
+        $remoteAddress = $this->container->get('request')->getClientIp();
+        $currentUser = $this->getUser();
+        if (!($currentUser instanceof UserEntity)) {
+            $currentUser = null;
+        }
+        $audit = new AuditEntity();
+        $audit->setLevel($level);
+        $audit->setRemoteAddress($remoteAddress);
+        $audit->setUser($currentUser);
+        $audit->setLogDate(new \DateTime());
+        $audit->setModule($module);
+        $audit->setAction($action);
+        $audit->setGuid($guid);
+        $audit->setDescription($description);
+        $this->em()->persist($audit);
+        $this->em()->flush();
+    }
+
 
     /**
      * @param Request $request

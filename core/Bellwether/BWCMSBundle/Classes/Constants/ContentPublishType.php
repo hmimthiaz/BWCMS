@@ -12,4 +12,18 @@ class ContentPublishType
     const WorkFlow = 'CP.WorkFlow';
 
     const Expired = 'CP.Expired';
+
+    public static function getList()
+    {
+        static $list = null;
+        if ($list === null) {
+            $list = array(
+                self::Draft,
+                self::Published,
+                self::WorkFlow,
+                self::Expired
+            );
+        }
+        return $list;
+    }
 }

@@ -7,6 +7,7 @@ use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentScopeType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
+use Bellwether\BWCMSBundle\Classes\Constants\AuditLevelType;
 use Bellwether\BWCMSBundle\Entity\ContentRelationEntity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -688,11 +689,13 @@ class ContentService extends BaseService
             return;
         }
         $currentUser = $this->getUser();
+        $newRecord = false;
         if ($content->getId() == null) {
             $content->setCreatedDate(new \DateTime());
             if ($content->getAuthor() == null) {
                 $content->setAuthor($currentUser);
             }
+            $newRecord = true;
         } else {
             $content->setLastModifiedAuthor($currentUser);
             $content->setModifiedDate(new \DateTime());
@@ -705,6 +708,11 @@ class ContentService extends BaseService
         }
         $this->em()->persist($content);
         $this->em()->flush();
+        if ($newRecord) {
+            $this->admin()->addAudit(AuditLevelType::Normal, 'Content::' . $content->getType() . '::' . $content->getSchema(), 'Add', $content->getId(), 'Added: '.$content->getTitle());
+        } else {
+            $this->admin()->addAudit(AuditLevelType::Normal, 'Content::' . $content->getType() . '::' . $content->getSchema(), 'Edit', $content->getId(), 'Edit: '.$content->getTitle());
+        }
         return $content;
     }
 

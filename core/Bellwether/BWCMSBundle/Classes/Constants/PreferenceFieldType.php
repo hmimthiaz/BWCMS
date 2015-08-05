@@ -24,4 +24,25 @@ class PreferenceFieldType
 
     const Custom = 'PF.Custom';
 
+    public static function getList()
+    {
+        static $list = null;
+        if ($list === null) {
+            $list = array(
+                self::Internal,
+                self::Number,
+                self::String,
+                self::Date,
+                self::Time,
+                self::DateTime,
+                self::Serialized,
+                self::Content,
+                self::DateTime,
+                self::Custom
+            );
+        }
+        return $list;
+    }
+
+
 }

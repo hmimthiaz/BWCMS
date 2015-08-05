@@ -15,6 +15,21 @@ class ContentSortByType
 
     const SortIndex = 'CSB.SortIndex';
 
+    public static function getList()
+    {
+        static $list = null;
+        if ($list === null) {
+            $list = array(
+                self::Title,
+                self::Size,
+                self::Created,
+                self::Published,
+                self::SortIndex
+            );
+        }
+        return $list;
+    }
+
 }
 
 

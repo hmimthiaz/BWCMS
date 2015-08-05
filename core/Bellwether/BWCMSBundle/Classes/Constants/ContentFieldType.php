@@ -24,4 +24,22 @@ class ContentFieldType
 
     const Custom = 'CF.Custom';
 
+    public static function getList()
+    {
+        static $list = null;
+        if ($list === null) {
+            $list = array(
+                self::Internal,
+                self::Number,
+                self::String,
+                self::Date,
+                self::Time,
+                self::DateTime,
+                self::Serialized,
+                self::Content,
+                self::Custom
+            );
+        }
+        return $list;
+    }
 }
