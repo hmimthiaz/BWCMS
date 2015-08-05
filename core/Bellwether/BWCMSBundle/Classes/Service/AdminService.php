@@ -163,7 +163,7 @@ class AdminService extends BaseService
         ));
         $menu['Admin']->addChild('-*-', array('uri' => '#'))->setAttribute('divider', true);
         $menu['Admin']->addChild('About', array(
-            'route' => 'admin_about'
+            'route' => 'dashboard_about'
         ));
         return $menu;
     }
