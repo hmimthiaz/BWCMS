@@ -2,7 +2,6 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Service;
 
-use Bellwether\BWCMSBundle\Classes\Constants\AuditActionType;
 use Knp\Menu\FactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -12,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Bellwether\BWCMSBundle\Entity\UserEntity;
 use Bellwether\BWCMSBundle\Entity\AuditEntity;
 use Bellwether\BWCMSBundle\Classes\Constants\AuditLevelType;
+use Bellwether\BWCMSBundle\Classes\Constants\AuditActionType;
 
 class AdminService extends BaseService
 {

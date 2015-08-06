@@ -8,6 +8,8 @@ use Bellwether\BWCMSBundle\Classes\Constants\ContentScopeType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Bellwether\BWCMSBundle\Classes\Constants\AuditLevelType;
+use Bellwether\BWCMSBundle\Classes\Constants\AuditActionType;
+
 use Bellwether\BWCMSBundle\Entity\ContentRelationEntity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
