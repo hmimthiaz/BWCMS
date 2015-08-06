@@ -9,6 +9,8 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
+use Bellwether\BWCMSBundle\Classes\Event\RouteLoaderEvent;
+
 
 class RoutingService extends BaseService implements LoaderInterface
 {
@@ -56,9 +58,12 @@ class RoutingService extends BaseService implements LoaderInterface
                 }
             }
         }
+        $routeLoaderEvent = new RouteLoaderEvent();
+        $routeLoaderEvent->setRoutes($routes);
 
+        $this->getEventDispatcher()->dispatch('BWCMS.Route.Loader',$routeLoaderEvent);
         $this->loaded = true;
-        return $routes;
+        return $routeLoaderEvent->getRoutes();
     }
 
     public function supports($resource, $type = null)
