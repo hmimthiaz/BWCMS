@@ -11,6 +11,7 @@
 !var/logs/.gitkeep
 
 # Parameters
+/app/config/config.yml
 /app/config/parameters.yml
 /app/config/parameters.ini
 /app/config/routing.yml
@@ -45,4 +46,3 @@ composer.lock
 /app/BWBundleRegister.php
 
 /.idea/*
-
