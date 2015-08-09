@@ -711,9 +711,9 @@ class ContentService extends BaseService
         $this->em()->persist($content);
         $this->em()->flush();
         if ($newRecord) {
-            $this->admin()->addAudit(AuditLevelType::Normal, 'Content::' . $content->getType() . '::' . $content->getSchema(), 'Add', $content->getId(), 'Added: '.$content->getTitle());
+            $this->admin()->addAudit(AuditLevelType::Normal, 'Content::' . $content->getType() . '::' . $content->getSchema(), AuditActionType::Add, $content->getId(), 'Added: '.$content->getTitle());
         } else {
-            $this->admin()->addAudit(AuditLevelType::Normal, 'Content::' . $content->getType() . '::' . $content->getSchema(), 'Edit', $content->getId(), 'Edit: '.$content->getTitle());
+            $this->admin()->addAudit(AuditLevelType::Normal, 'Content::' . $content->getType() . '::' . $content->getSchema(), AuditActionType::Edit, $content->getId(), 'Edit: '.$content->getTitle());
         }
         return $content;
     }
