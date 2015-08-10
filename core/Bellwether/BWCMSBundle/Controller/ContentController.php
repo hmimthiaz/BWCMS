@@ -793,13 +793,13 @@ class ContentController extends BaseController implements BackEndControllerInter
                     $this->em()->remove($meta);
                 }
             }
-            if ($content->getFile() == null) {
-                $this->em()->remove($content);
-            } else {
-                if ($this->mm()->deleteMedia($content->getFile()) == true) {
-                    $this->em()->remove($content);
+            $existingMedia = $content->getMedia();
+            if(!empty($existingMedia)){
+                foreach($existingMedia as $media){
+                    $this->em()->remove($media);
                 }
             }
+            $this->em()->remove($content);
             $this->em()->flush();
         }
 
