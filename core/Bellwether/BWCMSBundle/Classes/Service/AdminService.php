@@ -188,14 +188,15 @@ class AdminService extends BaseService
         }
 
         $menu->addChild('Admin', array('uri' => '#', 'label' => 'Admin'))->setAttribute('dropdown', true);
-
-        $menu['Admin']->addChild('Site', array(
-            'route' => 'site_home'
-        ));
-        $menu['Admin']->addChild('User', array(
-            'route' => 'user_home'
-        ));
-        $menu['Admin']->addChild('-*-', array('uri' => '#'))->setAttribute('divider', true);
+        if ($this->isGranted('ROLE_PREFERENCE')) {
+            $menu['Admin']->addChild('Site', array(
+                'route' => 'site_home'
+            ));
+            $menu['Admin']->addChild('User', array(
+                'route' => 'user_home'
+            ));
+            $menu['Admin']->addChild('-*-', array('uri' => '#'))->setAttribute('divider', true);
+        }
         $menu['Admin']->addChild('About', array(
             'route' => 'dashboard_about'
         ));
