@@ -711,11 +711,33 @@ class ContentService extends BaseService
         $this->em()->persist($content);
         $this->em()->flush();
         if ($newRecord) {
-            $this->admin()->addAudit(AuditLevelType::Normal, 'Content::' . $content->getType() . '::' . $content->getSchema(), AuditActionType::Add, $content->getId(), 'Added: '.$content->getTitle());
+            $this->admin()->addAudit(AuditLevelType::Normal, 'Content::' . $content->getType() . '::' . $content->getSchema(), AuditActionType::Add, $content->getId(), 'Added: ' . $content->getTitle());
         } else {
-            $this->admin()->addAudit(AuditLevelType::Normal, 'Content::' . $content->getType() . '::' . $content->getSchema(), AuditActionType::Edit, $content->getId(), 'Edit: '.$content->getTitle());
+            $this->admin()->addAudit(AuditLevelType::Normal, 'Content::' . $content->getType() . '::' . $content->getSchema(), AuditActionType::Edit, $content->getId(), 'Edit: ' . $content->getTitle());
         }
         return $content;
+    }
+
+    /**
+     * @param ContentEntity|null $content
+     */
+    public function delete(ContentEntity $content = null)
+    {
+        $existingMeta = $content->getMeta();
+        if (!empty($existingMeta)) {
+            foreach ($existingMeta as $meta) {
+                $this->em()->remove($meta);
+            }
+        }
+        $existingMedia = $content->getMedia();
+        if(!empty($existingMedia)){
+            foreach($existingMedia as $media){
+                $this->em()->remove($media);
+            }
+        }
+        $this->admin()->addAudit(AuditLevelType::Critical, 'Content::' . $content->getType() . '::' . $content->getSchema(), AuditActionType::Delete, $content->getId(), 'Deleted: ' . $content->getTitle());
+        $this->em()->remove($content);
+        $this->em()->flush();
     }
 
     public function generateSlug($title, $type = 'Page', $parentId = null, $contentId = null)

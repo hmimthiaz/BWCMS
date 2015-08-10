@@ -4,6 +4,7 @@ namespace Bellwether\BWCMSBundle\Controller;
 
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
 use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
+use Bellwether\BWCMSBundle\Classes\Constants\AuditLevelType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
@@ -787,23 +788,8 @@ class ContentController extends BaseController implements BackEndControllerInter
             }
         }
         foreach ($loadedContent as $content) {
-            $existingMeta = $content->getMeta();
-            if (!empty($existingMeta)) {
-                foreach ($existingMeta as $meta) {
-                    $this->em()->remove($meta);
-                }
-            }
-            $existingMedia = $content->getMedia();
-            if(!empty($existingMedia)){
-                foreach($existingMedia as $media){
-                    $this->em()->remove($media);
-                }
-            }
-            $this->em()->remove($content);
-            $this->em()->flush();
+            $this->cm()->delete($content);
         }
-
-
         $jsNodes = $this->getFolderTree($type, $targetId);
         return $this->returnJsonReponse($request, array('nodes' => $jsNodes));
     }
