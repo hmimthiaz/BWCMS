@@ -119,6 +119,9 @@ class PreferenceService extends BaseService
                         $prefValue = $this->cm()->getContentRepository()->find($prefValue);
                     }
                 }
+                if ($prefType == PreferenceFieldType::Custom) {
+                    $prefValue = $classInstance->loadCustomField($prefField, $prefValue);
+                }
                 $returnArray[$prefField] = $prefValue;
             }
             $fields = $classInstance->getFields();
@@ -200,7 +203,7 @@ class PreferenceService extends BaseService
             $dateValue = new \DateTime($fieldValue);
             return $dateValue;
         }
-        if ($fieldType == PreferenceFieldType::Serialized) {
+        if ($fieldType == PreferenceFieldType::Serialized || $fieldType == PreferenceFieldType::Custom) {
             try {
                 $data = $this->getSerializer()->deserialize($fieldValue, 'ArrayCollection', 'json');
             } catch (\RuntimeException $exp) {
@@ -268,7 +271,7 @@ class PreferenceService extends BaseService
                         $preferenceEntity->setSite($this->sm()->getAdminCurrentSite());
                     }
                     $action = 'NEW';
-                } elseif (!is_null($preferenceEntity) && ( is_null($fieldValue) || empty($fieldValue) ) ) {
+                } elseif (!is_null($preferenceEntity) && (is_null($fieldValue) || empty($fieldValue))) {
                     $action = 'DELETE';
                     $this->em()->remove($preferenceEntity);
                     continue;
@@ -295,14 +298,14 @@ class PreferenceService extends BaseService
                     $dateString = $fieldValue->format(\DateTime::ISO8601);
                     $preferenceEntity->setValue($dateString);
                 }
-                if ($fieldType == PreferenceFieldType::Serialized) {
+                if ($fieldType == PreferenceFieldType::Serialized || $fieldType == PreferenceFieldType::Custom) {
                     $cleanedData = $this->prepareSerializedMeta($fieldValue);
                     $serializedString = $this->getSerializer()->serialize($cleanedData, 'json');
                     $preferenceEntity->setValue($serializedString);
                 }
                 $this->em()->persist($preferenceEntity);
                 $this->em()->flush();
-                
+
                 if ($action == 'NEW') {
                     $this->admin()->addAudit(AuditLevelType::Normal, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Add, $preferenceEntity->getId(), 'Added: ' . $preferenceEntity->getField());
                 } else if ($action == 'UPDATE') {

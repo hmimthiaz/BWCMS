@@ -14,6 +14,14 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Bellwether\BWCMSBundle\Entity\PreferenceEntity;
 use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
 
+use Bellwether\BWCMSBundle\Classes\Service\SiteService;
+use Bellwether\BWCMSBundle\Classes\Service\ContentService;
+use Bellwether\BWCMSBundle\Classes\Service\MediaService;
+use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
+use Doctrine\ORM\EntityManager;
+
+
+
 abstract class PreferenceType implements PreferenceTypeInterface
 {
     /**
@@ -103,6 +111,11 @@ abstract class PreferenceType implements PreferenceTypeInterface
 
     abstract function validateForm(FormEvent $event);
 
+    public function loadCustomField($fieldName, $fieldValue)
+    {
+        return $fieldValue;
+    }
+
 //    abstract public function loadFormData(OptionEntity $option = null, Form $form = null);
 //
 //    abstract public function prepareEntity(OptionEntity $content = null, $data = array());
@@ -112,6 +125,46 @@ abstract class PreferenceType implements PreferenceTypeInterface
         $this->fb()->add('save', 'submit', array(
             'attr' => array('class' => 'save'),
         ));
+    }
+
+    /**
+     * @return EntityManager
+     */
+    public function em()
+    {
+        return $this->container->get('doctrine')->getManager();
+    }
+
+    /**
+     * @return SiteService
+     */
+    public function sm()
+    {
+        return $this->container->get('BWCMS.Site')->getManager();
+    }
+
+    /**
+     * @return ContentService
+     */
+    public function cm()
+    {
+        return $this->container->get('BWCMS.Content')->getManager();
+    }
+
+    /**
+     * @return MediaService
+     */
+    public function mm()
+    {
+        return $this->container->get('BWCMS.Media')->getManager();
+    }
+
+    /**
+     * @return PreferenceService
+     */
+    public function pref()
+    {
+        return $this->container->get('BWCMS.Preference')->getManager();
     }
 
     /**

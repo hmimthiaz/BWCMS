@@ -189,7 +189,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         $resolver->setDefaults(array(
             'factory' => $this->factory,
             'environment' => $this->environment,
-            'emptyTitle' => false ,
+            'emptyTitle' => false,
             'class' => 'menu-' . $contentEntity->getSlug(),
             'id' => 'menu-' . $contentEntity->getSlug(),
         ));
@@ -266,14 +266,14 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         if ($this->mm()->isImage($contentEntity)) {
             $filename = $this->mm()->getMediaCachePath($media);
             $path = $this->getThumbService()->open($filename)->resize($media->getWidth(), $media->getHeight())->cacheFile('guess');
-        }else{
+        } else {
             $filename = $this->mm()->getMimeResourceImage($media->getExtension());
             $path = $this->getThumbService()->open($filename)->resize(128, 128)->cacheFile('guess');
         }
         return $path;
     }
 
-    public function getThumbImage($contentEntity, $thumbSlug)
+    public function getThumbImage($contentEntity, $thumbSlug, $scaleFactor = 1.0)
     {
         $thumbEntity = $this->mm()->getThumbStyle($thumbSlug, $this->sm()->getCurrentSite());
         if (empty($thumbEntity)) {
@@ -296,7 +296,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             $this->em()->persist($thumbEntity);
             $this->em()->flush();
         }
-        return $this->mm()->getContentThumbURLWithStyle($contentEntity, $thumbEntity);
+        return $this->mm()->getContentThumbURLWithStyle($contentEntity, $thumbEntity, $scaleFactor);
     }
 
     /**
