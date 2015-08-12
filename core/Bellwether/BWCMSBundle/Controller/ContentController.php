@@ -275,6 +275,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             array(
                 'id' => 'Root',
                 'text' => $rootFolderCaption,
+                'sort' => 0,
                 'icon' => 'glyphicon glyphicon-folder-open',
                 'parent' => '#',
                 'state' => array(
@@ -289,6 +290,11 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $jsNode = array();
                 $jsNode['id'] = $content->getId();
                 $jsNode['text'] = $content->getTitle();
+                if ($content->getSortBy() == ContentSortByType::SortIndex) {
+                    $jsNode['sort'] = 1;
+                } else {
+                    $jsNode['sort'] = 0;
+                }
                 $jsNode['icon'] = 'glyphicon glyphicon-folder-open';
                 if ($content->getTreeParent() != null) {
                     $jsNode['parent'] = $content->getTreeParent()->getId();
@@ -577,6 +583,10 @@ class ContentController extends BaseController implements BackEndControllerInter
 
         $qb->setFirstResult($start);
         $qb->setMaxResults($length);
+        if ($uiSortEnabled) {
+            $qb->setFirstResult(0);
+            $qb->setMaxResults(99999);
+        }
 
         if (!empty($searchString)) {
             $qb->andWhere(" ( node.title LIKE :query1 OR node.file LIKE :query2  ) ");
@@ -585,7 +595,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         }
 
         if ($onlyImage == 'yes') {
-            $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentMediaEntity', 'media',\Doctrine\ORM\Query\Expr\Join::WITH,' node.id = media.content ');
+            $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentMediaEntity', 'media', \Doctrine\ORM\Query\Expr\Join::WITH, ' node.id = media.content ');
             $qb->andWhere(" ( media.height > 0 AND media.width > 0 ) ");
         }
 

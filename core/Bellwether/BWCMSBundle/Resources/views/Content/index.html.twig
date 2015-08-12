@@ -29,6 +29,12 @@
             }
         })
     </script>
+    <style>
+        #contentTable_wrapper{
+            padding-bottom: 100px;;
+        }
+
+    </style>
     <div class="row">
         <div class="col-md-3">
             <div id="jstree_div" class="contentPageLeft"></div>
@@ -55,7 +61,7 @@
             <input type="hidden" id="toolbarCommand" value="">
             <input type="hidden" id="sourceFolderId" value="">
             <input type="hidden" id="selectedIds" value="">
-            <table id="contentTable" class="table" border="0" width="100%">
+            <table id="contentTable"  class="table" border="0" width="100%">
                 <thead>
                 <tr>
                     <th width="32"></th>
@@ -183,12 +189,12 @@
             var sourceFolderId = $("#sourceFolderId").val();
             var command = $('#toolbarCommand').val();
             if (command == 'cut' && currentFolderId == sourceFolderId) {
-                $.notify({message: 'You cannot paste the items in to the same folder'},{type: 'info', delay: 5.0 });
+                $.notify({message: 'You cannot paste the items in to the same folder'}, {type: 'info', delay: 5.0});
                 resetToolBar();
                 return;
             }
             if (command == 'cut' && contentIds.search(currentFolderId) != -1) {
-                $.notify({message: 'You cannot paste the selected item into itself!'},{type: 'info', delay: 5.0 });
+                $.notify({message: 'You cannot paste the selected item into itself!'}, {type: 'info', delay: 5.0});
                 resetToolBar();
                 return;
             }
@@ -207,7 +213,7 @@
                 },
                 error: function (xhr, ajaxOptions, errorThrown) {
                     ajaxRequestActive = false;
-                    $.notify({message: xhr.responseText},{type: 'danger', delay: 5.0 });
+                    $.notify({message: xhr.responseText}, {type: 'danger', delay: 5.0});
                 },
                 success: function (data) {
                     console.log(data);
@@ -246,7 +252,7 @@
                 },
                 error: function (xhr, ajaxOptions, errorThrown) {
                     ajaxRequestActive = false;
-                    $.notify({message: xhr.responseText},{type: 'danger', delay: 5.0 });
+                    $.notify({message: xhr.responseText}, {type: 'danger', delay: 5.0});
                 },
                 success: function (data) {
                     console.log(data);
@@ -277,6 +283,7 @@
                         return params;
                     },
                     complete: function (e, d) {
+                        console.log(e);
                         updateToolbar();
                     }
                 },
@@ -345,7 +352,7 @@
                                 contentTable.ajax.reload(null, false);
                             });
                             request.fail(function () {
-                                $.notify({message: 'Unable to delete media'},{type: 'danger', delay: 5.0 });
+                                $.notify({message: 'Unable to delete media'}, {type: 'danger', delay: 5.0});
                             });
                         });
                     });
@@ -399,12 +406,17 @@
             });
             $('#contentTable').on('draw.dt', function (e, settings) {
                 var parent = $("#selectedContentFolderId").val();
-                if (parent == '' || parent == 'Root') {
+                var treeNode = $("#jstree_div").jstree(true).get_node(parent);
+                if (treeNode.original.sort==0) {
+                    $('#contentTable_info').show();
+                    $('#contentTable_paginate').show();
                     try {
                         $("#contentTable tbody").sortable('destroy');
                     } catch (err) {
                     }
                 } else {
+                    $('#contentTable_info').hide();
+                    $('#contentTable_paginate').hide();
                     $("#contentTable tbody").sortable({
                         start: function (event, ui) {
                             sortStartPosition = ui.item.prevAll().length;
@@ -426,7 +438,7 @@
                                 error: function (xhr, ajaxOptions, errorThrown) {
                                     ajaxRequestActive = false;
                                     $("#contentTable tbody").sortable("cancel");
-                                    $.notify({message: xhr.responseText},{type: 'danger', delay: 5.0 });
+                                    $.notify({message: xhr.responseText}, {type: 'danger', delay: 5.0});
                                 },
                                 complete: function () {
                                     ajaxRequestActive = false;
@@ -494,7 +506,7 @@
                                 },
                                 error: function (xhr, ajaxOptions, errorThrown) {
                                     ajaxRequestActive = false;
-                                    $.notify({message: xhr.responseText},{type: 'danger', delay: 5.0 });
+                                    $.notify({message: xhr.responseText}, {type: 'danger', delay: 5.0});
                                 },
                                 success: function (data) {
                                     if ($("#selectedContentFolderId").val() == node_parent.id) {
