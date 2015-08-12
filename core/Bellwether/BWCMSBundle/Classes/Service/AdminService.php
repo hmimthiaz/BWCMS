@@ -128,30 +128,43 @@ class AdminService extends BaseService
         $menu->addChild('Dashboard', array('route' => 'dashboard_home'));
 
         $menu->addChild('Manage', array('uri' => '#', 'label' => 'Manage'))->setAttribute('dropdown', true);
-        $menu['Manage']->addChild('Content', array(
-            'route' => 'content_home',
-            'routeParameters' => array(
-                'type' => 'content'
-            )
-        ));
-        $menu['Manage']->addChild('Media', array(
-            'route' => 'content_home',
-            'routeParameters' => array(
-                'type' => 'media'
-            )
-        ));
-        $menu['Manage']->addChild('Navigation', array(
-            'route' => 'content_home',
-            'routeParameters' => array(
-                'type' => 'navigation'
-            )
-        ));
-        $menu['Manage']->addChild('Widget', array(
-            'route' => 'content_home',
-            'routeParameters' => array(
-                'type' => 'widget'
-            )
-        ));
+
+        if (count($this->cm()->getRegisteredContentTypes('Content')) > 0) {
+            $menu['Manage']->addChild('Content', array(
+                'route' => 'content_home',
+                'routeParameters' => array(
+                    'type' => 'content'
+                )
+            ));
+        }
+
+        if (count($this->cm()->getRegisteredContentTypes('Media')) > 0) {
+            $menu['Manage']->addChild('Media', array(
+                'route' => 'content_home',
+                'routeParameters' => array(
+                    'type' => 'media'
+                )
+            ));
+        }
+
+        if (count($this->cm()->getRegisteredContentTypes('Navigation')) > 0) {
+            $menu['Manage']->addChild('Navigation', array(
+                'route' => 'content_home',
+                'routeParameters' => array(
+                    'type' => 'navigation'
+                )
+            ));
+        }
+
+        if (count($this->cm()->getRegisteredContentTypes('Widget')) > 0) {
+            $menu['Manage']->addChild('Widget', array(
+                'route' => 'content_home',
+                'routeParameters' => array(
+                    'type' => 'widget'
+                )
+            ));
+        }
+
         $menu['Manage']->addChild('-', array('uri' => '#'))->setAttribute('divider', true);
 
 
