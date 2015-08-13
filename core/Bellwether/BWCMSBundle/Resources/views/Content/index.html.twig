@@ -216,7 +216,6 @@
                     $.notify({message: xhr.responseText}, {type: 'danger', delay: 5.0});
                 },
                 success: function (data) {
-                    console.log(data);
                     $('#jstree_div').jstree(true).settings.core.data = data.nodes;
                     $('#jstree_div').jstree(true).refresh();
                     resetToolBar();
@@ -255,7 +254,6 @@
                     $.notify({message: xhr.responseText}, {type: 'danger', delay: 5.0});
                 },
                 success: function (data) {
-                    console.log(data);
                     $('#jstree_div').jstree(true).settings.core.data = data.nodes;
                     $('#jstree_div').jstree(true).refresh();
                     resetToolBar();
@@ -283,7 +281,6 @@
                         return params;
                     },
                     complete: function (e, d) {
-                        console.log(e);
                         updateToolbar();
                     }
                 },
@@ -407,14 +404,7 @@
             $('#contentTable').on('draw.dt', function (e, settings) {
                 var parent = $("#selectedContentFolderId").val();
                 var treeNode = $("#jstree_div").jstree(true).get_node(parent);
-                if (treeNode.original.sort==0) {
-                    $('#contentTable_info').show();
-                    $('#contentTable_paginate').show();
-                    try {
-                        $("#contentTable tbody").sortable('destroy');
-                    } catch (err) {
-                    }
-                } else {
+                if (  (typeof treeNode.original !== 'undefined') && treeNode.original.sort==1) {
                     $('#contentTable_info').hide();
                     $('#contentTable_paginate').hide();
                     $("#contentTable tbody").sortable({
@@ -446,6 +436,13 @@
                             });
                         }
                     });
+                }else{
+                    $('#contentTable_info').show();
+                    $('#contentTable_paginate').show();
+                    try {
+                        $("#contentTable tbody").sortable('destroy');
+                    } catch (err) {
+                    }
                 }
 
             });
@@ -518,7 +515,6 @@
                                 }
                             });
                         }
-                        console.log(operation);
                         return true;  //allow all other operations
                     }
 
