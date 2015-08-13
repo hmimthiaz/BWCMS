@@ -447,7 +447,7 @@ class ContentService extends BaseService
         $fields = $classInstance->getFields();
 
         foreach ($fields as $fieldName => $fieldInfo) {
-            if ($fieldName == 'parent') {
+            if ($fieldName == 'parent' && !empty($data['parent'])) {
                 $parentContent = $this->getContentRepository()->find($data['parent']);
                 $content->setTreeParent($parentContent);
             }
