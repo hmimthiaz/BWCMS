@@ -274,7 +274,7 @@ class ContentService extends BaseService
         $form->get('title')->setData($content->getTitle());
 
         if ($classInstance->isSummaryEnabled()) {
-            $form->get('summary')->setData($content->getSummary());
+            $form->get('summary')->setData($content->getSummary(true));
         }
         if ($classInstance->isContentEnabled()) {
             $form->get('content')->setData($content->getContent());
@@ -447,9 +447,6 @@ class ContentService extends BaseService
         $fields = $classInstance->getFields();
 
         foreach ($fields as $fieldName => $fieldInfo) {
-            if (!isset($data[$fieldName]) || empty($data[$fieldName])) {
-                continue;
-            }
             if ($fieldName == 'parent') {
                 $parentContent = $this->getContentRepository()->find($data['parent']);
                 $content->setTreeParent($parentContent);
@@ -515,6 +512,7 @@ class ContentService extends BaseService
                 }
             }
         }
+
         if ($content->getSlug() == null) {
             $parentId = null;
             if ($content->getTreeParent() != null) {
@@ -730,8 +728,8 @@ class ContentService extends BaseService
             }
         }
         $existingMedia = $content->getMedia();
-        if(!empty($existingMedia)){
-            foreach($existingMedia as $media){
+        if (!empty($existingMedia)) {
+            foreach ($existingMedia as $media) {
                 $this->em()->remove($media);
             }
         }
