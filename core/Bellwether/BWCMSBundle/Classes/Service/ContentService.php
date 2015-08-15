@@ -293,6 +293,9 @@ class ContentService extends BaseService
             $existingRelation = $content->getRelation();
             $fieldValues = array();
             foreach ($existingRelation as $relation) {
+                if (!isset($taxonomyRelations[$relation->getRelation()]['fieldName'])) {
+                    continue;
+                }
                 $formFieldName = $taxonomyRelations[$relation->getRelation()]['fieldName'];
                 $fieldValues[$formFieldName][] = $relation->getRelatedContent()->getId();
             }
@@ -734,6 +737,12 @@ class ContentService extends BaseService
         if (!empty($existingMedia)) {
             foreach ($existingMedia as $media) {
                 $this->em()->remove($media);
+            }
+        }
+        $existingRelation = $content->getRelation();
+        if (!empty($existingRelation)) {
+            foreach ($existingRelation as $relation) {
+                $this->em()->remove($relation);
             }
         }
         $this->admin()->addAudit(AuditLevelType::Critical, 'Content::' . $content->getType() . '::' . $content->getSchema(), AuditActionType::Delete, $content->getId(), 'Deleted: ' . $content->getTitle());
