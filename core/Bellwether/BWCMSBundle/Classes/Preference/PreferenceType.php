@@ -183,6 +183,12 @@ abstract class PreferenceType implements PreferenceTypeInterface
         return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
 
+    public function dump($var, $maxDepth = 2, $stripTags = true){
+        print '<pre>';
+        \Doctrine\Common\Util\Debug::dump($var, $maxDepth, $stripTags);
+        print '</pre>';
+    }
+
     /**
      * @return ContainerInterface
      */

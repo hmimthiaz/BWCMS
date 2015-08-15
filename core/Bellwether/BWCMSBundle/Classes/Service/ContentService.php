@@ -373,6 +373,9 @@ class ContentService extends BaseService
     public function getContentAllMeta($contentEntity)
     {
         $returnValue = array();
+        if (!$contentEntity instanceof ContentEntity) {
+            return $returnValue;
+        }
         $classInstance = $this->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
         $loadedMeta = $contentEntity->getLoadedMeta();
         if (!is_null($loadedMeta)) {

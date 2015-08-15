@@ -272,13 +272,13 @@ class PreferenceService extends BaseService
                     }
                     $action = 'NEW';
                 } elseif (!is_null($preferenceEntity) && (is_null($fieldValue) || empty($fieldValue))) {
-                    $action = 'DELETE';
                     $this->em()->remove($preferenceEntity);
+                    $this->em()->flush();
+                    $this->admin()->addAudit(AuditLevelType::Critical, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Delete, $preferenceEntity->getId(), 'Deleted: ' . $preferenceEntity->getField());
                     continue;
                 } elseif (is_null($preferenceEntity) && is_null($fieldValue)) {
                     continue;
                 }
-
 
                 if ($fieldType == PreferenceFieldType::String || $fieldType == PreferenceFieldType::Number) {
                     $preferenceEntity->setValue($fieldValue);
@@ -310,8 +310,6 @@ class PreferenceService extends BaseService
                     $this->admin()->addAudit(AuditLevelType::Normal, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Add, $preferenceEntity->getId(), 'Added: ' . $preferenceEntity->getField());
                 } else if ($action == 'UPDATE') {
                     $this->admin()->addAudit(AuditLevelType::Normal, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Edit, $preferenceEntity->getId(), 'Edited: ' . $preferenceEntity->getField());
-                } else if ($action == 'DELETE') {
-                    $this->admin()->addAudit(AuditLevelType::Critical, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Delete, $preferenceEntity->getId(), 'Deleted: ' . $preferenceEntity->getField());
                 }
             }
         }
