@@ -119,7 +119,7 @@
                                     "label": "Add",
                                     "icon": "glyphicon glyphicon-plus",
                                     "action": function () {
-                                        window.location = '{{ url('content_create') }}' + '?parent=' + node.id + '&type={{ type }}&schema={{ schema }}';
+                                         window.location = '{{ url('content_create') }}' + '?parent=' + node.id + '&type={{ type }}&schema={{ schema }}';
                                         return false;
                                     },
                                     "_disabled": function () {
@@ -141,7 +141,45 @@
                                         }
                                         return false;
                                     }
+                                },
+                                "Delete": {
+                                    "separator_before": false,
+                                    "separator_after": false,
+                                    "label": "Delete",
+                                    "icon": "glyphicon glyphicon-remove",
+                                    "action": function () {
+                                        var request = $.ajax({
+                                            method: "POST",
+                                            url: "{{ url('content_delete') }}",
+                                            data: {
+                                                contentIds: node.id,
+                                                targetId: 'Root',
+                                                type: '{{ type }}'
+                                            },
+                                            beforeSend: function () {
+                                                ajaxRequestActive = true;
+                                            },
+                                            error: function (xhr, ajaxOptions, errorThrown) {
+                                                ajaxRequestActive = false;
+                                                $.notify({message: xhr.responseText}, {type: 'danger', delay: 5.0});
+                                            },
+                                            success: function (data) {
+                                                $('#jstree_div').jstree(true).settings.core.data = data.nodes;
+                                                $('#jstree_div').jstree(true).refresh();
+                                            },
+                                            complete: function (data) {
+                                                ajaxRequestActive = false;
+                                            }
+                                        });
+                                    },
+                                    "_disabled": function () {
+                                        if (node.id == 'Root') {
+                                            return true;
+                                        }
+                                        return false;
+                                    }
                                 }
+
 
                             }
                         }

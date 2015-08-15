@@ -711,7 +711,7 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return boolean
      */
-    public function isIsTaxonomy()
+    public function isTaxonomy()
     {
         return $this->isTaxonomy;
     }

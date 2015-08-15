@@ -239,7 +239,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             if ($contentEntity->getTreeParent() != null) {
                 $parentId = $contentEntity->getTreeParent()->getId();
             }
-            if ($class->isIsTaxonomy()) {
+            if ($class->isTaxonomy()) {
                 return $this->redirect($this->generateUrl('taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
             }
             return $this->redirect($this->generateUrl('content_home', array('type' => $type, 'parent' => $parentId)));

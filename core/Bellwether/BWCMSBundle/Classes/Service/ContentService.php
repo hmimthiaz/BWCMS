@@ -149,7 +149,7 @@ class ContentService extends BaseService
                     'type' => $class->getType(),
                     'schema' => $class->getSchema(),
                     'isHierarchy' => $class->isHierarchy(),
-                    'isIsTaxonomy' => $class->isIsTaxonomy(),
+                    'isTaxonomy' => $class->isTaxonomy(),
                     'isRootItem' => $class->isRootItem(),
                     'class' => $class
                 );
@@ -180,7 +180,7 @@ class ContentService extends BaseService
         if (!empty($registeredContents)) {
             foreach ($registeredContents as $content) {
                 $class = $content['class'];
-                if ($class->isIsTaxonomy()) {
+                if ($class->isTaxonomy()) {
                     $mediaContentTypes[] = $content;
                 }
             }
@@ -745,6 +745,15 @@ class ContentService extends BaseService
                 $this->em()->remove($relation);
             }
         }
+        $contentClass = $this->getContentClass($content->getType(), $content->getSchema());
+        if ($contentClass->isTaxonomy()) {
+            $taxonomyRelations = $this->em()->getRepository('BWCMSBundle:ContentRelationEntity')->findBy(array("relatedContent" => $content));
+            if (!empty($taxonomyRelations)) {
+                foreach ($taxonomyRelations as $relation) {
+                    $this->em()->remove($relation);
+                }
+            }
+        }
         $this->admin()->addAudit(AuditLevelType::Critical, 'Content::' . $content->getType() . '::' . $content->getSchema(), AuditActionType::Delete, $content->getId(), 'Deleted: ' . $content->getTitle());
         $this->em()->remove($content);
         $this->em()->flush();
@@ -764,7 +773,7 @@ class ContentService extends BaseService
      */
     public function getTaxonomyTerms($taxonomyClass)
     {
-        if (!$taxonomyClass->isIsTaxonomy()) {
+        if (!$taxonomyClass->isTaxonomy()) {
             throw new \InvalidArgumentException('Invalid Schema');
         }
         $returnTerms = array();
