@@ -52,6 +52,11 @@ abstract class PreferenceType implements PreferenceTypeInterface
     private $fields = null;
 
     /**
+     * @var bool
+     */
+    private $isPagePreference = false;
+
+    /**
      * @return FormBuilder
      */
     final public function fb()
@@ -125,6 +130,22 @@ abstract class PreferenceType implements PreferenceTypeInterface
         $this->fb()->add('save', 'submit', array(
             'attr' => array('class' => 'save'),
         ));
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isPagePreference()
+    {
+        return $this->isPagePreference;
+    }
+
+    /**
+     * @param boolean $isPagePreference
+     */
+    public function setIsPagePreference($isPagePreference)
+    {
+        $this->isPagePreference = $isPagePreference;
     }
 
     /**
