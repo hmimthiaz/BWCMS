@@ -14,6 +14,7 @@ use Bellwether\BWCMSBundle\Classes\Service\ACLService;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentQueryService;
+use Bellwether\BWCMSBundle\Classes\Service\LocaleService;
 use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
@@ -121,6 +122,14 @@ abstract class BaseController extends Controller
     public function cq()
     {
         return $this->container->get('BWCMS.ContentQuery')->getManager();
+    }
+
+    /**
+     * @return LocaleService
+     */
+    public function locale()
+    {
+        return $this->container->get('BWCMS.Locale')->getManager();
     }
 
     /**

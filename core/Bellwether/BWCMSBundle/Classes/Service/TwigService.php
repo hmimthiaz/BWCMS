@@ -114,13 +114,15 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     {
         return array(
             'link' => new \Twig_Function_Method($this, 'getContentLink'),
-            'menu' => new \Twig_Function_Method($this, 'getContentMenu'),
-            'widget' => new \Twig_Function_Method($this, 'getContentWidget'),
-            'meta' => new \Twig_Function_Method($this, 'getContentMeta'),
-            'pref' => new \Twig_Function_Method($this, 'getPreference'),
+            'menu' => new \Twig_Function_Method($this, 'getContentMenu', array('is_safe' => array('html'))),
+            'widget' => new \Twig_Function_Method($this, 'getContentWidget', array('is_safe' => array('html'))),
+            'meta' => new \Twig_Function_Method($this, 'getContentMeta', array('is_safe' => array('html'))),
+            'pref' => new \Twig_Function_Method($this, 'getPreference', array('is_safe' => array('html'))),
             'image' => new \Twig_Function_Method($this, 'getImage'),
             'thumb' => new \Twig_Function_Method($this, 'getThumbImage'),
-            'pagination' => new \Twig_Function_Method($this, 'getPagination'),
+            'pagination' => new \Twig_Function_Method($this, 'getPagination', array('is_safe' => array('html'))),
+            'loc' => new \Twig_Function_Method($this, 'getLocale', array('is_safe' => array('html'))),
+            'exit' => new \Twig_Function_Method($this, 'doExit', array('is_safe' => array('html'))),
         );
     }
 
@@ -310,6 +312,29 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         $html = $this->container->get('templating')->render($paginationTemplate, array('cp' => $pager));
 
         return $html;
+    }
+
+    /**
+     * @param string $string
+     * @return string
+     */
+    public function getLocale($string)
+    {
+        $stringValue = $this->locale()->fetch($string);
+        if (is_null($stringValue)) {
+            $stringValue = $this->locale()->add($string);
+        }
+        if (func_num_args() == 1) {
+            return $stringValue;
+        }
+        $parameters = array_slice(func_get_args(), 1);
+        return vsprintf($stringValue, $parameters);
+    }
+
+
+    public function doExit()
+    {
+        exit();
     }
 
 
