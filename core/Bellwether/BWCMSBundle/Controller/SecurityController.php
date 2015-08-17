@@ -11,6 +11,10 @@ use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Bellwether\BWCMSBundle\Form\Security\ForgotType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SecurityController extends BaseController implements BackEndControllerInterface
 {
@@ -74,31 +78,44 @@ class SecurityController extends BaseController implements BackEndControllerInte
 
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
-            if ($form->isValid()) {
-                $data = $form->getData();
-                $emailId = $data['email'];
-                $user = $this->container->get('fos_user.user_manager')->findUserByUsernameOrEmail($emailId);
-                if (null === $user) {
+            $formData = $form->getData();
+            /**
+             * @var \Bellwether\BWCMSBundle\Entity\UserEntity $userEntity
+             */
+            $userEntity = null;
+            if ($form->get('email')->isValid()) {
+                $userEntity = $this->container->get('fos_user.user_manager')->findUserByUsernameOrEmail($formData['email']);
+                if (null === $userEntity) {
                     $form->get('email')->addError(new FormError('No user associated with that email.'));
-                }
-
-                if ($user->isPasswordRequestNonExpired($this->container->getParameter('fos_user.resetting.token_ttl'))) {
+                } else if ($userEntity->isPasswordRequestNonExpired($this->container->getParameter('fos_user.resetting.token_ttl'))) {
                     $form->get('email')->addError(new FormError('Password reset request already sent.'));
-                    return $this->container->get('templating')->renderResponse('FOSUserBundle:Resetting:passwordAlreadyRequested.html.'.$this->getEngine());
                 }
 
-                if (null === $user->getConfirmationToken()) {
-                    /** @var $tokenGenerator \FOS\UserBundle\Util\TokenGeneratorInterface */
+            }
+            if ($form->isValid()) {
+
+                if (null === $userEntity->getConfirmationToken()) {
                     $tokenGenerator = $this->container->get('fos_user.util.token_generator');
-                    $user->setConfirmationToken($tokenGenerator->generateToken());
+                    $userEntity->setConfirmationToken($tokenGenerator->generateToken());
                 }
+                $userEntity->setPasswordRequestedAt(new \DateTime());
+                $this->container->get('fos_user.user_manager')->updateUser($userEntity);
 
-                $this->container->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
-                $this->container->get('fos_user.mailer')->sendResettingEmailMessage($user);
-                $user->setPasswordRequestedAt(new \DateTime());
-                $this->container->get('fos_user.user_manager')->updateUser($user);
-
-
+                $formSubject = 'Password Request';
+                $resetURL = $this->generateUrl('user_forgot_reset', array('token' => $userEntity->getConfirmationToken()), true);
+                $emailData = array(
+                    'resetURL' => $resetURL
+                );
+                $emailText = $this->renderView('@Generic/Extras/Forgot.Email.txt.twig', $emailData);
+                $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
+                if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject($formSubject)
+                        ->setFrom($emailSettings['sender_address'])
+                        ->addTo($userEntity->getEmail(), $userEntity->getFirstName());
+                    $message->setBody($emailText);
+                    $this->mailer()->getMailer()->send($message);
+                }
             }
         }
 
@@ -111,6 +128,53 @@ class SecurityController extends BaseController implements BackEndControllerInte
             'form' => $form->createView(),
             'error' => '',
         ));
+    }
+
+    /**
+     * @Route("/user-password/{token}/reset.php",name="user_forgot_reset")
+     * @Template()
+     */
+    public function forgotResetAction(Request $request, $token)
+    {
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\UserEntity $userEntity
+         */
+        $userEntity = $this->container->get('fos_user.user_manager')->findUserByConfirmationToken($token);
+
+        if (null === $userEntity) {
+            throw new NotFoundHttpException('Invalid Code');
+        }
+
+        $tokenGenerator = $this->container->get('fos_user.util.token_generator');
+        $newPassword = substr($tokenGenerator->generateToken(), 0, 10);
+        $manipulator = $this->container->get('fos_user.util.user_manipulator');
+        $manipulator->changePassword($userEntity->getUsername(), $newPassword);
+
+        $userEntity->setConfirmationToken(null);
+        $userEntity->setPasswordRequestedAt(null);
+        $this->container->get('fos_user.user_manager')->updateUser($userEntity);
+
+        $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
+        if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
+            $message = \Swift_Message::newInstance()
+                ->setSubject('Reset Password Successfully')
+                ->setFrom($emailSettings['sender_address'])
+                ->setTo($userEntity->getEmail(), $userEntity->getFirstName())
+                ->setBody(
+                    $this->renderView(
+                        'BWCMSBundle:User:reset-password.email.txt.twig',
+                        array(
+                            'firstName' => $userEntity->getFirstName(),
+                            'username' => $userEntity->getEmail(),
+                            'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
+                            'password' => $newPassword,
+                        )
+                    )
+                );
+            $this->mailer()->getMailer()->send($message);
+        }
+        $template = "@Generic/Extras/Forgot-Success.html.twig";
+        return $this->render($template, array());
     }
 
     /**

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}BWCMS!{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/include/js/jquery.js"></script>
+    <script src="/include/js/bootstrap.js"></script>
+    <link href="/include/css/bootstrap.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/font-awesome/css/font-awesome.min.css') }}">
+    {% include 'BraincraftedBootstrapBundle::ie8-support.html.twig' %}
+    {% block header %}{% endblock %}
+</head>
+<body>
+<script language="JavaScript">
+    $(function(){
+        $("#bwcms_forgot_email").focus();
+    });
+</script>
+<section id="login">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-wrap">
+                    <h1>Your password reset successfully. Please check your email.</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
+
