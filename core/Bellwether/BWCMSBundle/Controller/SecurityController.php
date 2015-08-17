@@ -8,7 +8,9 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\Security\Core\Security;
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
 use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
-
+use Bellwether\BWCMSBundle\Form\Security\ForgotType;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class SecurityController extends BaseController implements BackEndControllerInterface
 {
@@ -43,8 +45,6 @@ class SecurityController extends BaseController implements BackEndControllerInte
 
         $csrfToken = $this->container->get('form.csrf_provider')->generateCsrfToken('authenticate');
 
-        $template = sprintf('FOSUserBundle:Security:login.html.%s', $this->container->getParameter('fos_user.template.engine'));
-
         $template = $this->tp()->getCurrentSkin()->getLoginTemplate();
 
         if (is_null($template)) {
@@ -63,10 +63,54 @@ class SecurityController extends BaseController implements BackEndControllerInte
      * @Route("/forgot",name="user_forgot")
      * @Template()
      */
-    public function forgotAction()
+    public function forgotAction(Request $request)
     {
+
+        $form = $this->createForm(new ForgotType(), null, array(
+            'action' => $this->generateUrl('user_forgot'),
+            'method' => 'POST',
+        ));
+        $form->add('submit', 'submit', array('label' => 'Request Password'));
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $data = $form->getData();
+                $emailId = $data['email'];
+                $user = $this->container->get('fos_user.user_manager')->findUserByUsernameOrEmail($emailId);
+                if (null === $user) {
+                    $form->get('email')->addError(new FormError('No user associated with that email.'));
+                }
+
+                if ($user->isPasswordRequestNonExpired($this->container->getParameter('fos_user.resetting.token_ttl'))) {
+                    $form->get('email')->addError(new FormError('Password reset request already sent.'));
+                    return $this->container->get('templating')->renderResponse('FOSUserBundle:Resetting:passwordAlreadyRequested.html.'.$this->getEngine());
+                }
+
+                if (null === $user->getConfirmationToken()) {
+                    /** @var $tokenGenerator \FOS\UserBundle\Util\TokenGeneratorInterface */
+                    $tokenGenerator = $this->container->get('fos_user.util.token_generator');
+                    $user->setConfirmationToken($tokenGenerator->generateToken());
+                }
+
+                $this->container->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
+                $this->container->get('fos_user.mailer')->sendResettingEmailMessage($user);
+                $user->setPasswordRequestedAt(new \DateTime());
+                $this->container->get('fos_user.user_manager')->updateUser($user);
+
+
+            }
+        }
+
         $template = $this->tp()->getCurrentSkin()->getForgotTemplate();
-        return $this->render($template, array());
+        if (is_null($template)) {
+            $template = "@Generic/Extras/Forgot.html.twig";
+        }
+
+        return $this->render($template, array(
+            'form' => $form->createView(),
+            'error' => '',
+        ));
     }
 
     /**
