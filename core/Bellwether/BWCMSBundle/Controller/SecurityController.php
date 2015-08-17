@@ -46,6 +46,11 @@ class SecurityController extends BaseController implements BackEndControllerInte
         $template = sprintf('FOSUserBundle:Security:login.html.%s', $this->container->getParameter('fos_user.template.engine'));
 
         $template = $this->tp()->getCurrentSkin()->getLoginTemplate();
+
+        if (is_null($template)) {
+            $template = "@Generic/Extras/Login.html.twig";
+        }
+
         return $this->render($template, array(
             'last_username' => $lastUsername,
             'error' => $error,
