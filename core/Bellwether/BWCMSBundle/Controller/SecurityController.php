@@ -64,7 +64,7 @@ class SecurityController extends BaseController implements BackEndControllerInte
     }
 
     /**
-     * @Route("/forgot",name="user_forgot")
+     * @Route("/resetting/forgot",name="user_forgot")
      * @Template()
      */
     public function forgotAction(Request $request)
@@ -131,7 +131,7 @@ class SecurityController extends BaseController implements BackEndControllerInte
     }
 
     /**
-     * @Route("/user-password/{token}/reset.php",name="user_forgot_reset")
+     * @Route("/resetting/{token}/index.php",name="user_forgot_reset")
      * @Template()
      */
     public function forgotResetAction(Request $request, $token)
