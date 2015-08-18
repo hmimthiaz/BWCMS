@@ -192,6 +192,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             'factory' => $this->factory,
             'environment' => $this->environment,
             'emptyTitle' => false,
+            'template' => false,
             'class' => 'menu-' . $contentEntity->getSlug(),
             'id' => 'menu-' . $contentEntity->getSlug(),
         ));
