@@ -47,3 +47,6 @@ composer.json
 /app/BWBundleRegister.php
 
 /.idea/*
+.project
+.buildpath
+.settings
