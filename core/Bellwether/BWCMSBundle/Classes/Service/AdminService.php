@@ -241,6 +241,14 @@ class AdminService extends BaseService
     /**
      * @return bool
      */
+    public function isAdmin()
+    {
+        return $this->isAdmin;
+    }
+
+    /**
+     * @return bool
+     */
     public function getIsAdmin()
     {
         return $this->isAdmin;

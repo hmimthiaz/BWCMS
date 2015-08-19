@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilder;
 
+use Bellwether\BWCMSBundle\Classes\Service\AdminService;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentQueryService;
@@ -579,6 +580,14 @@ abstract class ContentType implements ContentTypeInterface
     public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
         return $this->container->get('router')->generate($route, $parameters, $referenceType);
+    }
+
+    /**
+     * @return AdminService
+     */
+    public function admin()
+    {
+        return $this->container->get('BWCMS.Admin')->getManager();
     }
 
     /**
