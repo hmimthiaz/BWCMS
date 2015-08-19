@@ -7,6 +7,9 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
+
 class FrontEndController extends BaseController implements FrontEndControllerInterface
 {
     /**
@@ -61,6 +64,33 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
         );
         $template = $this->getContentTemplate($pageEntity);
         return $this->render($template, $templateVariables);
+    }
+
+    public function mediaViewAction($siteSlug, $contentId)
+    {
+
+        $contentRepository = $this->cm()->getContentRepository();
+        /**
+         * @var ContentEntity $contentEntity
+         */
+        $contentEntity = $contentRepository->find($contentId);
+        if ($contentEntity == null) {
+            throw new NotFoundHttpException('File does not exist');
+        }
+
+        if (!$this->mm()->isImage($contentEntity)) {
+            throw new NotFoundHttpException('File is not an image');
+        }
+        /**
+         * @var ContentMediaEntity $media
+         */
+        $media = $contentEntity->getMedia()->first();
+        $filename = $this->mm()->checkAndCreateMediaCacheFile($media);
+        header('Content-Disposition: inline; filename='.$media->getFile().';');
+        header('Content-Type:' . $media->getMime());
+        header('Content-Length: ' . $media->getSize());
+        readfile($filename);
+        exit;
     }
 
 }

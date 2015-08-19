@@ -115,7 +115,7 @@ class MediaService extends BaseService
             fwrite($localFile, stream_get_contents($contentMediaEntity->getData()));
             fclose($localFile);
         }
-        return true;
+        return $cacheFile;
     }
 
 

@@ -527,6 +527,8 @@ class ContentController extends BaseController implements BackEndControllerInter
         $length = $request->get('length', 10);
         $parentId = $request->get('parent', 'Root');
         $onlyImage = strtolower($request->get('onlyImage', 'no'));
+        $imageURL = $request->get('imageURL', false);
+
         $search = $request->get('search');
         $searchString = null;
         $schema = $request->get('schema');
@@ -572,7 +574,9 @@ class ContentController extends BaseController implements BackEndControllerInter
         if (!empty($condition)) {
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
-        $qb->andWhere(" node.site = '" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+
+        $currentSite = $this->sm()->getAdminCurrentSite();
+        $qb->andWhere(" node.site = '" . $currentSite->getId() . "' ");
         $qb->andWhere(" node.scope = '" . ContentScopeType::CPublic . "' ");
 
         $qb->setFirstResult($start);
@@ -585,7 +589,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         }
 
         if ($onlyImage == 'yes') {
-            $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentMediaEntity', 'media',\Doctrine\ORM\Query\Expr\Join::WITH,' node.id = media.content ');
+            $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentMediaEntity', 'media', \Doctrine\ORM\Query\Expr\Join::WITH, ' node.id = media.content ');
             $qb->andWhere(" ( media.height > 0 AND media.width > 0 ) ");
         }
 
@@ -638,9 +642,12 @@ class ContentController extends BaseController implements BackEndControllerInter
                 if ($contentClass->isPageBuilderSupported()) {
                     $ca['pbLink'] = $this->generateUrl('content_pb', array('contentId' => $content->getId()));
                 }
-
                 $ca['download'] = '';
                 if ($this->mm()->isMedia($content)) {
+                    $ca['imageURL'] = $this->generateUrl('media_image_view', array('contentId' => $content->getId(), 'siteSlug' => $currentSite->getSlug()));
+                    $ca['imageURL'] = str_ireplace('/app_dev.php','',$ca['imageURL']);
+                }
+                if ($imageURL) {
                     $ca['download'] = $this->generateUrl('content_media_download', array('contentId' => $content->getId()));
                 }
                 if ($this->mm()->isImage($content)) {

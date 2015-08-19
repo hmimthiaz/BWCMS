@@ -1,0 +1,119 @@
+{% extends "BWCMSBundle:Common:popup.html.twig" %}
+
+{% block title %}Content Browser{% endblock %}
+
+{% block bodyAttr %}
+    {% spaceless %}
+        style="padding:0px !important;margin: 2px !important;"
+    {% endspaceless %}
+{% endblock %}
+
+
+
+{% block header %}
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/js/datatable/css/jquery.dataTables.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/js/jstree/themes/default/style.min.css') }}"/>
+{% endblock %}
+
+{% block body %}
+    <div class="panel panel-default">
+        {% if selectContentPath is not null %}
+            <div class="panel-heading">
+                <h3 class="panel-title">Selected:
+                    {% for content in selectContentPath %}
+                        {% if not loop.last %}
+                            {{ content.title }} /
+                        {% else %}
+                            {{ content.title }}
+                        {% endif %}
+                    {% endfor %}
+                </h3>
+            </div>
+        {% endif %}
+        <div style="min-width: 780px;">
+
+            <div class="row">
+                <div class="col-sm-3 mediaPageLeft">
+                    <div id="jstree_div"></div>
+                </div>
+                <div class="col-sm-9 mediaPageRight" style="margin-top: 10px;">
+                    <input type="hidden" id="selectedContentFolderId" value="{{ parentId }}">
+                    <table id="contentTable" class="table" border="0">
+                        <thead>
+                        <tr>
+                            <th width="32">Icon</th>
+                            <th>Filename</th>
+                            <th width="100">Action</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script language="JavaScript">
+        $(document).ready(function () {
+            var contentTable = $('#contentTable').DataTable({
+                ordering: false,
+                pageLength: 5,
+                processing: true,
+                serverSide: true,
+                drag: true,
+                select: true,
+                ajax: {
+                    url: "{{ url('content_table_data') }}",
+                    type: 'GET',
+                    'data': function (params) {
+                        params.type = '{{ type }}';
+                        params.schema = '{{ schema }}';
+                        params.onlyImage = '{{ onlyImage }}';
+                        params.length = '5';
+                        params.imageURL = true;
+                        params.parent = $("#selectedContentFolderId").val();
+                        return params;
+                    }
+                },
+                columns: [
+                    {data: "thumbnail"},
+                    {data: "title", className: "title"},
+                    {
+                        data: null,
+                        className: "center",
+                        render: function (data, type, full, meta) {
+                            var ret = '<button type="button" data-url="' + data.imageURL + '" class="btn btn-primary select"><i class="glyphicon glyphicon-ok"></i></button>';
+                            return ret;
+                        }
+                    }
+                ],
+                fnDrawCallback: function (oSettings) {
+                    $('#contentTable button.select').click(function (e) {
+                        var imageURL = $(this).data('url');
+                        var args = top.tinymce.activeEditor.windowManager.getParams();
+                        win = (args.window);
+                        input = (args.input);
+                        win.document.getElementById(input).value = imageURL;
+                        top.tinymce.activeEditor.windowManager.close();
+                    });
+                }
+            });
+            $('#jstree_div').jstree({
+                'core': {
+                    'data': {{ jsNodes|raw }},
+                    'check_callback': true
+                }
+            });
+            $('#jstree_div').on('select_node.jstree', function (node, selected, event) {
+                $("#selectedContentFolderId").val(selected.node.id);
+                contentTable.ajax.reload();
+            });
+        });
+    </script>
+
+
+{% endblock %}
+
+{% block footer %}
+    <script src="{{ asset('bundles/bwcms/js/datatable/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/js/jstree/jstree.min.js') }}"></script>
+{% endblock %}

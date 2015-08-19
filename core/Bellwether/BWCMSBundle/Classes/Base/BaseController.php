@@ -23,6 +23,7 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Gregwar\Image\Image;
 
 
 abstract class BaseController extends Controller
@@ -129,6 +130,14 @@ abstract class BaseController extends Controller
     public function mm()
     {
         return $this->container->get('BWCMS.Media')->getManager();
+    }
+
+    /**
+     * @return Image
+     */
+    public function getThumbService()
+    {
+        return $this->container->get('image.handling');
     }
 
     /**

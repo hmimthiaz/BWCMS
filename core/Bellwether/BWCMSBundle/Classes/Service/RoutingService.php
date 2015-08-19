@@ -46,6 +46,14 @@ class RoutingService extends BaseService implements LoaderInterface
         ));
         $routes->add('home_page', $homeRedirectRoute);
 
+        $mediaImageViewRoute = new Route('/{siteSlug}/media/{contentId}/view.php', array(
+            '_controller' => 'BWCMSBundle:FrontEnd:mediaView',
+        ), array(
+            'siteSlug' => '[a-zA-Z0-9-]+',
+            'contentId' => '[a-zA-Z0-9-]+'
+        ));
+        $routes->add('media_image_view', $mediaImageViewRoute);
+
         //make sure all content types are initialized.
         $this->cm()->init();
         $registerContentTypes = $this->cm()->getAllContentTypes();
