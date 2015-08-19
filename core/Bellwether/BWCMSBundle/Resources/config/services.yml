@@ -5,6 +5,9 @@ services:
   BWCMS.ACL:
     class: Bellwether\BWCMSBundle\Classes\Service\ACLService
     arguments: [@service_container,@request_stack]
+  BWCMS.Cache:
+    class: Bellwether\BWCMSBundle\Classes\Service\CacheService
+    arguments: [@service_container,@request_stack]
   BWCMS.Site:
     class: Bellwether\BWCMSBundle\Classes\Service\SiteService
     arguments: [@service_container,@request_stack]

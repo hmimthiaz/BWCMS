@@ -11,6 +11,7 @@ use Bellwether\BWCMSBundle\Entity\UserEntity;
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Classes\Service\AdminService;
 use Bellwether\BWCMSBundle\Classes\Service\ACLService;
+use Bellwether\BWCMSBundle\Classes\Service\CacheService;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentQueryService;
@@ -91,6 +92,14 @@ abstract class BaseController extends Controller
     public function admin()
     {
         return $this->container->get('BWCMS.Admin')->getManager();
+    }
+
+    /**
+     * @return CacheService
+     */
+    public function cache()
+    {
+        return $this->container->get('BWCMS.Cache')->getManager();
     }
 
     /**

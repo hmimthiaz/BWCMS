@@ -39,7 +39,10 @@ class AdminService extends BaseService
      */
     public function init()
     {
-        $this->setIsAdmin(false);
+        if (!$this->loaded) {
+            $this->setIsAdmin(false);
+        }
+        $this->loaded = true;
     }
 
     public function addAudit($level, $module, $action, $guid, $description)

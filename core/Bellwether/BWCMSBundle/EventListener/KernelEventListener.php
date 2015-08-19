@@ -35,6 +35,7 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
     public function init()
     {
         if (!$this->loaded) {
+            $this->cache()->init();
             $this->admin()->init();
             $this->cm()->init();
             $this->mm()->init();
@@ -48,7 +49,8 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-
+//        $response = new Response('fuck',200);
+//        $event->setResponse($response);
     }
 
     public function onKernelController(FilterControllerEvent $event)
@@ -154,6 +156,9 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
+//        dump($event);
+//        exit;
+
     }
 
     public function onKernelTerminate(PostResponseEvent $event)
