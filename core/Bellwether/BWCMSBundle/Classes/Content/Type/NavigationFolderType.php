@@ -147,13 +147,28 @@ class NavigationFolderType Extends ContentType
             }
         }
 
+        if (isset($options['template']) && !empty($options['template'])) {
+            $menuTemplate = $this->tp()->getCurrentSkin()->getTemplateName($options['template']);
+        } else {
+            $menuTemplate = $this->getContentTemplate($contentEntity);
+        }
+
         $requestURL = $this->getRequest()->getRequestUri();
-        $menuTemplate = $this->getContentTemplate($contentEntity);
         $matcher = new Matcher();
         $voter = new UriVoter($requestURL);
         $matcher->addVoter($voter);
 
-        $renderer = new TwigRenderer($options['environment'], $menuTemplate, $matcher);
+        $rendererOptions = array();
+        if (isset($options['currentClass']) && !empty($options['currentClass'])) {
+            $rendererOptions['currentClass'] = $options['currentClass'];
+        }
+        if (isset($options['firstClass']) && !empty($options['firstClass'])) {
+            $rendererOptions['firstClass'] = $options['firstClass'];
+        }
+        if (isset($options['lastClass']) && !empty($options['lastClass'])) {
+            $rendererOptions['lastClass'] = $options['lastClass'];
+        }
+        $renderer = new TwigRenderer($options['environment'], $menuTemplate, $matcher, $rendererOptions);
         return $renderer->render($menu[$contentEntity->getId()]);
     }
 

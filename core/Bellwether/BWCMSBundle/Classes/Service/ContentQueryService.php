@@ -56,7 +56,7 @@ class ContentQueryService extends BaseService
      * @param string $type
      * @return Pagination
      */
-    public function getFolderItems($contentEntity = null, Pagination $pager, $type = 'Content')
+    public function getFolderItems($contentEntity = null, Pagination $pager, $type = 'Content', $schema = null)
     {
         $start = $pager->getStart();
         $limit = $pager->getLimit();
@@ -79,7 +79,7 @@ class ContentQueryService extends BaseService
             $qb->add('orderBy', 'node.size' . $sortOrder);
         }
 
-        $registeredContents = $this->cm()->getRegisteredContentTypes($type);
+        $registeredContents = $this->cm()->getRegisteredContentTypes($type, $schema);
         $condition = array();
         foreach ($registeredContents as $cInfo) {
             $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
@@ -101,7 +101,6 @@ class ContentQueryService extends BaseService
 
         return $pager;
     }
-
 
 
     /**

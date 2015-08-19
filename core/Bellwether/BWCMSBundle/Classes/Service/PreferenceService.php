@@ -119,6 +119,9 @@ class PreferenceService extends BaseService
                         $prefValue = $this->cm()->getContentRepository()->find($prefValue);
                     }
                 }
+                if ($prefType == PreferenceFieldType::Custom) {
+                    $prefValue = $classInstance->loadCustomField($prefField, $prefValue);
+                }
                 $returnArray[$prefField] = $prefValue;
             }
             $fields = $classInstance->getFields();
@@ -200,7 +203,7 @@ class PreferenceService extends BaseService
             $dateValue = new \DateTime($fieldValue);
             return $dateValue;
         }
-        if ($fieldType == PreferenceFieldType::Serialized) {
+        if ($fieldType == PreferenceFieldType::Serialized || $fieldType == PreferenceFieldType::Custom) {
             try {
                 $data = $this->getSerializer()->deserialize($fieldValue, 'ArrayCollection', 'json');
             } catch (\RuntimeException $exp) {
@@ -268,14 +271,14 @@ class PreferenceService extends BaseService
                         $preferenceEntity->setSite($this->sm()->getAdminCurrentSite());
                     }
                     $action = 'NEW';
-                } elseif (!is_null($preferenceEntity) && ( is_null($fieldValue) || empty($fieldValue) ) ) {
-                    $action = 'DELETE';
+                } elseif (!is_null($preferenceEntity) && (is_null($fieldValue) || empty($fieldValue))) {
                     $this->em()->remove($preferenceEntity);
+                    $this->em()->flush();
+                    $this->admin()->addAudit(AuditLevelType::Critical, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Delete, $preferenceEntity->getId(), 'Deleted: ' . $preferenceEntity->getField());
                     continue;
                 } elseif (is_null($preferenceEntity) && is_null($fieldValue)) {
                     continue;
                 }
-
 
                 if ($fieldType == PreferenceFieldType::String || $fieldType == PreferenceFieldType::Number) {
                     $preferenceEntity->setValue($fieldValue);
@@ -295,20 +298,18 @@ class PreferenceService extends BaseService
                     $dateString = $fieldValue->format(\DateTime::ISO8601);
                     $preferenceEntity->setValue($dateString);
                 }
-                if ($fieldType == PreferenceFieldType::Serialized) {
+                if ($fieldType == PreferenceFieldType::Serialized || $fieldType == PreferenceFieldType::Custom) {
                     $cleanedData = $this->prepareSerializedMeta($fieldValue);
                     $serializedString = $this->getSerializer()->serialize($cleanedData, 'json');
                     $preferenceEntity->setValue($serializedString);
                 }
                 $this->em()->persist($preferenceEntity);
                 $this->em()->flush();
-                
+
                 if ($action == 'NEW') {
                     $this->admin()->addAudit(AuditLevelType::Normal, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Add, $preferenceEntity->getId(), 'Added: ' . $preferenceEntity->getField());
                 } else if ($action == 'UPDATE') {
                     $this->admin()->addAudit(AuditLevelType::Normal, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Edit, $preferenceEntity->getId(), 'Edited: ' . $preferenceEntity->getField());
-                } else if ($action == 'DELETE') {
-                    $this->admin()->addAudit(AuditLevelType::Critical, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Delete, $preferenceEntity->getId(), 'Deleted: ' . $preferenceEntity->getField());
                 }
             }
         }

@@ -23,6 +23,7 @@ class AppKernel extends Kernel
             new Knp\Bundle\MenuBundle\KnpMenuBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new Gregwar\ImageBundle\GregwarImageBundle(),
+            new Gregwar\CaptchaBundle\GregwarCaptchaBundle(),
             new Bellwether\BWCMSBundle\BWCMSBundle(),
         );
 

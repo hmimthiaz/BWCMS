@@ -40,9 +40,13 @@
 # Composer PHAR
 /composer.phar
 composer.lock
+composer.json
 
 #CMS Related
 /src/*
 /app/BWBundleRegister.php
 
 /.idea/*
+.project
+.buildpath
+.settings

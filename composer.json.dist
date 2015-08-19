@@ -48,6 +48,7 @@
     "twbs/bootstrap": "3.0.*",
     "jquery/jquery": "1.11.*",
     "gregwar/image-bundle": "dev-master",
+    "gregwar/captcha-bundle": "dev-master",
     "html2text/html2text": "~2.0"
   },
   "require-dev": {

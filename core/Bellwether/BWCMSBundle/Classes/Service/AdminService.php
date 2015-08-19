@@ -128,31 +128,63 @@ class AdminService extends BaseService
         $menu->addChild('Dashboard', array('route' => 'dashboard_home'));
 
         $menu->addChild('Manage', array('uri' => '#', 'label' => 'Manage'))->setAttribute('dropdown', true);
-        $menu['Manage']->addChild('Content', array(
-            'route' => 'content_home',
-            'routeParameters' => array(
-                'type' => 'content'
-            )
-        ));
-        $menu['Manage']->addChild('Media', array(
-            'route' => 'content_home',
-            'routeParameters' => array(
-                'type' => 'media'
-            )
-        ));
-        $menu['Manage']->addChild('Navigation', array(
-            'route' => 'content_home',
-            'routeParameters' => array(
-                'type' => 'navigation'
-            )
-        ));
-        $menu['Manage']->addChild('Widget', array(
-            'route' => 'content_home',
-            'routeParameters' => array(
-                'type' => 'widget'
-            )
-        ));
-        $menu['Manage']->addChild('-', array('uri' => '#'))->setAttribute('divider', true);
+
+        if (count($this->cm()->getRegisteredContentTypes('Content')) > 0) {
+            $menu['Manage']->addChild('Content', array(
+                'route' => 'content_home',
+                'routeParameters' => array(
+                    'type' => 'content'
+                )
+            ));
+        }
+
+        if (count($this->cm()->getRegisteredContentTypes('Media')) > 0) {
+            $menu['Manage']->addChild('Media', array(
+                'route' => 'content_home',
+                'routeParameters' => array(
+                    'type' => 'media'
+                )
+            ));
+        }
+
+        if (count($this->cm()->getRegisteredContentTypes('Navigation')) > 0) {
+            $menu['Manage']->addChild('Navigation', array(
+                'route' => 'content_home',
+                'routeParameters' => array(
+                    'type' => 'navigation'
+                )
+            ));
+        }
+
+        if (count($this->cm()->getRegisteredContentTypes('Widget')) > 0) {
+            $menu['Manage']->addChild('Widget', array(
+                'route' => 'content_home',
+                'routeParameters' => array(
+                    'type' => 'widget'
+                )
+            ));
+        }
+
+        $menu['Manage']->addChild('-ct-', array('uri' => '#'))->setAttribute('divider', true);
+
+
+        $registeredOptionTypes = $this->pref()->getRegisteredOptionTypes();
+        $addedPagePreference = false;
+        foreach ($registeredOptionTypes as $optionType) {
+            $classInstance = $optionType['class'];
+            if ($classInstance->isPagePreference()) {
+                $menu['Manage']->addChild($optionType['name'], array(
+                    'route' => 'preference_page',
+                    'routeParameters' => array(
+                        'type' => $optionType['type']
+                    )
+                ));
+                $addedPagePreference = true;
+            }
+        }
+        if ($addedPagePreference) {
+            $menu['Manage']->addChild('-pf-', array('uri' => '#'))->setAttribute('divider', true);
+        }
 
 
         $taxonomyContentTypes = $this->cm()->getTaxonomyContentTypes();
@@ -166,24 +198,27 @@ class AdminService extends BaseService
                     )
                 ));
             }
-            $menu['Manage']->addChild('--', array('uri' => '#'))->setAttribute('divider', true);
+            $menu['Manage']->addChild('-ct-', array('uri' => '#'))->setAttribute('divider', true);
         }
 
         $menu['Manage']->addChild('Image Thumb Styles', array(
             'route' => 'thumbstyle_home'
         ));
 
-
         if ($this->isGranted('ROLE_PREFERENCE')) {
-            $menu->addChild('Preference', array('uri' => '#', 'label' => 'Preference'))->setAttribute('dropdown', true);
-            $registeredOptionTypes = $this->pref()->getRegisteredOptionTypes();
             foreach ($registeredOptionTypes as $optionType) {
-                $menu['Preference']->addChild($optionType['name'], array(
-                    'route' => 'preference_page',
-                    'routeParameters' => array(
-                        'type' => $optionType['type']
-                    )
-                ));
+                $classInstance = $optionType['class'];
+                if (!$classInstance->isPagePreference()) {
+                    if (!isset($menu['Preference'])) {
+                        $menu->addChild('Preference', array('uri' => '#', 'label' => 'Preference'))->setAttribute('dropdown', true);
+                    }
+                    $menu['Preference']->addChild($optionType['name'], array(
+                        'route' => 'preference_page',
+                        'routeParameters' => array(
+                            'type' => $optionType['type']
+                        )
+                    ));
+                }
             }
         }
 
@@ -201,6 +236,14 @@ class AdminService extends BaseService
             'route' => 'dashboard_about'
         ));
         return $menu;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        return $this->isAdmin;
     }
 
     /**

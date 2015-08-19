@@ -403,8 +403,11 @@ class ContentEntity
     /**
      * @return mixed
      */
-    public function getSummary()
+    public function getSummary($actualSummary = false)
     {
+        if($actualSummary){
+            return $this->summary;
+        }
         $summary = $this->summary;
         if (empty($summary)) {
             if (!empty($this->content)) {

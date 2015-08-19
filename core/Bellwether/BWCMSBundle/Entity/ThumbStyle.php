@@ -132,6 +132,9 @@ class ThumbStyle
      */
     public function getWidth()
     {
+        if($this->width==0){
+            return null;
+        }
         return $this->width;
     }
 
@@ -148,6 +151,9 @@ class ThumbStyle
      */
     public function getHeight()
     {
+        if($this->height==0){
+            return null;
+        }
         return $this->height;
     }
 

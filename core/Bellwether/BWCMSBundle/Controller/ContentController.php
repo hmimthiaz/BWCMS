@@ -239,7 +239,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             if ($contentEntity->getTreeParent() != null) {
                 $parentId = $contentEntity->getTreeParent()->getId();
             }
-            if ($class->isIsTaxonomy()) {
+            if ($class->isTaxonomy()) {
                 return $this->redirect($this->generateUrl('taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
             }
             return $this->redirect($this->generateUrl('content_home', array('type' => $type, 'parent' => $parentId)));
@@ -275,6 +275,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             array(
                 'id' => 'Root',
                 'text' => $rootFolderCaption,
+                'sort' => 0,
                 'icon' => 'glyphicon glyphicon-folder-open',
                 'parent' => '#',
                 'state' => array(
@@ -289,6 +290,11 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $jsNode = array();
                 $jsNode['id'] = $content->getId();
                 $jsNode['text'] = $content->getTitle();
+                if ($content->getSortBy() == ContentSortByType::SortIndex) {
+                    $jsNode['sort'] = 1;
+                } else {
+                    $jsNode['sort'] = 0;
+                }
                 $jsNode['icon'] = 'glyphicon glyphicon-folder-open';
                 if ($content->getTreeParent() != null) {
                     $jsNode['parent'] = $content->getTreeParent()->getId();
@@ -581,6 +587,10 @@ class ContentController extends BaseController implements BackEndControllerInter
 
         $qb->setFirstResult($start);
         $qb->setMaxResults($length);
+        if ($uiSortEnabled) {
+            $qb->setFirstResult(0);
+            $qb->setMaxResults(99999);
+        }
 
         if (!empty($searchString)) {
             $qb->andWhere(" ( node.title LIKE :query1 OR node.file LIKE :query2  ) ");

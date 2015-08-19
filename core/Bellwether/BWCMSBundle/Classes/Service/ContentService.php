@@ -149,7 +149,7 @@ class ContentService extends BaseService
                     'type' => $class->getType(),
                     'schema' => $class->getSchema(),
                     'isHierarchy' => $class->isHierarchy(),
-                    'isIsTaxonomy' => $class->isIsTaxonomy(),
+                    'isTaxonomy' => $class->isTaxonomy(),
                     'isRootItem' => $class->isRootItem(),
                     'class' => $class
                 );
@@ -180,7 +180,7 @@ class ContentService extends BaseService
         if (!empty($registeredContents)) {
             foreach ($registeredContents as $content) {
                 $class = $content['class'];
-                if ($class->isIsTaxonomy()) {
+                if ($class->isTaxonomy()) {
                     $mediaContentTypes[] = $content;
                 }
             }
@@ -274,7 +274,7 @@ class ContentService extends BaseService
         $form->get('title')->setData($content->getTitle());
 
         if ($classInstance->isSummaryEnabled()) {
-            $form->get('summary')->setData($content->getSummary());
+            $form->get('summary')->setData($content->getSummary(true));
         }
         if ($classInstance->isContentEnabled()) {
             $form->get('content')->setData($content->getContent());
@@ -293,6 +293,9 @@ class ContentService extends BaseService
             $existingRelation = $content->getRelation();
             $fieldValues = array();
             foreach ($existingRelation as $relation) {
+                if (!isset($taxonomyRelations[$relation->getRelation()]['fieldName'])) {
+                    continue;
+                }
                 $formFieldName = $taxonomyRelations[$relation->getRelation()]['fieldName'];
                 $fieldValues[$formFieldName][] = $relation->getRelatedContent()->getId();
             }
@@ -373,6 +376,9 @@ class ContentService extends BaseService
     public function getContentAllMeta($contentEntity)
     {
         $returnValue = array();
+        if (!$contentEntity instanceof ContentEntity) {
+            return $returnValue;
+        }
         $classInstance = $this->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
         $loadedMeta = $contentEntity->getLoadedMeta();
         if (!is_null($loadedMeta)) {
@@ -447,10 +453,7 @@ class ContentService extends BaseService
         $fields = $classInstance->getFields();
 
         foreach ($fields as $fieldName => $fieldInfo) {
-            if (!isset($data[$fieldName]) || empty($data[$fieldName])) {
-                continue;
-            }
-            if ($fieldName == 'parent') {
+            if ($fieldName == 'parent' && !empty($data['parent'])) {
                 $parentContent = $this->getContentRepository()->find($data['parent']);
                 $content->setTreeParent($parentContent);
             }
@@ -515,6 +518,7 @@ class ContentService extends BaseService
                 }
             }
         }
+
         if ($content->getSlug() == null) {
             $parentId = null;
             if ($content->getTreeParent() != null) {
@@ -730,9 +734,24 @@ class ContentService extends BaseService
             }
         }
         $existingMedia = $content->getMedia();
-        if(!empty($existingMedia)){
-            foreach($existingMedia as $media){
+        if (!empty($existingMedia)) {
+            foreach ($existingMedia as $media) {
                 $this->em()->remove($media);
+            }
+        }
+        $existingRelation = $content->getRelation();
+        if (!empty($existingRelation)) {
+            foreach ($existingRelation as $relation) {
+                $this->em()->remove($relation);
+            }
+        }
+        $contentClass = $this->getContentClass($content->getType(), $content->getSchema());
+        if ($contentClass->isTaxonomy()) {
+            $taxonomyRelations = $this->em()->getRepository('BWCMSBundle:ContentRelationEntity')->findBy(array("relatedContent" => $content));
+            if (!empty($taxonomyRelations)) {
+                foreach ($taxonomyRelations as $relation) {
+                    $this->em()->remove($relation);
+                }
             }
         }
         $this->admin()->addAudit(AuditLevelType::Critical, 'Content::' . $content->getType() . '::' . $content->getSchema(), AuditActionType::Delete, $content->getId(), 'Deleted: ' . $content->getTitle());
@@ -754,7 +773,7 @@ class ContentService extends BaseService
      */
     public function getTaxonomyTerms($taxonomyClass)
     {
-        if (!$taxonomyClass->isIsTaxonomy()) {
+        if (!$taxonomyClass->isTaxonomy()) {
             throw new \InvalidArgumentException('Invalid Schema');
         }
         $returnTerms = array();

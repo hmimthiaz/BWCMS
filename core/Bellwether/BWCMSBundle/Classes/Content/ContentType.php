@@ -15,9 +15,11 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilder;
 
+use Bellwether\BWCMSBundle\Classes\Service\AdminService;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentQueryService;
+use Bellwether\BWCMSBundle\Classes\Service\LocaleService;
 use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
@@ -581,6 +583,14 @@ abstract class ContentType implements ContentTypeInterface
     }
 
     /**
+     * @return AdminService
+     */
+    public function admin()
+    {
+        return $this->container->get('BWCMS.Admin')->getManager();
+    }
+
+    /**
      * @return SiteService
      */
     public function sm()
@@ -602,6 +612,14 @@ abstract class ContentType implements ContentTypeInterface
     public function cq()
     {
         return $this->container->get('BWCMS.ContentQuery')->getManager();
+    }
+
+    /**
+     * @return LocaleService
+     */
+    public function locale()
+    {
+        return $this->container->get('BWCMS.Locale')->getManager();
     }
 
     /**
@@ -711,7 +729,7 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return boolean
      */
-    public function isIsTaxonomy()
+    public function isTaxonomy()
     {
         return $this->isTaxonomy;
     }

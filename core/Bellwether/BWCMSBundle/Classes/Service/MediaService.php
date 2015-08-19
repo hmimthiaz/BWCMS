@@ -242,28 +242,30 @@ class MediaService extends BaseService
      * @param ContentEntity $contentEntity
      * @param ThumbStyle $thumbStyle
      */
-    public function getContentThumbURLWithStyle($contentEntity, $thumbStyle)
+    public function getContentThumbURLWithStyle($contentEntity, $thumbStyle, $scaleFactor = 1.0)
     {
         $filename = $this->getContentFile($contentEntity);
         if (empty($filename)) {
             return null;
         }
         $thumb = $this->getThumbService()->open($filename);
+        $width = $thumbStyle->getWidth() * $scaleFactor;
+        $height = $thumbStyle->getHeight() * $scaleFactor;
         switch ($thumbStyle->getMode()) {
             case 'resize':
-                $thumb = $thumb->resize($thumbStyle->getWidth(), $thumbStyle->getHeight());
+                $thumb = $thumb->resize($width, $height);
                 break;
             case 'scaleResize':
-                $thumb = $thumb->scaleResize($thumbStyle->getWidth(), $thumbStyle->getHeight());
+                $thumb = $thumb->scaleResize($width, $height);
                 break;
             case 'forceResize':
-                $thumb = $thumb->forceResize($thumbStyle->getWidth(), $thumbStyle->getHeight());
+                $thumb = $thumb->forceResize($width, $height);
                 break;
             case 'cropResize':
-                $thumb = $thumb->cropResize($thumbStyle->getWidth(), $thumbStyle->getHeight());
+                $thumb = $thumb->cropResize($width, $height);
                 break;
             case 'zoomCrop':
-                $thumb = $thumb->zoomCrop($thumbStyle->getWidth(), $thumbStyle->getHeight());
+                $thumb = $thumb->zoomCrop($width, $height);
                 break;
         }
         return $thumb->cacheFile('guess');
