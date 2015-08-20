@@ -4,9 +4,12 @@ namespace Bellwether\BWCMSBundle\Controller;
 
 use Bellwether\BWCMSBundle\Classes\Base\FrontEndControllerInterface;
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
 
@@ -86,11 +89,16 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
          */
         $media = $contentEntity->getMedia()->first();
         $filename = $this->mm()->checkAndCreateMediaCacheFile($media);
-        header('Content-Disposition: inline; filename='.$media->getFile().';');
-        header('Content-Type:' . $media->getMime());
-        header('Content-Length: ' . $media->getSize());
-        readfile($filename);
-        exit;
+
+        $response = new BinaryFileResponse($filename);
+        $response->trustXSendfileTypeHeader();
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_INLINE,
+            $media->getFile(),
+            iconv('UTF-8', 'ASCII//TRANSLIT', $media->getFile())
+        );
+
+        return $response;
     }
 
 }
