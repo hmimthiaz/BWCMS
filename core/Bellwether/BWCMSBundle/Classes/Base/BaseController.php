@@ -239,6 +239,15 @@ abstract class BaseController extends Controller
     }
 
     /**
+     * @param string $string
+     * @return string
+     */
+    public function loc($string)
+    {
+        return call_user_func_array(array($this->locale(), "get"), func_get_args());
+    }
+
+    /**
      * @param Request $request
      * @param Array $jsonArray
      * @return Response

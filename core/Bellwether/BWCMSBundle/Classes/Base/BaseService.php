@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\Security\Core\SecurityContext;
 use Bellwether\BWCMSBundle\Entity\UserEntity;
 use Bellwether\BWCMSBundle\Classes\Service\AdminService;
@@ -210,6 +211,15 @@ abstract class BaseService  extends ContainerAware
      */
     public function getUser(){
         return $this->getSecurityContext()->getToken()->getUser();
+    }
+
+    /**
+     * @param string $string
+     * @return string
+     */
+    public function loc($string)
+    {
+        return call_user_func_array(array($this->locale(), "get"), func_get_args());
     }
 
 

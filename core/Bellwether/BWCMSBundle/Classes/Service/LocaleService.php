@@ -40,6 +40,24 @@ class LocaleService extends BaseService
         $this->loaded = true;
     }
 
+    /**
+     * @param string $string
+     * @return string
+     */
+    public function get($string)
+    {
+        $stringValue = $this->fetch($string);
+        if (is_null($stringValue)) {
+            $stringValue = $this->add($string);
+        }
+        if (func_num_args() == 1) {
+            return $stringValue;
+        }
+        $parameters = array_slice(func_get_args(), 1);
+        return vsprintf($stringValue, $parameters);
+    }
+
+
     public function add($string)
     {
         $localeEntity = new LocaleEntity();

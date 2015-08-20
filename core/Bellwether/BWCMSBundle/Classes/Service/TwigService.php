@@ -324,15 +324,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      */
     public function getLocale($string)
     {
-        $stringValue = $this->locale()->fetch($string);
-        if (is_null($stringValue)) {
-            $stringValue = $this->locale()->add($string);
-        }
-        if (func_num_args() == 1) {
-            return $stringValue;
-        }
-        $parameters = array_slice(func_get_args(), 1);
-        return vsprintf($stringValue, $parameters);
+        return call_user_func_array(array($this->locale(), "get"), func_get_args());
     }
 
 
