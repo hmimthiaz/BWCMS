@@ -18,9 +18,14 @@ class LocaleEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=50, nullable=false)
      */
     private $hash;
+
+    /**
+     * @ORM\Column(type="text", name="sourceText", nullable=false)
+     */
+    private $text;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -55,6 +60,22 @@ class LocaleEntity
     public function getHash()
     {
         return $this->hash;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getText()
+    {
+        return $this->text;
+    }
+
+    /**
+     * @param mixed $text
+     */
+    public function setText($text)
+    {
+        $this->text = $text;
     }
 
     /**

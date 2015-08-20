@@ -1,0 +1,32 @@
+{% extends "BWCMSBundle:Common:default.html.twig" %}
+
+
+{% block title %} {{ title }} {% endblock %}
+{% block pageTitle %}
+    <h1>{{ title }}</h1>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th width="45%">String</th>
+                    <th width="45%">Value</th>
+                    <th width="10%" >Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for entity in entities %}
+                    <tr>
+                        <td>{{ entity.text }}</td>
+                        <td>{{ entity.value }}</td>
+                        <td align="center"><button type="button" class="btn btn-primary edit"><i class="glyphicon glyphicon-pencil"></i></button></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -62,6 +62,7 @@ class LocaleService extends BaseService
     {
         $localeEntity = new LocaleEntity();
         $localeEntity->setHash(md5($string));
+        $localeEntity->setText($string);
         $localeEntity->setValue($string);
         $localeEntity->setSite($this->sm()->getCurrentSite());
         $this->em()->persist($localeEntity);

@@ -204,7 +204,11 @@ class AdminService extends BaseService
             $menu['Manage']->addChild('-ct-', array('uri' => '#'))->setAttribute('divider', true);
         }
 
-        $menu['Manage']->addChild('Image Thumb Styles', array(
+        $menu['Manage']->addChild('Locale', array(
+            'route' => 'locale_home'
+        ));
+
+        $menu['Manage']->addChild('Thumb Styles', array(
             'route' => 'thumbstyle_home'
         ));
 
