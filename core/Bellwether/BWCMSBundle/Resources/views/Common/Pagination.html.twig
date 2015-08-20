@@ -1,0 +1,34 @@
+{% set previousURL = pager.prev() %}
+{% set nextURL = pager.next() %}
+{% set pages = pager.pages() %}
+
+{% if pages|length > 1 %}
+    <ul class="pagination">
+        {% if previousURL is not null %}
+            <li>
+                <a href="{{ path(previousURL.route,previousURL.params) }}">&laquo;</a>
+            </li>
+        {% endif %}
+
+        {% for page in pages %}
+            <li {% if page.class is not empty %} class="{{ page.class }}"{% endif %}>
+                {% if page.route is defined %}
+                <a href="{{ path(page.route,page.params) }}">
+                    {% endif %}
+                    {{ page.text }}
+                    {% if page.route is defined %}
+                </a>
+                {% endif %}
+            </li>
+        {% endfor %}
+
+        {% if nextURL is not null %}
+            <li>
+                <a href="{{ path(nextURL.route,nextURL.params) }}">&raquo;</a>
+            </li>
+        {% endif %}
+    </ul>
+{% endif %}
+
+
+

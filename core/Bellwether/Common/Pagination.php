@@ -43,7 +43,12 @@ class Pagination
     {
         $this->totalItems = 0;
         $this->setItems(array());
-        $this->setCurrentPage($this->getRequest()->get($this->getPageVar(), 1));
+        $currentPage = $this->getRequest()->get($this->getPageVar(), 1);
+        $currentPage = filter_var($currentPage, FILTER_SANITIZE_NUMBER_INT);
+        if ($currentPage < 1) {
+            $currentPage = 1;
+        }
+        $this->setCurrentPage($currentPage);
         $this->setStart(($this->getCurrentPage() - 1) * $this->getLimit());
     }
 

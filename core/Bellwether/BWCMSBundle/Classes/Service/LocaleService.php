@@ -85,10 +85,15 @@ class LocaleService extends BaseService
         return $localeEntity->getValue();
     }
 
-    public function save($stringHash, $value)
+    public function save($id, $value)
     {
-
-
+        $localeEntity = $this->getRepository()->find($id);
+        if (!is_null($localeEntity)) {
+            $localeEntity->setValue($value);
+            $this->em()->persist($localeEntity);
+            $this->em()->flush();
+        }
+        return true;
     }
 
     /**
