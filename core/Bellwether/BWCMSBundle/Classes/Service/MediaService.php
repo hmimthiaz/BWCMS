@@ -11,7 +11,7 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Gregwar\Image\Image;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
-use Bellwether\BWCMSBundle\Entity\ThumbStyle;
+use Bellwether\BWCMSBundle\Entity\ThumbStyleEntity;
 
 class MediaService extends BaseService
 {
@@ -153,7 +153,7 @@ class MediaService extends BaseService
      */
     public function getThumbStyle($thumbSlug, $site = null)
     {
-        $repo = $this->em()->getRepository('BWCMSBundle:ThumbStyle');
+        $repo = $this->em()->getRepository('BWCMSBundle:ThumbStyleEntity');
         $criteria = array(
             'slug' => $thumbSlug,
             'site' => null
@@ -240,7 +240,7 @@ class MediaService extends BaseService
 
     /**
      * @param ContentEntity $contentEntity
-     * @param ThumbStyle $thumbStyle
+     * @param ThumbStyleEntity $thumbStyle
      */
     public function getContentThumbURLWithStyle($contentEntity, $thumbStyle, $scaleFactor = 1.0)
     {

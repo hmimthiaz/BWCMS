@@ -43,6 +43,7 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
             $this->sm()->init();
             $this->tp()->init();
             $this->locale()->init();
+            $this->search()->init();
         }
         $this->loaded = true;
     }

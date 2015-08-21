@@ -41,15 +41,18 @@ class DashboardController extends BaseController implements BackEndControllerInt
     public function indexAction()
     {
 
-        $contentTypes = $this->cm()->getIndexedContentTypes();
-        /**
-         * @var ContentType $type
-         */
-        foreach ($contentTypes as $type) {
-            $fields = $type->getIndexedFields();
-            dump($fields);
+//        $contentTypes = $this->cm()->getIndexedContentTypes();
+//        /**
+//         * @var ContentType $type
+//         */
+//        foreach ($contentTypes as $type) {
+//            $fields = $type->getIndexedFields();
+//            dump($fields);
+//
+//        }
 
-        }
+        dump( $this->search()->getLastIndexedDate());
+        dump( $this->search()->saveLastIndexDate(new \DateTime()));
         exit;
 
 

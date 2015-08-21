@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Bellwether\BWCMSBundle\Entity\ThumbStyle;
+use Bellwether\BWCMSBundle\Entity\ThumbStyleEntity;
 use Bellwether\BWCMSBundle\Form\ThumbStyleType;
 use Symfony\Component\Form\FormError;
 use Bellwether\Common\StringUtility;
@@ -24,7 +24,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
 {
 
     /**
-     * Lists all ThumbStyle entities.
+     * Lists all ThumbStyleEntity entities.
      *
      * @Route("/", name="thumbstyle_home")
      * @Method("GET")
@@ -34,7 +34,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('BWCMSBundle:ThumbStyle')->findAll();
+        $entities = $em->getRepository('BWCMSBundle:ThumbStyleEntity')->findAll();
 
         return array(
             'entities' => $entities,
@@ -42,15 +42,15 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     }
 
     /**
-     * Creates a new ThumbStyle entity.
+     * Creates a new ThumbStyleEntity entity.
      *
      * @Route("/", name="thumbstyle_create")
      * @Method("POST")
-     * @Template("BWCMSBundle:ThumbStyle:new.html.twig")
+     * @Template("BWCMSBundle:ThumbStyleEntity:new.html.twig")
      */
     public function createAction(Request $request)
     {
-        $entity = new ThumbStyle();
+        $entity = new ThumbStyleEntity();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
@@ -68,7 +68,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
                     'site' => $this->sm()->getAdminCurrentSite()->getId()
                 );
                 $em = $this->getDoctrine()->getManager();
-                $existingEntity = $em->getRepository('BWCMSBundle:ThumbStyle')->findOneBy($criteria);
+                $existingEntity = $em->getRepository('BWCMSBundle:ThumbStyleEntity')->findOneBy($criteria);
                 if ($existingEntity != null) {
                     $form->get('slug')->addError(new FormError('Slug already exists'));
                 }
@@ -90,13 +90,13 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     }
 
     /**
-     * Creates a form to create a ThumbStyle entity.
+     * Creates a form to create a ThumbStyleEntity entity.
      *
-     * @param ThumbStyle $entity The entity
+     * @param ThumbStyleEntity $entity The entity
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createCreateForm(ThumbStyle $entity)
+    private function createCreateForm(ThumbStyleEntity $entity)
     {
         $form = $this->createForm(new ThumbStyleType(), $entity, array(
             'action' => $this->generateUrl('thumbstyle_create'),
@@ -109,7 +109,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     }
 
     /**
-     * Displays a form to create a new ThumbStyle entity.
+     * Displays a form to create a new ThumbStyleEntity entity.
      *
      * @Route("/new", name="thumbstyle_new")
      * @Method("GET")
@@ -117,7 +117,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
      */
     public function newAction()
     {
-        $entity = new ThumbStyle();
+        $entity = new ThumbStyleEntity();
         $form = $this->createCreateForm($entity);
 
         return array(
@@ -127,7 +127,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     }
 
     /**
-     * Displays a form to edit an existing ThumbStyle entity.
+     * Displays a form to edit an existing ThumbStyleEntity entity.
      *
      * @Route("/{id}/edit", name="thumbstyle_edit")
      * @Method("GET")
@@ -137,10 +137,10 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('BWCMSBundle:ThumbStyle')->find($id);
+        $entity = $em->getRepository('BWCMSBundle:ThumbStyleEntity')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find ThumbStyle entity.');
+            throw $this->createNotFoundException('Unable to find ThumbStyleEntity entity.');
         }
 
         $editForm = $this->createEditForm($entity);
@@ -152,13 +152,13 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     }
 
     /**
-     * Creates a form to edit a ThumbStyle entity.
+     * Creates a form to edit a ThumbStyleEntity entity.
      *
-     * @param ThumbStyle $entity The entity
+     * @param ThumbStyleEntity $entity The entity
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createEditForm(ThumbStyle $entity)
+    private function createEditForm(ThumbStyleEntity $entity)
     {
         $form = $this->createForm(new ThumbStyleType(), $entity, array(
             'action' => $this->generateUrl('thumbstyle_update', array('id' => $entity->getId())),
@@ -171,20 +171,20 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     }
 
     /**
-     * Edits an existing ThumbStyle entity.
+     * Edits an existing ThumbStyleEntity entity.
      *
      * @Route("/{id}", name="thumbstyle_update")
      * @Method("POST")
-     * @Template("BWCMSBundle:ThumbStyle:edit.html.twig")
+     * @Template("BWCMSBundle:ThumbStyleEntity:edit.html.twig")
      */
     public function updateAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('BWCMSBundle:ThumbStyle')->find($id);
+        $entity = $em->getRepository('BWCMSBundle:ThumbStyleEntity')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find ThumbStyle entity.');
+            throw $this->createNotFoundException('Unable to find ThumbStyleEntity entity.');
         }
 
         $form = $this->createEditForm($entity);
@@ -203,7 +203,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
                 $em = $this->getDoctrine()->getManager();
                 $qb = $em->createQueryBuilder();
                 $queryResult = $qb->select(array('t'))
-                    ->from('BWCMSBundle:ThumbStyle', 't')
+                    ->from('BWCMSBundle:ThumbStyleEntity', 't')
                     ->andWhere(" t.slug = '" . $entity->getSlug() . "'")
                     ->andWhere(" t.site = '" . $this->sm()->getAdminCurrentSite()->getId() . "'")
                     ->andWhere(" t.id != '" . $entity->getId() . "'")

@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\ThumbStyleRepository")
  * @ORM\Table(name="BWThumbStyle")
  */
-class ThumbStyle
+class ThumbStyleEntity
 {
     /**
      * @ORM\Id

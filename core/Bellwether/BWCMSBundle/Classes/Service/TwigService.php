@@ -7,7 +7,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManager;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
-use Bellwether\BWCMSBundle\Entity\ThumbStyle;
+use Bellwether\BWCMSBundle\Entity\ThumbStyleEntity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
@@ -283,7 +283,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     {
         $thumbEntity = $this->mm()->getThumbStyle($thumbSlug, $this->sm()->getCurrentSite());
         if (empty($thumbEntity)) {
-            $thumbEntity = new ThumbStyle();
+            $thumbEntity = new ThumbStyleEntity();
             $thumbEntity->setSite($this->sm()->getCurrentSite());
             $thumbInfo = $this->tp()->getCurrentSkin()->getThumbStyleDefault($thumbSlug);
             if (!is_null($thumbInfo)) {
