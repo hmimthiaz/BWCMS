@@ -20,6 +20,9 @@ services:
   BWCMS.ContentQuery:
     class: Bellwether\BWCMSBundle\Classes\Service\ContentQueryService
     arguments: [@service_container,@request_stack]
+  BWCMS.Search:
+    class: Bellwether\BWCMSBundle\Classes\Service\SearchService
+    arguments: [@service_container,@request_stack]
   BWCMS.Locale:
     class: Bellwether\BWCMSBundle\Classes\Service\LocaleService
     arguments: [@service_container,@request_stack]

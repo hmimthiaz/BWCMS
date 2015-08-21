@@ -15,6 +15,7 @@ use Bellwether\BWCMSBundle\Classes\Service\CacheService;
 use Bellwether\BWCMSBundle\Classes\Service\SiteService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentService;
 use Bellwether\BWCMSBundle\Classes\Service\ContentQueryService;
+use Bellwether\BWCMSBundle\Classes\Service\SearchService;
 use Bellwether\BWCMSBundle\Classes\Service\LocaleService;
 use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
@@ -132,6 +133,14 @@ abstract class BaseController extends Controller
     public function cq()
     {
         return $this->container->get('BWCMS.ContentQuery')->getManager();
+    }
+
+    /**
+     * @return SearchService
+     */
+    public function search()
+    {
+        return $this->container->get('BWCMS.Search')->getManager();
     }
 
     /**

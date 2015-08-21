@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 
 use Bellwether\BWCMSBundle\Entity\Site;
+use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Symfony\Component\Form\Form;
 use AppKernel;
@@ -39,10 +40,19 @@ class DashboardController extends BaseController implements BackEndControllerInt
      */
     public function indexAction()
     {
-//        $this->addSuccessFlash('Success Message');
-//        $this->addInfoFlash('Information Message');
-//        $this->addWarningFlash('Warning Message');
-//        $this->addDangerFlash('Danger');
+
+        $contentTypes = $this->cm()->getIndexedContentTypes();
+        /**
+         * @var ContentType $type
+         */
+        foreach ($contentTypes as $type) {
+            $fields = $type->getIndexedFields();
+            dump($fields);
+
+        }
+        exit;
+
+
         return array();
     }
 

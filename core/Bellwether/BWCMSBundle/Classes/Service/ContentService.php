@@ -133,6 +133,21 @@ class ContentService extends BaseService
         return $this->contentType;
     }
 
+    public function getIndexedContentTypes()
+    {
+        $returnValue = array();
+        $contentTypes = $this->getAllContentTypes();
+        if (!empty($contentTypes)) {
+            foreach ($contentTypes as $key => $type) {
+                if ($type->isIndexed()) {
+                    $returnValue[$key] = $type;
+                }
+            }
+        }
+        return $returnValue;
+    }
+
+
     /**
      * @return array
      */

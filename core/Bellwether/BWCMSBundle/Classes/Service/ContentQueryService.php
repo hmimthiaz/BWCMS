@@ -35,7 +35,7 @@ class ContentQueryService extends BaseService
     }
 
     /**
-     * @return AdminService
+     * @return ContentQueryService
      */
     public function getManager()
     {

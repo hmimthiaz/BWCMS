@@ -32,6 +32,7 @@ class ContentPageType Extends ContentType
         $this->setIsUploadEnabled(false);
 
         $this->setIsSlugEnabled(true);
+        $this->setIsIndexed(true);
         $this->setIsPageBuilderSupported(true);
     }
 

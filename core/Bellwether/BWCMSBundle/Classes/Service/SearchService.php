@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
-class CacheService extends BaseService
+class SearchService extends BaseService
 {
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
@@ -16,7 +16,7 @@ class CacheService extends BaseService
     }
 
     /**
-     * @return CacheService
+     * @return SearchService
      */
     public function getManager()
     {

@@ -115,6 +115,11 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @var bool
      */
+    private $isIndexed = false;
+
+    /**
+     * @var bool
+     */
     private $isPublishDateEnabled = false;
 
     /**
@@ -149,11 +154,12 @@ abstract class ContentType implements ContentTypeInterface
         $this->parentId = $contentId;
     }
 
-    final public function addField($fieldName, $type)
+    final public function addField($fieldName, $type, $isIndexed = false)
     {
         $this->fields[$fieldName] = array(
             'name' => $fieldName,
-            'type' => $type
+            'type' => $type,
+            'isIndexed' => $isIndexed
         );
     }
 
@@ -238,12 +244,12 @@ abstract class ContentType implements ContentTypeInterface
             $this->addField('scope', ContentFieldType::Internal);
             $this->addField('template', ContentFieldType::Internal);
             $this->addField('parent', ContentFieldType::Internal);
-            $this->addField('title', ContentFieldType::Internal);
+            $this->addField('title', ContentFieldType::Internal, $this->isIndexed());
             if ($this->isSummaryEnabled) {
-                $this->addField('summary', ContentFieldType::Internal);
+                $this->addField('summary', ContentFieldType::Internal, $this->isIndexed());
             }
             if ($this->isContentEnabled) {
-                $this->addField('content', ContentFieldType::Internal);
+                $this->addField('content', ContentFieldType::Internal, $this->isIndexed());
             }
             if ($this->isUploadEnabled) {
                 $this->addField('attachment', ContentFieldType::Internal);
@@ -261,6 +267,20 @@ abstract class ContentType implements ContentTypeInterface
             $this->buildFields();
         }
         return $this->fields;
+    }
+
+    final public function getIndexedFields()
+    {
+        $returnVar = array();
+        $fields = $this->getFields();
+        if (!empty($fields)) {
+            foreach ($fields as $fieldInfo) {
+                if ($fieldInfo['isIndexed']) {
+                    $returnVar[] = $fieldInfo['name'];
+                }
+            }
+        }
+        return $returnVar;
     }
 
     final public function addTaxonomyRelation($name, $schema, $isMultiple = true, $required = true)
@@ -849,6 +869,22 @@ abstract class ContentType implements ContentTypeInterface
     public function setIsSortEnabled($isSortEnabled)
     {
         $this->isSortEnabled = $isSortEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIndexed()
+    {
+        return $this->isIndexed;
+    }
+
+    /**
+     * @param boolean $isIndexed
+     */
+    public function setIsIndexed($isIndexed)
+    {
+        $this->isIndexed = $isIndexed;
     }
 
     /**
