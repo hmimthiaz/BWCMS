@@ -23,7 +23,7 @@ class ContentMediaEntity
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="media")
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="media",cascade={"remove"})
      * @ORM\JoinColumn(name="contentId", referencedColumnName="id", nullable=true)
      */
     private $content;

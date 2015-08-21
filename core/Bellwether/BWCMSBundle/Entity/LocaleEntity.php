@@ -5,7 +5,7 @@ namespace Bellwether\BWCMSBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\LocaleEntityRepository")
+ * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\LocaleRepository")
  * @ORM\Table(name="BWLocale")
  */
 class LocaleEntity
@@ -33,7 +33,7 @@ class LocaleEntity
     private $value;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity",cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity",cascade={"remove"})
      * @ORM\JoinColumn(name="siteId", referencedColumnName="id", nullable=false)
      */
     private $site;

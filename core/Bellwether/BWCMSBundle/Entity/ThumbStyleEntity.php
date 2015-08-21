@@ -58,7 +58,7 @@ class ThumbStyleEntity
     private $quality = 80;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity",cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity",cascade={"remove"})
      * @ORM\JoinColumn(name="siteId", referencedColumnName="id", nullable=true)
      */
     private $site;

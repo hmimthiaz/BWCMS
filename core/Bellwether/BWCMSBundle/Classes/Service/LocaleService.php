@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
 use Bellwether\BWCMSBundle\Entity\LocaleEntity;
-use Bellwether\BWCMSBundle\Entity\LocaleEntityRepository;
+use Bellwether\BWCMSBundle\Entity\LocaleRepository;
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
 
 
@@ -97,7 +97,7 @@ class LocaleService extends BaseService
     }
 
     /**
-     * @return LocaleEntityRepository
+     * @return LocaleRepository
      */
     public function getRepository()
     {
