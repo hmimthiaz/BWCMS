@@ -134,7 +134,7 @@
     {% endif %}
 
     <script language="JavaScript">
-        var createURL = '{{ url('content_create') }}';
+        var createURL = '{{ url('_bwcms_admin_content_create') }}';
         var sortStartPosition, sortEndPosition = 0;
         var ajaxRequestActive = false;
         var contentTable = null;
@@ -200,7 +200,7 @@
             }
             var request = $.ajax({
                 method: "POST",
-                url: "{{ url('content_paste') }}",
+                url: "{{ url('_bwcms_admin_content_paste') }}",
                 data: {
                     contentIds: contentIds,
                     targetId: currentFolderId,
@@ -240,7 +240,7 @@
             var contentIds = selectedIds.join(',');
             var request = $.ajax({
                 method: "POST",
-                url: "{{ url('content_delete') }}",
+                url: "{{ url('_bwcms_admin_content_delete') }}",
                 data: {
                     contentIds: contentIds,
                     targetId: currentFolderId,
@@ -273,7 +273,7 @@
                 drag: true,
                 select: true,
                 ajax: {
-                    url: "{{ url('content_table_data') }}",
+                    url: "{{ url('_bwcms_admin_content_table_data') }}",
                     type: 'GET',
                     'data': function (params) {
                         params.type = '{{ type }}';
@@ -317,7 +317,7 @@
                 ],
                 fnDrawCallback: function (oSettings) {
                     $('#contentTable button.edit').click(function (e) {
-                        var editURL = '{{ url('content_edit') }}';
+                        var editURL = '{{ url('_bwcms_admin_content_edit') }}';
                         var contentId = $(this).parents('tr').attr('id');
                         window.location = editURL + '?contentId=' + contentId;
                         e.preventDefault();
@@ -342,7 +342,7 @@
                     $('#contentTable button.remove').click(function (e) {
                         var contentId = $(this).parents('tr').attr('id');
                         bootbox.confirm("Do you want to delete the selected item?", function (result) {
-                            var request = $.post("{{ url('content_delete') }}", {
+                            var request = $.post("{{ url('_bwcms_admin_content_delete') }}", {
                                 contentId: contentId
                             });
                             request.done(function (data) {
@@ -420,7 +420,7 @@
                             var contentId = ui.item.first().attr('id');
                             var request = $.ajax({
                                 method: "POST",
-                                url: "{{ url('content_sort') }}",
+                                url: "{{ url('_bwcms_admin_content_sort') }}",
                                 data: {start: sortStartPosition, end: sortEndPosition, contentId: contentId},
                                 beforeSend: function () {
                                     ajaxRequestActive = true;
@@ -451,7 +451,7 @@
             var previewTemplate = previewNode.innerHTML;
             $('#fileUploaderTemplate').remove();
             var myDropZone = new Dropzone('div#uploadModel', {
-                url: "{{ url('content_media_upload') }}",
+                url: "{{ url('_bwcms_admin_content_media_upload') }}",
                 thumbnailWidth: 100,
                 thumbnailHeight: 100,
                 parallelUploads: 3,
@@ -496,7 +496,7 @@
                             }
                             var request = $.ajax({
                                 method: "POST",
-                                url: "{{ url('content_folder_move') }}",
+                                url: "{{ url('_bwcms_admin_content_folder_move') }}",
                                 data: {contentId: node.id, targetId: node_parent.id},
                                 beforeSend: function () {
                                     ajaxRequestActive = true;

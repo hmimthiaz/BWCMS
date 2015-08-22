@@ -229,10 +229,7 @@ class ContentService extends BaseService
         if ($parentContent != null) {
             $parentId = $parentContent->getId();
         }
-        if ($content->getFile() != null) {
-            $newFile = $this->mm()->cloneMedia($content->getFile());
-            $newContent->setFile($newFile);
-        }
+
         $existingSlug = $newContent->getSlug();
         $newSlug = $this->generateSlug($newContent->getTitle(), $newContent->getType(), $parentId);
         if ($newSlug != $existingSlug) {
@@ -242,6 +239,16 @@ class ContentService extends BaseService
         }
 
         $this->em()->persist($newContent);
+
+        $existingMedia = $content->getMedia();
+        if (!empty($existingMedia)) {
+            foreach ($existingMedia as $media) {
+                $newMedia = clone $media;
+                $newMedia->setContent($newContent);
+                $newContent->addMedia($newMedia);
+                $this->em()->persist($newMedia);
+            }
+        }
 
         $existingRelation = $content->getRelation();
         if (!empty($existingRelation)) {

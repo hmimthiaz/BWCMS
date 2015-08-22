@@ -12,7 +12,7 @@ tinymce.init({
     toolbar: "bold italic | styleselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table hr | code ",
     file_browser_callback_types: 'image',
     file_browser_callback   : function(field_name, url, type, win) {
-        var cmsURL  = '{{ path('editor_image_browser') }}?field=' + field_name + '&imageURL=' + encodeURIComponent(url);
+        var cmsURL  = '{{ path('_bwcms_admin_editor_image_browser') }}?field=' + field_name + '&imageURL=' + encodeURIComponent(url);
         tinymce.activeEditor.windowManager.open({
             file : cmsURL,
             title           : 'Select an Image',

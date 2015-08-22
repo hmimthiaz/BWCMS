@@ -49,7 +49,7 @@
                             }
                             var request = $.ajax({
                                 method: "POST",
-                                url: "{{ url('content_folder_move') }}",
+                                url: "{{ url('_bwcms_admin_content_folder_move') }}",
                                 data: {contentId: node.id, targetId: node_parent.id},
                                 beforeSend: function () {
                                     ajaxRequestActive = true;
@@ -93,7 +93,7 @@
                                             return false;
                                         },
                                         "action": function () {
-                                            window.location = '{{ url('content_create') }}' + '?parent=' + node.id + '&type={{ type.type }}&schema={{ type.schema }}&scope={{ scope }}';
+                                            window.location = '{{ url('_bwcms_admin_content_create') }}' + '?parent=' + node.id + '&type={{ type.type }}&schema={{ type.schema }}&scope={{ scope }}';
                                             return false;
                                         }
                                     },
@@ -106,7 +106,7 @@
                                 "label": "Edit",
                                 "icon": "glyphicon glyphicon-pencil",
                                 "action": function () {
-                                    window.location = '{{ url('content_edit') }}' + '?contentId=' + node.id;
+                                    window.location = '{{ url('_bwcms_admin_content_edit') }}' + '?contentId=' + node.id;
                                     return false;
                                 },
                                 "_disabled": function () {
@@ -128,7 +128,7 @@
                                 {#"label": "Add",#}
                                 {#"icon": "glyphicon glyphicon-plus",#}
                                 {#"action": function () {#}
-                                    {#window.location = '{{ url('content_create') }}' + '?parent=' + node.id + '&type={{ type }}&schema={{ schema }}';#}
+                                    {#window.location = '{{ url('_bwcms_admin_content_create') }}' + '?parent=' + node.id + '&type={{ type }}&schema={{ schema }}';#}
                                     {#return false;#}
                                 {#},#}
                                 {#"_disabled": function () {#}
@@ -141,7 +141,7 @@
                                 {#"label": "Edit",#}
                                 {#"icon": "glyphicon glyphicon-pencil",#}
                                 {#"action": function () {#}
-                                    {#window.location = '{{ url('content_edit') }}' + '?contentId=' + node.id;#}
+                                    {#window.location = '{{ url('_bwcms_admin_content_edit') }}' + '?contentId=' + node.id;#}
                                     {#return false;#}
                                 {#},#}
                                 {#"_disabled": function () {#}

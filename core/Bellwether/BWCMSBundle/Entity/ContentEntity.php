@@ -775,7 +775,7 @@ class ContentEntity
      */
     public function addMedia(ContentMediaEntity $meta)
     {
-        $this->meta->add($meta);
+        $this->media->add($meta);
         return $this;
     }
 
@@ -785,7 +785,7 @@ class ContentEntity
      */
     public function removeMedia(ContentMediaEntity $meta)
     {
-        $this->meta->removeElement($meta);
+        $this->media->removeElement($meta);
         return $this;
     }
 

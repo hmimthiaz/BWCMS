@@ -229,7 +229,7 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $parents = array_reverse($parents);
                 foreach ($parents as $parent) {
                     if ($parent->getScope() == ContentScopeType::CPublic) {
-                        return $this->redirect($this->generateUrl('content_pb', array('contentId' => $parent->getId())));
+                        return $this->redirect($this->generateUrl('_bwcms_admin_content_pb', array('contentId' => $parent->getId())));
                     }
                 }
                 return $this->returnErrorResponse();
@@ -240,9 +240,9 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $parentId = $contentEntity->getTreeParent()->getId();
             }
             if ($class->isTaxonomy()) {
-                return $this->redirect($this->generateUrl('taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
+                return $this->redirect($this->generateUrl('_bwcms_admin_taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
             }
-            return $this->redirect($this->generateUrl('content_home', array('type' => $type, 'parent' => $parentId)));
+            return $this->redirect($this->generateUrl('_bwcms_admin_content_home', array('type' => $type, 'parent' => $parentId)));
         }
 
         return array(
@@ -650,15 +650,13 @@ class ContentController extends BaseController implements BackEndControllerInter
                 }
                 $ca['pbLink'] = '';
                 if ($contentClass->isPageBuilderSupported()) {
-                    $ca['pbLink'] = $this->generateUrl('content_pb', array('contentId' => $content->getId()));
+                    $ca['pbLink'] = $this->generateUrl('_bwcms_admin_content_pb', array('contentId' => $content->getId()));
                 }
                 $ca['download'] = '';
                 if ($this->mm()->isMedia($content)) {
                     $ca['imageURL'] = $this->generateUrl('media_image_view', array('contentId' => $content->getId(), 'siteSlug' => $currentSite->getSlug()));
                     $ca['imageURL'] = str_ireplace('/app_dev.php','',$ca['imageURL']);
-                }
-                if ($imageURL) {
-                    $ca['download'] = $this->generateUrl('content_media_download', array('contentId' => $content->getId()));
+                    $ca['download'] = $this->generateUrl('_bwcms_admin_content_media_download', array('contentId' => $content->getId()));
                 }
                 if ($this->mm()->isImage($content)) {
                     $imageThumb = $this->mm()->getContentThumbURL($content, 800, 800);
@@ -856,14 +854,15 @@ class ContentController extends BaseController implements BackEndControllerInter
         if ($content == null) {
             return new Response('Content not available', 500);
         }
-        $downloadFile = $this->mm()->getFilePath($content->getFile(), true);
+        $media = $content->getMedia()->first();
+        $downloadFile = $this->mm()->checkAndCreateMediaCacheFile($media);
 
         $response = new BinaryFileResponse($downloadFile);
         $response->trustXSendfileTypeHeader();
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $content->getFile(),
-            iconv('UTF-8', 'ASCII//TRANSLIT', $content->getFile())
+            $media->getFile(),
+            iconv('UTF-8', 'ASCII//TRANSLIT', $media->getFile())
         );
 
         return $response;

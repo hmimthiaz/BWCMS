@@ -235,7 +235,7 @@ abstract class ContentType implements ContentTypeInterface
             $this->setDefaultFormFields($isEditMode);
             $this->buildForm();
             $this->setDefaultHiddenFormFields($isEditMode);
-            $this->fb()->setAction($this->generateUrl('content_save'));
+            $this->fb()->setAction($this->generateUrl('_bwcms_admin_content_save'));
             $this->fb()->setMethod('POST');
             $this->form = $this->fb()->getForm();
         }
