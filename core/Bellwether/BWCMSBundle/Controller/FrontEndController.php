@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
+use Symfony\Component\HttpFoundation\Request;
 
 class FrontEndController extends BaseController implements FrontEndControllerInterface
 {
@@ -67,6 +68,21 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
         );
         $template = $this->getContentTemplate($pageEntity);
         return $this->render($template, $templateVariables);
+    }
+
+    public function searchAction(Request $request, $siteSlug)
+    {
+        $searchString = $request->query->get('query');
+        if (!empty($searchString)) {
+            $searchString = filter_var($searchString, FILTER_SANITIZE_STRING);
+        }
+
+        $searchWords = explode(' ',$searchString);
+
+        dump($searchString);
+        exit;
+
+
     }
 
     public function mediaViewAction($siteSlug, $contentId)
