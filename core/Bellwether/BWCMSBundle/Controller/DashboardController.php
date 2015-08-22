@@ -40,20 +40,8 @@ class DashboardController extends BaseController implements BackEndControllerInt
      */
     public function indexAction()
     {
-
-//        $contentTypes = $this->cm()->getIndexedContentTypes();
-//        /**
-//         * @var ContentType $type
-//         */
-//        foreach ($contentTypes as $type) {
-//            $fields = $type->getIndexedFields();
-//            dump($fields);
-//
-//        }
-
-        dump( $this->search()->runIndex());
-        exit;
-
+        //For now run index here..
+        $this->search()->runIndex();
 
         return array();
     }

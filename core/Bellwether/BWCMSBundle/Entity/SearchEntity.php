@@ -3,7 +3,7 @@ namespace Bellwether\BWCMSBundle\Entity;
 use Doctrine\ORM\Mapping AS ORM;
 
 /**
- * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\SearchEntityRepository")
+ * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\SearchRepository")
  * @ORM\Table(name="BWSearch")
  */
 class SearchEntity
