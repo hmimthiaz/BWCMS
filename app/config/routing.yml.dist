@@ -1,8 +1,11 @@
+bwcms_dynamic:
+    resource: .
+    type: dynamic
+
+
+
 bwcms:
     resource: "@BWCMSBundle/Controller/"
     type:     annotation
     prefix:   /
 
-bwcms_dynamic:
-    resource: .
-    type: dynamic
