@@ -163,6 +163,14 @@ abstract class ContentType implements ContentTypeInterface
         );
     }
 
+    final public function getFieldType($fieldName)
+    {
+        if (!isset($this->fields[$fieldName])) {
+            return null;
+        }
+        return $this->fields[$fieldName]['type'];
+    }
+
     abstract protected function buildFields();
 
     abstract protected function buildForm($isEditMode = false);
@@ -387,6 +395,11 @@ abstract class ContentType implements ContentTypeInterface
     public function loadCustomField($fieldName, $fieldValue)
     {
         return $fieldValue;
+    }
+
+    public function getSearchTextForField($fieldName, $fieldValue)
+    {
+        return '';
     }
 
 

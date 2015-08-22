@@ -760,6 +760,10 @@ class ContentService extends BaseService
                 $this->em()->remove($relation);
             }
         }
+        $searchEntity = $this->search()->searchIndexEntity($content);
+        if (!empty($searchEntity)) {
+            $this->em()->remove($searchEntity);
+        }
         $contentClass = $this->getContentClass($content->getType(), $content->getSchema());
         if ($contentClass->isTaxonomy()) {
             $taxonomyRelations = $this->em()->getRepository('BWCMSBundle:ContentRelationEntity')->findBy(array("relatedContent" => $content));

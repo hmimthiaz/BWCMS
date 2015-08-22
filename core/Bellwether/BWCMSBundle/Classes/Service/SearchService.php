@@ -11,6 +11,7 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\SearchEntity;
 use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
 use Bellwether\BWCMSBundle\Classes\Content\ContentType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 
 
@@ -54,6 +55,7 @@ class SearchService extends BaseService
         $contentRepository = $this->cm()->getContentRepository();
         $qb = $contentRepository->createQueryBuilder('node');
         $qb->add('orderBy', 'node.modifiedDate ASC');
+        $qb->add('orderBy', 'node.createdDate ASC');
         /**
          * @var ContentType $contentType
          */
@@ -64,23 +66,44 @@ class SearchService extends BaseService
         if (!empty($condition)) {
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
-        $qb->andWhere($qb->expr()->gt('node.modifiedDate', ':date_modified'));
+
+        $qb->andWhere(
+            $qb->expr()->orX(
+                $qb->expr()->andX(
+                    $qb->expr()->isNull('node.modifiedDate'),
+                    $qb->expr()->gt('node.createdDate', ':date_modified')),
+                $qb->expr()->gt('node.modifiedDate', ':date_modified'))
+        );
+
         $qb->setParameter('date_modified', $this->getLastIndexedDate(), \Doctrine\DBAL\Types\Type::DATETIME);
         $qb->setFirstResult(0);
-        $qb->setMaxResults(5);
+        $qb->setMaxResults(10);
         $result = $qb->getQuery()->getResult();
         $lastContentModifiedDate = new \DateTime();
-
         if (!empty($result)) {
             /**
              * @var ContentEntity $content
              */
             foreach ($result as $content) {
+                print "Indexing: {" . $content->getId() . "} - " . $content->getTitle() . "\n";
                 $this->indexContent($content);
-                $lastContentModifiedDate = $content->getModifiedDate();
+            }
+            $lastContentModifiedDate = $content->getModifiedDate();
+            if (empty($lastContentModifiedDate)) {
+                $lastContentModifiedDate = $content->getCreatedDate();
             }
         }
         $this->saveLastIndexDate($lastContentModifiedDate);
+    }
+
+    public function dropSearchIndex()
+    {
+        $connection = $this->em()->getConnection();
+        $platform = $connection->getDatabasePlatform();
+        print "Emptying search index.\n";
+        $connection->executeUpdate($platform->getTruncateTableSQL('BWSearch', false));
+        print "Emptying search last search date.\n";
+        $this->saveLastIndexDate(new \DateTime('@0'));
     }
 
     public function indexContent(ContentEntity $content = null)
@@ -109,7 +132,12 @@ class SearchService extends BaseService
             $metaFields = $this->cm()->getContentAllMeta($content);
             foreach ($indexMetaFields as $field) {
                 if (isset($metaFields[$field])) {
-                    $indexText = $indexText . ' ' . $metaFields[$field];
+                    $fieldType = $contentClass->getFieldType($field);
+                    if ($fieldType == ContentFieldType::String) {
+                        $indexText = $indexText . ' ' . $metaFields[$field];
+                    } else {
+                        $indexText = $indexText . ' ' . $contentClass->getSearchTextForField($field, $metaFields[$field]);
+                    }
                 }
             }
         }
@@ -134,7 +162,7 @@ class SearchService extends BaseService
         return true;
     }
 
-    private function searchIndexEntity(ContentEntity $content)
+    public function searchIndexEntity(ContentEntity $content)
     {
         $criteria = array(
             'site' => $content->getSite(),

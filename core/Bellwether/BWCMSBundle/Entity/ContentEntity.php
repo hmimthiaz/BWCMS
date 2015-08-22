@@ -199,7 +199,7 @@ class ContentEntity
     private $lastModifiedAuthor;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity",cascade={"remove"})
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity")
      * @ORM\JoinColumn(name="siteId", referencedColumnName="id", nullable=false)
      */
     private $site;

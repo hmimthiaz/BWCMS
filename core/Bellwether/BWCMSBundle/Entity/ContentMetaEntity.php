@@ -38,7 +38,7 @@ class ContentMetaEntity
     private $fieldType;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="meta",cascade={"remove"})
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="meta")
      * @ORM\JoinColumn(name="contentId", referencedColumnName="id", nullable=false)
      */
     private $content;

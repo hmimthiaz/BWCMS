@@ -40,9 +40,6 @@ class DashboardController extends BaseController implements BackEndControllerInt
      */
     public function indexAction()
     {
-        //For now run index here..
-        $this->search()->runIndex();
-
         return array();
     }
 

@@ -26,13 +26,13 @@ class SearchEntity
     private $indexedDate;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity",cascade={"remove"})
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity")
      * @ORM\JoinColumn(name="siteId", referencedColumnName="id", nullable=false)
      */
     private $site;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", cascade={"remove"})
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity")
      * @ORM\JoinColumn(name="contentId", referencedColumnName="id", nullable=false)
      */
     private $content;

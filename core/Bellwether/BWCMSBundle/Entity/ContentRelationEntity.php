@@ -27,7 +27,7 @@ class ContentRelationEntity
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="relation",cascade={"remove"})
+     * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="relation")
      * @ORM\JoinColumn(name="contentId", referencedColumnName="id", nullable=false)
      */
     private $content;
