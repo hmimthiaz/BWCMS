@@ -26,7 +26,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     /**
      * Lists all ThumbStyleEntity entities.
      *
-     * @Route("/", name="thumbstyle_home")
+     * @Route("/", name="_bwcms_admin_thumbstyle_home")
      * @Method("GET")
      * @Template()
      */
@@ -44,7 +44,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     /**
      * Creates a new ThumbStyleEntity entity.
      *
-     * @Route("/", name="thumbstyle_create")
+     * @Route("/", name="_bwcms_admin_thumbstyle_create")
      * @Method("POST")
      * @Template("BWCMSBundle:ThumbStyleEntity:new.html.twig")
      */
@@ -111,7 +111,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     /**
      * Displays a form to create a new ThumbStyleEntity entity.
      *
-     * @Route("/new", name="thumbstyle_new")
+     * @Route("/new", name="_bwcms_admin_thumbstyle_new")
      * @Method("GET")
      * @Template()
      */
@@ -129,7 +129,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     /**
      * Displays a form to edit an existing ThumbStyleEntity entity.
      *
-     * @Route("/{id}/edit", name="thumbstyle_edit")
+     * @Route("/{id}/edit", name="_bwcms_admin_thumbstyle_edit")
      * @Method("GET")
      * @Template()
      */
@@ -173,7 +173,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     /**
      * Edits an existing ThumbStyleEntity entity.
      *
-     * @Route("/{id}", name="thumbstyle_update")
+     * @Route("/{id}", name="_bwcms_admin_thumbstyle_update")
      * @Method("POST")
      * @Template("BWCMSBundle:ThumbStyleEntity:edit.html.twig")
      */

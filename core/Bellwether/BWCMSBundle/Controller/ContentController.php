@@ -29,7 +29,7 @@ use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 class ContentController extends BaseController implements BackEndControllerInterface
 {
     /**
-     * @Route("/{type}/index.php",name="content_home")
+     * @Route("/{type}/index.php",name="_bwcms_admin_content_home")
      * @Template()
      */
     public function indexAction(Request $request)
@@ -54,7 +54,7 @@ class ContentController extends BaseController implements BackEndControllerInter
     }
 
     /**
-     * @Route("/create.php",name="content_create")
+     * @Route("/create.php",name="_bwcms_admin_content_create")
      * @Template("BWCMSBundle:Content:save.html.twig")
      */
     public function createAction(Request $request)
@@ -88,7 +88,7 @@ class ContentController extends BaseController implements BackEndControllerInter
     }
 
     /**
-     * @Route("/edit.php",name="content_edit")
+     * @Route("/edit.php",name="_bwcms_admin_content_edit")
      * @Template("BWCMSBundle:Content:save.html.twig")
      */
     public function editAction(Request $request)
@@ -118,7 +118,7 @@ class ContentController extends BaseController implements BackEndControllerInter
 
 
     /**
-     * @Route("/pb.php",name="content_pb")
+     * @Route("/pb.php",name="_bwcms_admin_content_pb")
      * @Template()
      */
     public function pageBuilderAction(Request $request)
@@ -189,7 +189,7 @@ class ContentController extends BaseController implements BackEndControllerInter
     }
 
     /**
-     * @Route("/save.php",name="content_save")
+     * @Route("/save.php",name="_bwcms_admin_content_save")
      * @Method({"POST"})
      * @Template("BWCMSBundle:Content:save.html.twig")
      */
@@ -314,7 +314,7 @@ class ContentController extends BaseController implements BackEndControllerInter
     }
 
     /**
-     * @Route("/taxonomy.php",name="taxonomy_home")
+     * @Route("/taxonomy.php",name="_bwcms_admin_taxonomy_home")
      * @Template()
      */
     public function taxonomyAction(Request $request)
@@ -367,7 +367,7 @@ class ContentController extends BaseController implements BackEndControllerInter
     }
 
     /**
-     * @Route("/browser.php",name="content_browser")
+     * @Route("/browser.php",name="_bwcms_admin_content_browser")
      * @Template()
      */
     public function browserAction(Request $request)
@@ -463,7 +463,7 @@ class ContentController extends BaseController implements BackEndControllerInter
 
 
     /**
-     * @Route("/upload.php",name="content_media_upload")
+     * @Route("/upload.php",name="_bwcms_admin_content_media_upload")
      * @Method({"POST"})
      */
     public function uploadAction(Request $request)
@@ -522,7 +522,7 @@ class ContentController extends BaseController implements BackEndControllerInter
     }
 
     /**
-     * @Route("/data.php",name="content_table_data")
+     * @Route("/data.php",name="_bwcms_admin_content_table_data")
      * @Method({"GET"})
      */
     public function indexDataAction(Request $request)
@@ -679,7 +679,7 @@ class ContentController extends BaseController implements BackEndControllerInter
     }
 
     /**
-     * @Route("/folder-move.php",name="content_folder_move")
+     * @Route("/folder-move.php",name="_bwcms_admin_content_folder_move")
      * @Method({"POST"})
      */
     public function folderMoveAction(Request $request)
@@ -712,7 +712,7 @@ class ContentController extends BaseController implements BackEndControllerInter
     }
 
     /**
-     * @Route("/paste.php",name="content_paste")
+     * @Route("/paste.php",name="_bwcms_admin_content_paste")
      * @Method({"POST"})
      */
     public function pasteAction(Request $request)
@@ -772,7 +772,7 @@ class ContentController extends BaseController implements BackEndControllerInter
     }
 
     /**
-     * @Route("/delete.php",name="content_delete")
+     * @Route("/delete.php",name="_bwcms_admin_content_delete")
      * @Method({"GET", "POST"})
      */
     public function deleteAction(Request $request)
@@ -813,7 +813,7 @@ class ContentController extends BaseController implements BackEndControllerInter
 
 
     /**
-     * @Route("/sort.php",name="content_sort")
+     * @Route("/sort.php",name="_bwcms_admin_content_sort")
      * @Method({"POST"})
      */
     public function sortAction(Request $request)
@@ -841,7 +841,7 @@ class ContentController extends BaseController implements BackEndControllerInter
 
 
     /**
-     * @Route("/download.php",name="content_media_download")
+     * @Route("/download.php",name="_bwcms_admin_content_media_download")
      * @Method({"GET"})
      */
     public function downloadAction(Request $request)

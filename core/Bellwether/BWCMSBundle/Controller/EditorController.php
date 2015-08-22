@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 class EditorController extends BaseController implements BackEndControllerInterface
 {
     /**
-     * @Route("/init.js",name="editor_init")
+     * @Route("/init.js",name="_bwcms_admin_editor_init")
      * @Template()
      */
     public function initAction(Request $request)
@@ -32,7 +32,7 @@ class EditorController extends BaseController implements BackEndControllerInterf
     }
 
     /**
-     * @Route("/browser.php",name="editor_image_browser")
+     * @Route("/browser.php",name="_bwcms_admin_editor_image_browser")
      * @Template()
      */
     public function imageBrowserAction(Request $request)

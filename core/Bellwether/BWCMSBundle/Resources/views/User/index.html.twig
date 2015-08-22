@@ -2,7 +2,7 @@
 
 {% block title %}User Manager{% endblock %}
 {% block pageTitle %}
-    <h1>User Manager <a href="{{ path('user_create') }}" class="btn btn-info" role="button">Add User</a></h1>
+    <h1>User Manager <a href="{{ path('_bwcms_admin_user_create') }}" class="btn btn-info" role="button">Add User</a></h1>
 {% endblock %}
 
 {% block body %}
@@ -30,14 +30,14 @@
                     <td>
                         <div class="btn-group">
                             {% if is_granted('ROLE_ALLOWED_TO_SWITCH') %}
-                            <a class="btn btn-default btn-sm" href="{{ path('dashboard_home', {'_switch_user': entity.username}) }}">
+                            <a class="btn btn-default btn-sm" href="{{ path('_bwcms_admin_dashboard_home', {'_switch_user': entity.username}) }}">
                             <i class="fa fa-file"></i> Switch
                             </a>
                             {% endif %}
-                            <a class="btn btn-default btn-sm" href="{{ path('user_edit', {'id': entity.id}) }}">
+                            <a class="btn btn-default btn-sm" href="{{ path('_bwcms_admin_user_edit', {'id': entity.id}) }}">
                                 <i class="fa fa-edit"></i> {{ 'edit'|trans({}, 'admin') }}
                             </a>
-                            <a class="btn btn-default btn-sm" href="{{ path('user_reset_password', {'id': entity.id}) }}">
+                            <a class="btn btn-default btn-sm" href="{{ path('_bwcms_admin_user_reset_password', {'id': entity.id}) }}">
                                 <i class="fa fa-repeat"></i> Reset Password
                             </a>
                         </div>

@@ -24,7 +24,7 @@ class SiteController extends BaseController  implements BackEndControllerInterfa
     /**
      * Lists all SiteEntity entities.
      *
-     * @Route("/index.php", name="site_home")
+     * @Route("/index.php", name="_bwcms_admin_site_home")
      * @Method("GET")
      * @Template()
      */
@@ -40,7 +40,7 @@ class SiteController extends BaseController  implements BackEndControllerInterfa
     /**
      * Lists all SiteEntity entities.
      *
-     * @Route("/change.php", name="site_change_current")
+     * @Route("/change.php", name="_bwcms_admin_site_change_current")
      * @Method("GET")
      * @Template()
      */
@@ -53,13 +53,13 @@ class SiteController extends BaseController  implements BackEndControllerInterfa
                 $this->sm()->setAdminCurrentSite($siteEntity->getId());
             }
         }
-        return $this->redirect($this->generateUrl('dashboard_home'));
+        return $this->redirect($this->generateUrl('_bwcms_admin_dashboard_home'));
     }
 
     /**
      * Displays a form to create a new SiteEntity entity.
      *
-     * @Route("/new.php", name="site_new")
+     * @Route("/new.php", name="_bwcms_admin_site_new")
      * @Method("GET")
      * @Template()
      */
@@ -77,7 +77,7 @@ class SiteController extends BaseController  implements BackEndControllerInterfa
     /**
      * Creates a new SiteEntity entity.
      *
-     * @Route("/create.php", name="site_create")
+     * @Route("/create.php", name="_bwcms_admin_site_create")
      * @Method("POST")
      * @Template("BWCMSBundle:Site:new.html.twig")
      */
@@ -92,7 +92,7 @@ class SiteController extends BaseController  implements BackEndControllerInterfa
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('site_home'));
+            return $this->redirect($this->generateUrl('_bwcms_admin_site_home'));
         }
 
         return array(
@@ -111,7 +111,7 @@ class SiteController extends BaseController  implements BackEndControllerInterfa
     private function createCreateForm(SiteEntity $entity)
     {
         $form = $this->createForm(new SiteEntityType($this->tp()), $entity, array(
-            'action' => $this->generateUrl('site_create'),
+            'action' => $this->generateUrl('_bwcms_admin_site_create'),
             'method' => 'POST',
         ));
 
@@ -124,7 +124,7 @@ class SiteController extends BaseController  implements BackEndControllerInterfa
     /**
      * Displays a form to edit an existing SiteEntity entity.
      *
-     * @Route("/{id}/edit.php", name="site_edit")
+     * @Route("/{id}/edit.php", name="_bwcms_admin_site_edit")
      * @Method("GET")
      * @Template()
      */
@@ -149,7 +149,7 @@ class SiteController extends BaseController  implements BackEndControllerInterfa
     /**
      * Edits an existing SiteEntity entity.
      *
-     * @Route("/{id}/update.php", name="site_update")
+     * @Route("/{id}/update.php", name="_bwcms_admin_site_update")
      * @Method("POST")
      * @Template("BWCMSBundle:Site:edit.html.twig")
      */
@@ -169,7 +169,7 @@ class SiteController extends BaseController  implements BackEndControllerInterfa
         if ($editForm->isValid()) {
             $em->flush();
 
-            return $this->redirect($this->generateUrl('site_home', array('id' => $id)));
+            return $this->redirect($this->generateUrl('_bwcms_admin_site_home', array('id' => $id)));
         }
 
         return array(
@@ -188,7 +188,7 @@ class SiteController extends BaseController  implements BackEndControllerInterfa
     private function createEditForm(SiteEntity $entity)
     {
         $form = $this->createForm(new SiteEntityType($this->tp()), $entity, array(
-            'action' => $this->generateUrl('site_update', array('id' => $entity->getId())),
+            'action' => $this->generateUrl('_bwcms_admin_site_update', array('id' => $entity->getId())),
             'method' => 'POST',
         ));
 

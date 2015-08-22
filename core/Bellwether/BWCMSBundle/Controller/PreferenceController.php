@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 class PreferenceController extends BaseController  implements BackEndControllerInterface
 {
     /**
-     * @Route("/{type}/index.php",name="preference_page")
+     * @Route("/{type}/index.php",name="_bwcms_admin_preference_page")
      * @Template("BWCMSBundle:Preference:save.html.twig")
      */
     public function loadAction($type)
@@ -34,7 +34,7 @@ class PreferenceController extends BaseController  implements BackEndControllerI
     }
 
     /**
-     * @Route("/{type}/save.php",name="preference_save_page")
+     * @Route("/{type}/save.php",name="_bwcms_admin_preference_save_page")
      * @Method({"POST"})
      * @Template("BWCMSBundle:Preference:save.html.twig")
      */

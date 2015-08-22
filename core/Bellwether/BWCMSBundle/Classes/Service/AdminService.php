@@ -98,7 +98,7 @@ class AdminService extends BaseService
                  * @var \Knp\Menu\MenuItem $siteMenu
                  */
                 $siteMenu = $menu['Site']->addChild($siteInfo->getName(), array(
-                    'route' => 'site_change_current',
+                    'route' => '_bwcms_admin_site_change_current',
                     'routeParameters' => array('siteId' => $siteInfo->getId())
                 ));
                 if ($currentSite->getId() == $siteInfo->getId()) {
@@ -112,11 +112,11 @@ class AdminService extends BaseService
             $displayName = $this->getUser()->getEmail();
         }
         $menu->addChild('Profile', array('uri' => '#', 'label' => $displayName))->setAttribute('dropdown', true);
-        $menu['Profile']->addChild('Profile', array('route' => 'user_profile'));
-        $menu['Profile']->addChild('Change Password', array('route' => 'user_change_password'));
+        $menu['Profile']->addChild('Profile', array('route' => '_bwcms_admin_user_profile'));
+        $menu['Profile']->addChild('Change Password', array('route' => '_bwcms_admin_user_change_password'));
         if ($this->getSecurityContext()->isGranted('ROLE_PREVIOUS_ADMIN')) {
             $menu['Profile']->addChild('Exit User', array(
-                'route' => 'user_home',
+                'route' => '_bwcms_admin_user_home',
                 'routeParameters' => array('_switch_user' => '_exit')
             ));
         }
@@ -128,13 +128,13 @@ class AdminService extends BaseService
     public function buildLeftMainMenu(Request $request)
     {
         $menu = $this->factory->createItem('root');
-        $menu->addChild('Dashboard', array('route' => 'dashboard_home'));
+        $menu->addChild('Dashboard', array('route' => '_bwcms_admin_dashboard_home'));
 
         $menu->addChild('Manage', array('uri' => '#', 'label' => 'Manage'))->setAttribute('dropdown', true);
 
         if (count($this->cm()->getRegisteredContentTypes('Content')) > 0) {
             $menu['Manage']->addChild('Content', array(
-                'route' => 'content_home',
+                'route' => '_bwcms_admin_content_home',
                 'routeParameters' => array(
                     'type' => 'content'
                 )
@@ -143,7 +143,7 @@ class AdminService extends BaseService
 
         if (count($this->cm()->getRegisteredContentTypes('Media')) > 0) {
             $menu['Manage']->addChild('Media', array(
-                'route' => 'content_home',
+                'route' => '_bwcms_admin_content_home',
                 'routeParameters' => array(
                     'type' => 'media'
                 )
@@ -152,7 +152,7 @@ class AdminService extends BaseService
 
         if (count($this->cm()->getRegisteredContentTypes('Navigation')) > 0) {
             $menu['Manage']->addChild('Navigation', array(
-                'route' => 'content_home',
+                'route' => '_bwcms_admin_content_home',
                 'routeParameters' => array(
                     'type' => 'navigation'
                 )
@@ -161,14 +161,14 @@ class AdminService extends BaseService
 
         if (count($this->cm()->getRegisteredContentTypes('Widget')) > 0) {
             $menu['Manage']->addChild('Widget', array(
-                'route' => 'content_home',
+                'route' => '_bwcms_admin_content_home',
                 'routeParameters' => array(
                     'type' => 'widget'
                 )
             ));
         }
 
-        $menu['Manage']->addChild('-ct-', array('uri' => '#'))->setAttribute('divider', true);
+        $menu['Manage']->addChild('-ctc-', array('uri' => '#'))->setAttribute('divider', true);
 
 
         $registeredOptionTypes = $this->pref()->getRegisteredOptionTypes();
@@ -177,7 +177,7 @@ class AdminService extends BaseService
             $classInstance = $optionType['class'];
             if ($classInstance->isPagePreference()) {
                 $menu['Manage']->addChild($optionType['name'], array(
-                    'route' => 'preference_page',
+                    'route' => '_bwcms_admin_preference_page',
                     'routeParameters' => array(
                         'type' => $optionType['type']
                     )
@@ -195,7 +195,7 @@ class AdminService extends BaseService
             foreach ($taxonomyContentTypes as $cType) {
                 $class = $cType['class'];
                 $menu['Manage']->addChild($class->getName(), array(
-                    'route' => 'taxonomy_home',
+                    'route' => '_bwcms_admin_taxonomy_home',
                     'routeParameters' => array(
                         'schema' => $class->getSchema()
                     )
@@ -205,11 +205,11 @@ class AdminService extends BaseService
         }
 
         $menu['Manage']->addChild('Locale', array(
-            'route' => 'locale_home'
+            'route' => '_bwcms_admin_locale_home'
         ));
 
         $menu['Manage']->addChild('Thumb Styles', array(
-            'route' => 'thumbstyle_home'
+            'route' => '_bwcms_admin_thumbstyle_home'
         ));
 
         if ($this->isGranted('ROLE_PREFERENCE')) {
@@ -220,7 +220,7 @@ class AdminService extends BaseService
                         $menu->addChild('Preference', array('uri' => '#', 'label' => 'Preference'))->setAttribute('dropdown', true);
                     }
                     $menu['Preference']->addChild($optionType['name'], array(
-                        'route' => 'preference_page',
+                        'route' => '_bwcms_admin_preference_page',
                         'routeParameters' => array(
                             'type' => $optionType['type']
                         )
@@ -232,15 +232,15 @@ class AdminService extends BaseService
         $menu->addChild('Admin', array('uri' => '#', 'label' => 'Admin'))->setAttribute('dropdown', true);
         if ($this->isGranted('ROLE_PREFERENCE')) {
             $menu['Admin']->addChild('Site', array(
-                'route' => 'site_home'
+                'route' => '_bwcms_admin_site_home'
             ));
             $menu['Admin']->addChild('User', array(
-                'route' => 'user_home'
+                'route' => '_bwcms_admin_user_home'
             ));
             $menu['Admin']->addChild('-*-', array('uri' => '#'))->setAttribute('divider', true);
         }
         $menu['Admin']->addChild('About', array(
-            'route' => 'dashboard_about'
+            'route' => '_bwcms_admin_dashboard_about'
         ));
         return $menu;
     }

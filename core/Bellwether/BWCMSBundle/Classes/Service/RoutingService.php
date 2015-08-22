@@ -46,6 +46,13 @@ class RoutingService extends BaseService implements LoaderInterface
         ));
         $routes->add('home_page', $homeRedirectRoute);
 
+        $searchRoute = new Route('/{siteSlug}/search/index.php', array(
+            '_controller' => 'BWCMSBundle:FrontEnd:search',
+        ), array(
+            'siteSlug' => '[a-zA-Z0-9-]+'
+        ));
+        $routes->add('search_page', $searchRoute);
+
         $mediaImageViewRoute = new Route('/{siteSlug}/media/{contentId}/view.php', array(
             '_controller' => 'BWCMSBundle:FrontEnd:mediaView',
         ), array(
@@ -69,7 +76,7 @@ class RoutingService extends BaseService implements LoaderInterface
         $routeLoaderEvent = new RouteLoaderEvent();
         $routeLoaderEvent->setRoutes($routes);
 
-        $this->getEventDispatcher()->dispatch('BWCMS.Route.Loader',$routeLoaderEvent);
+        $this->getEventDispatcher()->dispatch('BWCMS.Route.Loader', $routeLoaderEvent);
         $this->loaded = true;
         return $routeLoaderEvent->getRoutes();
     }

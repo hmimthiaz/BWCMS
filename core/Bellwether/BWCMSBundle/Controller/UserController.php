@@ -28,7 +28,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
 
 
     /**
-     * @Route("/",name="user_home")
+     * @Route("/",name="_bwcms_admin_user_home")
      * @Template()
      */
     public function indexAction()
@@ -44,7 +44,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
     /**
      * Creates a new UserEntity entity.
      *
-     * @Route("/create.php", name="user_create")
+     * @Route("/create.php", name="_bwcms_admin_user_create")
      * @Template("BWCMSBundle:User:edit.html.twig")
      */
     public function createAction(Request $request)
@@ -53,7 +53,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
         $tokenGenerator = $this->container->get('fos_user.util.token_generator');
         $password = substr($tokenGenerator->generateToken(), 0, 10);
         $form = $this->createForm(new NewType($roles, $password), null, array(
-            'action' => $this->generateUrl('user_create'),
+            'action' => $this->generateUrl('_bwcms_admin_user_create'),
             'method' => 'POST',
         ));
         $form->add('submit', 'submit', array('label' => 'Create'));
@@ -109,7 +109,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
                     $this->mailer()->getMailer()->send($message);
                 }
                 $this->addSuccessFlash('Added new user!');
-                return $this->redirect($this->generateUrl('user_home'));
+                return $this->redirect($this->generateUrl('_bwcms_admin_user_home'));
             }
         }
 
@@ -122,7 +122,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
     /**
      * Creates a new UserEntity entity.
      *
-     * @Route("/edit.php", name="user_edit")
+     * @Route("/edit.php", name="_bwcms_admin_user_edit")
      * @Template("BWCMSBundle:User:edit.html.twig")
      */
     public function editAction(Request $request)
@@ -142,7 +142,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
         }
         $roles = $this->acl()->getRoles();
         $form = $this->createForm(new EditType($roles, $existingUser), null, array(
-            'action' => $this->generateUrl('user_edit', array('id' => $userId)),
+            'action' => $this->generateUrl('_bwcms_admin_user_edit', array('id' => $userId)),
             'method' => 'POST',
         ));
         $form->add('submit', 'submit', array('label' => 'Edit'));
@@ -178,7 +178,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
                 $this->em()->persist($existingUser);
                 $this->em()->flush();
                 $this->addSuccessFlash('Updated user information!');
-                return $this->redirect($this->generateUrl('user_home'));
+                return $this->redirect($this->generateUrl('_bwcms_admin_user_home'));
             }
         }
 
@@ -192,7 +192,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
     /**
      * Creates a new UserEntity entity.
      *
-     * @Route("/reset-password.php", name="user_reset_password")
+     * @Route("/reset-password.php", name="_bwcms_admin_user_reset_password")
      * @Template("BWCMSBundle:User:edit.html.twig")
      */
     public function resetPasswordAction(Request $request)
@@ -215,7 +215,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
         $tokenGenerator = $this->container->get('fos_user.util.token_generator');
         $password = substr($tokenGenerator->generateToken(), 0, 10);
         $form = $this->createForm(new ResetPasswordType($existingUser, $password), null, array(
-            'action' => $this->generateUrl('user_reset_password', array('id' => $userId)),
+            'action' => $this->generateUrl('_bwcms_admin_user_reset_password', array('id' => $userId)),
             'method' => 'POST',
         ));
         $form->add('submit', 'submit', array('label' => 'Reset Password'));
@@ -249,7 +249,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
                     $this->mailer()->getMailer()->send($message);
                 }
                 $this->addSuccessFlash('Updated user password!');
-                return $this->redirect($this->generateUrl('user_home'));
+                return $this->redirect($this->generateUrl('_bwcms_admin_user_home'));
             }
         }
 
@@ -262,7 +262,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
     /**
      * Creates a new UserEntity entity.
      *
-     * @Route("/profile.php", name="user_profile")
+     * @Route("/profile.php", name="_bwcms_admin_user_profile")
      * @Template("BWCMSBundle:User:edit.html.twig")
      */
     public function profileAction(Request $request)
@@ -276,7 +276,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
             throw $this->createNotFoundException('Unable to find user entity.');
         }
         $form = $this->createForm(new ProfileType($existingUser), null, array(
-            'action' => $this->generateUrl('user_profile'),
+            'action' => $this->generateUrl('_bwcms_admin_user_profile'),
             'method' => 'POST',
         ));
         $form->add('submit', 'submit', array('label' => 'Save'));
@@ -291,7 +291,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
                 $this->em()->persist($existingUser);
                 $this->em()->flush();
                 $this->addSuccessFlash('Updated profile information!');
-                return $this->redirect($this->generateUrl('user_profile'));
+                return $this->redirect($this->generateUrl('_bwcms_admin_user_profile'));
             }
         }
         return array(
@@ -304,7 +304,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
     /**
      * Creates a new UserEntity entity.
      *
-     * @Route("/change-password.php", name="user_change_password")
+     * @Route("/change-password.php", name="_bwcms_admin_user_change_password")
      * @Template("BWCMSBundle:User:edit.html.twig")
      */
     public function changePasswordAction(Request $request)
@@ -318,7 +318,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
         }
 
         $form = $this->createForm(new ChangePasswordType(), null, array(
-            'action' => $this->generateUrl('user_change_password'),
+            'action' => $this->generateUrl('_bwcms_admin_user_change_password'),
             'method' => 'POST',
         ));
         $form->add('submit', 'submit', array('label' => 'Update Password'));
@@ -345,7 +345,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
                 $manipulator->changePassword($existingUser->getUsername(), $formData['password']);
                 $this->get('security.token_storage')->setToken(null);
                 $this->get('request')->getSession()->invalidate();
-                return $this->redirect($this->generateUrl('dashboard_home'));
+                return $this->redirect($this->generateUrl('_bwcms_admin_dashboard_home'));
             }
         }
 

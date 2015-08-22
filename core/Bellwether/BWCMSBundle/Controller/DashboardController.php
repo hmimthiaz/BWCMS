@@ -25,17 +25,17 @@ class DashboardController extends BaseController implements BackEndControllerInt
 {
 
     /**
-     * @Route("/")
-     * @Route("/index.php")
+     * @Route("/", name="_bwcms_admin_redirect_1")
+     * @Route("/index.php", name="_bwcms_admin_redirect_2")
      * @Template()
      */
     public function homeRedirectAction()
     {
-        return $this->redirectToRoute('dashboard_home');
+        return $this->redirectToRoute('_bwcms_admin_dashboard_home');
     }
 
     /**
-     * @Route("/dashboard/index.php",name="dashboard_home")
+     * @Route("/dashboard/index.php",name="_bwcms_admin_dashboard_home")
      * @Template()
      */
     public function indexAction()
@@ -45,7 +45,7 @@ class DashboardController extends BaseController implements BackEndControllerInt
 
 
     /**
-     * @Route("/dashboard/about.php",name="dashboard_about")
+     * @Route("/dashboard/about.php",name="_bwcms_admin_dashboard_about")
      * @Template()
      */
     public function aboutAction()

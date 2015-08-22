@@ -25,7 +25,7 @@ class LocaleController extends BaseController implements BackEndControllerInterf
     /**
      * Lists all LocaleEntity entities.
      *
-     * @Route("/index.php", name="locale_home")
+     * @Route("/index.php", name="_bwcms_admin_locale_home")
      * @Method("GET")
      * @Template()
      */
@@ -59,7 +59,7 @@ class LocaleController extends BaseController implements BackEndControllerInterf
     /**
      * Save a local
      *
-     * @Route("/save.php", name="locale_save")
+     * @Route("/save.php", name="_bwcms_admin_locale_save")
      * @Method("POST")
      * @Template()
      */
