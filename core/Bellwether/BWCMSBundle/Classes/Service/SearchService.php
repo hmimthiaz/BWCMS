@@ -7,8 +7,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 
 use Bellwether\BWCMSBundle\Entity\PreferenceEntity;
-use Bellwether\BWCMSBundle\Entity\PreferenceRepository;
+use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Entity\SearchEntity;
 use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
+use Bellwether\BWCMSBundle\Classes\Content\ContentType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 
 
 class SearchService extends BaseService
@@ -39,7 +42,50 @@ class SearchService extends BaseService
         $this->loaded = true;
     }
 
+    public function runIndex()
+    {
+        $indexContentTypes = $this->cm()->getIndexedContentTypes();
+        if (empty($indexContentTypes)) {
+            return;
+        }
 
+        $contentRepository = $this->cm()->getContentRepository();
+        $qb = $contentRepository->createQueryBuilder('node');
+        $qb->add('orderBy', 'node.modifiedDate ASC');
+        /**
+         * @var ContentType $contentType
+         */
+        $condition = array();
+        foreach ($indexContentTypes as $contentType) {
+            $condition[] = " (node.type = '" . $contentType->getType() . "' AND node.schema = '" . $contentType->getSchema() . "' )";
+        }
+        if (!empty($condition)) {
+            $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
+        }
+        $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+        $qb->andWhere($qb->expr()->gt('node.modifiedDate', ':date_modified'));
+        $qb->setParameter('date_modified', $this->getLastIndexedDate(), \Doctrine\DBAL\Types\Type::DATETIME);
+        $qb->setFirstResult(0);
+        $qb->setMaxResults(3);
+        $result = $qb->getQuery()->getResult();
+        $lastContentModifiedDate = new \DateTime();
+
+        if (!empty($result)) {
+            /**
+             * @var ContentEntity $content
+             */
+            foreach ($result as $content) {
+                $this->indexContent($content);
+                $lastContentModifiedDate = $content->getModifiedDate();
+            }
+        }
+        $this->saveLastIndexDate($lastContentModifiedDate);
+    }
+
+    public function indexContent(ContentEntity $content = null)
+    {
+
+    }
 
     public function getLastIndexedDate()
     {

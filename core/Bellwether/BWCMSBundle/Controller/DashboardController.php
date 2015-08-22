@@ -51,8 +51,7 @@ class DashboardController extends BaseController implements BackEndControllerInt
 //
 //        }
 
-        dump( $this->search()->getLastIndexedDate());
-        dump( $this->search()->saveLastIndexDate(new \DateTime()));
+        dump( $this->search()->runIndex());
         exit;
 
 
