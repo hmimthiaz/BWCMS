@@ -28,7 +28,7 @@
                     <td>{{ entity.height }}</td>
                     <td>
                         <div class="btn-group">
-                            <a class="btn btn-default btn-sm" href="{{ path('thumbstyle_edit', {'id': entity.id}) }}">
+                            <a class="btn btn-default btn-sm" href="{{ path('_bwcms_admin_thumbstyle_edit', {'id': entity.id}) }}">
                                 <i class="fa fa-edit"></i> Edit
                             </a>
                         </div>
@@ -40,7 +40,7 @@
 
         <ul>
             <li>
-                <a href="{{ path('thumbstyle_new') }}">
+                <a href="{{ path('_bwcms_admin_thumbstyle_new') }}">
                     Create a new entry
                 </a>
             </li>

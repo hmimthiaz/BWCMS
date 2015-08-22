@@ -54,7 +54,7 @@ class ContentType extends AbstractType
         if (isset($options['onlyImage']) && $options['onlyImage'] === true) {
             $browserURLOptions['onlyImage'] = 'true';
         }
-        $view->vars['browserURL'] = $this->generateUrl('content_browser', $browserURLOptions, true);
+        $view->vars['browserURL'] = $this->generateUrl('_bwcms_admin_content_browser', $browserURLOptions, true);
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)

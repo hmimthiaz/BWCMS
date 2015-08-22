@@ -46,7 +46,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
      *
      * @Route("/", name="_bwcms_admin_thumbstyle_create")
      * @Method("POST")
-     * @Template("BWCMSBundle:ThumbStyleEntity:new.html.twig")
+     * @Template("BWCMSBundle:ThumbStyle:new.html.twig")
      */
     public function createAction(Request $request)
     {
@@ -79,7 +79,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
                 $entity->setSite($this->sm()->getAdminCurrentSite());
                 $em->persist($entity);
                 $em->flush();
-                return $this->redirect($this->generateUrl('thumbstyle_home'));
+                return $this->redirect($this->generateUrl('_bwcms_admin_thumbstyle_home'));
             }
         }
 
@@ -99,7 +99,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     private function createCreateForm(ThumbStyleEntity $entity)
     {
         $form = $this->createForm(new ThumbStyleType(), $entity, array(
-            'action' => $this->generateUrl('thumbstyle_create'),
+            'action' => $this->generateUrl('_bwcms_admin_thumbstyle_create'),
             'method' => 'POST',
         ));
 
@@ -161,7 +161,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
     private function createEditForm(ThumbStyleEntity $entity)
     {
         $form = $this->createForm(new ThumbStyleType(), $entity, array(
-            'action' => $this->generateUrl('thumbstyle_update', array('id' => $entity->getId())),
+            'action' => $this->generateUrl('_bwcms_admin_thumbstyle_update', array('id' => $entity->getId())),
             'method' => 'POST',
         ));
 
@@ -175,7 +175,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
      *
      * @Route("/{id}", name="_bwcms_admin_thumbstyle_update")
      * @Method("POST")
-     * @Template("BWCMSBundle:ThumbStyleEntity:edit.html.twig")
+     * @Template("BWCMSBundle:ThumbStyle:edit.html.twig")
      */
     public function updateAction(Request $request, $id)
     {
@@ -219,7 +219,7 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
                 $entity->setSite($this->sm()->getAdminCurrentSite());
                 $em->persist($entity);
                 $em->flush();
-                return $this->redirect($this->generateUrl('thumbstyle_home'));
+                return $this->redirect($this->generateUrl('_bwcms_admin_thumbstyle_home'));
             }
         }
 

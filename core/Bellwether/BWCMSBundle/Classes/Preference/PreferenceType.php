@@ -98,7 +98,7 @@ abstract class PreferenceType implements PreferenceTypeInterface
         if ($this->form == null) {
             $this->buildForm();
             $this->setDefaultHiddenFormFields();
-            $this->fb()->setAction($this->generateUrl('preference_save_page', array('type' => $this->getType())));
+            $this->fb()->setAction($this->generateUrl('_bwcms_admin_preference_save_page', array('type' => $this->getType())));
             $this->fb()->setMethod('POST');
             $this->form = $this->fb()->getForm();
         }

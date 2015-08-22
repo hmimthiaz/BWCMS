@@ -46,7 +46,7 @@ class PreferenceController extends BaseController  implements BackEndControllerI
         $form->handleRequest($request);
         if ($form->isValid()) {
             $this->pref()->saveFormData($form, $preferenceClass);
-            return $this->redirect($this->generateUrl('preference_page', array('type' => $type)));
+            return $this->redirect($this->generateUrl('_bwcms_admin_preference_page', array('type' => $type)));
         }
 
         return array(
