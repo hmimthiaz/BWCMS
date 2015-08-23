@@ -55,6 +55,14 @@ abstract class BaseController extends Controller
     }
 
     /**
+     * @return string
+     */
+    public function getTemplateName($templateFilename)
+    {
+        return $this->tp()->getCurrentSkin()->getTemplateName($templateFilename);
+    }
+
+    /**
      * @param ContentEntity $contentEntity
      * @return string
      */
