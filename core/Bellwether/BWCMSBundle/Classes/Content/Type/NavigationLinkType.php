@@ -33,6 +33,7 @@ class NavigationLinkType Extends ContentType
 
     public function buildFields()
     {
+        $this->addField('linkCaption', ContentFieldType::String);
         $this->addField('linkType', ContentFieldType::String);
         $this->addField('linkContent', ContentFieldType::Content);
         $this->addField('linkExternal', ContentFieldType::String);
@@ -40,12 +41,23 @@ class NavigationLinkType Extends ContentType
 
         $this->addField('linkTarget', ContentFieldType::String);
         $this->addField('linkClass', ContentFieldType::String);
+        $this->addField('liClass', ContentFieldType::String);
+
+        $this->addField('linkImage', ContentFieldType::Content);
+        $this->addField('linkDescription', ContentFieldType::String);
     }
 
     public function buildForm($isEditMode = false)
     {
         $routes = $this->tp()->getCurrentSkin()->getNavigationRoutes();
         $routes = array_merge(array('' => ''), $routes);
+
+        $this->fb()->add('linkCaption', 'text',
+            array(
+                'required' => false,
+                'label' => 'Caption',
+            )
+        );
 
         $this->fb()->add('linkType', 'choice',
             array(
@@ -56,18 +68,21 @@ class NavigationLinkType Extends ContentType
 
         $this->fb()->add('linkContent', 'bwcms_content',
             array(
+                'required' => false,
                 'label' => 'Content'
             )
         );
 
         $this->fb()->add('linkExternal', 'text',
             array(
+                'required' => false,
                 'label' => 'Link',
             )
         );
 
         $this->fb()->add('linkRoute', 'choice',
             array(
+                'required' => false,
                 'label' => 'Route',
                 'choices' => $routes,
             )
@@ -75,6 +90,7 @@ class NavigationLinkType Extends ContentType
 
         $this->fb()->add('linkTarget', 'choice',
             array(
+                'required' => false,
                 'label' => 'Target',
                 'choices' => array('_self' => 'Same Window', '_blank' => 'New Window'),
             )
@@ -82,10 +98,34 @@ class NavigationLinkType Extends ContentType
 
         $this->fb()->add('linkClass', 'text',
             array(
-                'label' => 'Class',
+                'required' => false,
+                'label' => 'Link Class',
             )
         );
 
+        $this->fb()->add('liClass', 'text',
+            array(
+                'required' => false,
+                'label' => 'Li Class',
+            )
+        );
+
+        $this->fb()->add('linkImage', 'bwcms_content',
+            array(
+                'required' => false,
+                'label' => 'Image',
+                'contentType' => 'Media',
+                'schema' => 'File',
+                'onlyImage' => true
+            )
+        );
+
+        $this->fb()->add('linkDescription', 'text',
+            array(
+                'required' => false,
+                'label' => 'Summary',
+            )
+        );
     }
 
     public function addTemplates()

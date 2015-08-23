@@ -35,6 +35,7 @@ class NavigationFolderType Extends ContentType
 
     public function buildFields()
     {
+        $this->addField('linkCaption', ContentFieldType::String);
         $this->addField('linkType', ContentFieldType::String);
         $this->addField('linkContent', ContentFieldType::Content);
         $this->addField('linkExternal', ContentFieldType::String);
@@ -42,12 +43,20 @@ class NavigationFolderType Extends ContentType
 
         $this->addField('linkTarget', ContentFieldType::String);
         $this->addField('linkClass', ContentFieldType::String);
+        $this->addField('liClass', ContentFieldType::String);
     }
 
     public function buildForm($isEditMode = false)
     {
         $routes = $this->tp()->getCurrentSkin()->getNavigationRoutes();
         $routes = array_merge(array('' => ''), $routes);
+
+        $this->fb()->add('linkCaption', 'text',
+            array(
+                'required' => false,
+                'label' => 'Caption',
+            )
+        );
 
         $this->fb()->add('linkType', 'choice',
             array(
@@ -58,18 +67,21 @@ class NavigationFolderType Extends ContentType
 
         $this->fb()->add('linkContent', 'bwcms_content',
             array(
+                'required' => false,
                 'label' => 'Content'
             )
         );
 
         $this->fb()->add('linkExternal', 'text',
             array(
+                'required' => false,
                 'label' => 'Link',
             )
         );
 
         $this->fb()->add('linkRoute', 'choice',
             array(
+                'required' => false,
                 'label' => 'Route',
                 'choices' => $routes,
             )
@@ -81,9 +93,18 @@ class NavigationFolderType Extends ContentType
                 'choices' => array('_self' => 'Same Window', '_blank' => 'New Window'),
             )
         );
+
         $this->fb()->add('linkClass', 'text',
             array(
-                'label' => 'Class',
+                'required' => false,
+                'label' => 'Link Class',
+            )
+        );
+
+        $this->fb()->add('liClass', 'text',
+            array(
+                'required' => false,
+                'label' => 'Li Class',
             )
         );
     }
@@ -122,6 +143,10 @@ class NavigationFolderType Extends ContentType
                 $menu[$content->getId()]->setLabel($content->getTitle());
             }
             $contentMeta = $this->cm()->getContentAllMeta($content);
+            if (isset($contentMeta['linkCaption']) && !empty($contentMeta['linkCaption'])) {
+                $menu[$content->getId()]->setLabel($contentMeta['linkCaption']);
+                $menu[$content->getId()]->setExtra('safe_label', true);
+            }
             if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'route') {
                 if (isset($contentMeta['linkRoute']) && !empty($contentMeta['linkRoute'])) {
                     $linkURL = $this->tp()->getCurrentSkin()->getNavigationRoute($contentMeta['linkRoute']);
@@ -144,6 +169,16 @@ class NavigationFolderType Extends ContentType
             }
             if (isset($contentMeta['linkClass']) && !empty($contentMeta['linkClass'])) {
                 $menu[$content->getId()]->setLinkAttribute('class', $contentMeta['linkClass']);
+
+            }
+            if (isset($contentMeta['liClass']) && !empty($contentMeta['liClass'])) {
+                $menu[$content->getId()]->setAttribute('class', $contentMeta['liClass']);
+            }
+            if (isset($contentMeta['linkImage']) && !empty($contentMeta['linkImage'])) {
+                $menu[$content->getId()]->setExtra('image', $contentMeta['linkImage']);
+            }
+            if (isset($contentMeta['linkDescription']) && !empty($contentMeta['linkDescription'])) {
+                $menu[$content->getId()]->setExtra('summary', $contentMeta['linkDescription']);
             }
         }
 
@@ -167,6 +202,9 @@ class NavigationFolderType Extends ContentType
         }
         if (isset($options['lastClass']) && !empty($options['lastClass'])) {
             $rendererOptions['lastClass'] = $options['lastClass'];
+        }
+        if (isset($options['allow_safe_labels']) && !empty($options['allow_safe_labels'])) {
+            $rendererOptions['allow_safe_labels'] = $options['allow_safe_labels'];
         }
         $renderer = new TwigRenderer($options['environment'], $menuTemplate, $matcher, $rendererOptions);
         return $renderer->render($menu[$contentEntity->getId()]);
