@@ -34,15 +34,31 @@ abstract class BaseSkin extends ContainerAware
     private $path = null;
 
 
-    abstract public function getHomePageTemplate();
+    public function getHomePageTemplate()
+    {
+        return null;
+    }
 
-    abstract public function getLoginTemplate();
+    public function getLoginTemplate()
+    {
+        return null;
+    }
 
-    abstract public function getForgotTemplate();
+    public function getForgotTemplate()
+    {
+        return null;
+    }
 
-    abstract public function get404Template();
+    public function get404Template()
+    {
+        return null;
+    }
 
-    abstract public function getPaginationTemplate();
+    public function getPaginationTemplate()
+    {
+        return null;
+    }
+
 
     abstract public function getName();
 
