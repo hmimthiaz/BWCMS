@@ -22,7 +22,6 @@ use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Doctrine\ORM\EntityManager;
 
 
-
 abstract class PreferenceType implements PreferenceTypeInterface
 {
     /**
@@ -58,6 +57,12 @@ abstract class PreferenceType implements PreferenceTypeInterface
     private $isPagePreference = false;
 
     /**
+     * @var bool
+     */
+    private $isSeoFieldsEnabled = false;
+
+
+    /**
      * @return FormBuilder
      */
     final public function fb()
@@ -84,6 +89,11 @@ abstract class PreferenceType implements PreferenceTypeInterface
         if ($this->fields == null) {
             $this->fields = array();
             $this->buildFields();
+            if ($this->isSeoFieldsEnabled()) {
+                $this->addField('pageTitle', PreferenceFieldType::String);
+                $this->addField('pageDescription', PreferenceFieldType::String);
+                $this->addField('pageKeywords', PreferenceFieldType::String);
+            }
         }
         return $this->fields;
     }
@@ -122,12 +132,31 @@ abstract class PreferenceType implements PreferenceTypeInterface
         return $fieldValue;
     }
 
-//    abstract public function loadFormData(OptionEntity $option = null, Form $form = null);
-//
-//    abstract public function prepareEntity(OptionEntity $content = null, $data = array());
-
     private function setDefaultHiddenFormFields()
     {
+        if ($this->isSeoFieldsEnabled()) {
+            $this->fb()->add('pageTitle', 'text',
+                array(
+                    'required' => false,
+                    'label' => 'Page Title'
+                )
+            );
+
+            $this->fb()->add('pageDescription', 'text',
+                array(
+                    'required' => false,
+                    'label' => 'Page Description'
+                )
+            );
+
+            $this->fb()->add('pageKeywords', 'text',
+                array(
+                    'required' => false,
+                    'label' => 'Page Keywords'
+                )
+            );
+        }
+
         $this->fb()->add('save', 'submit', array(
             'attr' => array('class' => 'save'),
         ));
@@ -198,6 +227,22 @@ abstract class PreferenceType implements PreferenceTypeInterface
     }
 
     /**
+     * @return boolean
+     */
+    public function isSeoFieldsEnabled()
+    {
+        return $this->isSeoFieldsEnabled;
+    }
+
+    /**
+     * @param boolean $isSeoFieldsEnabled
+     */
+    public function setIsSeoFieldsEnabled($isSeoFieldsEnabled)
+    {
+        $this->isSeoFieldsEnabled = $isSeoFieldsEnabled;
+    }
+
+    /**
      * Generates a URL from the given parameters.
      *
      * @param string $route The name of the route
@@ -213,7 +258,8 @@ abstract class PreferenceType implements PreferenceTypeInterface
         return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
 
-    public function dump($var, $maxDepth = 2, $stripTags = true){
+    public function dump($var, $maxDepth = 2, $stripTags = true)
+    {
         print '<pre>';
         \Doctrine\Common\Util\Debug::dump($var, $maxDepth, $stripTags);
         print '</pre>';
