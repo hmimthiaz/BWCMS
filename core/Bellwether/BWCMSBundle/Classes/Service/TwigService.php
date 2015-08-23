@@ -193,6 +193,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             'environment' => $this->environment,
             'emptyTitle' => false,
             'template' => false,
+            'allow_safe_labels' => false,
             'currentClass' => 'active',
             'firstClass' => 'first',
             'lastClass' => 'last',
