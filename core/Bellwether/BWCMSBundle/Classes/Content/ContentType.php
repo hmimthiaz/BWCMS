@@ -132,6 +132,11 @@ abstract class ContentType implements ContentTypeInterface
      */
     private $isPageBuilderSupported = false;
 
+    /**
+     * @var bool
+     */
+    private $isSeoFieldsEnabled = false;
+
     private $taxonomyRelations = null;
 
     public function getType()
@@ -272,6 +277,11 @@ abstract class ContentType implements ContentTypeInterface
             $this->addField('slug', ContentFieldType::Internal);
             $this->addField('sortBy', ContentFieldType::Internal);
             $this->addField('sortOrder', ContentFieldType::Internal);
+            if ($this->isSeoFieldsEnabled()) {
+                $this->addField('pageTitle', ContentFieldType::String, $this->isIndexed());
+                $this->addField('pageDescription', ContentFieldType::String, $this->isIndexed());
+                $this->addField('pageKeywords', ContentFieldType::String, $this->isIndexed());
+            }
             $this->buildFields();
         }
         return $this->fields;
@@ -485,6 +495,29 @@ abstract class ContentType implements ContentTypeInterface
             $this->fb()->add('attachment', 'file',
                 array(
                     'label' => 'Attachment'
+                )
+            );
+        }
+
+        if ($this->isSeoFieldsEnabled()) {
+            $this->fb()->add('pageTitle', 'text',
+                array(
+                    'required' => false,
+                    'label' => 'Page Title'
+                )
+            );
+
+            $this->fb()->add('pageDescription', 'text',
+                array(
+                    'required' => false,
+                    'label' => 'Page Description'
+                )
+            );
+
+            $this->fb()->add('pageKeywords', 'text',
+                array(
+                    'required' => false,
+                    'label' => 'Page Keywords'
                 )
             );
         }
@@ -930,6 +963,22 @@ abstract class ContentType implements ContentTypeInterface
     public function setIsPageBuilderSupported($isPageBuilderSupported)
     {
         $this->isPageBuilderSupported = $isPageBuilderSupported;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isSeoFieldsEnabled()
+    {
+        return $this->isSeoFieldsEnabled;
+    }
+
+    /**
+     * @param boolean $isSeoFieldsEnabled
+     */
+    public function setIsSeoFieldsEnabled($isSeoFieldsEnabled)
+    {
+        $this->isSeoFieldsEnabled = $isSeoFieldsEnabled;
     }
 
     /**
