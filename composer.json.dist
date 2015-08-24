@@ -49,7 +49,9 @@
     "jquery/jquery": "1.11.*",
     "gregwar/image-bundle": "dev-master",
     "gregwar/captcha-bundle": "dev-master",
-    "html2text/html2text": "~2.0"
+    "html2text/html2text": "~2.0",
+    "ramsey/uuid": "~2.8",
+    "moontoast/math":"*"
   },
   "require-dev": {
     "sensio/generator-bundle": "~2.3"
