@@ -17,7 +17,9 @@ class LocaleService extends BaseService
     /**
      * @var SiteEntity
      */
-    private $curentSite;
+    private $currentSite = null;
+
+    private $currentSiteId = null;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -36,8 +38,22 @@ class LocaleService extends BaseService
     public function init()
     {
         if (!$this->loaded) {
+
         }
         $this->loaded = true;
+    }
+
+    /**
+     * @param SiteEntity $site
+     */
+    public function setCurrentSite($site = null)
+    {
+        $this->currentSite = $site;
+        if (is_null($site)) {
+            $this->currentSiteId = null;
+        } else {
+            $this->currentSiteId = $this->currentSite->getId();
+        }
     }
 
     /**
@@ -46,10 +62,16 @@ class LocaleService extends BaseService
      */
     public function get($string)
     {
-        $stringValue = $this->fetch($string);
-        if (is_null($stringValue)) {
-            $stringValue = $this->add($string);
+        $cacheHash = $this->getCacheHash($string);
+        $stringValue = $this->cache()->fetch($cacheHash);
+        if ($stringValue === false) {
+            $stringValue = $this->fetch($string);
+            if (is_null($stringValue)) {
+                $stringValue = $this->add($string);
+            }
+            $this->cache()->save($cacheHash, $stringValue, 3600);
         }
+
         if (func_num_args() == 1) {
             return $stringValue;
         }
@@ -92,8 +114,14 @@ class LocaleService extends BaseService
             $localeEntity->setValue($value);
             $this->em()->persist($localeEntity);
             $this->em()->flush();
+            $this->cache()->delete($this->getCacheHash($localeEntity->getText()));
         }
         return true;
+    }
+
+    public function getCacheHash($string)
+    {
+        return 'LCString_' . md5($string);
     }
 
     /**

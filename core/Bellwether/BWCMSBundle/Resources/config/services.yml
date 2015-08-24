@@ -8,6 +8,9 @@ services:
   BWCMS.Cache:
     class: Bellwether\BWCMSBundle\Classes\Service\CacheService
     arguments: [@service_container,@request_stack]
+  BWCMS.DoctrineFileCache:
+    class: Doctrine\Common\Cache\FilesystemCache
+    arguments: [%kernel.cache_dir%]
   BWCMS.Site:
     class: Bellwether\BWCMSBundle\Classes\Service\SiteService
     arguments: [@service_container,@request_stack]

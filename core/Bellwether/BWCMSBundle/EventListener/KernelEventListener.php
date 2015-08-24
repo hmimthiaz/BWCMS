@@ -72,16 +72,21 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
                 throw new NotFoundHttpException("Unable to detect language");
             }
             $siteEntity = $this->sm()->getSiteBySlug($params['siteSlug']);
+
             if ($siteEntity == null) {
                 throw new NotFoundHttpException("Language does not exists");
             }
             $this->sm()->setCurrentSite($siteEntity);
+            $this->cache()->setCurrentSite($siteEntity);
+            $this->locale()->setCurrentSite($siteEntity);
             $this->tp()->setSkin($siteEntity->getSkinFolderName());
             return;
         }
 
         if ($controller[0] instanceof SecurityController) {
             $currentSite = $this->sm()->getAdminCurrentSite();
+            $this->cache()->setCurrentSite($currentSite);
+            $this->locale()->setCurrentSite($currentSite);
             $this->tp()->setSkin($currentSite->getSkinFolderName());
             return;
         }
@@ -93,6 +98,8 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
             }
             $this->admin()->setIsAdmin(true);
             $currentSite = $this->sm()->getAdminCurrentSite();
+            $this->cache()->setCurrentSite($currentSite);
+            $this->locale()->setCurrentSite($currentSite);
             $this->tp()->setSkin($currentSite->getSkinFolderName());
             return;
         }
