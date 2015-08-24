@@ -3,6 +3,7 @@
 namespace Bellwether\BWCMSBundle\Classes\Service;
 
 use Knp\Menu\FactoryInterface;
+use Knp\Menu\MenuItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
@@ -12,6 +13,7 @@ use Bellwether\BWCMSBundle\Entity\UserEntity;
 use Bellwether\BWCMSBundle\Entity\AuditEntity;
 use Bellwether\BWCMSBundle\Classes\Constants\AuditLevelType;
 use Bellwether\BWCMSBundle\Classes\Constants\AuditActionType;
+use Bellwether\BWCMSBundle\Classes\Event\AdminMenuLoaderEvent;
 
 class AdminService extends BaseService
 {
@@ -82,10 +84,13 @@ class AdminService extends BaseService
      */
     public function buildRightMainMenu(Request $request)
     {
+        /**
+         * @var MenuItem $menu
+         */
         $menu = $this->factory->createItem('root');
-
         $currentSite = $this->sm()->getAdminCurrentSite();
         $allSites = $this->sm()->getAllSites();
+
         $menu->addChild('Site', array('uri' => '#', 'label' => 'Site: ' . $currentSite->getName()))->setAttribute('dropdown', true);
         $menu['Site']->addChild('View Site', array(
             'route' => 'home_page',
@@ -122,11 +127,17 @@ class AdminService extends BaseService
         }
         $menu['Profile']->addChild('Logout', array('route' => 'user_logout'));
 
-        return $menu;
+        $loaderEvent = new AdminMenuLoaderEvent();
+        $loaderEvent->setMenuItem($menu);
+        $this->getEventDispatcher()->dispatch('BWCMS.Admin.MenuRight', $loaderEvent);
+        return $loaderEvent->getMenuItem();
     }
 
     public function buildLeftMainMenu(Request $request)
     {
+        /**
+         * @var MenuItem $menu
+         */
         $menu = $this->factory->createItem('root');
         $menu->addChild('Dashboard', array('route' => '_bwcms_admin_dashboard_home'));
 
@@ -242,7 +253,11 @@ class AdminService extends BaseService
         $menu['Admin']->addChild('About', array(
             'route' => '_bwcms_admin_dashboard_about'
         ));
-        return $menu;
+
+        $loaderEvent = new AdminMenuLoaderEvent();
+        $loaderEvent->setMenuItem($menu);
+        $this->getEventDispatcher()->dispatch('BWCMS.Admin.MenuLeft', $loaderEvent);
+        return $loaderEvent->getMenuItem();
     }
 
     /**
