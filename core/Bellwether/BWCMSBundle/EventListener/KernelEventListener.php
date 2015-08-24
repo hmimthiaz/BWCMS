@@ -50,8 +50,7 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-//        $response = new Response('fuck',200);
-//        $event->setResponse($response);
+        $this->cache()->checkPageCacheResponse($event);
     }
 
     public function onKernelController(FilterControllerEvent $event)
@@ -164,9 +163,7 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-//        dump($event);
-//        exit;
-
+        $this->cache()->savePageCacheReponse($event);
     }
 
     public function onKernelTerminate(PostResponseEvent $event)
