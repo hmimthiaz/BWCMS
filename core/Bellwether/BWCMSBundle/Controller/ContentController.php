@@ -655,7 +655,7 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $ca['download'] = '';
                 if ($this->mm()->isMedia($content)) {
                     $ca['imageURL'] = $this->generateUrl('media_image_view', array('contentId' => $content->getId(), 'siteSlug' => $currentSite->getSlug()));
-                    $ca['imageURL'] = str_ireplace('/app_dev.php','',$ca['imageURL']);
+                    $ca['imageURL'] = str_ireplace('/app_dev.php', '', $ca['imageURL']);
                     $ca['download'] = $this->generateUrl('_bwcms_admin_content_media_download', array('contentId' => $content->getId()));
                 }
                 if ($this->mm()->isImage($content)) {

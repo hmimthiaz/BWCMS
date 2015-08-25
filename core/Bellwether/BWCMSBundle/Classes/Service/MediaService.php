@@ -88,31 +88,31 @@ class MediaService extends BaseService
     }
 
     /**
-     * @param ContentMediaEntity $contentMediaEntity
+     * @param $mediaEntity
      * @return string|null
      */
-    public function getMediaCachePath($contentMediaEntity)
+    public function getMediaCachePath($mediaEntity)
     {
-        $folderHash = md5($contentMediaEntity->getId());
+        $folderHash = md5($mediaEntity->getId());
         $folderName = substr($folderHash, 0, 1) . DIRECTORY_SEPARATOR .
             substr($folderHash, 1, 1) . DIRECTORY_SEPARATOR .
             substr($folderHash, 2, 1) . DIRECTORY_SEPARATOR .
             substr($folderHash, 3, 1);
         $path = $this->mediaFolder . DIRECTORY_SEPARATOR . $folderName . DIRECTORY_SEPARATOR;
-        $path .= $contentMediaEntity->getId() . '.bin';
+        $path .= $mediaEntity->getId() . '.bin';
         return $path;
     }
 
     /**
-     * @param ContentMediaEntity $contentMediaEntity
+     * @param $mediaEntity
      */
-    public function checkAndCreateMediaCacheFile($contentMediaEntity)
+    public function checkAndCreateMediaCacheFile($mediaEntity)
     {
-        $cacheFile = $this->getMediaCachePath($contentMediaEntity);
+        $cacheFile = $this->getMediaCachePath($mediaEntity);
         if (!file_exists($cacheFile)) {
             $this->fs->mkdir(dirname($cacheFile));
             $localFile = fopen($cacheFile, 'wb');
-            fwrite($localFile, stream_get_contents($contentMediaEntity->getData()));
+            fwrite($localFile, stream_get_contents($mediaEntity->getData()));
             fclose($localFile);
         }
         return $cacheFile;
@@ -337,5 +337,15 @@ class MediaService extends BaseService
         $cleaned = trim($cleaned, '-');
         return $cleaned;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getMediaFolder()
+    {
+        return $this->mediaFolder;
+    }
+
+
 
 }
