@@ -10,9 +10,13 @@ class AuditActionType
 
     const Approve = 'AA.Approve';
 
+    const Accept = 'AA.Accept';
+
     const Edit = 'AA.Edit';
 
     const Delete = 'AA.Delete';
+
+    const Duplicate = 'AA.Duplicate';
 
     const Login = 'AA.Login';
 
@@ -28,6 +32,9 @@ class AuditActionType
 
     const Sync = 'AA.Sync';
 
+    const Verify = 'AA.Verify';
+
+
     public static function getList()
     {
         static $list = null;
@@ -35,14 +42,17 @@ class AuditActionType
             $list = array(
                 self::Add,
                 self::Approve,
+                self::Accept,
                 self::Edit,
                 self::Delete,
+                self::Duplicate,
                 self::Login,
                 self::Publish,
                 self::Read,
                 self::Reject,
                 self::Send,
-                self::Sync
+                self::Sync,
+                self::Verify
             );
         }
         return $list;
