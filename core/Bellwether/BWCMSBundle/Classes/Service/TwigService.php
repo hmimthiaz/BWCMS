@@ -239,17 +239,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
 
     public function getPreference($type, $field = false, $default = false)
     {
-        $allPreference = $this->pref()->getAllPreferenceByType($type);
-        if (empty($allPreference)) {
-            return $default;
-        }
-        if (empty($field)) {
-            return $allPreference;
-        }
-        if (isset($allPreference[$field])) {
-            return $allPreference[$field];
-        }
-        return $default;
+        return $this->pref()->getPreference($type, $field, $default);
     }
 
     /**

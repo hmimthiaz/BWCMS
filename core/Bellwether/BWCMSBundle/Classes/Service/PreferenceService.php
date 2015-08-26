@@ -139,6 +139,21 @@ class PreferenceService extends BaseService
         return $returnArray;
     }
 
+    public function getPreference($type, $field = false, $default = false)
+    {
+        $allPreference = $this->getAllPreferenceByType($type);
+        if (empty($allPreference)) {
+            return $default;
+        }
+        if (empty($field)) {
+            return $allPreference;
+        }
+        if (isset($allPreference[$field])) {
+            return $allPreference[$field];
+        }
+        return $default;
+    }
+
 
     /**
      * @param Form $form
