@@ -59,6 +59,11 @@ abstract class BaseSkin extends ContainerAware
         return null;
     }
 
+    public function getSearchTemplate()
+    {
+        return null;
+    }
+
 
     abstract public function getName();
 

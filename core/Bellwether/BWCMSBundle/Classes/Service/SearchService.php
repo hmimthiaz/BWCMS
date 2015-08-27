@@ -14,6 +14,7 @@ use Bellwether\BWCMSBundle\Classes\Content\ContentType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 
+use Bellwether\Common\Pagination;
 
 class SearchService extends BaseService
 {
@@ -43,6 +44,52 @@ class SearchService extends BaseService
 
         }
         $this->loaded = true;
+    }
+
+    /**
+     * @param string $searchString
+     * @param Pagination $pager
+     * @param null $type
+     * @param null $schema
+     * @return Pagination
+     */
+    public function searchIndex($searchString, Pagination $pager, $type = null, $schema = null)
+    {
+        if (!empty($searchString)) {
+            $searchString = filter_var($searchString, FILTER_SANITIZE_STRING);
+        }
+        $searchString = $this->search()->cleanText($searchString);
+        $searchWords = explode(' ', $searchString);
+        $searchWords = array_map('trim', $searchWords);
+        $searchWords = array_filter($searchWords);
+        if (empty($searchWords)) {
+            return $pager;
+        }
+
+        $searchRepo = $this->getSearchRepository();
+        $qb = $searchRepo->createQueryBuilder('si');
+        $qb->leftJoin('si.content', 'c');
+        $qb->leftJoin('si.site', 's');
+        $qb->select('si', 'c');
+        $searchLikeExp = $qb->expr()->orX();
+        foreach ($searchWords as $index => $value) {
+            $searchLikeExp->add($qb->expr()->like('si.keywords', ':KEYWORD_' . $index));
+            $qb->setParameter(':KEYWORD_' . $index, '%' . $value . '%');
+        }
+        $qb->andWhere($searchLikeExp);
+        $qb->andWhere(" c.status ='" . ContentPublishType::Published . "' ");
+        $qb->andWhere(" si.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
+        $qb->add('orderBy', 'c.publishDate DESC');
+        $qb->setFirstResult($pager->getStart());
+        $qb->setMaxResults($pager->getLimit());
+
+        $result = $qb->getQuery()->getResult();
+        $pager->setItems($result);
+
+        $totalCount = $qb->select('COUNT(si)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+        $pager->setTotalItems($totalCount);
+
+        return $pager;
     }
 
     public function runIndex()
@@ -171,7 +218,7 @@ class SearchService extends BaseService
         return $this->getSearchRepository()->findOneBy($criteria);
     }
 
-    private function cleanText($string)
+    public function cleanText($string)
     {
         //remove html
         $string = strip_tags($string);

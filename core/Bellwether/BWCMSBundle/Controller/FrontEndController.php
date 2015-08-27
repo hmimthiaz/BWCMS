@@ -4,6 +4,7 @@ namespace Bellwether\BWCMSBundle\Controller;
 
 use Bellwether\BWCMSBundle\Classes\Base\FrontEndControllerInterface;
 use Bellwether\BWCMSBundle\Classes\Base\BaseController;
+use Bellwether\Common\Pagination;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -13,6 +14,10 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
 use Symfony\Component\HttpFoundation\Request;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
+
+use Bellwether\BWCMSBundle\Classes\Service\ContentService;
+use Bellwether\BWCMSBundle\Classes\Service\ContentQueryService;
 
 class FrontEndController extends BaseController implements FrontEndControllerInterface
 {
@@ -77,12 +82,13 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
             $searchString = filter_var($searchString, FILTER_SANITIZE_STRING);
         }
 
-        $searchWords = explode(' ',$searchString);
+        $pager = new Pagination($request, 5);
+        $pager = $this->search()->searchIndex($searchString, $pager);
+        $returnVar['pager'] = $pager;
+        $returnVar['searchString'] = $searchString;
 
-        dump($searchString);
-        exit;
-
-
+        $template = $this->tp()->getCurrentSkin()->getSearchTemplate();
+        return $this->render($template,$returnVar);
     }
 
     public function mediaViewAction($siteSlug, $contentId)
