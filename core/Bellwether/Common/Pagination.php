@@ -25,6 +25,8 @@ class Pagination
 
     private $activeClass = 'active';
 
+    private $preQueryCallbackFunction = null;
+
     /**
      * @var Request
      */
@@ -118,6 +120,17 @@ class Pagination
             $allParams[$this->pageVar] = null;
         }
         return $allParams;
+    }
+
+    public function callPreQueryCallback()
+    {
+        if (is_null($this->preQueryCallbackFunction)) {
+            return;
+        }
+        $functionArguments = func_get_args();
+        if (is_callable($this->preQueryCallbackFunction)) {
+            call_user_func_array($this->preQueryCallbackFunction, $functionArguments);
+        }
     }
 
     /**
@@ -267,5 +280,22 @@ class Pagination
     {
         $this->activeClass = $activeClass;
     }
+
+    /**
+     * @return null
+     */
+    public function getPreQueryCallbackFunction()
+    {
+        return $this->preQueryCallbackFunction;
+    }
+
+    /**
+     * @param null $preQueryCallbackFunction
+     */
+    public function setPreQueryCallbackFunction($preQueryCallbackFunction)
+    {
+        $this->preQueryCallbackFunction = $preQueryCallbackFunction;
+    }
+
 
 }
