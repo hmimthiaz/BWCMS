@@ -5,7 +5,7 @@ namespace Bellwether\Common;
 use Symfony\Component\HttpFoundation\Request;
 
 
-class Pagination
+class Pagination implements \Countable, \Iterator
 {
 
 
@@ -54,7 +54,7 @@ class Pagination
         $this->setStart(($this->getCurrentPage() - 1) * $this->getLimit());
     }
 
-    public function prev()
+    public function prevPage()
     {
         if ($this->getCurrentPage() <= 1) {
             return null;
@@ -71,7 +71,7 @@ class Pagination
         return $pages;
     }
 
-    public function next()
+    public function nextPage()
     {
         if ($this->getCurrentPage() >= $this->getTotalPages()) {
             return null;
@@ -114,9 +114,8 @@ class Pagination
         $routeParams = $this->request->get('_route_params');
         $queryParams = $this->request->query->all();
         $allParams = array_merge($routeParams, $queryParams);
-        if ($page != 1) {
-            $allParams[$this->pageVar] = $page;
-        } else {
+        $allParams[$this->pageVar] = $page;
+        if ($page == 1 && !isset($routeParams[$this->pageVar])) {
             $allParams[$this->pageVar] = null;
         }
         return $allParams;
@@ -297,5 +296,47 @@ class Pagination
         $this->preQueryCallbackFunction = $preQueryCallbackFunction;
     }
 
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->items);
+    }
+
+    public function first()
+    {
+        return reset($this->items);
+    }
+
+    public function last()
+    {
+        return end($this->items);
+    }
+
+    function rewind()
+    {
+        reset($this->items);
+    }
+
+    function current()
+    {
+        return current($this->items);
+    }
+
+    function key()
+    {
+        return key($this->items);
+    }
+
+    function next()
+    {
+        next($this->items);
+    }
+
+    function valid()
+    {
+        return key($this->items) !== null;
+    }
 
 }

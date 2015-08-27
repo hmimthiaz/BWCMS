@@ -93,7 +93,7 @@ class ContentQueryService extends BaseService
         $qb->setFirstResult($start);
         $qb->setMaxResults($limit);
 
-        $pager->callPreQueryCallback($qb, $contentEntity, $type, $schema);
+        $pager->callPreQueryCallback($qb,$contentEntity, $type, $schema);
 
         $result = $qb->getQuery()->getResult();
         $pager->setItems($result);

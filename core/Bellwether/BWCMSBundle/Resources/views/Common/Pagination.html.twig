@@ -1,5 +1,5 @@
-{% set previousURL = pager.prev() %}
-{% set nextURL = pager.next() %}
+{% set previousURL = pager.prevPage() %}
+{% set nextURL = pager.nextPage() %}
 {% set pages = pager.pages() %}
 
 {% if pages|length > 1 %}
