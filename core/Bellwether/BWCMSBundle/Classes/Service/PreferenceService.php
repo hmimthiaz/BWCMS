@@ -11,6 +11,7 @@ use Bellwether\BWCMSBundle\Classes\Preference\Type\GeneralType;
 use Bellwether\BWCMSBundle\Classes\Preference\Type\EmailSMTPType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Entity\PreferenceEntity;
 use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
 
@@ -353,6 +354,71 @@ class PreferenceService extends BaseService
             }
         }
         return $haystack;
+    }
+
+    public function getInstagramInstance()
+    {
+        $authURL = $this->generateUrl('_admin_instagram_auth', array(), true);
+        $instagram = new Instagram(array(
+            'apiKey' => 'c0484faef7f74811ab1e9ca7afac77bc',
+            'apiSecret' => '0e44c59e9077469fafc22188d6058e7e',
+            'apiCallback' => $authURL
+        ));
+        $instaToken = $this->getInstagramToken();
+        if (!is_null($instaToken)) {
+            $instagram->setAccessToken($instaToken);
+        }
+        return $instagram;
+    }
+
+    public function getSinglePreference($fieldName, $fieldScope = '_SINGLE_PREFERENCE_', SiteEntity $siteEntity = null)
+    {
+        $criteria = array(
+            'field' => $fieldName,
+            'fieldType' => PreferenceFieldType::Internal,
+            'type' => $fieldScope,
+            'site' => $siteEntity
+        );
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\PreferenceEntity $preferenceEntity
+         */
+        $preferenceRepo = $this->pref()->getPreferenceRepository();
+        $preferenceEntity = $preferenceRepo->findOneBy($criteria);
+        if (!is_null($preferenceEntity)) {
+            return $preferenceEntity->getValue();
+        }
+        return null;
+    }
+
+    public function saveSinglePreference($fieldName, $fieldValue = null, $fieldScope = '_SINGLE_PREFERENCE_', SiteEntity $siteEntity = null)
+    {
+        $criteria = array(
+            'field' => $fieldName,
+            'fieldType' => PreferenceFieldType::Internal,
+            'type' => $fieldScope,
+            'site' => $siteEntity
+        );
+        /**
+         * @var \Bellwether\BWCMSBundle\Entity\PreferenceEntity $preferenceEntity
+         */
+        $preferenceRepo = $this->pref()->getPreferenceRepository();
+        $preferenceEntity = $preferenceRepo->findOneBy($criteria);
+        if (!is_null($preferenceEntity) && is_null($fieldValue)) {
+            $this->em()->remove($preferenceEntity);
+            $this->em()->flush();
+            return true;
+        }
+        if (is_null($preferenceEntity)) {
+            $preferenceEntity = new PreferenceEntity();
+            $preferenceEntity->setField($fieldName);
+            $preferenceEntity->setType($fieldScope);
+            $preferenceEntity->setFieldType(PreferenceFieldType::Internal);
+            $preferenceEntity->setSite($siteEntity);
+        }
+        $preferenceEntity->setValue($fieldValue);
+        $this->em()->persist($preferenceEntity);
+        $this->em()->flush();
+        return true;
     }
 
 
