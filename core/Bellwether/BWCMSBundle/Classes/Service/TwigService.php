@@ -23,6 +23,8 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
 
     private $factory;
 
+    private $currentSkinFolder = null;
+
     /**
      * @var \Twig_Environment
      */
@@ -113,6 +115,8 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     public function getFunctions()
     {
         return array(
+            'skin' => new \Twig_Function_Method($this, 'getSkin', array('is_safe' => array('html'))),
+            'skinAsset' => new \Twig_Function_Method($this, 'getSkinAsset', array('is_safe' => array('html'))),
             'link' => new \Twig_Function_Method($this, 'getContentLink'),
             'menu' => new \Twig_Function_Method($this, 'getContentMenu', array('is_safe' => array('html'))),
             'widget' => new \Twig_Function_Method($this, 'getContentWidget', array('is_safe' => array('html'))),
@@ -145,6 +149,26 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     public function getGlobals()
     {
         return array();
+    }
+
+    /**
+     * @param string $template
+     * @return string
+     */
+    public function getSkin($template)
+    {
+        $skinFolder = $this->getCurrentSkinFolder();
+        return '@' . $skinFolder . DIRECTORY_SEPARATOR . $template;
+    }
+
+    /**
+     * @param string $template
+     * @return string
+     */
+    public function getSkinAsset($template)
+    {
+        $skinFolder = $this->getCurrentSkinFolder();
+        return '/skins/' . strtolower($skinFolder) . '/' . $template ;
     }
 
     /**
@@ -347,6 +371,16 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         exit();
     }
 
+    /**
+     * @return string
+     */
+    public function getCurrentSkinFolder()
+    {
+        if (is_null($this->currentSkinFolder)) {
+            $this->currentSkinFolder = $this->sm()->getCurrentSite()->getSkinFolderName();
+        }
+        return $this->currentSkinFolder;
+    }
 
     /**
      * @return Image
