@@ -35,17 +35,26 @@ class GeneralType Extends PreferenceType
     {
         $this->fb()->add('title', 'text',
             array(
-                'label' => 'Title'
+                'label' => 'Title',
+                'attr' => array(
+                    'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
+                )
             )
         );
         $this->fb()->add('description', 'text',
             array(
-                'label' => 'Description'
+                'label' => 'Description',
+                'attr' => array(
+                    'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
+                )
             )
         );
         $this->fb()->add('keywords', 'text',
             array(
-                'label' => 'Keywords'
+                'label' => 'Keywords',
+                'attr' => array(
+                    'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
+                )
             )
         );
         $this->fb()->add('brandLogo', 'bwcms_content',
