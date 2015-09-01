@@ -189,6 +189,7 @@ abstract class ContentType implements ContentTypeInterface
     {
         $templateImagePath = str_replace('.', DIRECTORY_SEPARATOR, $this->getType() . '.' . $this->getSchema());
         $templateImagePath = $this->tp()->getCurrentSkin()->getPath() . DIRECTORY_SEPARATOR . $templateImagePath . DIRECTORY_SEPARATOR . $templateImage;
+        dump($templateImagePath);
         $templateImagePath = $this->getThumbService()->open($templateImagePath)->resize(240, 200)->cacheFile('guess');
         $this->templates[] = array(
             'title' => $templateName,
@@ -415,10 +416,15 @@ abstract class ContentType implements ContentTypeInterface
 
     private function setDefaultFormFields($isEditMode = false)
     {
+        $currentSite = $this->sm()->getAdminCurrentSite();
+
         $this->fb()->add('title', 'text',
             array(
                 'required' => true,
-                'label' => 'Title'
+                'label' => 'Title',
+                'attr' => array(
+                    'dir' => $currentSite->getDirection()
+                )
             )
         );
 
@@ -426,7 +432,10 @@ abstract class ContentType implements ContentTypeInterface
             $this->fb()->add('slug', 'text',
                 array(
                     'required' => true,
-                    'label' => 'URL Slug'
+                    'label' => 'URL Slug',
+                    'attr' => array(
+                        'dir' => $currentSite->getDirection()
+                    )
                 )
             );
         } else {
@@ -437,7 +446,10 @@ abstract class ContentType implements ContentTypeInterface
             $this->fb()->add('summary', 'textarea',
                 array(
                     'required' => false,
-                    'label' => 'Summary'
+                    'label' => 'Summary',
+                    'attr' => array(
+                        'dir' => $currentSite->getDirection()
+                    )
                 )
             );
         }
@@ -448,6 +460,7 @@ abstract class ContentType implements ContentTypeInterface
                     'required' => false,
                     'label' => 'Content',
                     'attr' => array(
+                        'dir' => $currentSite->getDirection(),
                         'class' => 'editor'
                     )
                 )
@@ -503,21 +516,30 @@ abstract class ContentType implements ContentTypeInterface
             $this->fb()->add('pageTitle', 'text',
                 array(
                     'required' => false,
-                    'label' => 'Page Title'
+                    'label' => 'Page Title',
+                    'attr' => array(
+                        'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
+                    )
                 )
             );
 
             $this->fb()->add('pageDescription', 'text',
                 array(
                     'required' => false,
-                    'label' => 'Page Description'
+                    'label' => 'Page Description',
+                    'attr' => array(
+                        'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
+                    )
                 )
             );
 
             $this->fb()->add('pageKeywords', 'text',
                 array(
                     'required' => false,
-                    'label' => 'Page Keywords'
+                    'label' => 'Page Keywords',
+                    'attr' => array(
+                        'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
+                    )
                 )
             );
         }

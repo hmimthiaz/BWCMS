@@ -24,6 +24,7 @@ class AppKernel extends Kernel
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new Gregwar\ImageBundle\GregwarImageBundle(),
             new Gregwar\CaptchaBundle\GregwarCaptchaBundle(),
+            new Liuggio\ExcelBundle\LiuggioExcelBundle(),
             new Bellwether\BWCMSBundle\BWCMSBundle(),
         );
 

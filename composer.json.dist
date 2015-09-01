@@ -51,7 +51,8 @@
     "gregwar/captcha-bundle": "dev-master",
     "html2text/html2text": "~2.0",
     "ramsey/uuid": "~2.8",
-    "moontoast/math":"*"
+    "moontoast/math":"*",
+    "liuggio/excelbundle":"2.*"
   },
   "require-dev": {
     "sensio/generator-bundle": "~2.3"

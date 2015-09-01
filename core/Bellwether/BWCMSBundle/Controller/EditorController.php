@@ -24,8 +24,8 @@ class EditorController extends BaseController implements BackEndControllerInterf
      */
     public function initAction(Request $request)
     {
-
         $templateVariables = array();
+        $templateVariables['direction'] = $this->sm()->getAdminCurrentSite()->getDirection();
         $scriptText = $this->renderView('BWCMSBundle:Editor:init.html.twig', $templateVariables);
         $response = new Response($scriptText, 200, array('Content-Type' => 'application/javascript'));
         return $response;
