@@ -103,7 +103,11 @@ class PreferenceService extends BaseService
             return $this->loadedPreference[$type];
         }
         $classInstance = $this->getPreferenceClass($type);
-        $currentSite = $this->sm()->getAdminCurrentSite();
+        if($this->admin()->isAdmin()){
+            $currentSite = $this->sm()->getAdminCurrentSite();
+        }else{
+            $currentSite = $this->sm()->getCurrentSite();
+        }
         $qb = $this->getPreferenceRepository()->createQueryBuilder('p');
         $qb->andWhere(" ( p.type = '" . $classInstance->getType() . "' ) ");
         $qb->andWhere(" ( p.site = '" . $currentSite->getId() . "' OR p.site IS NULL ) ");
