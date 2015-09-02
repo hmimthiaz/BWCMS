@@ -18,6 +18,7 @@ class MediaService extends BaseService
 
     private $mediaFolder;
     private $uploadFolder;
+    private $webRoot;
     private $webPath;
     private $extensionMimeIcons = null;
     /**
@@ -44,10 +45,10 @@ class MediaService extends BaseService
     {
         if (!$this->loaded) {
             $rootDirectory = $this->getKernel()->getRootDir();
-            $webRoot = realpath($rootDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'web');
+            $this->webRoot = realpath($rootDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'web');
 
             $this->webPath = $this->container->getParameter('media.path');
-            $this->uploadFolder = $webRoot . DIRECTORY_SEPARATOR . $this->webPath;
+            $this->uploadFolder = $this->webRoot . DIRECTORY_SEPARATOR . $this->webPath;
             $this->mediaFolder = $rootDirectory . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . $this->getKernel()->getEnvironment() . DIRECTORY_SEPARATOR . 'media';
             $this->fs = new Filesystem();
         }
@@ -94,11 +95,11 @@ class MediaService extends BaseService
     public function getMediaCachePath($mediaEntity)
     {
         $folderHash = md5($mediaEntity->getId());
-        $folderName = substr($folderHash, 0, 1) . DIRECTORY_SEPARATOR .
-            substr($folderHash, 1, 1) . DIRECTORY_SEPARATOR .
-            substr($folderHash, 2, 1) . DIRECTORY_SEPARATOR .
-            substr($folderHash, 3, 1);
-        $path = $this->mediaFolder . DIRECTORY_SEPARATOR . $folderName . DIRECTORY_SEPARATOR;
+        $folderName = '';
+        for ($index = 0; $index <= 10; $index++) {
+            $folderName .= substr($folderHash, $index, 1) . DIRECTORY_SEPARATOR;
+        }
+        $path = $this->mediaFolder . DIRECTORY_SEPARATOR . $folderName ;
         $path .= $mediaEntity->getId() . '.bin';
         return $path;
     }
@@ -346,6 +347,13 @@ class MediaService extends BaseService
         return $this->mediaFolder;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getWebRoot()
+    {
+        return $this->webRoot;
+    }
 
 
 }

@@ -61,6 +61,16 @@ class RoutingService extends BaseService implements LoaderInterface
         ));
         $routes->add('media_image_view', $mediaImageViewRoute);
 
+        $mediaThumbViewRoute = new Route('/{siteSlug}/thumb/{contentId}/{thumbSlug}/{scale}/index.php', array(
+            '_controller' => 'BWCMSBundle:FrontEnd:mediaThumb',
+        ), array(
+            'siteSlug' => '[a-zA-Z0-9-]+',
+            'contentId' => '[a-zA-Z0-9-]+',
+            'thumbSlug' => '[a-zA-Z0-9-_]+'
+        ));
+        $routes->add('media_thumb_view', $mediaThumbViewRoute);
+
+
         //make sure all content types are initialized.
         $this->cm()->init();
         $registerContentTypes = $this->cm()->getAllContentTypes();

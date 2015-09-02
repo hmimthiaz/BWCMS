@@ -168,7 +168,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     public function getSkinAsset($template)
     {
         $skinFolder = $this->getCurrentSkinFolder();
-        return '/skins/' . strtolower($skinFolder) . '/' . $template ;
+        return '/skins/' . strtolower($skinFolder) . '/' . $template;
     }
 
     /**
@@ -295,30 +295,52 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         return $path;
     }
 
+    /**
+     * @param ContentEntity $contentEntity
+     * @param $thumbSlug
+     * @param float $scaleFactor
+     * @return mixed|null|string
+     */
     public function getThumbImage($contentEntity, $thumbSlug, $scaleFactor = 1.0)
     {
-        $thumbEntity = $this->mm()->getThumbStyle($thumbSlug, $this->sm()->getCurrentSite());
-        if (empty($thumbEntity)) {
-            $thumbEntity = new ThumbStyleEntity();
-            $thumbEntity->setSite($this->sm()->getCurrentSite());
-            $thumbInfo = $this->tp()->getCurrentSkin()->getThumbStyleDefault($thumbSlug);
-            if (!is_null($thumbInfo)) {
-                $thumbEntity->setName($thumbInfo['name']);
-                $thumbEntity->setSlug($thumbSlug);
-                $thumbEntity->setMode($thumbInfo['mode']);
-                $thumbEntity->setWidth($thumbInfo['width']);
-                $thumbEntity->setHeight($thumbInfo['height']);
-            } else {
-                $thumbEntity->setName($thumbSlug);
-                $thumbEntity->setSlug($thumbSlug);
-                $thumbEntity->setMode('scaleResize');
-                $thumbEntity->setWidth(100);
-                $thumbEntity->setHeight(100);
-            }
-            $this->em()->persist($thumbEntity);
-            $this->em()->flush();
+        if (empty($contentEntity)) {
+            return null;
         }
-        return $this->mm()->getContentThumbURLWithStyle($contentEntity, $thumbEntity, $scaleFactor);
+
+        $thumbEntity = $this->cache()->fetch('thumbStyle_' . $thumbSlug);
+        if (empty($thumbEntity)) {
+            $thumbEntity = $this->mm()->getThumbStyle($thumbSlug, $this->sm()->getCurrentSite());
+            if (empty($thumbEntity)) {
+                $thumbEntity = new ThumbStyleEntity();
+                $thumbEntity->setSite($this->sm()->getCurrentSite());
+                $thumbInfo = $this->tp()->getCurrentSkin()->getThumbStyleDefault($thumbSlug);
+                if (!is_null($thumbInfo)) {
+                    $thumbEntity->setName($thumbInfo['name']);
+                    $thumbEntity->setSlug($thumbSlug);
+                    $thumbEntity->setMode($thumbInfo['mode']);
+                    $thumbEntity->setWidth($thumbInfo['width']);
+                    $thumbEntity->setHeight($thumbInfo['height']);
+                } else {
+                    $thumbEntity->setName($thumbSlug);
+                    $thumbEntity->setSlug($thumbSlug);
+                    $thumbEntity->setMode('scaleResize');
+                    $thumbEntity->setWidth(100);
+                    $thumbEntity->setHeight(100);
+                }
+                $this->em()->persist($thumbEntity);
+                $this->em()->flush();
+            }
+            $this->cache()->save('thumbStyle_' . $thumbSlug, $thumbEntity, 600);
+        }
+
+        $url = $this->generateUrl('media_thumb_view', array(
+            'siteSlug' => $this->sm()->getCurrentSite()->getSlug(),
+            'contentId' => $contentEntity->getId(),
+            'thumbSlug' => $thumbSlug,
+            'scale' => $scaleFactor
+        ));
+
+        return $url;
     }
 
     /**

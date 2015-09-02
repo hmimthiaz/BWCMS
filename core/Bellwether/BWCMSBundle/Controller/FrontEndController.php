@@ -88,7 +88,69 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
         $returnVar['searchString'] = $searchString;
 
         $template = $this->tp()->getCurrentSkin()->getSearchTemplate();
-        return $this->render($template,$returnVar);
+        return $this->render($template, $returnVar);
+    }
+
+    public function mediaThumbAction($siteSlug, $contentId, $thumbSlug, $scale)
+    {
+        $thumbEntity = $this->cache()->fetch('thumbStyle_' . $thumbSlug);
+        if (empty($thumbEntity)) {
+            $thumbEntity = $this->mm()->getThumbStyle($thumbSlug, $this->sm()->getCurrentSite());
+            if (empty($thumbEntity)) {
+                throw new $this->createNotFoundException();
+            }
+            $this->cache()->save('thumbStyle_' . $thumbSlug, $thumbEntity, 600);
+        }
+
+        /**
+         * @var ContentMediaEntity $contentMediaEntity
+         */
+        $contentMediaEntity = $this->cache()->fetch('contentMedia_' . $contentId);
+        if (empty($contentMediaEntity)) {
+            /**
+             * @var ContentEntity $contentEntity
+             */
+            $contentEntity = $this->cm()->getContentRepository()->find($contentId);
+            $contentMediaEntity = $contentEntity->getMedia()->first();
+            if (empty($contentMediaEntity)) {
+                throw new $this->createNotFoundException();
+            }
+            $this->mm()->checkAndCreateMediaCacheFile($contentMediaEntity);
+            $this->cache()->save('contentMedia_' . $contentId, $contentMediaEntity, 600);
+        }
+
+        $filename = $this->mm()->getMediaCachePath($contentMediaEntity);
+        $thumb = $this->getThumbService()->open($filename);
+        $width = $thumbEntity->getWidth() * $scale;
+        $height = $thumbEntity->getHeight() * $scale;
+        switch ($thumbEntity->getMode()) {
+            case 'resize':
+                $thumb = $thumb->resize($width, $height);
+                break;
+            case 'scaleResize':
+                $thumb = $thumb->scaleResize($width, $height);
+                break;
+            case 'forceResize':
+                $thumb = $thumb->forceResize($width, $height);
+                break;
+            case 'cropResize':
+                $thumb = $thumb->cropResize($width, $height);
+                break;
+            case 'zoomCrop':
+                $thumb = $thumb->zoomCrop($width, $height);
+                break;
+        }
+
+        $thumbCache = $this->mm()->getWebRoot() . $thumb->cacheFile('guess');
+        $response = new BinaryFileResponse($thumbCache);
+        $response->trustXSendfileTypeHeader();
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_INLINE,
+            $contentMediaEntity->getFile(),
+            iconv('UTF-8', 'ASCII//TRANSLIT', $contentMediaEntity->getFile())
+        );
+
+        return $response;
     }
 
     public function mediaViewAction($siteSlug, $contentId)
