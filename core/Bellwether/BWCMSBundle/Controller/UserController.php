@@ -90,7 +90,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
                 $this->em()->flush();
 
                 $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
-                if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
+                if (isset($emailSettings['host']) && !empty($emailSettings['host'])) {
                     $message = \Swift_Message::newInstance()
                         ->setSubject('Welcome Email')
                         ->setFrom($emailSettings['sender_address'])
@@ -102,7 +102,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
                                     'firstName' => $formData['firstName'],
                                     'username' => $formData['email'],
                                     'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
-                                    'password' => $password,
+                                    'password' => $formData['password'],
                                 )
                             )
                         );
@@ -166,6 +166,8 @@ class UserController extends BaseController implements BackEndControllerInterfac
             if ($form->isValid()) {
                 $existingUser->setFirstname($formData['firstName']);
                 $existingUser->setLastname($formData['lastName']);
+                $username = filter_var($formData['email'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $existingUser->setUsername($username);
                 $existingUser->setEmail($formData['email']);
                 $existingUser->setMobile($formData['mobile']);
                 foreach ($roles as $roleKey => $roleValue) {
