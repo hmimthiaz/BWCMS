@@ -86,7 +86,12 @@ class LocaleService extends BaseService
         $localeEntity->setHash(md5($string));
         $localeEntity->setText($string);
         $localeEntity->setValue($string);
-        $localeEntity->setSite($this->sm()->getCurrentSite());
+        if($this->admin()->isAdmin()){
+            $localeEntity->setSite($this->sm()->getAdminCurrentSite());
+        }else{
+            $localeEntity->setSite($this->sm()->getCurrentSite());
+        }
+
         $this->em()->persist($localeEntity);
         $this->em()->flush();
         return $string;
