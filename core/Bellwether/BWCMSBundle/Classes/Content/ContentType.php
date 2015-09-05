@@ -189,7 +189,6 @@ abstract class ContentType implements ContentTypeInterface
     {
         $templateImagePath = str_replace('.', DIRECTORY_SEPARATOR, $this->getType() . '.' . $this->getSchema());
         $templateImagePath = $this->tp()->getCurrentSkin()->getPath() . DIRECTORY_SEPARATOR . $templateImagePath . DIRECTORY_SEPARATOR . $templateImage;
-        dump($templateImagePath);
         $templateImagePath = $this->getThumbService()->open($templateImagePath)->resize(240, 200)->cacheFile('guess');
         $this->templates[] = array(
             'title' => $templateName,
