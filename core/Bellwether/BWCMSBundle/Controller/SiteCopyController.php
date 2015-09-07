@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
+use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Bellwether\BWCMSBundle\Entity\GuidReferenceEntity;
 use Symfony\Component\Form\Form;
 use AppKernel;
@@ -63,6 +64,10 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
         $this->em()->flush();
     }
 
+    /**
+     * @param $sourceID
+     * @return null|ContentEntity
+     */
     function getTargetContent($sourceID)
     {
         $loadedReferenceKey = $this->sourceSiteID . $this->targetSiteID . $sourceID;
@@ -83,9 +88,6 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
         $reference = $this->em()->getRepository('BWCMSBundle:GuidReferenceEntity')->findOneBy($criteria);
         if (!empty($reference)) {
             $content = $this->cm()->getContentRepository()->find($reference->getTargetGUID());
-            if (empty($content)) {
-                throw new \Exception();
-            }
             $this->loadedReference[$loadedReferenceKey] = $content;
         }
         return $content;
@@ -110,7 +112,7 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
         set_time_limit(0);
         $contentRepository = $this->cm()->getContentRepository();
         $qb = $contentRepository->createQueryBuilder('c');
-        $qb->andWhere(" c.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->andWhere(" c.site ='" . $this->sourceSiteID . "' ");
 
         $registeredContents = $this->cm()->getRegisteredContentTypes(null, null);
         $condition = array();
@@ -151,7 +153,7 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
         set_time_limit(0);
         $contentRepository = $this->cm()->getContentRepository();
         $qb = $contentRepository->createQueryBuilder('c');
-        $qb->andWhere(" c.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->andWhere(" c.site ='" . $this->sourceSiteID . "' ");
 
         $registeredContents = $this->cm()->getRegisteredContentTypes(null, null);
         $condition = array();
@@ -180,8 +182,51 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
                 $this->createGUIDReference($content->getId(), $newContent->getId(), $content->getCreatedDate());
             }
         }
+        return $this->redirectToRoute('_bwcms_admin_sitecopy_fixmeta');
 
-        dump('Done');
+    }
+
+    /**
+     * @Route("/sitecopy/fixmeta.php",name="_bwcms_admin_sitecopy_fixmeta")
+     * @Template()
+     */
+    function fixMetaAction()
+    {
+        set_time_limit(0);
+        $contentMetaRepository = $this->em()->getRepository('BWCMSBundle:ContentMetaEntity');
+        $qb = $contentMetaRepository->createQueryBuilder('m');
+        $qb->leftJoin('m.content', 'c');
+        $qb->andWhere(" c.site ='" . $this->targetSiteID . "' ");
+        $qb->add('orderBy', 'c.createdDate ASC');
+        $qb->setMaxResults(1000);
+
+        dump($qb->getQuery()->getSQL());
+        $result = $qb->getQuery()->getResult();
+
+        if (!empty($result)) {
+            /**
+             * @var ContentMetaEntity $meta ;
+             */
+            foreach ($result as $meta) {
+                $matches = null;
+                $searchedValue = $meta->getValue();
+                preg_match_all('/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/', $searchedValue, $matches);
+                if (!empty($matches[0])) {
+                    foreach ($matches[0] as $contentId) {
+                        $newContent = $this->getTargetContent($contentId);
+                        if (!empty($newContent)) {
+                            $newContentId = $newContent->getId();
+                            $searchedValue = str_replace($contentId, $newContentId, $searchedValue);
+                        }
+                    }
+                    $meta->setValue($searchedValue);
+                    $this->em()->persist($meta);
+                    $this->em()->flush();
+                }
+            }
+        }
+
+
         exit;
     }
 
@@ -193,6 +238,7 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
     function cloneContent(ContentEntity $content, ContentEntity $parentContent = null)
     {
         $newContent = clone $content;
+        $newContent->setTitle('[' . $this->targetSite->getSlug() . '] - ' . $content->getTitle());
         $newContent->setTreeParent($parentContent);
         $newContent->setSite($this->targetSite);
         $parentId = null;
