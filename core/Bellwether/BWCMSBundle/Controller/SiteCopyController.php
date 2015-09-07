@@ -364,7 +364,7 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
     function cloneContent(ContentEntity $content, ContentEntity $parentContent = null)
     {
         $newContent = clone $content;
-        $newContent->setTitle('[' . $this->targetSite->getSlug() . '] - ' . $content->getTitle());
+        //$newContent->setTitle('[' . $this->targetSite->getSlug() . '] - ' . $content->getTitle());
         $newContent->setTreeParent($parentContent);
         $newContent->setSite($this->targetSite);
         $parentId = null;

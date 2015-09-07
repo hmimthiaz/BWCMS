@@ -25,6 +25,8 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
 
     private $currentSkinFolder = null;
 
+    private $skinAssetPrefix = null;
+
     /**
      * @var \Twig_Environment
      */
@@ -117,6 +119,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         return array(
             'skin' => new \Twig_Function_Method($this, 'getSkin', array('is_safe' => array('html'))),
             'skinAsset' => new \Twig_Function_Method($this, 'getSkinAsset', array('is_safe' => array('html'))),
+            'setSkinAssetPrefix' => new \Twig_Function_Method($this, 'setSkinAssetPrefix', array('is_safe' => array('html'))),
             'link' => new \Twig_Function_Method($this, 'getContentLink'),
             'menu' => new \Twig_Function_Method($this, 'getContentMenu', array('is_safe' => array('html'))),
             'widget' => new \Twig_Function_Method($this, 'getContentWidget', array('is_safe' => array('html'))),
@@ -161,6 +164,11 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         return '@' . $skinFolder . DIRECTORY_SEPARATOR . $template;
     }
 
+    public function setSkinAssetPrefix($prefix)
+    {
+        $this->skinAssetPrefix = $prefix;
+    }
+
     /**
      * @param string $template
      * @return string
@@ -168,7 +176,12 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     public function getSkinAsset($template)
     {
         $skinFolder = $this->getCurrentSkinFolder();
-        return '/skins/' . strtolower($skinFolder) . '/' . $template;
+        $returnValue = '/skins/' . strtolower($skinFolder) . '/';
+        if (!is_null($this->skinAssetPrefix)) {
+            $returnValue .= $this->skinAssetPrefix . '/';
+        }
+        $returnValue .= $template;
+        return $returnValue;
     }
 
     /**
