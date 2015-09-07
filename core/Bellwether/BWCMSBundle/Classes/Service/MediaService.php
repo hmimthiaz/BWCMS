@@ -99,7 +99,7 @@ class MediaService extends BaseService
         for ($index = 0; $index <= 10; $index++) {
             $folderName .= substr($folderHash, $index, 1) . DIRECTORY_SEPARATOR;
         }
-        $path = $this->mediaFolder . DIRECTORY_SEPARATOR . $folderName ;
+        $path = $this->mediaFolder . DIRECTORY_SEPARATOR . $folderName;
         $path .= $mediaEntity->getId() . '.bin';
         return $path;
     }
@@ -309,6 +309,26 @@ class MediaService extends BaseService
         return $this->extensionMimeIcons;
     }
 
+    function compress_png($pngFilePath, $max_quality = 90)
+    {
+        if (!function_exists('shell_exec')) {
+            return null;
+        }
+        if (!file_exists($pngFilePath)) {
+            return null;
+        }
+
+        $min_quality = 60;
+        // '-' makes it use stdout, required to save to $compressed_png_content variable
+        // '<' makes it read from the given file path
+        // escapeshellarg() makes this safe to use with any path
+        $compressed_png_content = shell_exec("pngquant --quality=$min_quality-$max_quality - < " . escapeshellarg($pngFilePath));
+
+        if (!$compressed_png_content) {
+            return null;
+        }
+        return $compressed_png_content;
+    }
 
     /**
      * @return Image

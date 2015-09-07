@@ -287,25 +287,14 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      */
     public function getImage($contentEntity, $default = false)
     {
-        /**
-         * @var ContentMediaEntity $media
-         */
-        if (empty($contentEntity)) {
-            return $default;
-        }
-        if (!$this->mm()->isMedia($contentEntity)) {
-            return $default;
-        }
-        $media = $contentEntity->getMedia()->first();
-        $this->mm()->checkAndCreateMediaCacheFile($media);
-        if ($this->mm()->isImage($contentEntity)) {
-            $filename = $this->mm()->getMediaCachePath($media);
-            $path = $this->getThumbService()->open($filename)->resize($media->getWidth(), $media->getHeight())->cacheFile('guess');
-        } else {
-            $filename = $this->mm()->getMimeResourceImage($media->getExtension());
-            $path = $this->getThumbService()->open($filename)->resize(128, 128)->cacheFile('guess');
-        }
-        return $path;
+
+        $url = $this->generateUrl('media_image_view', array(
+            'siteSlug' => $this->sm()->getCurrentSite()->getSlug(),
+            'contentId' => $contentEntity->getId()
+        ));
+
+        return $url;
+
     }
 
     /**

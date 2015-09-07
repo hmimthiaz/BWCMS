@@ -10,6 +10,7 @@ use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Doctrine\Common\Cache\FilesystemCache;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpFoundation\Response;
 
 class CacheService extends BaseService
 {
@@ -34,7 +35,7 @@ class CacheService extends BaseService
     /**
      * @var int
      */
-    private $cachePageLifetime = 900;
+    private $cachePageLifetime = 600;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -72,26 +73,56 @@ class CacheService extends BaseService
 
     public function checkPageCacheResponse(GetResponseEvent $event)
     {
+        $env = $this->container->get('kernel')->getEnvironment();
+        if ($env != 'prod') {
+            return;
+        }
+        if ($this->isUserLoggedIn()) {
+            return;
+        }
         $baseURL = $event->getRequest()->getBaseUrl();
         $pathInfo = $event->getRequest()->getPathInfo();
         $pageCacheHash = md5($baseURL . $pathInfo);
-
+        /**
+         * @var Response $pageResponse
+         */
         $pageResponse = $this->pageCache->fetch($pageCacheHash);
         if ($pageResponse !== false) {
+            $pageContent = $pageResponse->getContent();
+            $pageContent .= "\n<!-- Page Cached -->";
+            $pageResponse->setContent($pageContent);
             $event->setResponse($pageResponse);
         }
     }
 
     public function savePageCacheReponse(FilterResponseEvent $event)
     {
-        $baseURL = $event->getRequest()->getBaseUrl();
-        $pathInfo = $event->getRequest()->getPathInfo();
-        $pageCacheHash = md5($baseURL . $pathInfo);
-
-        if($this->cacheCurrentPage){
-            $this->pageCache->save($pageCacheHash,$event->getResponse(),$this->cachePageLifetime);
+        $env = $this->container->get('kernel')->getEnvironment();
+        if ($env != 'prod') {
+            return;
+        }
+        if ($this->isUserLoggedIn()) {
+            return;
+        }
+        if ($this->cacheCurrentPage) {
+            $baseURL = $event->getRequest()->getBaseUrl();
+            $pathInfo = $event->getRequest()->getPathInfo();
+            $pageCacheHash = md5($baseURL . $pathInfo);
+            $this->pageCache->save($pageCacheHash, $event->getResponse(), $this->cachePageLifetime);
             $this->cacheCurrentPage = false;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUserLoggedIn()
+    {
+        $securityContext = $this->container->get('security.context');
+        if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -176,8 +207,6 @@ class CacheService extends BaseService
     {
         $this->cachePageLifetime = $cachePageLifetime;
     }
-
-
 
 
 }

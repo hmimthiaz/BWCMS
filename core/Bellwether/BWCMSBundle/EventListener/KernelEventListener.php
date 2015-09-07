@@ -71,7 +71,6 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
                 throw new NotFoundHttpException("Unable to detect language");
             }
             $siteEntity = $this->sm()->getSiteBySlug($params['siteSlug']);
-
             if ($siteEntity == null) {
                 throw new NotFoundHttpException("Language does not exists");
             }
@@ -105,6 +104,15 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
         }
     }
 
+    public function isUserLoggedIn()
+    {
+        $securityContext = $this->container->get('security.context');
+        if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            return true;
+        }
+        return false;
+    }
+
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
 
@@ -136,7 +144,7 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
             }
         }
 
-        if(!empty($displayTemplate)){
+        if (!empty($displayTemplate)) {
             $template = $this->container->get('templating');
             $response = new Response($template->render($displayTemplate, $templateVars));
             $event->setResponse($response);

@@ -155,31 +155,43 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
 
     public function mediaViewAction($siteSlug, $contentId)
     {
-
-        $contentRepository = $this->cm()->getContentRepository();
         /**
-         * @var ContentEntity $contentEntity
+         * @var ContentMediaEntity $contentMediaEntity
          */
-        $contentEntity = $contentRepository->find($contentId);
-        if ($contentEntity == null) {
-            throw new NotFoundHttpException('File does not exist');
-        }
+        $contentMediaEntity = $this->cache()->fetch('contentMedia_' . $contentId);
+        if (empty($contentMediaEntity)) {
+            /**
+             * @var ContentEntity $contentEntity
+             */
+            $contentEntity = $this->cm()->getContentRepository()->find($contentId);
+            $contentMediaEntity = $contentEntity->getMedia()->first();
+            if (empty($contentMediaEntity)) {
+                throw new $this->createNotFoundException();
+            }
+            if (!$this->mm()->isImage($contentEntity)) {
+                throw new NotFoundHttpException('File is not an image');
+            }
 
-        if (!$this->mm()->isImage($contentEntity)) {
-            throw new NotFoundHttpException('File is not an image');
+            $this->mm()->checkAndCreateMediaCacheFile($contentMediaEntity);
+            $this->cache()->save('contentMedia_' . $contentId, $contentMediaEntity, 600);
         }
-        /**
-         * @var ContentMediaEntity $media
-         */
-        $media = $contentEntity->getMedia()->first();
-        $filename = $this->mm()->checkAndCreateMediaCacheFile($media);
-
+        $filename = $this->mm()->getMediaCachePath($contentMediaEntity);
         $response = new BinaryFileResponse($filename);
         $response->trustXSendfileTypeHeader();
+        $lastModified = $contentMediaEntity->getContent()->getModifiedDate();
+        if (is_null($lastModified)) {
+            $lastModified = $contentMediaEntity->getContent()->getCreatedDate();
+        }
+        if (!is_null($lastModified)) {
+            $response->setLastModified($lastModified);
+        }
+        $expiresDate = new \DateTime();
+        $expiresDate->add(new \DateInterval('P30D'));
+        $response->setExpires($expiresDate);
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_INLINE,
-            $media->getFile(),
-            iconv('UTF-8', 'ASCII//TRANSLIT', $media->getFile())
+            $contentMediaEntity->getFile(),
+            iconv('UTF-8', 'ASCII//TRANSLIT', $contentMediaEntity->getFile())
         );
 
         return $response;
