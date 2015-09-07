@@ -14,6 +14,7 @@ use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Bellwether\BWCMSBundle\Entity\GuidReferenceEntity;
+use Bellwether\BWCMSBundle\Entity\PreferenceEntity;
 use Symfony\Component\Form\Form;
 use AppKernel;
 
@@ -100,6 +101,88 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
     public function resetAction()
     {
         $this->saveLastCreatedDate(null);
+        return $this->redirectToRoute('_bwcms_admin_sitecopy_delete');
+    }
+
+    /**
+     * @Route("/sitecopy/delete.php",name="_bwcms_admin_sitecopy_delete")
+     * @Template()
+     */
+    public function deleteTargetAction()
+    {
+        set_time_limit(0);
+
+        $connection = $this->em()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+
+        $connection->executeUpdate($platform->getTruncateTableSQL('BWGuidReference', true /* whether to cascade */));
+
+        $prefRepository = $this->em()->getRepository('BWCMSBundle:PreferenceEntity');
+        $qb = $prefRepository->createQueryBuilder('p');
+        $qb->andWhere(" p.site ='" . $this->targetSiteID . "' ");
+        $qb->add('orderBy', 'p.id ASC');
+        $qb->setMaxResults(9999);
+
+        $result = $qb->getQuery()->getResult();
+
+        if (!empty($result)) {
+            /**
+             * @var PreferenceEntity $pref ;
+             */
+            foreach ($result as $pref) {
+                $this->em()->remove($pref);
+                $this->em()->flush();
+            }
+        }
+
+        $contentRepository = $this->cm()->getContentRepository();
+        $qb = $contentRepository->createQueryBuilder('c');
+        $qb->andWhere(" c.site ='" . $this->targetSiteID . "' ");
+        $registeredContents = $this->cm()->getRegisteredContentTypes(null, null);
+        $condition = array();
+        foreach ($registeredContents as $cInfo) {
+            if (!$cInfo['isHierarchy']) {
+                $condition[] = " (c.type = '" . $cInfo['type'] . "' AND c.schema = '" . $cInfo['schema'] . "' )";
+            }
+        }
+        if (!empty($condition)) {
+            $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
+        }
+        $qb->add('orderBy', 'c.createdDate DESC');
+        $qb->setMaxResults(9999);
+        $result = $qb->getQuery()->getResult();
+        if (!empty($result)) {
+            /**
+             * @var ContentEntity $content ;
+             */
+            foreach ($result as $content) {
+                $this->delete($content);
+            }
+        }
+
+        $qb = $contentRepository->createQueryBuilder('c');
+        $qb->andWhere(" c.site ='" . $this->targetSiteID . "' ");
+        $registeredContents = $this->cm()->getRegisteredContentTypes(null, null);
+        $condition = array();
+        foreach ($registeredContents as $cInfo) {
+            if ($cInfo['isHierarchy']) {
+                $condition[] = " (c.type = '" . $cInfo['type'] . "' AND c.schema = '" . $cInfo['schema'] . "' )";
+            }
+        }
+        if (!empty($condition)) {
+            $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
+        }
+        $qb->add('orderBy', 'c.createdDate DESC');
+        $qb->setMaxResults(9999);
+        $result = $qb->getQuery()->getResult();
+        if (!empty($result)) {
+            /**
+             * @var ContentEntity $content ;
+             */
+            foreach ($result as $content) {
+                $this->delete($content);
+            }
+        }
         return $this->redirectToRoute('_bwcms_admin_sitecopy_folders');
     }
 
@@ -125,7 +208,7 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
         $qb->add('orderBy', 'c.createdDate ASC');
-        $qb->setMaxResults(10000);
+        $qb->setMaxResults(9999);
         $result = $qb->getQuery()->getResult();
 
         if (!empty($result)) {
@@ -166,7 +249,7 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
         $qb->add('orderBy', 'c.createdDate ASC');
-        $qb->setMaxResults(10000);
+        $qb->setMaxResults(9999);
         $result = $qb->getQuery()->getResult();
 
         if (!empty($result)) {
@@ -198,9 +281,7 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
         $qb->leftJoin('m.content', 'c');
         $qb->andWhere(" c.site ='" . $this->targetSiteID . "' ");
         $qb->add('orderBy', 'c.createdDate ASC');
-        $qb->setMaxResults(1000);
-
-        dump($qb->getQuery()->getSQL());
+        $qb->setMaxResults(9999);
         $result = $qb->getQuery()->getResult();
 
         if (!empty($result)) {
@@ -226,9 +307,54 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
             }
         }
 
+        return $this->redirectToRoute('_bwcms_admin_sitecopy_pref');
+    }
 
+
+    /**
+     * @Route("/sitecopy/pref.php",name="_bwcms_admin_sitecopy_pref")
+     * @Template()
+     */
+    function copyPrefAction()
+    {
+        set_time_limit(0);
+        $prefRepository = $this->em()->getRepository('BWCMSBundle:PreferenceEntity');
+        $qb = $prefRepository->createQueryBuilder('p');
+        $qb->andWhere(" p.site ='" . $this->sourceSiteID . "' ");
+        $qb->add('orderBy', 'p.id ASC');
+        $qb->setMaxResults(9999);
+
+        $result = $qb->getQuery()->getResult();
+
+        if (!empty($result)) {
+            /**
+             * @var PreferenceEntity $pref ;
+             */
+            foreach ($result as $pref) {
+                $newPref = clone $pref;
+                $newPref->setSite($this->targetSite);
+
+                $matches = null;
+                $searchedValue = $pref->getValue();
+                preg_match_all('/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/', $searchedValue, $matches);
+                if (!empty($matches[0])) {
+                    foreach ($matches[0] as $contentId) {
+                        $newContent = $this->getTargetContent($contentId);
+                        if (!empty($newContent)) {
+                            $newContentId = $newContent->getId();
+                            $searchedValue = str_replace($contentId, $newContentId, $searchedValue);
+                        }
+                    }
+                    $newPref->setValue($searchedValue);
+                }
+                $this->em()->persist($newPref);
+                $this->em()->flush();
+            }
+        }
+        dump('done');
         exit;
     }
+
 
     /**
      * @param ContentEntity $content
@@ -277,6 +403,43 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
         $this->em()->flush();
 
         return $newContent;
+    }
+
+    public function delete(ContentEntity $content = null)
+    {
+        $existingMeta = $content->getMeta();
+        if (!empty($existingMeta)) {
+            foreach ($existingMeta as $meta) {
+                $this->em()->remove($meta);
+            }
+        }
+        $existingMedia = $content->getMedia();
+        if (!empty($existingMedia)) {
+            foreach ($existingMedia as $media) {
+                $this->em()->remove($media);
+            }
+        }
+        $existingRelation = $content->getRelation();
+        if (!empty($existingRelation)) {
+            foreach ($existingRelation as $relation) {
+                $this->em()->remove($relation);
+            }
+        }
+        $searchEntity = $this->search()->searchIndexEntity($content);
+        if (!empty($searchEntity)) {
+            $this->em()->remove($searchEntity);
+        }
+        $contentClass = $this->cm()->getContentClass($content->getType(), $content->getSchema());
+        if ($contentClass->isTaxonomy()) {
+            $taxonomyRelations = $this->em()->getRepository('BWCMSBundle:ContentRelationEntity')->findBy(array("relatedContent" => $content));
+            if (!empty($taxonomyRelations)) {
+                foreach ($taxonomyRelations as $relation) {
+                    $this->em()->remove($relation);
+                }
+            }
+        }
+        $this->em()->remove($content);
+        $this->em()->flush();
     }
 
 
