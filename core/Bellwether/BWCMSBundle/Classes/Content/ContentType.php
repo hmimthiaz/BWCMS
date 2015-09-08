@@ -349,9 +349,11 @@ abstract class ContentType implements ContentTypeInterface
                 }
             }
         }
-        if (!empty($data['slug'])) {
-            if ($this->cm()->checkSlugExists($data['slug'], $this->getType(), $data['parent'], $data['id'])) {
-                $form->get('slug')->addError(new FormError('Slug already exists!'));
+        if ($this->isSlugEnabled) {
+            if (!empty($data['slug'])) {
+                if ($this->cm()->checkSlugExists($data['slug'], $this->getType(), $data['parent'], $data['id'])) {
+                    $form->get('slug')->addError(new FormError('Slug already exists!'));
+                }
             }
         }
         $this->validateForm($event);

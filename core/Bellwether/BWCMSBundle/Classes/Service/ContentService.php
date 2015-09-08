@@ -38,6 +38,7 @@ use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Bellwether\Common\StringUtility;
 use Bellwether\Common\Pagination;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Doctrine\ORM\NoResultException;
@@ -523,20 +524,22 @@ class ContentService extends BaseService
                 }
             }
             if ($fieldName == 'attachment') {
-                $mediaInfo = $this->mm()->handleUpload($data['attachment']);
-                if (!empty($mediaInfo)) {
-                    $contentMedia = new ContentMediaEntity();
-                    $contentMedia->setFile($mediaInfo['filename']);
-                    $contentMedia->setExtension($mediaInfo['extension']);
-                    $contentMedia->setMime($mediaInfo['mimeType']);
-                    $contentMedia->setSize($mediaInfo['size']);
-                    $contentMedia->setHeight($mediaInfo['height']);
-                    $contentMedia->setWidth($mediaInfo['width']);
-                    if (!is_null($mediaInfo['binary'])) {
-                        $contentMedia->setData($mediaInfo['binary']);
+                if ($data['attachment'] instanceof UploadedFile) {
+                    $mediaInfo = $this->mm()->handleUpload($data['attachment']);
+                    if (!empty($mediaInfo)) {
+                        $contentMedia = new ContentMediaEntity();
+                        $contentMedia->setFile($mediaInfo['filename']);
+                        $contentMedia->setExtension($mediaInfo['extension']);
+                        $contentMedia->setMime($mediaInfo['mimeType']);
+                        $contentMedia->setSize($mediaInfo['size']);
+                        $contentMedia->setHeight($mediaInfo['height']);
+                        $contentMedia->setWidth($mediaInfo['width']);
+                        if (!is_null($mediaInfo['binary'])) {
+                            $contentMedia->setData($mediaInfo['binary']);
+                        }
+                        $contentMedia->setContent($content);
+                        $this->em()->persist($contentMedia);
                     }
-                    $contentMedia->setContent($content);
-                    $this->em()->persist($contentMedia);
                 }
             }
         }
@@ -862,6 +865,8 @@ class ContentService extends BaseService
             $qb->andWhere(" node.id != '{$contentId}' ");
         }
         $qb->andWhere(" node.slug = '{$slug}' ");
+        $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+
         $totalCount = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
         if ($totalCount > 0) {
             return true;
