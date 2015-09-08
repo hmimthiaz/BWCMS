@@ -1,6 +1,7 @@
 <?php
 $baseDIR = __DIR__;
-$requestFile = $baseDIR . DIRECTORY_SEPARATOR . $_REQUEST['file'];
+$requestFile = $baseDIR . DIRECTORY_SEPARATOR .'skins'. $_REQUEST['file'];
+
 if (!file_exists($requestFile)) {
     header("HTTP/1.0 404 Not Found");
     exit;
