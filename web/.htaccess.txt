@@ -8,7 +8,11 @@ DirectoryIndex app.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
     #Enabling Gzip of files
-    RewriteRule ^skins(.*\.(css|js))$ %{ENV:BASE}/gzip.php?file=$1 [L,NC]
+    #RewriteRule ^skins(.*\.(css|js))$ %{ENV:BASE}/gzip.php?file=$1 [L,NC]
+    #Overide fav icon
+    #RewriteRule ^favicon\.(gif|ico|png|jpe?g)$ /skins/(*skinname*)/favicon.ico [L,NC]
+    #Overide touch icon
+    #RewriteRule ^apple-touch-icon\.(gif|ico|png|jpe?g)$ /skins/(*skinname*)/apple-touch-icon.png [L,NC]
 </IfModule>
 
 <ifmodule mod_expires.c>
