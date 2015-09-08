@@ -7,6 +7,18 @@ DirectoryIndex app.php
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    #Enabling Gzip of files
+    RewriteRule ^(.*\.(css|js))$ %{ENV:BASE}/gzip.php?file=$1 [L,NC]
+</IfModule>
+
+<ifmodule mod_expires.c>
+  ExpiresActive On
+  #Enabling expire headers for all to one day
+  ExpiresDefault "access plus 86400 seconds"
+</ifmodule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
 
     # Determine the RewriteBase automatically and set it as environment variable.
     # If you are using Apache aliases to do mass virtual hosting or installed the
