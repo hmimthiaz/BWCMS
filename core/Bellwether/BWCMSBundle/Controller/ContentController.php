@@ -97,17 +97,19 @@ class ContentController extends BaseController implements BackEndControllerInter
         if ($contentId == null) {
             return $this->returnErrorResponse();
         }
-
         /**
          * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
          */
         $content = $this->cm()->getContentRepository()->find($contentId);
+        if ($content == null) {
+            return $this->returnErrorResponse();
+        }
 
         $class = $this->cm()->getContentClass($content->getType(), $content->getSchema());
         if ($content->getTreeParent() != null) {
             $class->setParent($content->getTreeParent()->getId());
         }
-        $form = $class->getForm(true);
+        $form = $class->getForm(true, $content);
         $form = $this->cm()->loadFormData($content, $form, $class);
 
         return array(
@@ -196,36 +198,44 @@ class ContentController extends BaseController implements BackEndControllerInter
     public function saveAction(Request $request)
     {
 
-        $contentFormData = $request->request->get('BWCF');
-        $type = $contentFormData['type'];
-        $schema = $contentFormData['schema'];
-
-        if (is_null($type) || is_null($schema)) {
+        $contentId = $request->query->get('contentId');
+        $contentType = $request->query->get('contentType');
+        $contentSchema = $request->query->get('contentSchema');
+        if (is_null($contentType) || is_null($contentSchema)) {
             return $this->returnErrorResponse();
+        }
+
+        $editingContent = null;
+        $isEditMode = false;
+        if (!is_null($contentId)) {
+            /**
+             * @var \Bellwether\BWCMSBundle\Entity\ContentEntity $content
+             */
+            $editingContent = $this->cm()->getContentRepository()->find($contentId);
+            if ($editingContent == null) {
+                return $this->returnErrorResponse();
+            }
+            $isEditMode = true;
         }
 
         /**
          * @var ContentType $class
          */
-        $class = $this->cm()->getContentClass($type, $schema);
-        $form = $class->getForm(true);
+        $class = $this->cm()->getContentClass($contentType, $contentSchema);
+        $form = $class->getForm($isEditMode, $editingContent);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-
-            $contentId = $form->get('id')->getData();
-            if (empty($contentId)) {
-                $contentEntity = new ContentEntity();
-                $contentEntity->setSite($this->getSite());
-            } else {
-                $contentEntity = $this->cm()->getContentRepository()->find($contentId);
+            if (is_null($editingContent)) {
+                $editingContent = new ContentEntity();
+                $editingContent->setSite($this->getSite());
             }
 
-            $contentEntity = $this->cm()->prepareEntity($contentEntity, $form, $class);
-            $this->cm()->save($contentEntity);
+            $editingContent = $this->cm()->prepareEntity($editingContent, $form, $class);
+            $this->cm()->save($editingContent);
 
-            if ($contentEntity->getScope() == ContentScopeType::CPageBuilder) {
-                $parents = $this->cm()->getContentRepository()->getPath($contentEntity);
+            if ($editingContent->getScope() == ContentScopeType::CPageBuilder) {
+                $parents = $this->cm()->getContentRepository()->getPath($editingContent);
                 $parents = array_reverse($parents);
                 foreach ($parents as $parent) {
                     if ($parent->getScope() == ContentScopeType::CPublic) {
@@ -236,13 +246,13 @@ class ContentController extends BaseController implements BackEndControllerInter
             }
 
             $parentId = 'Root';
-            if ($contentEntity->getTreeParent() != null) {
-                $parentId = $contentEntity->getTreeParent()->getId();
+            if ($editingContent->getTreeParent() != null) {
+                $parentId = $editingContent->getTreeParent()->getId();
             }
             if ($class->isTaxonomy()) {
-                return $this->redirect($this->generateUrl('_bwcms_admin_taxonomy_home', array('schema' => $schema, 'parent' => $parentId)));
+                return $this->redirect($this->generateUrl('_bwcms_admin_taxonomy_home', array('schema' => $contentSchema, 'parent' => $parentId)));
             }
-            return $this->redirect($this->generateUrl('_bwcms_admin_content_home', array('type' => $type, 'parent' => $parentId)));
+            return $this->redirect($this->generateUrl('_bwcms_admin_content_home', array('type' => $contentType, 'parent' => $parentId)));
         }
 
         return array(

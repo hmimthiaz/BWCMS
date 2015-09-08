@@ -178,7 +178,7 @@ abstract class ContentType implements ContentTypeInterface
 
     abstract protected function buildFields();
 
-    abstract protected function buildForm($isEditMode = false);
+    abstract protected function buildForm($isEditMode = false, ContentEntity $contentEntity = null);
 
     /**
      * @return string
@@ -232,15 +232,36 @@ abstract class ContentType implements ContentTypeInterface
     abstract public function getPublicURL($contentEntity, $full = false);
 
     /**
+     * /**
      * @return Form
      */
-    final public function getForm($isEditMode = false)
+    /**
+     * @param bool|false $isEditMode
+     * @param ContentEntity $contentEntity
+     * @return Form
+     */
+    final public function getForm($isEditMode = false, ContentEntity $contentEntity = null)
     {
         if ($this->form == null) {
+            if ($this->formBuilder == null) {
+                $contentEmptyForm = new ContentEmptyForm();
+                $this->formBuilder = $this->container->get('form.factory')->createBuilder($contentEmptyForm);
+                $this->formBuilder->addEventListener(FormEvents::POST_SUBMIT, array(&$this, 'formEventPostSubmit'));
+            }
             $this->setDefaultFormFields($isEditMode);
-            $this->buildForm();
+            $this->buildForm($isEditMode, $contentEntity);
             $this->setDefaultHiddenFormFields($isEditMode);
-            $this->fb()->setAction($this->generateUrl('_bwcms_admin_content_save'));
+            $editURLParams = array();
+            if (!is_null($contentEntity)) {
+                $editURLParams['contentId'] = $contentEntity->getId();
+                $editURLParams['contentType'] = $contentEntity->getType();
+                $editURLParams['contentSchema'] = $contentEntity->getSchema();
+            } else {
+                $editURLParams['contentType'] = $this->getType();
+                $editURLParams['contentSchema'] = $this->getSchema();
+            }
+            $editURL = $this->generateUrl('_bwcms_admin_content_save', $editURLParams);
+            $this->fb()->setAction($editURL);
             $this->fb()->setMethod('POST');
             $this->form = $this->fb()->getForm();
         }
@@ -322,11 +343,6 @@ abstract class ContentType implements ContentTypeInterface
      */
     final public function fb()
     {
-        if ($this->formBuilder == null) {
-            $contentEmptyForm = new ContentEmptyForm();
-            $this->formBuilder = $this->container->get('form.factory')->createBuilder($contentEmptyForm);
-            $this->formBuilder->addEventListener(FormEvents::POST_SUBMIT, array(&$this, 'formEventPostSubmit'));
-        }
         return $this->formBuilder;
     }
 
@@ -335,20 +351,6 @@ abstract class ContentType implements ContentTypeInterface
         $form = $event->getForm();
         $data = $event->getData();
 
-        if (empty($data['title'])) {
-            $form->get('title')->addError(new FormError('Title cannot be empty!'));
-        }
-
-        if ($this->isUploadEnabled) {
-            if (!($data['attachment'] instanceof UploadedFile) && empty($data['id'])) {
-                $form->get('attachment')->addError(new FormError('Attachment cannot be empty'));
-            }
-            if ($data['attachment'] instanceof UploadedFile) {
-                if (!($data['attachment']->isValid())) {
-                    $form->get('attachment')->addError(new FormError($data['attachment']->getErrorMessage()));
-                }
-            }
-        }
         if ($this->isSlugEnabled) {
             if (!empty($data['slug'])) {
                 if ($this->cm()->checkSlugExists($data['slug'], $this->getType(), $data['parent'], $data['id'])) {
@@ -425,6 +427,9 @@ abstract class ContentType implements ContentTypeInterface
                 'label' => 'Title',
                 'attr' => array(
                     'dir' => $currentSite->getDirection()
+                ),
+                'constraints' => array(
+                    new NotBlank(array('message' => 'Title cannot be empty!'))
                 )
             )
         );
@@ -506,11 +511,24 @@ abstract class ContentType implements ContentTypeInterface
         }
 
         if ($this->isUploadEnabled()) {
-            $this->fb()->add('attachment', 'file',
-                array(
-                    'label' => 'Attachment'
-                )
-            );
+            if ($isEditMode) {
+                $this->fb()->add('attachment', 'file',
+                    array(
+                        'required' => false,
+                        'label' => 'Attachment'
+                    )
+                );
+            } else {
+                $this->fb()->add('attachment', 'file',
+                    array(
+                        'required' => true,
+                        'label' => 'Attachment',
+                        'constraints' => array(
+                            new NotBlank(array('message' => 'Please select an attachment to upload.'))
+                        )
+                    )
+                );
+            }
         }
 
         if ($this->isSeoFieldsEnabled()) {

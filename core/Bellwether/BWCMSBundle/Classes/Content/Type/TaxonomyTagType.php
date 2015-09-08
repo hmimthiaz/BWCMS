@@ -39,7 +39,7 @@ class TaxonomyTagType Extends ContentType
 
     }
 
-    public function buildForm($isEditMode = false)
+    public function buildForm($isEditMode = false, ContentEntity $contentEntity = null)
     {
 
     }

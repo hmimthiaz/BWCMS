@@ -46,7 +46,7 @@ class NavigationFolderType Extends ContentType
         $this->addField('liClass', ContentFieldType::String);
     }
 
-    public function buildForm($isEditMode = false)
+    public function buildForm($isEditMode = false, ContentEntity $contentEntity = null)
     {
         $routes = $this->tp()->getCurrentSkin()->getNavigationRoutes();
         $routes = array_merge(array('' => ''), $routes);

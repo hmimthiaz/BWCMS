@@ -42,7 +42,7 @@ class ContentPageType Extends ContentType
         $this->addField('gallery', ContentFieldType::Serialized);
     }
 
-    public function buildForm($isEditMode = false)
+    public function buildForm($isEditMode = false, ContentEntity $contentEntity = null)
     {
         $this->fb()->add('fieldContent', 'bwcms_content',
             array(

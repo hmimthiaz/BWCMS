@@ -527,6 +527,11 @@ class ContentService extends BaseService
                 if ($data['attachment'] instanceof UploadedFile) {
                     $mediaInfo = $this->mm()->handleUpload($data['attachment']);
                     if (!empty($mediaInfo)) {
+                        if ($content->getMedia()->count() > 0) {
+                            $mediaToDelete = $content->getMedia()->first();
+                            $this->em()->remove($mediaToDelete);
+                        }
+
                         $contentMedia = new ContentMediaEntity();
                         $contentMedia->setFile($mediaInfo['filename']);
                         $contentMedia->setExtension($mediaInfo['extension']);
