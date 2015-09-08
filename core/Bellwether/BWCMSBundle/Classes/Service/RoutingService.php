@@ -54,7 +54,7 @@ class RoutingService extends BaseService implements LoaderInterface
         $routes->add('search_page', $searchRoute);
 
         $mediaImageViewRoute = new Route('/{siteSlug}/media/{contentId}/view.php', array(
-            '_controller' => 'BWCMSBundle:FrontEnd:mediaView',
+            '_controller' => 'BWCMSBundle:MediaFrontEnd:mediaView',
         ), array(
             'siteSlug' => '[a-zA-Z0-9-]+',
             'contentId' => '[a-zA-Z0-9-]+'
@@ -62,7 +62,7 @@ class RoutingService extends BaseService implements LoaderInterface
         $routes->add('media_image_view', $mediaImageViewRoute);
 
         $mediaThumbViewRoute = new Route('/{siteSlug}/thumb/{contentId}/{thumbSlug}/{scale}/index.php', array(
-            '_controller' => 'BWCMSBundle:FrontEnd:mediaThumb',
+            '_controller' => 'BWCMSBundle:MediaFrontEnd:mediaThumb',
         ), array(
             'siteSlug' => '[a-zA-Z0-9-]+',
             'contentId' => '[a-zA-Z0-9-]+',

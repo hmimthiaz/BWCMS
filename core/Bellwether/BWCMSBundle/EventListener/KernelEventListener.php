@@ -13,7 +13,10 @@ use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Response;
+
 use Bellwether\BWCMSBundle\Classes\Base\FrontEndControllerInterface;
+use Bellwether\BWCMSBundle\Classes\Base\CachedSiteFrontEndControllerInterface;
+
 use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
 use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Bellwether\BWCMSBundle\Controller\SecurityController;
@@ -64,14 +67,23 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
             return;
         }
 
-        if ($controller[0] instanceof FrontEndControllerInterface) {
+        if ($controller[0] instanceof FrontEndControllerInterface || $controller[0] instanceof CachedSiteFrontEndControllerInterface) {
             $request = $event->getRequest();
             $params = $request->attributes->get('_route_params');
             if (!isset($params['siteSlug']) || empty($params['siteSlug'])) {
                 throw new NotFoundHttpException("Unable to detect language");
             }
-            $siteEntity = $this->sm()->getSiteBySlug($params['siteSlug']);
-            if ($siteEntity == null) {
+            $siteEntity = null;
+            if ($controller[0] instanceof CachedSiteFrontEndControllerInterface) {
+                $siteEntity = $this->cache()->fetch('Site' . $params['siteSlug']);
+                if(empty($siteEntity)){
+                    $siteEntity = $this->sm()->getSiteBySlug($params['siteSlug']);
+                    $this->cache()->save('Site' . $params['siteSlug'],$siteEntity);
+                }
+            } else {
+                $siteEntity = $this->sm()->getSiteBySlug($params['siteSlug']);
+            }
+            if (empty($siteEntity)) {
                 throw new NotFoundHttpException("Language does not exists");
             }
             $this->sm()->setCurrentSite($siteEntity);
