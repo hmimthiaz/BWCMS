@@ -27,6 +27,8 @@ class CacheService extends BaseService
      */
     private $pageCache;
 
+    private $isUserLoggedIn = null;
+
     /**
      * @var bool
      */
@@ -35,7 +37,9 @@ class CacheService extends BaseService
     /**
      * @var int
      */
-    private $cachePageLifetime = 600;
+    private $cachePageLifetime = 900;
+
+    private $isEnabled = true;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -58,6 +62,10 @@ class CacheService extends BaseService
     public function init()
     {
         if (!$this->loaded) {
+            $env = $this->container->get('kernel')->getEnvironment();
+            if ($env != 'prod') {
+                $this->isEnabled = false;
+            }
 
             $objectCacheDir = $this->container->getParameter('kernel.cache_dir') . DIRECTORY_SEPARATOR . 'objectCache';
             $this->objectCache = new FilesystemCache($objectCacheDir, '.BWObjCache.bin');
@@ -73,8 +81,7 @@ class CacheService extends BaseService
 
     public function checkPageCacheResponse(GetResponseEvent $event)
     {
-        $env = $this->container->get('kernel')->getEnvironment();
-        if ($env != 'prod') {
+        if (!$this->isEnabled()) {
             return;
         }
         if ($this->isUserLoggedIn()) {
@@ -97,8 +104,7 @@ class CacheService extends BaseService
 
     public function savePageCacheReponse(FilterResponseEvent $event)
     {
-        $env = $this->container->get('kernel')->getEnvironment();
-        if ($env != 'prod') {
+        if (!$this->isEnabled()) {
             return;
         }
         if ($this->isUserLoggedIn()) {
@@ -118,11 +124,18 @@ class CacheService extends BaseService
      */
     public function isUserLoggedIn()
     {
+        if (!is_null($this->isUserLoggedIn)) {
+            return $this->isUserLoggedIn;
+        }
+
+        $this->isUserLoggedIn = false;
+
         $securityContext = $this->container->get('security.context');
         if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            return true;
+            $this->isUserLoggedIn = true;
+            //$this->isEnabled = false;
         }
-        return false;
+        return $this->isUserLoggedIn;
     }
 
     /**
@@ -144,6 +157,9 @@ class CacheService extends BaseService
      */
     public function fetch($id)
     {
+        if (!$this->isEnabled() || $this->isUserLoggedIn()) {
+            return false;
+        }
         return $this->objectCache->fetch($id);
     }
 
@@ -153,6 +169,9 @@ class CacheService extends BaseService
      */
     public function fetchMultiple(array $keys)
     {
+        if (!$this->isEnabled() || $this->isUserLoggedIn()) {
+            return array();
+        }
         return $this->objectCache->fetchMultiple($keys);
     }
 
@@ -162,8 +181,11 @@ class CacheService extends BaseService
      * @param int $lifeTime
      * @return bool
      */
-    public function  save($id, $data, $lifeTime = 0)
+    public function  save($id, $data, $lifeTime = 600)
     {
+        if (!$this->isEnabled()) {
+            return true;
+        }
         return $this->objectCache->save($id, $data, $lifeTime);
     }
 
@@ -206,6 +228,14 @@ class CacheService extends BaseService
     public function setCachePageLifetime($cachePageLifetime)
     {
         $this->cachePageLifetime = $cachePageLifetime;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isEnabled()
+    {
+        return $this->isEnabled;
     }
 
 

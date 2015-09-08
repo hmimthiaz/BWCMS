@@ -99,7 +99,7 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
             if (empty($thumbEntity)) {
                 throw new $this->createNotFoundException();
             }
-            $this->cache()->save('thumbStyle_' . $thumbSlug, $thumbEntity, 600);
+            $this->cache()->save('thumbStyle_' . $thumbSlug, $thumbEntity);
         }
 
         /**
@@ -116,7 +116,7 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
                 throw new $this->createNotFoundException();
             }
             $this->mm()->checkAndCreateMediaCacheFile($contentMediaEntity);
-            $this->cache()->save('contentMedia_' . $contentId, $contentMediaEntity, 600);
+            $this->cache()->save('contentMedia_' . $contentId, $contentMediaEntity);
         }
 
         $filename = $this->mm()->getMediaCachePath($contentMediaEntity);
@@ -173,7 +173,7 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
             }
 
             $this->mm()->checkAndCreateMediaCacheFile($contentMediaEntity);
-            $this->cache()->save('contentMedia_' . $contentId, $contentMediaEntity, 600);
+            $this->cache()->save('contentMedia_' . $contentId, $contentMediaEntity);
         }
         $filename = $this->mm()->getMediaCachePath($contentMediaEntity);
         $response = new BinaryFileResponse($filename);

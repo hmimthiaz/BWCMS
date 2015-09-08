@@ -69,7 +69,7 @@ class LocaleService extends BaseService
             if (is_null($stringValue)) {
                 $stringValue = $this->add($string);
             }
-            $this->cache()->save($cacheHash, $stringValue, 3600);
+            $this->cache()->save($cacheHash, $stringValue);
         }
 
         if (func_num_args() == 1) {
@@ -86,9 +86,9 @@ class LocaleService extends BaseService
         $localeEntity->setHash(md5($string));
         $localeEntity->setText($string);
         $localeEntity->setValue($string);
-        if($this->admin()->isAdmin()){
+        if ($this->admin()->isAdmin()) {
             $localeEntity->setSite($this->sm()->getAdminCurrentSite());
-        }else{
+        } else {
             $localeEntity->setSite($this->sm()->getCurrentSite());
         }
 

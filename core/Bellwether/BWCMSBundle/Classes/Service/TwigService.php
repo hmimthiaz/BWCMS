@@ -332,7 +332,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
                 $this->em()->persist($thumbEntity);
                 $this->em()->flush();
             }
-            $this->cache()->save('thumbStyle_' . $thumbSlug, $thumbEntity, 600);
+            $this->cache()->save('thumbStyle_' . $thumbSlug, $thumbEntity);
         }
 
         $url = $this->generateUrl('media_thumb_view', array(
