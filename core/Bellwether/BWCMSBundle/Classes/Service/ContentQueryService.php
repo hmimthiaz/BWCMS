@@ -197,7 +197,9 @@ class ContentQueryService extends BaseService
             $qb->andWhere(" node.treeParent = '" . $parent->getId() . "' ");
         }
         $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+        $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
         $qb->setMaxResults(1);
+
         try {
             return $qb->getQuery()->getSingleResult();
         } catch (NoResultException $e) {
