@@ -37,6 +37,15 @@ class SiteEntityType extends AbstractType
             )
             ->add('slug')
             ->add('domain')
+            ->add('adminColorThemeName', 'choice',
+                array(
+                    'label' => 'Admin Theme',
+                    'choices' => array(
+                        'grey' => 'Grey',
+                        'blue' => 'Blue',
+                    ),
+                )
+            )
             ->add('skinFolderName', 'choice',
                 array(
                     'label' => 'Skin',

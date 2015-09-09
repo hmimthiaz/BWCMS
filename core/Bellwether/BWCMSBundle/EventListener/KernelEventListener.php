@@ -76,9 +76,9 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
             $siteEntity = null;
             if ($controller[0] instanceof CachedSiteFrontEndControllerInterface) {
                 $siteEntity = $this->cache()->fetch('Site' . $params['siteSlug']);
-                if(empty($siteEntity)){
+                if (empty($siteEntity)) {
                     $siteEntity = $this->sm()->getSiteBySlug($params['siteSlug']);
-                    $this->cache()->save('Site' . $params['siteSlug'],$siteEntity);
+                    $this->cache()->save('Site' . $params['siteSlug'], $siteEntity);
                 }
             } else {
                 $siteEntity = $this->sm()->getSiteBySlug($params['siteSlug']);
@@ -112,6 +112,10 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
             $this->cache()->setCurrentSite($currentSite);
             $this->locale()->setCurrentSite($currentSite);
             $this->tp()->setSkin($currentSite->getSkinFolderName());
+
+            // Twig global
+            $twig = $this->container->get('twig');
+            $twig->addGlobal('theme', $currentSite->getAdminColorThemeName());
             return;
         }
     }

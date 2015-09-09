@@ -18,7 +18,7 @@ use Bellwether\BWCMSBundle\Form\SiteEntityType;
  *
  * @Route("/admin/site")
  */
-class SiteController extends BaseController  implements BackEndControllerInterface
+class SiteController extends BaseController implements BackEndControllerInterface
 {
 
     /**
@@ -120,6 +120,37 @@ class SiteController extends BaseController  implements BackEndControllerInterfa
         return $form;
     }
 
+
+    /**
+     * Displays a form to edit an existing SiteEntity entity.
+     *
+     * @Route("/{id}/setDefault.php", name="_bwcms_admin_site_setdefault")
+     * @Method("GET")
+     * @Template()
+     */
+    public function setDefaultAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $entity = $em->getRepository('BWCMSBundle:SiteEntity')->find($id);
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find SiteEntity entity.');
+        }
+        $allSites = $this->em()->getRepository('BWCMSBundle:SiteEntity')->findAll();
+        /**
+         * @var SiteEntity $site
+         */
+        foreach ($allSites as $site) {
+            if ($site->getId() == $id) {
+                $site->setIsDefault(1);
+            }else{
+                $site->setIsDefault(null);
+            }
+            $this->em()->persist($site);
+        }
+        $this->em()->flush();
+        return $this->redirect($this->generateUrl('_bwcms_admin_site_home'));
+
+    }
 
     /**
      * Displays a form to edit an existing SiteEntity entity.

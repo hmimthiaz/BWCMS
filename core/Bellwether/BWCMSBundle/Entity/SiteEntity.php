@@ -1,5 +1,6 @@
 <?php
 namespace Bellwether\BWCMSBundle\Entity;
+
 use Doctrine\ORM\Mapping AS ORM;
 
 /**
@@ -31,12 +32,12 @@ class SiteEntity
     private $direction;
 
     /**
-     * @ORM\Column(type="string", length=10, nullable=false)
+     * @ORM\Column(type="string", unique=true, length=10, nullable=false)
      */
     private $slug;
 
     /**
-     * @ORM\Column(type="string", unique=true, length=100, nullable=false)
+     * @ORM\Column(type="string", unique=true, length=100, nullable=true)
      */
     private $domain;
 
@@ -44,6 +45,11 @@ class SiteEntity
      * @ORM\Column(type="string", length=100, nullable=false)
      */
     private $skinFolderName;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $adminColorThemeName;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
@@ -161,6 +167,26 @@ class SiteEntity
     {
         $this->skinFolderName = $skinFolderName;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAdminColorThemeName()
+    {
+        if (is_null($this->adminColorThemeName)) {
+            return 'grey';
+        }
+        return $this->adminColorThemeName;
+    }
+
+    /**
+     * @param mixed $adminColorThemeName
+     */
+    public function setAdminColorThemeName($adminColorThemeName)
+    {
+        $this->adminColorThemeName = $adminColorThemeName;
+    }
+
 
     /**
      * @return mixed

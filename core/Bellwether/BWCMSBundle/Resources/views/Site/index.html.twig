@@ -12,10 +12,9 @@
                 <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Locale</th>
                     <th>Direction</th>
                     <th>Slug</th>
-                    <th>Skin</th>
+                    <th>Skin Folder</th>
                     <th>Isdefault</th>
                     <th>Actions</th>
                 </tr>
@@ -24,17 +23,31 @@
                 {% for entity in entities %}
                     <tr>
                         <td>{{ entity.name }}</td>
-                        <td>{{ entity.locale }}</td>
-                        <td>{{ entity.direction }}</td>
+                        <td>
+                            {% if entity.direction == 'ltr'  %}
+                                Left to Right
+                            {% else %}
+                                Right To Left
+                            {% endif %}
+                        </td>
                         <td>{{ entity.slug }}</td>
                         <td>{{ entity.skinFolderName }}</td>
-                        <td>{{ entity.isDefault }}</td>
                         <td>
-                            <div class="btn-group">
+                            {% if entity.isDefault == 1  %}
+                                <i class="fa fa-check-square"></i>
+                            {% else %}
+                                <i class="fa fa-check-square-o"></i>
+                            {% endif %}
+                        </td>
+                        <td>
                                 <a class="btn btn-default btn-sm" href="{{ path('_bwcms_admin_site_edit', {'id': entity.id}) }}">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
-                            </div>
+                                {% if entity.isDefault != 1  %}
+                                    <a class="btn btn-default btn-sm" href="{{ path('_bwcms_admin_site_setdefault', {'id': entity.id}) }}">
+                                        <i class="fa fa-check-square"></i> Make Default
+                                    </a>
+                                {% endif %}
                         </td>
                     </tr>
                 {% endfor %}

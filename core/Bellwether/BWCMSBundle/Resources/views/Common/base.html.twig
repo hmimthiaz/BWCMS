@@ -11,6 +11,19 @@
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/font-awesome/css/font-awesome.min.css') }}">
     {% include 'BraincraftedBootstrapBundle::ie8-support.html.twig' %}
     {% block header %}{% endblock %}
+    {% if theme == 'blue' %}
+    <style>
+        .navbar-inverse {  background-color: #0b0070;  border-color: #8679ff; }
+        .navbar-inverse .navbar-nav > li > a { color: #cbc5ff; }
+        .navbar-inverse .navbar-nav > li > a:hover { color: #ffffff;}
+        .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus{color: #ffffff; background-color: #080056;}
+        .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus{ color: #ffffff; background-color: #3a2dac;}
+        .dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus{color: #ffffff;background-color: #080056;}
+        ul.menu_level_1.dropdown-menu{background-color: #3a2dac;}
+        .dropdown-menu > li > a{color: #cbc5ff;}
+        .dropdown-menu > li > a:hover{color: #0d0087;background-color: #c4beff;}
+    </style>
+    {% endif %}
 </head>
 <body {% block bodyAttr '' %}>
     <div id="loadingIndicatorHolder" style="display: none;"><div id="loadingIndicator" ><img src="{{ asset('bundles/bwcms/images/clock.svg') }}"></div></div>
