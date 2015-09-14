@@ -109,6 +109,7 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
             }
             $this->admin()->setIsAdmin(true);
             $currentSite = $this->sm()->getAdminCurrentSite();
+            $this->sm()->setCurrentSite($currentSite);
             $this->cache()->setCurrentSite($currentSite);
             $this->locale()->setCurrentSite($currentSite);
             $this->tp()->setSkin($currentSite->getSkinFolderName());
