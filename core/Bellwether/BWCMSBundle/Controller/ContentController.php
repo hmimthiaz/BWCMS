@@ -278,6 +278,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         }
         $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
         $qb->andWhere(" node.scope ='" . ContentScopeType::CPublic . "' ");
+        $qb->add('orderBy', 'node.title ASC');
 
         $rootFolders = $qb->getQuery()->getResult();
 
