@@ -190,7 +190,7 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $event->getResponse()->headers->set('X-XSS-Protection', '1; mode=block');
-        $event->getResponse()->headers->set('X-Frame-Options', 'deny');
+        $event->getResponse()->headers->set('X-Frame-Options', 'SAMEORIGIN, GOFORIT');
         $event->getResponse()->headers->set('X-Content-Type-Options', 'nosniff');
         $this->cache()->savePageCacheReponse($event);
     }
