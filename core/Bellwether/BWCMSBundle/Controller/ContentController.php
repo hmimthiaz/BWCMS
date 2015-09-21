@@ -545,6 +545,8 @@ class ContentController extends BaseController implements BackEndControllerInter
         $parentId = $request->get('parent', 'Root');
         $onlyImage = strtolower($request->get('onlyImage', 'no'));
         $imageURL = $request->get('imageURL', false);
+        $isEditor = $request->get('editor', false);
+
 
         $search = $request->get('search');
         $searchString = null;
@@ -598,7 +600,7 @@ class ContentController extends BaseController implements BackEndControllerInter
 
         $qb->setFirstResult($start);
         $qb->setMaxResults($length);
-        if ($uiSortEnabled) {
+        if ($uiSortEnabled && !$isEditor) {
             $qb->setFirstResult(0);
             $qb->setMaxResults(99999);
         }
