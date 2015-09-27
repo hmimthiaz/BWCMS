@@ -301,43 +301,26 @@
                         data: null,
                         className: "center",
                         render: function (data, type, full, meta) {
-                            var ret = '<button type="button" class="btn btn-primary edit"><i class="glyphicon glyphicon-pencil"></i></button>';
+                            var editURLBase = '{{ url('_bwcms_admin_content_edit') }}';
+                            var editURL = editURLBase + '?contentId=' + data.DT_RowId;
+                            var ret = '<a type="button" class="btn btn-primary edit" href="' + editURL + '"><i class="glyphicon glyphicon-pencil"></i></a>';
                             if (data.pbLink.length > 0) {
-                                ret = ret + ' <button type="button" class="btn btn-primary pageBuilder" data-url="' + data.pbLink + '"><i class="glyphicon glyphicon-list-alt"></i></button>';
+                                ret = ret + ' <a type="button" class="btn btn-primary pageBuilder" href="' + data.pbLink + '"><i class="glyphicon glyphicon-list-alt"></i></a>';
                             }
                             if (data.download.length > 0) {
-                                ret = ret + ' <button type="button" class="btn btn-primary download" data-url="' + data.download + '"><i class="glyphicon glyphicon-download-alt"></i></button>';
+                                ret = ret + ' <a type="button" class="btn btn-primary download" href="' + data.download + '"><i class="glyphicon glyphicon-download-alt"></i></a>';
                             }
                             if (data.link.length > 0) {
-                                ret = ret + ' <button type="button" class="btn btn-primary preview" data-url="' + data.link + '"><i class="glyphicon glyphicon-globe"></i></button>';
+                                ret = ret + ' <a type="button" class="btn btn-primary preview" href="' + data.link + '"><i class="glyphicon glyphicon-globe"></i></a>';
                             }
                             return ret;
                         }
                     }
                 ],
                 fnDrawCallback: function (oSettings) {
-                    $('#contentTable button.edit').click(function (e) {
-                        var editURL = '{{ url('_bwcms_admin_content_edit') }}';
-                        var contentId = $(this).parents('tr').attr('id');
-                        window.location = editURL + '?contentId=' + contentId;
-                        e.preventDefault();
-                        return false;
-                    });
                     $('#contentTable a.lightBox').click(function (e) {
                         e.preventDefault();
                         $(this).ekkoLightbox();
-                    });
-                    $('#contentTable button.pageBuilder').click(function (e) {
-                        e.preventDefault();
-                        window.location = $(this).data('url');
-                    });
-                    $('#contentTable button.download').click(function (e) {
-                        e.preventDefault();
-                        window.location = $(this).data('url');
-                    });
-                    $('#contentTable button.preview').click(function (e) {
-                        e.preventDefault();
-                        window.open($(this).data('url'));
                     });
                     $('#contentTable button.remove').click(function (e) {
                         var contentId = $(this).parents('tr').attr('id');
