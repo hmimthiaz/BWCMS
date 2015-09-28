@@ -104,7 +104,7 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
 
         if ($controller[0] instanceof BackEndControllerInterface) {
             if (!$this->isGranted('ROLE_BACKEND')) {
-                $message = 'User: ' . $this->getUser()->getEmail() . ' does not have access to the administration';
+                $message = "You don't not have access to the admin";
                 throw new AccessDeniedException($message, null);
             }
             $this->admin()->setIsAdmin(true);
