@@ -138,21 +138,30 @@ abstract class PreferenceType implements PreferenceTypeInterface
             $this->fb()->add('pageTitle', 'text',
                 array(
                     'required' => false,
-                    'label' => 'Page Title'
+                    'label' => 'Page Title',
+                    'attr' => array(
+                        'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
+                    )
                 )
             );
 
             $this->fb()->add('pageDescription', 'text',
                 array(
                     'required' => false,
-                    'label' => 'Page Description'
+                    'label' => 'Page Description',
+                    'attr' => array(
+                        'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
+                    )
                 )
             );
 
             $this->fb()->add('pageKeywords', 'text',
                 array(
                     'required' => false,
-                    'label' => 'Page Keywords'
+                    'label' => 'Page Keywords',
+                    'attr' => array(
+                        'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
+                    )
                 )
             );
         }
