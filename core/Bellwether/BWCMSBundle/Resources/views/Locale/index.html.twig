@@ -34,7 +34,7 @@
                 {% for entity in pager.items %}
                     <tr>
                         <td>{{ entity.text }}</td>
-                        <td id="{{ entity.id }}" class="iedit">{{ entity.value }}</td>
+                        <td id="{{ entity.id }}" dir="{{ dir }}" class="iedit">{{ entity.value }}</td>
                         <td align="center">
                             <button type="button" data-id="{{ entity.id }}" class="btn btn-primary edit"><i
                                         class="glyphicon glyphicon-pencil"></i></button>
@@ -94,7 +94,7 @@
                 isEditing = true;
                 editingId = $(this).attr('id');
                 orginalValue = $(this).html();
-                $(this).html('<textarea id="inlineEditor" rows="3" style="width: 100%;">' + orginalValue + '</textarea>');
+                $(this).html('<textarea id="inlineEditor" dir="{{ dir }}" rows="3" style="width: 100%;">' + orginalValue + '</textarea>');
                 $('#inlineEditor').keydown(function (e) {
                     var newValue = $('#inlineEditor').val();
                     if (e.keyCode == 27) {

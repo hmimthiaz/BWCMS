@@ -56,6 +56,7 @@ class LocaleController extends BaseController implements BackEndControllerInterf
 
         return array(
             'pager' => $pager,
+            'dir' => $this->sm()->getAdminCurrentSite()->getDirection(),
             'title' => 'Locale',
         );
     }
