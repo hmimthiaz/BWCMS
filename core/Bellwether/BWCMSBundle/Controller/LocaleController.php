@@ -36,14 +36,28 @@ class LocaleController extends BaseController implements BackEndControllerInterf
      */
     public function indexAction(Request $request)
     {
-        $pager = new Pagination($request, 10);
 
+        $query = $request->get('query');
+
+        $pager = new Pagination($request, 10);
         $start = $pager->getStart();
         $limit = $pager->getLimit();
 
         $localeRepository = $this->em()->getRepository('BWCMSBundle:LocaleEntity');
         $qb = $localeRepository->createQueryBuilder('l');
         $qb->andWhere(" l.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+
+        if (!empty($query)) {
+            if ($query != '=') {
+                $searchLikeExp = $qb->expr()->orX();
+                $searchLikeExp->add($qb->expr()->like('l.text', $qb->expr()->literal('%' . $query . '%')));
+                $searchLikeExp->add($qb->expr()->like('l.value', $qb->expr()->literal('%' . $query . '%')));
+                $qb->andWhere($searchLikeExp);
+            } else {
+                $qb->andWhere($qb->expr()->eq('l.text', 'l.value'));
+            }
+        }
+
         $qb->add('orderBy', 'l.text ASC');
         $qb->setFirstResult($start);
         $qb->setMaxResults($limit);
