@@ -92,6 +92,21 @@ class LocaleController extends BaseController implements BackEndControllerInterf
     }
 
     /**
+     * Save a local
+     *
+     * @Route("/delete.php", name="_bwcms_admin_locale_delete")
+     * @Method("POST")
+     * @Template()
+     */
+    public function deleteAction(Request $request)
+    {
+        $localeId = $request->get('localeId');
+
+        $this->locale()->delete($localeId);
+        return $this->returnJsonReponse($request, array());
+    }
+
+    /**
      * @param \PHPExcel $objPHPExcel
      * @param $cells
      * @param $color

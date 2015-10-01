@@ -124,6 +124,17 @@ class LocaleService extends BaseService
         return true;
     }
 
+    public function delete($id)
+    {
+        $localeEntity = $this->getRepository()->find($id);
+        if (!is_null($localeEntity)) {
+            $this->cache()->delete($this->getCacheHash($localeEntity->getText()));
+            $this->em()->remove($localeEntity);
+            $this->em()->flush();
+        }
+        return true;
+    }
+
     public function getCacheHash($string)
     {
         return 'LCString_' . md5($string);

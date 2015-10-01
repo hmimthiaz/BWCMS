@@ -14,7 +14,8 @@
                 <div class="panel-body">
                     <form class="form-inline" action="{{ url('_bwcms_admin_locale_home') }}" method="get">
                         <div class="form-group">
-                            <input name="query" value="{{ app.request.get('query') | escape }}" type="text" class="form-control" style="width: 300px;">
+                            <input name="query" value="{{ app.request.get('query') | escape }}" type="text"
+                                   class="form-control" style="width: 300px;">
                         </div>
                         <button type="submit" class="btn btn-default">Search</button>
                         | <a href="{{ url('_bwcms_admin_locale_export') }}" class="btn btn-success">Export EXcel</a>
@@ -38,6 +39,8 @@
                         <td align="center">
                             <button type="button" data-id="{{ entity.id }}" class="btn btn-primary edit"><i
                                         class="glyphicon glyphicon-pencil"></i></button>
+                            <button type="button" data-id="{{ entity.id }}" class="btn btn-danger delete"><i
+                                        class="glyphicon glyphicon-trash"></i></button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -81,11 +84,37 @@
             orginalValue = false;
         }
 
+        function deleteItem(deleteLocaleId) {
+            if (!confirm("Are you sure you want to delete this record?")) {
+                return;
+            }
+            var request = $.ajax({
+                method: "POST",
+                global: false,
+                url: "{{ url('_bwcms_admin_locale_delete') }}",
+                data: {localeId: deleteLocaleId},
+                error: function (xhr, ajaxOptions, errorThrown) {
+                    //
+                },
+                success: function (data) {
+                    $('#' + deleteLocaleId).parent().fadeOut().remove();
+                },
+                complete: function () {
+                    //
+                }
+            });
+        }
+
         $(document).ready(function () {
             $('button.edit').click(function () {
                 var tdID = $(this).data('id');
                 $('#' + tdID).trigger('click');
             });
+            $('button.delete').click(function () {
+                var tdID = $(this).data('id');
+                deleteItem(tdID);
+            });
+
 
             $('td.iedit').click(function (e) {
                 if (isEditing) {
