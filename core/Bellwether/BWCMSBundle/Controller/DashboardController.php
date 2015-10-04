@@ -45,6 +45,33 @@ class DashboardController extends BaseController implements BackEndControllerInt
 
 
     /**
+     * @Route("/dashboard/email.php",name="_bwcms_admin_dashboard_email")
+     * @Template()
+     */
+    public function emailAction()
+    {
+
+        $mailer = $this->mailer();
+        $mailer->enableEchoLogger();
+
+        $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
+        $adminSettings = $this->pref()->getAllPreferenceByType('General');
+        //Admin email
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Email Test')
+            ->setFrom($emailSettings['sender_address'])
+            ->addTo($adminSettings['adminEmail']);
+        $message->setBody('This is a test email! <br><br>- <strong>Admin</strong>','text/html');
+
+        try {
+            $mailer->getMailer()->send($message);
+        } catch (\Exception $e) {
+            //
+        }
+        exit;
+    }
+
+    /**
      * @Route("/dashboard/about.php",name="_bwcms_admin_dashboard_about")
      * @Template()
      */

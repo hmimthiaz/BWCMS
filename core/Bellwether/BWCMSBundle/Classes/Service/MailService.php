@@ -16,7 +16,9 @@ class MailService extends BaseService
 
     protected $mailer = null;
 
-    protected $logger = null;
+    protected $echoLogger = null;
+
+    protected $arrayLogger = null;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -46,13 +48,25 @@ class MailService extends BaseService
     /**
      * @return \Swift_Plugins_Loggers_EchoLogger
      */
-    public function enableLogger()
+    public function enableEchoLogger()
     {
-        if ($this->logger == null) {
-            $this->logger = new \Swift_Plugins_Loggers_ArrayLogger();
-            $this->getMailer()->registerPlugin(new \Swift_Plugins_LoggerPlugin($this->logger));
+        if ($this->echoLogger == null) {
+            $this->echoLogger = new \Swift_Plugins_Loggers_EchoLogger();
+            $this->getMailer()->registerPlugin(new \Swift_Plugins_LoggerPlugin($this->echoLogger));
         }
-        return $this->logger;
+        return $this->echoLogger;
+    }
+
+    /**
+     * @return \Swift_Plugins_Loggers_ArrayLogger
+     */
+    public function enableArrayLogger()
+    {
+        if ($this->arrayLogger == null) {
+            $this->arrayLogger = new \Swift_Plugins_Loggers_ArrayLogger(999);
+            $this->getMailer()->registerPlugin(new \Swift_Plugins_LoggerPlugin($this->arrayLogger));
+        }
+        return $this->arrayLogger;
     }
 
     /**
