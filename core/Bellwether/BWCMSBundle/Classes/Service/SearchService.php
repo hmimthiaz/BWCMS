@@ -124,7 +124,7 @@ class SearchService extends BaseService
 
         $qb->setParameter('date_modified', $this->getLastIndexedDate(), \Doctrine\DBAL\Types\Type::DATETIME);
         $qb->setFirstResult(0);
-        $qb->setMaxResults(10);
+//        $qb->setMaxResults(99999);
         $result = $qb->getQuery()->getResult();
         $lastContentModifiedDate = new \DateTime();
         if (!empty($result)) {
@@ -225,7 +225,7 @@ class SearchService extends BaseService
         //remove html entites
         $string = preg_replace("/&#?[a-z0-9]+;/i", "", $string);
         //$only words
-        $string = preg_replace('/\W+/', ' ', $string);
+        //$string = preg_replace('/\W+/', ' ', $string);
         //unique iy
         $arrayWords = explode(" ", $string);
         $arrayWords = array_unique($arrayWords);
