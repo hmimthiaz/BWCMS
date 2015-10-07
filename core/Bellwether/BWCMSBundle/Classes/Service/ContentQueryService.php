@@ -93,7 +93,7 @@ class ContentQueryService extends BaseService
         $qb->setFirstResult($start);
         $qb->setMaxResults($limit);
 
-        $pager->callPreQueryCallback($qb,$contentEntity, $type, $schema);
+        $pager->callPreQueryCallback($qb, $contentEntity, $type, $schema);
 
         $result = $qb->getQuery()->getResult();
         $pager->setItems($result);
@@ -196,7 +196,11 @@ class ContentQueryService extends BaseService
         if (!empty($parent)) {
             $qb->andWhere(" node.treeParent = '" . $parent->getId() . "' ");
         }
-        $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+
+        if (!$this->isGranted('ROLE_AUTHOR')) {
+            $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+        }
+
         $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
         $qb->setMaxResults(1);
 
