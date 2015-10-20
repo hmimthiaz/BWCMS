@@ -242,6 +242,9 @@ class AdminService extends BaseService
 
         $menu->addChild('Admin', array('uri' => '#', 'label' => 'Admin'))->setAttribute('dropdown', true);
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
+            $menu['Admin']->addChild('Audit', array(
+                'route' => '_bwcms_admin_audit_home'
+            ));
             $menu['Admin']->addChild('Site', array(
                 'route' => '_bwcms_admin_site_home'
             ));
