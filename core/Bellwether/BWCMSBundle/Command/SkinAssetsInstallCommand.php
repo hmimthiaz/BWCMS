@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
+use Symfony\Component\Finder\Finder;
 use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
 
 class SkinAssetsInstallCommand extends ContainerAwareCommand
@@ -67,13 +67,34 @@ EOT
             $targetDir = $skinsPublicDir . strtolower($skinClass->getFolderName());
 
             if (file_exists($sourceDir)) {
-                $output->writeln(sprintf('Installing assets symlink for skin : %s -> %s', $skinClass->getName(), $targetDir));
-                $filesystem->remove($targetDir);
-                $filesystem->symlink($sourceDir, $targetDir);
-                if (!file_exists($targetDir)) {
-                    throw new IOException('Symbolic link is broken');
+                if($this->isWindows()){
+                    $output->writeln(sprintf('Installing assets copy for skin : %s -> %s', $skinClass->getName(), $targetDir));
+                    $this->hardCopy($sourceDir, $targetDir);
+                }else{
+                    $output->writeln(sprintf('Installing assets symlink for skin : %s -> %s', $skinClass->getName(), $targetDir));
+                    $filesystem->remove($targetDir);
+                    $filesystem->symlink($sourceDir, $targetDir);
+                    if (!file_exists($targetDir)) {
+                        throw new IOException('Symbolic link is broken');
+                    }
                 }
             }
         }
+    }
+
+    private function hardCopy($originDir, $targetDir)
+    {
+        $filesystem = $this->getContainer()->get('filesystem');
+
+        $filesystem->mkdir($targetDir, 0777);
+        // We use a custom iterator to ignore VCS files
+        $filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
+    }
+
+    function isWindows(){
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            return true;
+        }
+        return false;
     }
 }
