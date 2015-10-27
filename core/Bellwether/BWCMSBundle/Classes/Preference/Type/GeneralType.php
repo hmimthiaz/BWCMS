@@ -27,8 +27,12 @@ class GeneralType Extends PreferenceType
         $this->addField('title', PreferenceFieldType::String);
         $this->addField('description', PreferenceFieldType::String);
         $this->addField('keywords', PreferenceFieldType::String);
-        $this->addField('brandLogo', PreferenceFieldType::Content);
         $this->addField('adminEmail', PreferenceFieldType::String, true);
+
+        $this->addField('headerNavigation', PreferenceFieldType::Content);
+        $this->addField('footerNavigation', PreferenceFieldType::Content);
+        $this->addField('googleAnalyticsCode', PreferenceFieldType::String);
+
     }
 
     protected function buildForm()
@@ -57,15 +61,32 @@ class GeneralType Extends PreferenceType
                 )
             )
         );
-        $this->fb()->add('brandLogo', 'bwcms_content',
-            array(
-                'label' => 'Content',
-                'contentType' => 'Media'
-            )
-        );
+
         $this->fb()->add('adminEmail', 'text',
             array(
                 'label' => 'Admin Email'
+            )
+        );
+
+        $this->fb()->add('headerNavigation', 'bwcms_content',
+            array(
+                'label' => 'Header Navigation',
+                'contentType' => 'Navigation',
+                'schema' => 'Folder'
+            )
+        );
+
+        $this->fb()->add('footerNavigation', 'bwcms_content',
+            array(
+                'label' => 'Footer Navigation',
+                'contentType' => 'Navigation',
+                'schema' => 'Folder'
+            )
+        );
+
+        $this->fb()->add('googleAnalyticsCode', 'text',
+            array(
+                'label' => 'Google Analytics'
             )
         );
     }
