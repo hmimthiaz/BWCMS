@@ -37,7 +37,7 @@ class ContentEntity
 
     /**
      * @Gedmo\TreeRoot
-     * @ORM\Column(type="guid", nullable=true, name="treeRoot")
+     * @ORM\Column(type="string", nullable=true, name="treeRoot")
      */
     private $treeRoot;
 
@@ -214,6 +214,7 @@ class ContentEntity
         $this->sortBy = ContentSortByType::Created;
         $this->sortOrder = ContentSortOrderType::DESC;
         $this->status = ContentPublishType::Draft;
+        $this->setTreeRoot(null);
     }
 
     /**

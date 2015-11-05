@@ -29,7 +29,7 @@ class ContentMediaEntity
     private $content;
 
     /**
-     * @ORM\Column(type="string", length=100, nullable=true)
+     * @ORM\Column(type="string", length=100, nullable=true, name="filename")
      */
     private $file;
 
