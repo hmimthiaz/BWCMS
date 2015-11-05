@@ -86,7 +86,13 @@ class SearchService extends BaseService
         $result = $qb->getQuery()->getResult();
         $pager->setItems($result);
 
-        $totalCount = $qb->select('COUNT(si)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+
+        $qb2 = clone $qb; // don't modify existing query
+        $qb2->resetDQLPart('orderBy');
+        $qb2->resetDQLPart('having');
+        $qb2->select('COUNT(si) AS cnt');
+        $countResult = $qb2->getQuery()->setFirstResult(0)->getScalarResult();
+        $totalCount = $countResult[0]['cnt'];
         $pager->setTotalItems($totalCount);
 
         return $pager;

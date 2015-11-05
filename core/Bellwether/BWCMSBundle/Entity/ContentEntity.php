@@ -87,7 +87,7 @@ class ContentEntity
     /**
      * @Gedmo\TreeParent
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ContentEntity", inversedBy="children")
-     * @ORM\JoinColumn(name="treeParentId", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="treeParentId", referencedColumnName="id")
      */
     private $treeParent;
 
@@ -112,7 +112,7 @@ class ContentEntity
     private $slug;
 
     /**
-     * @ORM\Column(type="string", length=100, nullable=true)
+     * @ORM\Column(type="string", length=100, nullable=true, name="filename")
      */
     private $file;
 

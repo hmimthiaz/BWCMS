@@ -370,7 +370,13 @@ class ContentController extends BaseController implements BackEndControllerInter
             $qb->setMaxResults($length);
 
             $returnVars['entities'] = $qb->getQuery()->getResult();
-            $returnVars['totalCount'] = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+
+            $qb2 = clone $qb; // don't modify existing query
+            $qb2->resetDQLPart('orderBy');
+            $qb2->resetDQLPart('having');
+            $qb2->select('COUNT(node) AS cnt');
+            $countResult = $qb2->getQuery()->setFirstResult(0)->getScalarResult();
+            $returnVars['totalCount'] = $countResult[0]['cnt'];
         }
 
         return $returnVars;
@@ -617,7 +623,14 @@ class ContentController extends BaseController implements BackEndControllerInter
         }
 
         $result = $qb->getQuery()->getResult();
-        $totalCount = $qb->select('COUNT(node)')->setFirstResult(0)->getQuery()->getSingleScalarResult();
+
+        $qb2 = clone $qb; // don't modify existing query
+        $qb2->resetDQLPart('orderBy');
+        $qb2->resetDQLPart('having');
+        $qb2->select('COUNT(node) AS cnt');
+        $countResult = $qb2->getQuery()->setFirstResult(0)->getScalarResult();
+        $totalCount = $countResult[0]['cnt'];
+
         $data = array();
         $data['draw'] = $draw;
         $data['sort'] = $uiSortEnabled;
