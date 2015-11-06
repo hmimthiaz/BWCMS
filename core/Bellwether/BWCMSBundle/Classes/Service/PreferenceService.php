@@ -102,19 +102,29 @@ class PreferenceService extends BaseService
         if (isset($this->loadedPreference[$type]) && !empty($this->loadedPreference[$type])) {
             return $this->loadedPreference[$type];
         }
+
         $classInstance = $this->getPreferenceClass($type);
-        if($this->admin()->isAdmin()){
-            $currentSite = $this->sm()->getAdminCurrentSite();
-        }else{
-            $currentSite = $this->sm()->getCurrentSite();
+        $cacheHash = 'Preference-' . $type;
+        $preferenceResult = $this->cache()->fetch($cacheHash);
+        if ($preferenceResult === false) {
+            if ($this->admin()->isAdmin()) {
+                $currentSite = $this->sm()->getAdminCurrentSite();
+            } else {
+                $currentSite = $this->sm()->getCurrentSite();
+            }
+            $qb = $this->getPreferenceRepository()->createQueryBuilder('p');
+            $qb->andWhere(" ( p.type = '" . $classInstance->getType() . "' ) ");
+            $qb->andWhere(" ( p.site = '" . $currentSite->getId() . "' OR p.site IS NULL ) ");
+            $preferenceResult = $qb->getQuery()->getResult();
+            $this->cache()->save($cacheHash, $preferenceResult);
         }
-        $qb = $this->getPreferenceRepository()->createQueryBuilder('p');
-        $qb->andWhere(" ( p.type = '" . $classInstance->getType() . "' ) ");
-        $qb->andWhere(" ( p.site = '" . $currentSite->getId() . "' OR p.site IS NULL ) ");
-        $preferenceResult = $qb->getQuery()->getResult();
+
         $returnArray = array();
         if (!empty($preferenceResult)) {
             foreach ($preferenceResult as $preferenceEntity) {
+                /**
+                 * @var PreferenceEntity $preferenceEntity
+                 */
                 $prefField = $preferenceEntity->getField();
                 $prefValue = $preferenceEntity->getValue();
                 $prefType = $preferenceEntity->getFieldType();
@@ -199,7 +209,7 @@ class PreferenceService extends BaseService
                 } catch (\OutOfBoundsException $e) {
                     continue;
                 }
-                $fieldValue = $this->decodeDataFromDB($fieldType, $preferenceEntity->getValue());
+                $fieldValue = $this->decodeDataFromDB($fieldType, $preferenceEntity->getValue(), $classInstance);
                 $formField->setData($fieldValue);
             }
         }
@@ -208,7 +218,7 @@ class PreferenceService extends BaseService
     }
 
 
-    private function decodeDataFromDB($fieldType, $fieldValue)
+    private function decodeDataFromDB($fieldType, $fieldValue, PreferenceTypeInterface $classInstance)
     {
         if (is_null($fieldValue)) {
             return null;
@@ -358,21 +368,6 @@ class PreferenceService extends BaseService
             }
         }
         return $haystack;
-    }
-
-    public function getInstagramInstance()
-    {
-        $authURL = $this->generateUrl('_admin_instagram_auth', array(), true);
-        $instagram = new Instagram(array(
-            'apiKey' => 'c0484faef7f74811ab1e9ca7afac77bc',
-            'apiSecret' => '0e44c59e9077469fafc22188d6058e7e',
-            'apiCallback' => $authURL
-        ));
-        $instaToken = $this->getInstagramToken();
-        if (!is_null($instaToken)) {
-            $instagram->setAccessToken($instaToken);
-        }
-        return $instagram;
     }
 
     public function getSinglePreference($fieldName, $fieldScope = '_SINGLE_PREFERENCE_', SiteEntity $siteEntity = null)
