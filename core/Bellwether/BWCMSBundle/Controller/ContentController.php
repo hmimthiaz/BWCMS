@@ -695,6 +695,52 @@ class ContentController extends BaseController implements BackEndControllerInter
         return $this->returnJsonReponse($request, $data);
     }
 
+    /**
+     * @Route("/thumb/{contentId}/w/{width}/h/{height}/file.png",name="_bwcms_admin_content_thumb")
+     * @Method({"GET"})
+     */
+    public function contentThumbAction(Request $request, $contentId, $width, $height)
+    {
+        /**
+         * @var ContentEntity $content
+         */
+        $content = $this->cm()->getContentRepository()->find($contentId);
+        if (empty($content)) {
+            return $this->createNotFoundException();
+        }
+
+        $imageFilename = 'dummy.jpg';
+        $contentClass = $this->cm()->getContentClass($content->getType(), $content->getSchema());
+        if (!$contentClass->isUploadEnabled()) {
+            $imageFile = $contentClass->getImage();
+            $imageFilename = basename($imageFile);
+        } else {
+            $media = $content->getMedia()->first();
+            $this->mm()->checkAndCreateMediaCacheFile($media);
+            $imageFilename = $media->getFile();
+            if ($this->mm()->isImage($content)) {
+                $imageFile = $this->mm()->getMediaCachePath($media);
+            } else {
+                $imageFile = $this->mm()->getMimeResourceImage($media->getMime());
+            }
+        }
+        /**
+         * @var \Gregwar\ImageBundle\Services\ImageHandling $ts
+         */
+        $thumb = $this->getThumbService()->open($imageFile)->resize($width, $height);
+        $thumbCache = $thumb->cacheFile('guess');
+        $response = new BinaryFileResponse($thumbCache);
+        $response->trustXSendfileTypeHeader();
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_INLINE,
+            $imageFilename,
+            iconv('UTF-8', 'ASCII//TRANSLIT', $imageFilename)
+        );
+
+        return $response;
+    }
+
+
     public function getImageThumbURL($filename, $width, $height)
     {
         $publicFilename = $this->mm()->getFilePath($filename);

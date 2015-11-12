@@ -21,6 +21,7 @@ use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
+use Bellwether\BWCMSBundle\Classes\Service\ThumbService;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
@@ -168,11 +169,11 @@ abstract class BaseController extends Controller
     }
 
     /**
-     * @return Image
+     * @return ThumbService
      */
     public function getThumbService()
     {
-        return $this->container->get('image.handling');
+        return $this->container->get('BWCMS.Thumb');
     }
 
     /**

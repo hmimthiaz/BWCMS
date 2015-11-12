@@ -21,6 +21,8 @@ use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
+use Bellwether\BWCMSBundle\Classes\Service\ThumbService;
+
 use Symfony\Component\HttpFoundation\Session\Session;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -259,6 +261,14 @@ abstract class BaseSkin extends ContainerAware
     public function tp()
     {
         return $this->container->get('BWCMS.Template')->getManager();
+    }
+
+    /**
+     * @return ThumbService
+     */
+    public function getThumbService()
+    {
+        return $this->container->get('BWCMS.Thumb');
     }
 
     /**

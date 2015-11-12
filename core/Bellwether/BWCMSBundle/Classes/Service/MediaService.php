@@ -128,22 +128,12 @@ class MediaService extends BaseService
      */
     public function getContentThumbURL($contentEntity, $width = 128, $height = 128)
     {
-        $contentClass = $this->cm()->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
-        if (!$contentClass->isUploadEnabled()) {
-            $thumbURL = $this->getThumbService()->open($contentClass->getImage())->resize($width, $height)->cacheFile('guess');
-            return $thumbURL;
-        }
-        if (!$this->isMedia($contentEntity)) {
-            return null;
-        }
-        $media = $contentEntity->getMedia()->first();
-        $this->checkAndCreateMediaCacheFile($media);
-        if ($this->isImage($contentEntity)) {
-            $thumbURL = $this->getThumbService()->open($this->getMediaCachePath($media))->resize($width, $height)->cacheFile('guess');
-        } else {
-            $thumbURL = $this->getThumbService()->open($this->getMimeResourceImage($media->getMime()))->resize($width, $height)->cacheFile('guess');
-        }
-        return $thumbURL;
+
+        return $this->generateUrl('_bwcms_admin_content_thumb', array(
+            'contentId' => $contentEntity->getId(),
+            'width' => $width,
+            'height' => $height,
+        ));
     }
 
 

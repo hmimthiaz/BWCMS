@@ -35,6 +35,9 @@ services:
   BWCMS.Template:
      class: Bellwether\BWCMSBundle\Classes\Service\TemplateService
      arguments: [@service_container,@request_stack]
+  BWCMS.Thumb:
+     class: Bellwether\BWCMSBundle\Classes\Service\ThumbService
+     arguments: [@kernel,@service_container,@request_stack]
   BWCMS.Router:
     class: Bellwether\BWCMSBundle\Classes\Service\RoutingService
     arguments: [@service_container,@request_stack]
