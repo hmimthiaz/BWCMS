@@ -37,6 +37,7 @@ use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMetaEntity;
 use Bellwether\Common\StringUtility;
 use Bellwether\Common\Pagination;
+use Bellwether\BWCMSBundle\Classes\Service\ThumbService;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Form;
@@ -913,11 +914,11 @@ class ContentService extends BaseService
     }
 
     /**
-     * @return Image
+     * @return ThumbService
      */
     public function getThumbService()
     {
-        return $this->container->get('image.handling');
+        return $this->container->get('BWCMS.Thumb');
     }
 
 

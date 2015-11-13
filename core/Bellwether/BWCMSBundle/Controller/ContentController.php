@@ -695,6 +695,32 @@ class ContentController extends BaseController implements BackEndControllerInter
         return $this->returnJsonReponse($request, $data);
     }
 
+
+
+    /**
+     * @Route("/templatethumb/{type}/s/{schema}/i/{image}",name="_bwcms_admin_content_template_thumb")
+     * @Method({"GET"})
+     */
+    public function contentTemplateThumbAction(Request $request, $type, $schema, $image)
+    {
+        $contentClass = $this->cm()->getContentClass($type,$schema);
+        $templateImagePath = str_replace('.', DIRECTORY_SEPARATOR, $contentClass->getType() . '.' . $contentClass->getSchema());
+        $templateImagePath = $contentClass->tp()->getCurrentSkin()->getPath() . DIRECTORY_SEPARATOR . $templateImagePath . DIRECTORY_SEPARATOR . $image;
+
+        $thumb = $this->getThumbService()->open($templateImagePath)->resize(240, 200);
+        $thumbCache = $thumb->cacheFile('guess');
+        $response = new BinaryFileResponse($thumbCache);
+        $response->trustXSendfileTypeHeader();
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_INLINE,
+            $image,
+            iconv('UTF-8', 'ASCII//TRANSLIT', $image)
+        );
+
+        return $response;
+
+    }
+
     /**
      * @Route("/thumb/{contentId}/w/{width}/h/{height}/file.png",name="_bwcms_admin_content_thumb")
      * @Method({"GET"})
@@ -724,9 +750,7 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $imageFile = $this->mm()->getMimeResourceImage($media->getMime());
             }
         }
-        /**
-         * @var \Gregwar\ImageBundle\Services\ImageHandling $ts
-         */
+
         $thumb = $this->getThumbService()->open($imageFile)->resize($width, $height);
         $thumbCache = $thumb->cacheFile('guess');
         $response = new BinaryFileResponse($thumbCache);
@@ -741,12 +765,12 @@ class ContentController extends BaseController implements BackEndControllerInter
     }
 
 
-    public function getImageThumbURL($filename, $width, $height)
-    {
-        $publicFilename = $this->mm()->getFilePath($filename);
-        $thumbURL = $this->mm()->getThumbService()->open($publicFilename)->cropResize($width, $height)->cacheFile('guess');
-        return $thumbURL;
-    }
+//    public function getImageThumbURL($filename, $width, $height)
+//    {
+//        $publicFilename = $this->mm()->getFilePath($filename);
+//        $thumbURL = $this->mm()->getThumbService()->open($publicFilename)->cropResize($width, $height)->cacheFile('guess');
+//        return $thumbURL;
+//    }
 
     /**
      * @Route("/folder-move.php",name="_bwcms_admin_content_folder_move")

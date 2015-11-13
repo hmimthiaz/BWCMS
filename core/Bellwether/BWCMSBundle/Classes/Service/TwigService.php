@@ -11,6 +11,7 @@ use Bellwether\BWCMSBundle\Entity\ThumbStyleEntity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
+use Bellwether\BWCMSBundle\Classes\Service\ThumbService;
 
 use Knp\Menu\FactoryInterface;
 use Gregwar\Image\Image;
@@ -407,11 +408,11 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     }
 
     /**
-     * @return Image
+     * @return ThumbService
      */
     public function getThumbService()
     {
-        return $this->container->get('image.handling');
+        return $this->container->get('BWCMS.Thumb');
     }
 
 

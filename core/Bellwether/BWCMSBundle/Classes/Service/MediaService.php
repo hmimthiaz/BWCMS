@@ -12,6 +12,8 @@ use Gregwar\Image\Image;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
 use Bellwether\BWCMSBundle\Entity\ThumbStyleEntity;
+use Bellwether\BWCMSBundle\Classes\Service\ThumbService;
+
 
 class MediaService extends BaseService
 {
@@ -229,38 +231,38 @@ class MediaService extends BaseService
         return $filename;
     }
 
-    /**
-     * @param ContentEntity $contentEntity
-     * @param ThumbStyleEntity $thumbStyle
-     */
-    public function getContentThumbURLWithStyle($contentEntity, $thumbStyle, $scaleFactor = 1.0)
-    {
-        $filename = $this->getContentFile($contentEntity);
-        if (empty($filename)) {
-            return null;
-        }
-        $thumb = $this->getThumbService()->open($filename);
-        $width = $thumbStyle->getWidth() * $scaleFactor;
-        $height = $thumbStyle->getHeight() * $scaleFactor;
-        switch ($thumbStyle->getMode()) {
-            case 'resize':
-                $thumb = $thumb->resize($width, $height);
-                break;
-            case 'scaleResize':
-                $thumb = $thumb->scaleResize($width, $height);
-                break;
-            case 'forceResize':
-                $thumb = $thumb->forceResize($width, $height);
-                break;
-            case 'cropResize':
-                $thumb = $thumb->cropResize($width, $height);
-                break;
-            case 'zoomCrop':
-                $thumb = $thumb->zoomCrop($width, $height);
-                break;
-        }
-        return $thumb->cacheFile('guess');
-    }
+//    /**
+//     * @param ContentEntity $contentEntity
+//     * @param ThumbStyleEntity $thumbStyle
+//     */
+//    public function getContentThumbURLWithStyle($contentEntity, $thumbStyle, $scaleFactor = 1.0)
+//    {
+//        $filename = $this->getContentFile($contentEntity);
+//        if (empty($filename)) {
+//            return null;
+//        }
+//        $thumb = $this->getThumbService()->open($filename);
+//        $width = $thumbStyle->getWidth() * $scaleFactor;
+//        $height = $thumbStyle->getHeight() * $scaleFactor;
+//        switch ($thumbStyle->getMode()) {
+//            case 'resize':
+//                $thumb = $thumb->resize($width, $height);
+//                break;
+//            case 'scaleResize':
+//                $thumb = $thumb->scaleResize($width, $height);
+//                break;
+//            case 'forceResize':
+//                $thumb = $thumb->forceResize($width, $height);
+//                break;
+//            case 'cropResize':
+//                $thumb = $thumb->cropResize($width, $height);
+//                break;
+//            case 'zoomCrop':
+//                $thumb = $thumb->zoomCrop($width, $height);
+//                break;
+//        }
+//        return $thumb->cacheFile('guess');
+//    }
 
     /**
      * @deprecated
@@ -321,11 +323,11 @@ class MediaService extends BaseService
     }
 
     /**
-     * @return Image
+     * @return ThumbService
      */
     public function getThumbService()
     {
-        return $this->container->get('image.handling');
+        return $this->container->get('BWCMS.Thumb');
     }
 
     private function sanitizeFilename($filename)

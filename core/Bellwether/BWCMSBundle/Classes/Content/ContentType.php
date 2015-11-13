@@ -24,6 +24,7 @@ use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
+use Bellwether\BWCMSBundle\Classes\Service\ThumbService;
 
 use Bellwether\BWCMSBundle\Classes\Content\Form\ContentEmptyForm;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -187,9 +188,11 @@ abstract class ContentType implements ContentTypeInterface
 
     public function addTemplate($templateName, $templateFile, $templateImage)
     {
-        $templateImagePath = str_replace('.', DIRECTORY_SEPARATOR, $this->getType() . '.' . $this->getSchema());
-        $templateImagePath = $this->tp()->getCurrentSkin()->getPath() . DIRECTORY_SEPARATOR . $templateImagePath . DIRECTORY_SEPARATOR . $templateImage;
-        $templateImagePath = $this->getThumbService()->open($templateImagePath)->resize(240, 200)->cacheFile('guess');
+        $templateImagePath = $this->generateUrl('_bwcms_admin_content_template_thumb', array(
+            'type' => $this->getType(),
+            'schema' => $this->getSchema(),
+            'image' => $templateImage,
+        ));
         $this->templates[] = array(
             'title' => $templateName,
             'template' => $templateFile,
@@ -770,11 +773,11 @@ abstract class ContentType implements ContentTypeInterface
     }
 
     /**
-     * @return Image
+     * @return ThumbService
      */
     public function getThumbService()
     {
-        return $this->container->get('image.handling');
+        return $this->container->get('BWCMS.Thumb');
     }
 
     /**
