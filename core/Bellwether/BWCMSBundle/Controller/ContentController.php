@@ -747,7 +747,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             if ($this->mm()->isImage($content)) {
                 $imageFile = $this->mm()->getMediaCachePath($media);
             } else {
-                $imageFile = $this->mm()->getMimeResourceImage($media->getMime());
+                $imageFile = $this->mm()->getMimeResourceImage($media->getExtension());
             }
         }
 
