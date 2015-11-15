@@ -696,19 +696,18 @@ class ContentController extends BaseController implements BackEndControllerInter
     }
 
 
-
     /**
      * @Route("/templatethumb/{type}/s/{schema}/i/{image}",name="_bwcms_admin_content_template_thumb")
      * @Method({"GET"})
      */
     public function contentTemplateThumbAction(Request $request, $type, $schema, $image)
     {
-        $contentClass = $this->cm()->getContentClass($type,$schema);
+        $contentClass = $this->cm()->getContentClass($type, $schema);
         $templateImagePath = str_replace('.', DIRECTORY_SEPARATOR, $contentClass->getType() . '.' . $contentClass->getSchema());
         $templateImagePath = $contentClass->tp()->getCurrentSkin()->getPath() . DIRECTORY_SEPARATOR . $templateImagePath . DIRECTORY_SEPARATOR . $image;
 
         $thumb = $this->getThumbService()->open($templateImagePath)->resize(240, 200);
-        $thumbCache = $thumb->cacheFile('guess');
+        $thumbCache = realpath($thumb->cacheFile('guess'));
         $response = new BinaryFileResponse($thumbCache);
         $response->trustXSendfileTypeHeader();
         $response->setContentDisposition(
@@ -752,7 +751,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         }
 
         $thumb = $this->getThumbService()->open($imageFile)->resize($width, $height);
-        $thumbCache = $thumb->cacheFile('guess');
+        $thumbCache = realpath($thumb->cacheFile('guess'));
         $response = new BinaryFileResponse($thumbCache);
         $response->trustXSendfileTypeHeader();
         $response->setContentDisposition(
