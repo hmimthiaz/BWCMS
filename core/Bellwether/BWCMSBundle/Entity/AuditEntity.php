@@ -17,12 +17,12 @@ class AuditEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=false)
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $level;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=false)
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $remoteAddress;
 
@@ -32,7 +32,7 @@ class AuditEntity
     private $logDate;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=false)
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $module;
 
@@ -42,7 +42,7 @@ class AuditEntity
     private $guid;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=false)
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $action;
 
