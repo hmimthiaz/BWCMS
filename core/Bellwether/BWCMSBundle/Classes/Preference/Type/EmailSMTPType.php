@@ -37,51 +37,54 @@ class EmailSMTPType Extends PreferenceType
 
     protected function buildForm()
     {
-//        $this->fb()->add('transport', 'choice',
-//            array(
-//                'label' => 'Transport',
-//                'choices' => array('smtp' => 'SMTP', 'gmail' => 'Gmail'),
-//            )
-//        );
+
         $this->fb()->add('username', 'text',
             array(
+                'required' => false,
                 'label' => 'Username'
             )
         );
         $this->fb()->add('password', 'text',
             array(
+                'required' => false,
                 'label' => 'Password'
             )
         );
         $this->fb()->add('host', 'text',
             array(
+                'required' => false,
                 'label' => 'Hostname'
             )
         );
         $this->fb()->add('port', 'text',
             array(
+                'required' => false,
                 'label' => 'Port'
             )
         );
         $this->fb()->add('encryption', 'choice',
             array(
+                'required' => false,
                 'label' => 'Encryption',
                 'choices' => array(null => 'none', 'tls' => 'TLS', 'ssl' => 'SSL'),
             )
         );
         $this->fb()->add('auth_mode', 'choice',
             array(
+                'required' => false,
                 'label' => 'Auth Mode',
                 'choices' => array(null => 'none', 'plain' => 'Plain', 'login' => 'Login', 'cram-md5' => 'Cram MD5'),
             )
         );
         $this->fb()->add('sender_address', 'text',
             array(
+                'required' => false,
                 'label' => 'Sender Email Address'
             )
         );
         $this->fb()->add('delivery_address', 'text',
             array(
+                'required' => false,
                 'label' => 'Delivery Email Address'
             )
         );

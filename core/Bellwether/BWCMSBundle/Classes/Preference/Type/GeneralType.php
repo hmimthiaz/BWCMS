@@ -48,6 +48,7 @@ class GeneralType Extends PreferenceType
         $this->fb()->add('description', 'text',
             array(
                 'label' => 'Description',
+                'required' => false,
                 'attr' => array(
                     'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
                 )
@@ -56,6 +57,7 @@ class GeneralType Extends PreferenceType
         $this->fb()->add('keywords', 'text',
             array(
                 'label' => 'Keywords',
+                'required' => false,
                 'attr' => array(
                     'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
                 )
@@ -70,6 +72,7 @@ class GeneralType Extends PreferenceType
 
         $this->fb()->add('headerNavigation', 'bwcms_content',
             array(
+                'required' => false,
                 'label' => 'Header Navigation',
                 'contentType' => 'Navigation',
                 'schema' => 'Folder'
@@ -78,6 +81,7 @@ class GeneralType Extends PreferenceType
 
         $this->fb()->add('footerNavigation', 'bwcms_content',
             array(
+                'required' => false,
                 'label' => 'Footer Navigation',
                 'contentType' => 'Navigation',
                 'schema' => 'Folder'
@@ -86,6 +90,7 @@ class GeneralType Extends PreferenceType
 
         $this->fb()->add('googleAnalyticsCode', 'text',
             array(
+                'required' => false,
                 'label' => 'Google Analytics'
             )
         );
