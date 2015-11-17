@@ -51,6 +51,9 @@ class DashboardController extends BaseController implements BackEndControllerInt
     public function emailAction()
     {
 
+        ignore_user_abort(true);
+        set_time_limit(0);
+
         $mailer = $this->mailer();
         $mailer->enableEchoLogger();
 
