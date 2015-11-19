@@ -20,7 +20,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @Route("/admin/thumbstyle")
  */
-class ThumbStyleController extends BaseController  implements BackEndControllerInterface
+class ThumbStyleController extends BaseController implements BackEndControllerInterface
 {
 
     /**
@@ -32,9 +32,12 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em();
 
-        $entities = $em->getRepository('BWCMSBundle:ThumbStyleEntity')->findAll();
+        $criteria = array(
+            'site' => $this->sm()->getAdminCurrentSite()->getId()
+        );
+        $entities = $em->getRepository('BWCMSBundle:ThumbStyleEntity')->findBy($criteria);
 
         return array(
             'entities' => $entities,
@@ -200,13 +203,13 @@ class ThumbStyleController extends BaseController  implements BackEndControllerI
             if (strlen($entity->getSlug()) < 3) {
                 $form->get('slug')->addError(new FormError('Slug too short'));
             } else {
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->em();
                 $qb = $em->createQueryBuilder();
                 $queryResult = $qb->select(array('t'))
                     ->from('BWCMSBundle:ThumbStyleEntity', 't')
-                    ->andWhere(" t.slug = '" . $entity->getSlug() . "'")
-                    ->andWhere(" t.site = '" . $this->sm()->getAdminCurrentSite()->getId() . "'")
-                    ->andWhere(" t.id != '" . $entity->getId() . "'")
+                    ->andWhere($qb->expr()->neq('t.id', $qb->expr()->literal($entity->getId())))
+                    ->andWhere($qb->expr()->eq('t.slug', $qb->expr()->literal($entity->getSlug())))
+                    ->andWhere($qb->expr()->eq('t.site', $qb->expr()->literal($this->sm()->getAdminCurrentSite()->getId())))
                     ->getQuery()
                     ->getResult();
                 if (!empty($queryResult)) {
