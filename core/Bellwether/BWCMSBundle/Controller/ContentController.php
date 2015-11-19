@@ -707,7 +707,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         $templateImagePath = $contentClass->tp()->getCurrentSkin()->getPath() . DIRECTORY_SEPARATOR . $templateImagePath . DIRECTORY_SEPARATOR . $image;
 
         $thumb = $this->getThumbService()->open($templateImagePath)->resize(240, 200);
-        $thumbCache = $this->truepath($thumb->cacheFile('guess'));
+        $thumbCache = $thumb->cacheFile('guess', 80, true);
         $response = new BinaryFileResponse($thumbCache);
         $response->trustXSendfileTypeHeader();
         $response->setContentDisposition(
@@ -751,7 +751,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         }
 
         $thumb = $this->getThumbService()->open($imageFile)->resize($width, $height);
-        $thumbCache = $this->truepath($thumb->cacheFile('guess'));
+        $thumbCache = $thumb->cacheFile('guess', 80, true);
         $response = new BinaryFileResponse($thumbCache);
         $response->trustXSendfileTypeHeader();
         $response->setContentDisposition(
@@ -762,41 +762,6 @@ class ContentController extends BaseController implements BackEndControllerInter
 
         return $response;
     }
-
-
-    function truepath($path)
-    {
-        // whether $path is unix or not
-        $unipath = strlen($path) == 0 || $path{0} != '/';
-        // attempts to detect if path is relative in which case, add cwd
-        if (strpos($path, ':') === false && $unipath)
-            $path = getcwd() . DIRECTORY_SEPARATOR . $path;
-        // resolve path parts (single dot, double dot and double delimiters)
-        $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
-        $parts = array_filter(explode(DIRECTORY_SEPARATOR, $path), 'strlen');
-        $absolutes = array();
-        foreach ($parts as $part) {
-            if ('.' == $part) continue;
-            if ('..' == $part) {
-                array_pop($absolutes);
-            } else {
-                $absolutes[] = $part;
-            }
-        }
-        $path = implode(DIRECTORY_SEPARATOR, $absolutes);
-        // resolve any symlinks
-        if (file_exists($path) && linkinfo($path) > 0) $path = readlink($path);
-        // put initial separator that could have been lost
-        $path = !$unipath ? '/' . $path : $path;
-        return $path;
-    }
-
-//    public function getImageThumbURL($filename, $width, $height)
-//    {
-//        $publicFilename = $this->mm()->getFilePath($filename);
-//        $thumbURL = $this->mm()->getThumbService()->open($publicFilename)->cropResize($width, $height)->cacheFile('guess');
-//        return $thumbURL;
-//    }
 
     /**
      * @Route("/folder-move.php",name="_bwcms_admin_content_folder_move")
