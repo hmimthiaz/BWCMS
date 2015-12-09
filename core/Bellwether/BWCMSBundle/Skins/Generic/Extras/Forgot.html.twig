@@ -23,6 +23,9 @@
             <div class="col-xs-12">
                 <div class="form-wrap">
                     <h1>Forgot Password</h1>
+                    {% if Sent is defined %}
+                        <p>Reset password instruction email sent. Please check your email to continue!</p>
+                    {% endif %}
                     {{ form(form) }}
                 </div>
             </div>

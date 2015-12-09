@@ -70,11 +70,12 @@ class SecurityController extends BaseController implements BackEndControllerInte
     public function forgotAction(Request $request)
     {
 
+        $returnArray = array();
+
         $form = $this->createForm(new ForgotType(), null, array(
             'action' => $this->generateUrl('user_forgot'),
             'method' => 'POST',
         ));
-        $form->add('submit', 'submit', array('label' => 'Request Password'));
 
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
@@ -104,7 +105,8 @@ class SecurityController extends BaseController implements BackEndControllerInte
                 $formSubject = 'Password Request';
                 $resetURL = $this->generateUrl('user_forgot_reset', array('token' => $userEntity->getConfirmationToken()), true);
                 $emailData = array(
-                    'resetURL' => $resetURL
+                    'resetURL' => $resetURL,
+                    'user' => $userEntity
                 );
                 $emailText = $this->renderView('@Generic/Extras/Forgot.Email.txt.twig', $emailData);
                 $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
@@ -116,18 +118,18 @@ class SecurityController extends BaseController implements BackEndControllerInte
                     $message->setBody($emailText);
                     $this->mailer()->getMailer()->send($message);
                 }
+                $returnArray['Sent'] = 'True';
             }
         }
+
+        $returnArray['form'] = $form->createView();
 
         $template = $this->tp()->getCurrentSkin()->getForgotTemplate();
         if (is_null($template)) {
             $template = "@Generic/Extras/Forgot.html.twig";
         }
 
-        return $this->render($template, array(
-            'form' => $form->createView(),
-            'error' => '',
-        ));
+        return $this->render($template, $returnArray);
     }
 
     /**

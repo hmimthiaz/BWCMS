@@ -28,6 +28,9 @@ class GeneralType Extends PreferenceType
         $this->addField('description', PreferenceFieldType::String);
         $this->addField('keywords', PreferenceFieldType::String);
         $this->addField('adminEmail', PreferenceFieldType::String, true);
+        $this->addField('adminEmail2', PreferenceFieldType::String, true);
+        $this->addField('adminEmail3', PreferenceFieldType::String, true);
+        $this->addField('adminEmail4', PreferenceFieldType::String, true);
 
         $this->addField('headerNavigation', PreferenceFieldType::Content);
         $this->addField('footerNavigation', PreferenceFieldType::Content);
@@ -67,6 +70,27 @@ class GeneralType Extends PreferenceType
         $this->fb()->add('adminEmail', 'text',
             array(
                 'label' => 'Admin Email'
+            )
+        );
+
+        $this->fb()->add('adminEmail2', 'text',
+            array(
+                'required' => false,
+                'label' => 'Admin Email 2'
+            )
+        );
+
+        $this->fb()->add('adminEmail3', 'text',
+            array(
+                'required' => false,
+                'label' => 'Admin Email 3'
+            )
+        );
+
+        $this->fb()->add('adminEmail4', 'text',
+            array(
+                'required' => false,
+                'label' => 'Admin Email 4'
             )
         );
 

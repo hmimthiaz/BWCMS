@@ -25,6 +25,9 @@ class ForgotType extends AbstractType
         $builder->add('email', 'email',
             array(
                 'label' => 'Email',
+                'label_attr' => array(
+                    'class' => 'label-wrapper'
+                ),
                 'constraints' => array(
                     new NotBlank(),
                     new Email(),
@@ -32,7 +35,23 @@ class ForgotType extends AbstractType
             )
         );
 
-        $builder->add('captcha', 'captcha');
+        $builder->add('captcha', 'captcha',
+            array(
+                'label_attr' => array(
+                    'class' => 'label-wrapper'
+                )
+            )
+        );
+
+        $builder->add('submit', 'submit',
+            array(
+                'label' => 'Request Password',
+                'attr' => array(
+                    'class' => 'login-btn'
+                )
+            )
+        );
+
     }
 
     /**
