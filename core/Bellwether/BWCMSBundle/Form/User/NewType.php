@@ -84,6 +84,13 @@ class NewType extends AbstractType
             )
         );
 
+        $builder->add('company', 'text',
+            array(
+                'label' => 'Company',
+                'required' => false,
+            )
+        );
+
         $builder->add('user_roles', 'choice',
             array(
                 'choices' => $this->roles,

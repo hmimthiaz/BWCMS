@@ -79,6 +79,14 @@ class ProfileType extends AbstractType
             )
         );
 
+        $builder->add('company', 'text',
+            array(
+                'label' => 'Company',
+                'data' => $this->existingUser->getCompany(),
+                'required' => false,
+            )
+        );
+
     }
 
     /**

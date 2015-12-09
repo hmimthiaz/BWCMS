@@ -81,6 +81,14 @@ class EditType extends AbstractType
             )
         );
 
+        $builder->add('company', 'text',
+            array(
+                'label' => 'Company',
+                'data' => $this->existingUser->getCompany(),
+                'required' => false,
+            )
+        );
+
         $builder->add('user_roles', 'choice',
             array(
                 'choices' => $this->roles,

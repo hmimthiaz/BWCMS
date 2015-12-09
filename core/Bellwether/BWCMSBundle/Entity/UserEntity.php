@@ -40,6 +40,13 @@ class UserEntity extends BaseUser
     private $mobile;
 
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=100, nullable=true, name="company")
+     */
+    private $company;
+
     public function __construct()
     {
         parent::__construct();
@@ -105,6 +112,22 @@ class UserEntity extends BaseUser
     public function setMobile($mobile)
     {
         $this->mobile = $mobile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompany()
+    {
+        return $this->company;
+    }
+
+    /**
+     * @param string $company
+     */
+    public function setCompany($company)
+    {
+        $this->company = $company;
     }
 
 }

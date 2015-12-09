@@ -18,6 +18,9 @@ use Bellwether\BWCMSBundle\Form\User\ChangePasswordType;
 use Bellwether\BWCMSBundle\Form\User\ProfileType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use Bellwether\Common\Pagination;
+
+
 /**
  * User controller.
  *
@@ -31,13 +34,45 @@ class UserController extends BaseController implements BackEndControllerInterfac
      * @Route("/",name="_bwcms_admin_user_home")
      * @Template()
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $em = $this->getDoctrine()->getManager();
-        $entities = $em->getRepository('BWCMSBundle:UserEntity')->findAll();
+
+        $query = $request->get('query');
+        $pager = new Pagination($request, 10);
+        $start = $pager->getStart();
+        $limit = $pager->getLimit();
+
+        $userRepository = $this->em()->getRepository('BWCMSBundle:UserEntity');
+        $qb = $userRepository->createQueryBuilder('u');
+
+        if (!empty($query)) {
+            $searchLikeExp = $qb->expr()->orX();
+            $searchLikeExp->add($qb->expr()->like('u.company', $qb->expr()->literal('%' . $query . '%')));
+            $searchLikeExp->add($qb->expr()->like('u.firstName', $qb->expr()->literal('%' . $query . '%')));
+            $searchLikeExp->add($qb->expr()->like('u.lastName', $qb->expr()->literal('%' . $query . '%')));
+            $searchLikeExp->add($qb->expr()->like('u.email', $qb->expr()->literal('%' . $query . '%')));
+            $searchLikeExp->add($qb->expr()->like('u.mobile', $qb->expr()->literal('%' . $query . '%')));
+            $qb->andWhere($searchLikeExp);
+        }
+
+        $qb->add('orderBy', 'u.company ASC, u.firstName ASC, u.lastName ASC');
+        $qb->setFirstResult($start);
+        $qb->setMaxResults($limit);
+
+        $result = $qb->getQuery()->getResult();
+        $pager->setItems($result);
+
+        $qb2 = clone $qb; // don't modify existing query
+        $qb2->resetDQLPart('orderBy');
+        $qb2->resetDQLPart('having');
+        $qb2->select('COUNT(u) AS cnt');
+        $countResult = $qb2->getQuery()->setFirstResult(0)->getScalarResult();
+        $totalCount= $countResult[0]['cnt'];
+        $pager->setTotalItems($totalCount);
+
         return array(
-            'entities' => $entities,
+            'pager' => $pager,
         );
     }
 
@@ -83,6 +118,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
                 $user->setFirstname($formData['firstName']);
                 $user->setLastname($formData['lastName']);
                 $user->setMobile($formData['mobile']);
+                $user->setCompany($formData['company']);
                 foreach ($formData['user_roles'] as $role) {
                     $user->addRole($role);
                 }
@@ -170,6 +206,8 @@ class UserController extends BaseController implements BackEndControllerInterfac
                 $existingUser->setUsername($username);
                 $existingUser->setEmail($formData['email']);
                 $existingUser->setMobile($formData['mobile']);
+                $existingUser->setCompany($formData['company']);
+
                 foreach ($roles as $roleKey => $roleValue) {
                     $existingUser->removeRole($roleKey);
                 }
@@ -290,6 +328,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
                 $existingUser->setFirstname($formData['firstName']);
                 $existingUser->setLastname($formData['lastName']);
                 $existingUser->setMobile($formData['mobile']);
+                $existingUser->setCompany($formData['company']);
                 $this->em()->persist($existingUser);
                 $this->em()->flush();
                 $this->addSuccessFlash('Updated profile information!');
