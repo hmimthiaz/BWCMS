@@ -174,7 +174,7 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
         $templateVars = array();
         $templateVars['message'] = $accessDeniedException->getMessage();
         if ($this->getSecurityContext()->isGranted('ROLE_PREVIOUS_ADMIN')) {
-            $templateVars['securityExitURL'] = $this->generateUrl('user_home', array('_switch_user' => '_exit'));
+            $templateVars['securityExitURL'] = $this->generateUrl('_bwcms_admin_user_home', array('_switch_user' => '_exit'));
         }
         $template = $this->container->get('templating');
         $response = new Response($template->render('BWCMSBundle:Common:access-denied.html.twig', $templateVars));
