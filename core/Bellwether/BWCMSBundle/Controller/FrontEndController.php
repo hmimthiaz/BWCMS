@@ -86,6 +86,7 @@ class FrontEndController extends BaseController implements FrontEndControllerInt
         $pager = $this->search()->searchIndex($searchString, $pager);
         $returnVar['pager'] = $pager;
         $returnVar['searchString'] = $searchString;
+        $returnVar['pageTitle'] = 'Search Results';
 
         $template = $this->tp()->getCurrentSkin()->getSearchTemplate();
         return $this->render($template, $returnVar);
