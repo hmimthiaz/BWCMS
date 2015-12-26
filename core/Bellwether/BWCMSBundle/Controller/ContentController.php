@@ -948,8 +948,8 @@ class ContentController extends BaseController implements BackEndControllerInter
         $response->trustXSendfileTypeHeader();
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $media->getFile(),
-            iconv('UTF-8', 'ASCII//TRANSLIT', $media->getFile())
+            $media->getFile() . '.' . $media->getExtension(),
+            iconv('UTF-8', 'ASCII//TRANSLIT', $media->getFile() . '.' . $media->getExtension())
         );
 
         return $response;

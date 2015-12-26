@@ -61,6 +61,14 @@ class RoutingService extends BaseService implements LoaderInterface
         ));
         $routes->add('media_image_view', $mediaImageViewRoute);
 
+        $downloadMediaRoute = new Route('/{siteSlug}/media/{contentId}/download.php', array(
+            '_controller' => 'BWCMSBundle:MediaFrontEnd:downloadMedia',
+        ), array(
+            'siteSlug' => '[a-zA-Z0-9-]+',
+            'contentId' => '[a-zA-Z0-9-]+'
+        ));
+        $routes->add('media_download_link', $downloadMediaRoute);
+
         $mediaThumbViewRoute = new Route('/{siteSlug}/thumb/{contentId}/{thumbSlug}/{scale}/index.php', array(
             '_controller' => 'BWCMSBundle:MediaFrontEnd:mediaThumb',
         ), array(

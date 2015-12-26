@@ -167,7 +167,8 @@ class MediaService extends BaseService
         if (null !== $uploadedFile && $uploadedFile->isValid()) {
             $uploadedTempFile = $uploadedFile->getPathname();
             $data['originalName'] = $uploadedFile->getClientOriginalName();
-            $data['filename'] = $this->sanitizeFilename($uploadedFile->getClientOriginalName());
+            $filenameWithoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $uploadedFile->getClientOriginalName());
+            $data['filename'] = $this->sanitizeFilename($filenameWithoutExt);
             $data['mimeType'] = $uploadedFile->getClientMimeType();
             $data['size'] = $uploadedFile->getClientSize();
             $data['extension'] = $uploadedFile->getClientOriginalExtension();

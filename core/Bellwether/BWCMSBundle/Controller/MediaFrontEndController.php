@@ -23,7 +23,7 @@ class MediaFrontEndController extends BaseController implements CachedSiteFrontE
         if (empty($thumbEntity)) {
             $thumbEntity = $this->mm()->getThumbStyle($thumbSlug, $this->sm()->getCurrentSite());
             if (empty($thumbEntity)) {
-                throw new $this->createNotFoundException();
+                throw new NotFoundHttpException('Thumb not found');
             }
             $this->cache()->save('thumbStyle_' . $thumbSlug, $thumbEntity);
         }
@@ -39,7 +39,7 @@ class MediaFrontEndController extends BaseController implements CachedSiteFrontE
             $contentEntity = $this->cm()->getContentRepository()->find($contentId);
             $contentMediaEntity = $contentEntity->getMedia()->first();
             if (empty($contentMediaEntity)) {
-                throw new $this->createNotFoundException();
+                throw new NotFoundHttpException('File not found');
             }
             $this->mm()->checkAndCreateMediaCacheFile($contentMediaEntity);
             $this->cache()->save('contentMedia_' . $contentId, $contentMediaEntity);
@@ -92,7 +92,7 @@ class MediaFrontEndController extends BaseController implements CachedSiteFrontE
             $contentEntity = $this->cm()->getContentRepository()->find($contentId);
             $contentMediaEntity = $contentEntity->getMedia()->first();
             if (empty($contentMediaEntity)) {
-                throw new $this->createNotFoundException();
+                throw new NotFoundHttpException('File not found');
             }
             if (!$this->mm()->isImage($contentEntity)) {
                 throw new NotFoundHttpException('File is not an image');
@@ -118,6 +118,46 @@ class MediaFrontEndController extends BaseController implements CachedSiteFrontE
             ResponseHeaderBag::DISPOSITION_INLINE,
             $contentMediaEntity->getFile(),
             iconv('UTF-8', 'ASCII//TRANSLIT', $contentMediaEntity->getFile())
+        );
+
+        return $response;
+    }
+
+    public function downloadMediaAction(Request $request, $siteSlug, $contentId)
+    {
+        /**
+         * @var ContentMediaEntity $contentMediaEntity
+         */
+        $contentMediaEntity = $this->cache()->fetch('contentMedia_' . $contentId);
+        if (empty($contentMediaEntity)) {
+            /**
+             * @var ContentEntity $contentEntity
+             */
+            $contentEntity = $this->cm()->getContentRepository()->find($contentId);
+            $contentMediaEntity = $contentEntity->getMedia()->first();
+            if (empty($contentMediaEntity)) {
+                throw new NotFoundHttpException('File not found');
+            }
+            $this->mm()->checkAndCreateMediaCacheFile($contentMediaEntity);
+            $this->cache()->save('contentMedia_' . $contentId, $contentMediaEntity);
+        }
+        $filename = $this->mm()->getMediaCachePath($contentMediaEntity);
+        $response = new BinaryFileResponse($filename);
+        $response->trustXSendfileTypeHeader();
+        $lastModified = $contentMediaEntity->getContent()->getModifiedDate();
+        if (is_null($lastModified)) {
+            $lastModified = $contentMediaEntity->getContent()->getCreatedDate();
+        }
+        if (!is_null($lastModified)) {
+            $response->setLastModified($lastModified);
+        }
+        $expiresDate = new \DateTime();
+        $expiresDate->add(new \DateInterval('P30D'));
+        $response->setExpires($expiresDate);
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $contentMediaEntity->getFile() . '.' . $contentMediaEntity->getExtension(),
+            iconv('UTF-8', 'ASCII//TRANSLIT', $contentMediaEntity->getFile() . '.' . $contentMediaEntity->getExtension())
         );
 
         return $response;

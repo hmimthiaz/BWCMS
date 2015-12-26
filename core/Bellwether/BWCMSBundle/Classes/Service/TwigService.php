@@ -122,6 +122,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             'skinAsset' => new \Twig_Function_Method($this, 'getSkinAsset', array('is_safe' => array('html'))),
             'setSkinAssetPrefix' => new \Twig_Function_Method($this, 'setSkinAssetPrefix', array('is_safe' => array('html'))),
             'link' => new \Twig_Function_Method($this, 'getContentLink'),
+            'download' => new \Twig_Function_Method($this, 'getContentDownloadLink'),
             'menu' => new \Twig_Function_Method($this, 'getContentMenu', array('is_safe' => array('html'))),
             'widget' => new \Twig_Function_Method($this, 'getContentWidget', array('is_safe' => array('html'))),
             'meta' => new \Twig_Function_Method($this, 'getContentMeta', array('is_safe' => array('html'))),
@@ -192,6 +193,20 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     public function getContentLink($contentEntity)
     {
         return $this->cq()->getPublicURL($contentEntity);
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return string
+     */
+    public function getContentDownloadLink($contentEntity)
+    {
+        $url = $this->generateUrl('media_download_link', array(
+            'siteSlug' => $this->sm()->getCurrentSite()->getSlug(),
+            'contentId' => $contentEntity->getId()
+        ));
+
+        return $url;
     }
 
     function getEllipse($text, $limit = 300, $end = '...')
