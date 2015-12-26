@@ -6,11 +6,11 @@ tinymce.init({
     plugins: [
         "advlist link image lists hr anchor",
         "wordcount visualblocks visualchars code ",
-        "table contextmenu directionality template paste"
+        "table contextmenu directionality template paste media"
     ],
     directionality : '{{ direction }}',
     {#content_css: "css/content.css",#}
-    toolbar: "bold italic | styleselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table hr | code ",
+    toolbar: "bold italic | styleselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table hr | code ",
     file_browser_callback_types: 'image',
     file_browser_callback   : function(field_name, url, type, win) {
         var cmsURL  = '{{ path('_bwcms_admin_editor_image_browser') }}?field=' + field_name + '&imageURL=' + encodeURIComponent(url);

@@ -186,6 +186,39 @@ class ContentQueryService extends BaseService
      * @param ContentEntity $parent
      * @return null|ContentEntity
      */
+    public function getContentByGUID($guid, $contentTypes = array())
+    {
+        $qb = $this->cm()->getContentRepository()->createQueryBuilder('node');
+        if (!empty($contentTypes)) {
+            $condition = array();
+            foreach ($contentTypes as $cInfo) {
+                $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
+            }
+            if (!empty($condition)) {
+                $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
+            }
+        }
+        $qb->andWhere(" node.id = '{$guid}' ");
+
+        if (!$this->isGranted('ROLE_AUTHOR')) {
+            $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+        }
+
+        $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
+        $qb->setMaxResults(1);
+
+        try {
+            return $qb->getQuery()->getSingleResult();
+        } catch (NoResultException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param string $slug
+     * @param ContentEntity $parent
+     * @return null|ContentEntity
+     */
     public function getContentBySlug($slug, $parent = null, $contentTypes = array())
     {
         $qb = $this->cm()->getContentRepository()->createQueryBuilder('node');
