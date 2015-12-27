@@ -13,6 +13,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Bellwether\BWCMSBundle\Classes\Service\ThumbService;
 
+use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentSortByType;
+use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
+
+
 use Knp\Menu\FactoryInterface;
 use Gregwar\Image\Image;
 use Bellwether\Common\Pagination;

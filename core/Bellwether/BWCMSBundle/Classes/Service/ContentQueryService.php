@@ -62,21 +62,26 @@ class ContentQueryService extends BaseService
         $limit = $pager->getLimit();
 
         $contentRepository = $this->getContentRepository();
-        $qb = $contentRepository->getChildrenQueryBuilder($contentEntity, true);
-        $sortOrder = ' ASC';
-        if ($contentEntity->getSortOrder() == ContentSortOrderType::DESC) {
+        $qb = $contentRepository->getChildrenQueryBuilder($contentEntity, !is_null($contentEntity));
+
+        if (!is_null($contentEntity)) {
             $sortOrder = ' DESC';
-        }
-        if ($contentEntity->getSortBy() == ContentSortByType::SortIndex) {
-            $qb->add('orderBy', 'node.treeLeft' . $sortOrder);
-        } elseif ($contentEntity->getSortBy() == ContentSortByType::Created) {
-            $qb->add('orderBy', 'node.createdDate' . $sortOrder);
-        } elseif ($contentEntity->getSortBy() == ContentSortByType::Published) {
-            $qb->add('orderBy', 'node.publishDate' . $sortOrder);
-        } elseif ($contentEntity->getSortBy() == ContentSortByType::Title) {
-            $qb->add('orderBy', 'node.title' . $sortOrder);
-        } elseif ($contentEntity->getSortBy() == ContentSortByType::Size) {
-            $qb->add('orderBy', 'node.size' . $sortOrder);
+            if ($contentEntity->getSortOrder() == ContentSortOrderType::ASC) {
+                $sortOrder = ' ASC';
+            }
+            if ($contentEntity->getSortBy() == ContentSortByType::SortIndex) {
+                $qb->add('orderBy', 'node.treeLeft' . $sortOrder);
+            } elseif ($contentEntity->getSortBy() == ContentSortByType::Created) {
+                $qb->add('orderBy', 'node.createdDate' . $sortOrder);
+            } elseif ($contentEntity->getSortBy() == ContentSortByType::Published) {
+                $qb->add('orderBy', 'node.publishDate' . $sortOrder);
+            } elseif ($contentEntity->getSortBy() == ContentSortByType::Title) {
+                $qb->add('orderBy', 'node.title' . $sortOrder);
+            } elseif ($contentEntity->getSortBy() == ContentSortByType::Size) {
+                $qb->add('orderBy', 'node.size' . $sortOrder);
+            }
+        } else {
+            $qb->add('orderBy', 'node.publishDate DESC');
         }
 
         $registeredContents = $this->cm()->getRegisteredContentTypes($type, $schema);
@@ -104,9 +109,7 @@ class ContentQueryService extends BaseService
         $qb2->select('COUNT(node) AS cnt');
         $countResult = $qb2->getQuery()->setFirstResult(0)->getScalarResult();
         $totalCount = $countResult[0]['cnt'];
-
         $pager->setTotalItems($totalCount);
-
         return $pager;
     }
 
