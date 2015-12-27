@@ -129,6 +129,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             'pref' => new \Twig_Function_Method($this, 'getPreference', array('is_safe' => array('html'))),
             'image' => new \Twig_Function_Method($this, 'getImage'),
             'thumb' => new \Twig_Function_Method($this, 'getThumbImage'),
+            'taxonomy' => new \Twig_Function_Method($this, 'getContentTaxonomy'),
             'pagination' => new \Twig_Function_Method($this, 'getPagination', array('is_safe' => array('html'))),
             'loc' => new \Twig_Function_Method($this, 'getLocale', array('is_safe' => array('html'))),
             'emailLink' => new \Twig_Function_Method($this, 'getEmailLink', array('is_safe' => array('html'))),
@@ -229,6 +230,32 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
 
     /**
      * @param ContentEntity $contentEntity
+     * @return array
+     */
+    public function getContentTaxonomy($contentEntity, $schema)
+    {
+        if (!($contentEntity instanceof ContentEntity)) {
+            return array();
+        }
+        $contentClass = $this->cm()->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
+        $relation = $contentClass->getTaxonomyRelations($schema);
+        if (empty($relation)) {
+            return array();
+        }
+
+        $qb = $this->cm()->getContentRepository()->createQueryBuilder('node');
+        $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentRelationEntity', 'relation', \Doctrine\ORM\Query\Expr\Join::WITH, ' node.id = relation.relatedContent ');
+        $qb->andWhere(" ( node.type = '" . $relation['type'] . "' AND node.schema = '" . $relation['schema'] . "' ) ");
+        if (!$this->isGranted('ROLE_AUTHOR')) {
+            $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+        }
+        $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
+        $qb->add('orderBy', 'node.title ASC');
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
      * @param array $options
      * @return string
      */
@@ -303,14 +330,11 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      */
     public function getImage($contentEntity, $default = false)
     {
-
         $url = $this->generateUrl('media_image_view', array(
             'siteSlug' => $this->sm()->getCurrentSite()->getSlug(),
             'contentId' => $contentEntity->getId()
         ));
-
         return $url;
-
     }
 
     /**

@@ -1031,8 +1031,14 @@ abstract class ContentType implements ContentTypeInterface
     /**
      * @return null
      */
-    public function getTaxonomyRelations()
+    public function getTaxonomyRelations($schema = null)
     {
+        if (!is_null($schema)) {
+            if (array_key_exists($schema, $this->taxonomyRelations)) {
+                return $this->taxonomyRelations[$schema];
+            }
+            return null;
+        }
         return $this->taxonomyRelations;
     }
 
