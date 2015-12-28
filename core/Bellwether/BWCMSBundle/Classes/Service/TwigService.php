@@ -235,28 +235,12 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
 
     /**
      * @param ContentEntity $contentEntity
+     * @param string $schema
      * @return array
      */
-    public function getContentTaxonomy($contentEntity, $schema)
+    public function getContentTaxonomy($contentEntity, $schema = null)
     {
-        if (!($contentEntity instanceof ContentEntity)) {
-            return array();
-        }
-        $contentClass = $this->cm()->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
-        $relation = $contentClass->getTaxonomyRelations($schema);
-        if (empty($relation)) {
-            return array();
-        }
-
-        $qb = $this->cm()->getContentRepository()->createQueryBuilder('node');
-        $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentRelationEntity', 'relation', \Doctrine\ORM\Query\Expr\Join::WITH, ' node.id = relation.relatedContent ');
-        $qb->andWhere(" ( node.type = '" . $relation['type'] . "' AND node.schema = '" . $relation['schema'] . "' ) ");
-        if (!$this->isGranted('ROLE_AUTHOR')) {
-            $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
-        }
-        $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
-        $qb->add('orderBy', 'node.title ASC');
-        return $qb->getQuery()->getResult();
+        return $this->cq()->getContentTaxonomy($contentEntity, $schema);
     }
 
     /**

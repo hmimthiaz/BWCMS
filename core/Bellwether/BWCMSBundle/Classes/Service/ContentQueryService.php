@@ -116,6 +116,47 @@ class ContentQueryService extends BaseService
 
     /**
      * @param ContentEntity $contentEntity
+     * @param string $taxonomySchema
+     * @return array
+     */
+    public function getContentTaxonomy($contentEntity, $taxonomySchema = null)
+    {
+        if (!($contentEntity instanceof ContentEntity)) {
+            return array();
+        }
+        $contentClass = $this->cm()->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
+        $relations = $contentClass->getTaxonomyRelations($taxonomySchema);
+        if (empty($relations)) {
+            return array();
+        }
+        $returnArray = array();
+        foreach ($relations as $relation) {
+            $returnArray[$relation['name']] = $this->getContentTaxonomyForRelation($contentEntity, $relation);
+        }
+        return $returnArray;
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @param string $taxonomySchema
+     * @return array
+     */
+    private function getContentTaxonomyForRelation($contentEntity, $relation)
+    {
+        $qb = $this->cm()->getContentRepository()->createQueryBuilder('node');
+        $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentRelationEntity', 'relation', \Doctrine\ORM\Query\Expr\Join::WITH, ' node.id = relation.relatedContent ');
+        $qb->andWhere(" ( node.type = '" . $relation['type'] . "' AND node.schema = '" . $relation['schema'] . "' ) ");
+        $qb->andWhere(" relation.content = '" . $contentEntity->getId() . "' ");
+        if (!$this->isGranted('ROLE_AUTHOR')) {
+            $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+        }
+        $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
+        $qb->add('orderBy', 'node.title ASC');
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
      * @return array
      */
     public function getContentMenuItems($contentEntity)
