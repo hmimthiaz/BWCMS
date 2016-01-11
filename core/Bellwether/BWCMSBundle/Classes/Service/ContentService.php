@@ -312,6 +312,11 @@ class ContentService extends BaseService
         if ($classInstance->isExpireDateEnabled()) {
             $form->get('expireDate')->setData($content->getExpireDate());
         }
+        if ($classInstance->isEventDateSupported()) {
+            $form->get('eventStartDate')->setData($content->getEventStartDate());
+            $form->get('eventEndDate')->setData($content->getEventEndDate());
+        }
+
         $taxonomyRelations = $classInstance->getTaxonomyRelations();
         if (!empty($taxonomyRelations)) {
             $existingRelation = $content->getRelation();
@@ -473,9 +478,7 @@ class ContentService extends BaseService
         }
 
         $data = $form->getData();
-
         $fields = $classInstance->getFields();
-
         foreach ($fields as $fieldName => $fieldInfo) {
             if ($fieldName == 'parent' && !empty($data['parent'])) {
                 $parentContent = $this->getContentRepository()->find($data['parent']);
@@ -522,6 +525,16 @@ class ContentService extends BaseService
             if ($fieldName == 'expireDate') {
                 if ($data['expireDate'] instanceof \DateTime) {
                     $content->setExpireDate($data['expireDate']);
+                }
+            }
+            if ($fieldName == 'eventStartDate') {
+                if ($data['eventStartDate'] instanceof \DateTime) {
+                    $content->setEventStartDate($data['eventStartDate']);
+                }
+            }
+            if ($fieldName == 'eventEndDate') {
+                if ($data['eventEndDate'] instanceof \DateTime) {
+                    $content->setEventEndDate($data['eventEndDate']);
                 }
             }
             if ($fieldName == 'attachment') {
@@ -910,6 +923,7 @@ class ContentService extends BaseService
             "schema", "template", "mime", "extension",
             "size", "height", "width",
             "modifiedDate", "createdDate", "status",
+            "eventStartDate", "eventEndDate",
             "author", "site", "parent", "sortBy", "sortOrder");
     }
 

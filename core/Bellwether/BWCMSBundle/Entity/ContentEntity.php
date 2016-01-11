@@ -182,6 +182,16 @@ class ContentEntity
     private $createdDate;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $eventStartDate;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $eventEndDate;
+
+    /**
      * @ORM\Column(type="string", length=100, nullable=false)
      */
     private $status = ContentPublishType::Published;
@@ -663,7 +673,7 @@ class ContentEntity
     }
 
     /**
-     * @param mixed $modifiedDate
+     * @param \DateTime $modifiedDate
      */
     public function setModifiedDate($modifiedDate)
     {
@@ -679,11 +689,43 @@ class ContentEntity
     }
 
     /**
-     * @param mixed $createdDate
+     * @param \DateTime $createdDate
      */
     public function setCreatedDate($createdDate)
     {
         $this->createdDate = $createdDate;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getEventStartDate()
+    {
+        return $this->eventStartDate;
+    }
+
+    /**
+     * @param \DateTime $eventStartDate
+     */
+    public function setEventStartDate($eventStartDate)
+    {
+        $this->eventStartDate = $eventStartDate;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getEventEndDate()
+    {
+        return $this->eventEndDate;
+    }
+
+    /**
+     * @param \DateTime $eventEndDate
+     */
+    public function setEventEndDate($eventEndDate)
+    {
+        $this->eventEndDate = $eventEndDate;
     }
 
     /**

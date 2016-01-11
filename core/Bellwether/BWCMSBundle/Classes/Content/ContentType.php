@@ -33,9 +33,12 @@ use Bellwether\BWCMSBundle\Classes\Constants\ContentFieldType;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Symfony\Component\Routing\RouteCollection;
 
+use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Date;
 
 use Symfony\Bundle\TwigBundle\TwigEngine;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 abstract class ContentType implements ContentTypeInterface
 {
@@ -132,6 +135,16 @@ abstract class ContentType implements ContentTypeInterface
      * @var bool
      */
     private $isPageBuilderSupported = false;
+
+    /**
+     * @var bool
+     */
+    private $isEventDateSupported = false;
+
+    /**
+     * @var bool
+     */
+    private $isEventDateTime = false;
 
     /**
      * @var bool
@@ -297,6 +310,11 @@ abstract class ContentType implements ContentTypeInterface
             if ($this->isExpireDateEnabled()) {
                 $this->addField('expireDate', ContentFieldType::Internal);
             }
+            if ($this->isEventDateSupported()) {
+                $this->addField('eventStartDate', ContentFieldType::Internal);
+                $this->addField('eventEndDate', ContentFieldType::Internal);
+            }
+
             $this->addField('status', ContentFieldType::Internal);
             $this->addField('slug', ContentFieldType::Internal);
             $this->addField('sortBy', ContentFieldType::Internal);
@@ -361,6 +379,19 @@ abstract class ContentType implements ContentTypeInterface
                 }
             }
         }
+
+        if ($this->isEventDateSupported()) {
+            if (isset($data['eventStartDate']) && isset($data['eventEndDate'])) {
+                $eventStartDate = $data['eventStartDate'];
+                $eventEndDate = $data['eventEndDate'];
+                if ($eventStartDate instanceof \DateTime && $eventEndDate instanceof \DateTime) {
+                    if ($eventEndDate < $eventStartDate ) {
+                        $form->get('eventEndDate')->addError(new FormError('Event end date cannot be lesser than start date.'));
+                    }
+                }
+            }
+        }
+
         $this->validateForm($event);
     }
 
@@ -471,6 +502,48 @@ abstract class ContentType implements ContentTypeInterface
                     'attr' => array(
                         'dir' => $currentSite->getDirection(),
                         'class' => 'editor'
+                    )
+                )
+            );
+        }
+
+        if ($this->isEventDateSupported()) {
+            if ($this->isEventDateTime()) {
+                $dateFormat = "yyyy-MM-dd HH:mm";
+                $calendarClass = "contentDateTime";
+                $validator = new DateTime();
+            } else {
+                $dateFormat = "yyyy-MM-dd";
+                $calendarClass = "contentDate";
+                $validator = new Date();
+            }
+
+            $this->fb()->add('eventStartDate', 'datetime',
+                array(
+                    'label' => 'Event Start Date',
+                    'widget' => 'single_text',
+                    'format' => $dateFormat,
+                    'constraints' => array(
+                        new NotBlank(),
+                        $validator,
+                    ),
+                    'attr' => array(
+                        'class' => $calendarClass
+                    )
+                )
+            );
+
+            $this->fb()->add('eventEndDate', 'datetime',
+                array(
+                    'label' => 'Event End Date',
+                    'widget' => 'single_text',
+                    'format' => $dateFormat,
+                    'constraints' => array(
+                        new NotBlank(),
+                        $validator,
+                    ),
+                    'attr' => array(
+                        'class' => $calendarClass
                     )
                 )
             );
@@ -610,7 +683,7 @@ abstract class ContentType implements ContentTypeInterface
                     'widget' => 'single_text',
                     'format' => 'yyyy-MM-dd HH:mm',
                     'attr' => array(
-                        'class' => 'contentDate'
+                        'class' => 'contentDateTime'
                     )
                 )
             );
@@ -623,7 +696,7 @@ abstract class ContentType implements ContentTypeInterface
                     'widget' => 'single_text',
                     'format' => 'yyyy-MM-dd HH:mm',
                     'attr' => array(
-                        'class' => 'contentDate'
+                        'class' => 'contentDateTime'
                     )
                 )
             );
@@ -1010,6 +1083,38 @@ abstract class ContentType implements ContentTypeInterface
     public function setIsPageBuilderSupported($isPageBuilderSupported)
     {
         $this->isPageBuilderSupported = $isPageBuilderSupported;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isEventDateSupported()
+    {
+        return $this->isEventDateSupported;
+    }
+
+    /**
+     * @param boolean $isEventDateSupported
+     */
+    public function setIsEventDateSupported($isEventDateSupported)
+    {
+        $this->isEventDateSupported = $isEventDateSupported;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isEventDateTime()
+    {
+        return $this->isEventDateTime;
+    }
+
+    /**
+     * @param boolean $isEventDateTime
+     */
+    public function setIsEventDateTime($isEventDateTime)
+    {
+        $this->isEventDateTime = $isEventDateTime;
     }
 
     /**
