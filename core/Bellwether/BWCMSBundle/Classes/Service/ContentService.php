@@ -542,7 +542,7 @@ class ContentService extends BaseService
                     $mediaInfo = $this->mm()->handleUpload($data['attachment']);
                     if (!empty($mediaInfo)) {
                         if ($content->getMedia()->count() > 0) {
-                            foreach($content->getMedia() as $mediaToDelete){
+                            foreach ($content->getMedia() as $mediaToDelete) {
                                 $this->em()->remove($mediaToDelete);
                             }
                         }
@@ -821,7 +821,7 @@ class ContentService extends BaseService
     /**
      * @param ContentType $taxonomyClass
      */
-    public function getTaxonomyTerms($taxonomyClass)
+    public function getTaxonomyTerms($taxonomyClass, $onlyPublished = false)
     {
         if (!$taxonomyClass->isTaxonomy()) {
             throw new \InvalidArgumentException('Invalid Schema');
@@ -833,6 +833,11 @@ class ContentService extends BaseService
             $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
             $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' )");
             $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+            if($onlyPublished){
+                $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+            }
+            $qb->add('orderBy', 'node.title ASC');
+
             $rootFolders = $qb->getQuery()->getResult();
 
             if (!empty($rootFolders)) {
@@ -861,6 +866,11 @@ class ContentService extends BaseService
             $qb = $contentRepository->getChildrenQueryBuilder(null, true);
             $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' ) ");
             $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+            if($onlyPublished){
+                $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+            }
+            $qb->add('orderBy', 'node.title ASC');
+
             $entities = $qb->getQuery()->getResult();
             if (!empty($entities)) {
                 foreach ($entities as $content) {
