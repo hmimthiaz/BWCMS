@@ -301,8 +301,11 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      * @param bool $default
      * @return bool
      */
-    public function getContentMeta($contentEntity, $metaKey, $default = false)
+    public function getContentMeta($contentEntity, $metaKey = null, $default = false)
     {
+        if (is_null($metaKey)) {
+            return $this->cm()->getContentAllMeta($contentEntity);
+        }
         return $this->cm()->getContentMeta($contentEntity, $metaKey, $default);
     }
 
