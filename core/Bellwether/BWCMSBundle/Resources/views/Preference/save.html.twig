@@ -6,6 +6,8 @@
 {% endblock %}
 
 {% block header %}
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/js/colorpicker/css/bootstrap-colorpicker.min.css') }}"/>
+
 {% endblock %}
 
 {% block body %}
@@ -14,7 +16,26 @@
 
 
 {% block footer %}
-    <script src="{{ asset('bundles/bwcms/js/tinymce/jquery.tinymce.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/js/datetimepicker/moment.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/js/datetimepicker/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/js/tinymce/tinymce.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/js/colorpicker/js/bootstrap-colorpicker.min.js') }}"></script>
     <script src="{{ url('_bwcms_admin_editor_init') }}"></script>
+    <script language="javascript">
+        $(document).ready(function () {
+            $('.BWCF_template_radio').click(function() {
+                $('#BWCF_template').val(this.value);
+            });
+            $('.contentDateTime').datetimepicker({
+                'format': 'YYYY-MM-DD HH:mm'
+            });
+            $('.contentDate').datetimepicker({
+                'format': 'YYYY-MM-DD'
+            });
+            $('.contentTime').datetimepicker({
+                'format': 'HH:mm'
+            });
+            $('.contentColor').colorpicker({format: 'hex',align: 'left'});
+        });
+    </script>
 {% endblock %}
