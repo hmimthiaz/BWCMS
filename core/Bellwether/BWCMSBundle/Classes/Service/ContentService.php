@@ -529,11 +529,17 @@ class ContentService extends BaseService
             }
             if ($fieldName == 'eventStartDate') {
                 if ($data['eventStartDate'] instanceof \DateTime) {
+                    if (!$classInstance->isEventDateTime()) {
+                        $data['eventStartDate']->setTime(0, 0, 0);
+                    }
                     $content->setEventStartDate($data['eventStartDate']);
                 }
             }
             if ($fieldName == 'eventEndDate') {
                 if ($data['eventEndDate'] instanceof \DateTime) {
+                    if (!$classInstance->isEventDateTime()) {
+                        $data['eventEndDate']->setTime(23, 59, 59);
+                    }
                     $content->setEventEndDate($data['eventEndDate']);
                 }
             }
@@ -546,7 +552,6 @@ class ContentService extends BaseService
                                 $this->em()->remove($mediaToDelete);
                             }
                         }
-
                         $contentMedia = new ContentMediaEntity();
                         $contentMedia->setFile($mediaInfo['filename']);
                         $contentMedia->setExtension($mediaInfo['extension']);
@@ -638,15 +643,27 @@ class ContentService extends BaseService
                     $meta->setValue($fieldValue);
                 }
                 if ($fields[$fieldName]['type'] == ContentFieldType::Date) {
-                    $dateString = $fieldValue->format('Y-m-d');
+                    if ($fieldValue instanceof \DateTime) {
+                        $dateString = $fieldValue->format('Y-m-d');
+                    } else {
+                        $dateString = null;
+                    }
                     $meta->setValue($dateString);
                 }
                 if ($fields[$fieldName]['type'] == ContentFieldType::Time) {
-                    $dateString = $fieldValue->format('H:i:sO');
+                    if ($fieldValue instanceof \DateTime) {
+                        $dateString = $fieldValue->format('H:i:sO');
+                    } else {
+                        $dateString = null;
+                    }
                     $meta->setValue($dateString);
                 }
                 if ($fields[$fieldName]['type'] == ContentFieldType::DateTime) {
-                    $dateString = $fieldValue->format(\DateTime::ISO8601);
+                    if ($fieldValue instanceof \DateTime) {
+                        $dateString = $fieldValue->format(\DateTime::ISO8601);
+                    } else {
+                        $dateString = null;
+                    }
                     $meta->setValue($dateString);
                 }
                 if ($fields[$fieldName]['type'] == ContentFieldType::Serialized || $fields[$fieldName]['type'] == ContentFieldType::Custom) {
@@ -833,7 +850,7 @@ class ContentService extends BaseService
             $qb = $this->cm()->getContentRepository()->getChildrenQueryBuilder(null, false);
             $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' )");
             $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
-            if($onlyPublished){
+            if ($onlyPublished) {
                 $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
             }
             $qb->add('orderBy', 'node.title ASC');
@@ -866,7 +883,7 @@ class ContentService extends BaseService
             $qb = $contentRepository->getChildrenQueryBuilder(null, true);
             $qb->andWhere(" (node.type = '" . $taxonomyClass->getType() . "' AND node.schema = '" . $taxonomyClass->getSchema() . "' ) ");
             $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
-            if($onlyPublished){
+            if ($onlyPublished) {
                 $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
             }
             $qb->add('orderBy', 'node.title ASC');
