@@ -138,6 +138,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             'pagination' => new \Twig_Function_Method($this, 'getPagination', array('is_safe' => array('html'))),
             'loc' => new \Twig_Function_Method($this, 'getLocale', array('is_safe' => array('html'))),
             'emailLink' => new \Twig_Function_Method($this, 'getEmailLink', array('is_safe' => array('html'))),
+            'navLink' => new \Twig_Function_Method($this, 'getNavLink'),
             'exit' => new \Twig_Function_Method($this, 'doExit', array('is_safe' => array('html'))),
         );
     }
@@ -397,6 +398,52 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     public function getLocale($string)
     {
         return call_user_func_array(array($this->locale(), "get"), func_get_args());
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return array
+     */
+    public function getNavLink($contentEntity)
+    {
+        $returnArray = array();
+        if (empty($contentEntity)) {
+            return $returnArray;
+        }
+
+        $returnArray = array(
+            'caption' => $contentEntity->getTitle(),
+            'link' => '#',
+            'target' => '',
+            'class' => ''
+        );
+
+        $contentMeta = $this->cm()->getContentAllMeta($contentEntity);
+        if (isset($contentMeta['linkCaption']) && !empty($contentMeta['linkCaption'])) {
+            $returnArray['caption'] = $contentMeta['linkCaption'];
+        }
+        if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'route') {
+            if (isset($contentMeta['linkRoute']) && !empty($contentMeta['linkRoute'])) {
+                $returnArray['link'] = $this->tp()->getCurrentSkin()->getNavigationRoute($contentMeta['linkRoute']);
+            }
+        }
+        if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'link') {
+            if (isset($contentMeta['linkExternal']) && !empty($contentMeta['linkExternal'])) {
+                $returnArray['link'] = $contentMeta['linkExternal'];
+            }
+        }
+        if (isset($contentMeta['linkType']) && $contentMeta['linkType'] == 'content') {
+            if (isset($contentMeta['linkContent']) && ($contentMeta['linkContent'] instanceof ContentEntity)) {
+                $returnArray['link'] = $this->cq()->getPublicURL($contentMeta['linkContent']);
+            }
+        }
+        if (isset($contentMeta['linkTarget']) && !empty($contentMeta['linkTarget'])) {
+            $returnArray['target'] = $contentMeta['linkTarget'];
+        }
+        if (isset($contentMeta['linkClass']) && !empty($contentMeta['linkClass'])) {
+            $returnArray['class'] = $contentMeta['linkClass'];
+        }
+        return $returnArray;
     }
 
 
