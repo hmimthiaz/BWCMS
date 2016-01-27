@@ -1,0 +1,576 @@
+<?xml version="1.0"?>
+<skipper version="3.1.2.1193" name="BWCMSBundle" mvc="Symfony2" orm="Doctrine2" uuid="48bd3de1-3535-447e-a07d-65770234c2d3">
+  <module name="Bellwether\BWCMSBundle\Entity" import-format="Doctrine2Php" import-path="Entity" uuid="dd2c2934-fd71-48c2-834a-ff5a52347e16">
+    <entity name="AuditEntity" uuid="fab34f86-fe94-4177-b157-10ebcfebdd5f">
+      <field name="id" type="guid" required="true" primary="true" uuid="8a2443f8-e2ed-40df-b5c6-32f159cf19bc">
+        <orm-attributes>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="level" type="string" size="255" required="true" uuid="11981f76-1a35-4782-afdc-f780b9f7b8ae"/>
+      <field name="remoteAddress" type="string" size="255" required="true" uuid="82cfa250-582c-4e67-8973-a05c2865b941"/>
+      <field name="logDate" type="datetime" required="true" uuid="ce9c255c-5de2-4ba9-8909-966adb906b15"/>
+      <field name="module" type="string" size="255" required="true" uuid="edb3cd45-dff3-4b07-bd3b-ae0ebdba6097"/>
+      <field name="guid" type="string" size="255" uuid="f0f2503e-731c-407b-8a6b-62e67dae77e9"/>
+      <field name="action" type="string" size="255" required="true" uuid="0630065b-39cb-4ab4-a0bd-3ef48e0a4c30"/>
+      <field name="description" type="text" uuid="7bd3a2ff-9d04-4cef-a93c-26956d724cc1"/>
+      <field name="userId" uuid="1deaaeec-86ca-4df8-be46-c765fa5a26d4"/>
+      <orm-attributes>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\AuditRepository</attribute>
+        <attribute name="table">BWAudit</attribute>
+        <attribute name="export-file-name">AuditEntity.php</attribute>
+        <attribute name="table">BWAudit</attribute>
+        <attribute name="export-file-name">AuditEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="AuditEntity" to="UserEntity" owner-alias="" inverse-alias="user" many-owner="true" many-inverse="false" uuid="c0cb25d1-b20f-4342-b5df-61bef2cfa46d">
+      <association-field from="userId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <entity name="ContentEntity" uuid="3063be1e-9241-4053-b0b9-535bacccc8a4">
+      <field name="id" type="guid" required="true" primary="true" uuid="46130595-931e-4634-a9f2-009e9c3346bf">
+        <orm-attributes>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="expireDate" type="datetime" uuid="25caee96-ae06-4a75-85cb-b5dd0ed3e6e7"/>
+      <field name="publishDate" type="datetime" uuid="a864cc59-3ef6-4c55-b887-5cba35aab9a0"/>
+      <field name="treeRoot" type="string" uuid="ce6fe36f-dae0-4933-b644-c76b2a4eb0d5">
+        <orm-attributes>
+          <attribute name="column">treeRoot</attribute>
+        </orm-attributes>
+      </field>
+      <field name="treeRight" type="integer" uuid="25e1b3b9-bad1-4192-9127-280bec9ca67d">
+        <orm-attributes>
+          <attribute name="column">treeRight</attribute>
+        </orm-attributes>
+      </field>
+      <field name="treeLevel" type="integer" uuid="d2cd9bbf-95dc-459d-96f9-635e8e74cde4">
+        <orm-attributes>
+          <attribute name="column">treeLevel</attribute>
+        </orm-attributes>
+      </field>
+      <field name="treeLeft" type="integer" uuid="5f55565f-5d5d-4a12-b4dd-6601b5a8ee8e">
+        <orm-attributes>
+          <attribute name="column">treeLeft</attribute>
+        </orm-attributes>
+      </field>
+      <field name="title" type="string" size="255" uuid="5f7dac7d-0e60-4c90-89ed-f74e736f407e"/>
+      <field name="summary" type="text" uuid="d189c837-43ee-4eda-8af7-db13262fd517"/>
+      <field name="content" type="text" uuid="2d35aa03-d0e7-4080-96dc-018c780bb691"/>
+      <field name="slug" type="string" size="100" uuid="9bfc5e99-756a-4801-900e-4e71b2661656"/>
+      <field name="file" type="string" size="100" uuid="e9031dee-d65b-4f03-b8c9-97a997732db6">
+        <orm-attributes>
+          <attribute name="column">filename</attribute>
+        </orm-attributes>
+      </field>
+      <field name="type" type="string" size="100" required="true" uuid="9ae2bce1-d57b-484c-9d5f-015e489e51fe"/>
+      <field name="schema" type="string" size="100" required="true" uuid="eafc8fbd-d18b-4caa-83b6-751301c89425">
+        <orm-attributes>
+          <attribute name="column">schemaType</attribute>
+        </orm-attributes>
+      </field>
+      <field name="scope" type="string" size="100" required="true" uuid="710dc4e6-5fb5-4698-b44d-7014dc9f0465">
+        <orm-attributes>
+          <attribute name="column">scope</attribute>
+        </orm-attributes>
+      </field>
+      <field name="template" type="string" size="100" required="true" uuid="e0bb17c7-e135-43ec-9122-903f3cdcf1b6"/>
+      <field name="mime" type="string" size="100" uuid="bb1c891e-eed7-47de-b728-0de546382972"/>
+      <field name="extension" type="string" size="100" uuid="94321a0b-e8d5-4c1f-a4ac-ab32690916ce"/>
+      <field name="size" type="bigint" uuid="9d164627-a3ed-43f8-b452-01337ac79ad1"/>
+      <field name="height" type="integer" uuid="ddf32e02-f094-49c8-8b8f-c79789596f2d"/>
+      <field name="width" type="integer" uuid="5799f545-73ff-40ef-a5b8-8ff34a659430"/>
+      <field name="sortBy" type="string" size="100" required="true" uuid="d291ee63-8a2d-4612-8118-2034051b0cb2"/>
+      <field name="sortOrder" type="string" size="100" required="true" uuid="0f254313-d6ef-4823-b6d1-3ddfc02f5892"/>
+      <field name="modifiedDate" type="datetime" uuid="cbdc85a4-730f-4908-9fe4-40074cd22276"/>
+      <field name="createdDate" type="datetime" uuid="8b193625-cd5b-4083-9830-660b7d23f42b"/>
+      <field name="eventStartDate" type="datetime" uuid="b1849634-d8c7-43b0-a21d-af92d38d6a0e"/>
+      <field name="eventEndDate" type="datetime" uuid="19c9c792-2cc9-4e7f-a2a0-66adcb4249b3"/>
+      <field name="status" type="string" size="100" required="true" uuid="a54900a5-5637-4169-afaf-850307104b89"/>
+      <field name="treeParentId" uuid="050bbe23-a88d-4080-b491-389f701dd465"/>
+      <field name="authorId" required="true" uuid="66e453b6-4ad3-4b6b-ab96-b87ccae6ba44"/>
+      <field name="lastModifiedAuthorId" uuid="9ff52c82-fb77-47b1-b7c9-c5ecb58a8a65"/>
+      <field name="siteId" required="true" uuid="7ac19e9d-a2f2-4755-bde1-458b64932632"/>
+      <orm-attributes>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\ContentRepository</attribute>
+        <attribute name="table">BWContent</attribute>
+        <attribute name="export-file-name">ContentEntity.php</attribute>
+        <attribute name="table">BWContent</attribute>
+        <attribute name="export-file-name">ContentEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="ContentEntity" to="ContentEntity" owner-alias="children" inverse-alias="treeParent" many-owner="true" many-inverse="false" uuid="48235569-7585-4e05-89f1-7856f1f5316b">
+      <association-field from="treeParentId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse">
+          <attribute name="order-by">
+            <attribute name="order-by-field">
+              <attribute name="field">treeLeft</attribute>
+              <attribute name="direction">ASC</attribute>
+            </attribute>
+          </attribute>
+        </attribute>
+        <attribute name="side-inverse">
+          <attribute name="order-by">
+            <attribute name="order-by-field">
+              <attribute name="field">treeLeft</attribute>
+              <attribute name="direction">ASC</attribute>
+            </attribute>
+          </attribute>
+        </attribute>
+      </orm-attributes>
+    </association>
+    <association from="ContentEntity" to="UserEntity" owner-alias="" inverse-alias="author" many-owner="true" many-inverse="false" parent-required="true" uuid="86c643d4-e8cc-4ff1-bde1-8a628c1c3edf">
+      <association-field from="authorId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <association from="ContentEntity" to="UserEntity" owner-alias="" inverse-alias="lastModifiedAuthor" many-owner="true" many-inverse="false" uuid="2ca98786-f5a4-4c3e-a9ec-71d8fe6c4603">
+      <association-field from="lastModifiedAuthorId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <association from="ContentEntity" to="SiteEntity" owner-alias="" inverse-alias="site" many-owner="true" many-inverse="false" parent-required="true" uuid="667198eb-0d4e-4018-abb7-b499ca9168f1">
+      <association-field from="siteId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <entity name="ContentMediaEntity" uuid="ea15c496-f466-4547-a953-ade4947d8510">
+      <field name="id" type="guid" required="true" primary="true" uuid="c2475d7d-7d42-4766-aa7b-6c2bcf3a26d0">
+        <orm-attributes>
+          <attribute name="column">id</attribute>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="file" type="string" size="100" uuid="9ee788f5-90e5-4b42-a03d-987fb874adea">
+        <orm-attributes>
+          <attribute name="column">filename</attribute>
+        </orm-attributes>
+      </field>
+      <field name="mime" type="string" size="100" uuid="3bdd92d8-2410-44f9-b41f-6d7b34a308a9"/>
+      <field name="extension" type="string" size="100" uuid="2f2b3eea-9437-4c21-85be-a516b2cce5cd"/>
+      <field name="size" type="bigint" uuid="23898652-7f6f-418e-9e92-75ab28506466"/>
+      <field name="height" type="integer" uuid="a23a46ad-ca07-4745-a173-e7d0beb9c02f"/>
+      <field name="width" type="integer" uuid="bfc8ca55-5111-404f-b578-baa3dbece138"/>
+      <field name="data" type="blob" uuid="baabe580-e841-4f87-8c50-c7e51c1911ca"/>
+      <field name="contentId" uuid="e1fd88de-0f16-4759-8b69-b8c87b9f737e"/>
+      <orm-attributes>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\ContentMediaRepository</attribute>
+        <attribute name="table">BWContentMedia</attribute>
+        <attribute name="export-file-name">ContentMediaEntity.php</attribute>
+        <attribute name="table">BWContentMedia</attribute>
+        <attribute name="export-file-name">ContentMediaEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="ContentMediaEntity" to="ContentEntity" owner-alias="media" inverse-alias="content" many-owner="true" many-inverse="false" uuid="96c757b8-346a-440f-a3c9-eeaef728a3c7">
+      <association-field from="contentId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning">
+          <attribute name="cascade">
+            <attribute name="cascade-remove">true</attribute>
+          </attribute>
+        </attribute>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <entity name="ContentMetaEntity" uuid="e9e80b7b-98d2-4def-891d-98d137256c25">
+      <field name="id" type="guid" required="true" primary="true" uuid="7f5f8d5a-b259-4f91-a301-0b41a2d6bcad">
+        <orm-attributes>
+          <attribute name="column">id</attribute>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="value" type="text" uuid="1cf4e232-d674-4aed-bf99-5e6ee4befbea"/>
+      <field name="field" type="string" size="100" uuid="f456a053-7a38-42c2-a6df-f94d35fbf047"/>
+      <field name="fieldType" type="string" size="100" uuid="92659800-59ea-4449-b26f-e0b5fb60719f"/>
+      <field name="contentId" required="true" uuid="8dc33fe6-dacc-4690-b8c0-414ff8799b93"/>
+      <orm-attributes>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\ContentMetaRepository</attribute>
+        <attribute name="table">BWContentMeta</attribute>
+        <attribute name="export-file-name">ContentMetaEntity.php</attribute>
+        <attribute name="table">BWContentMeta</attribute>
+        <attribute name="export-file-name">ContentMetaEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="ContentMetaEntity" to="ContentEntity" owner-alias="meta" inverse-alias="content" many-owner="true" many-inverse="false" parent-required="true" uuid="47ffb15e-5083-46f3-92a7-4e7a05effa01">
+      <association-field from="contentId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <entity name="ContentRelationEntity" uuid="4677d1f8-301f-4133-831a-800a6cce2b6e">
+      <field name="id" type="guid" required="true" primary="true" uuid="d7ae9c01-e472-4f99-857f-9c9a11cf51a1">
+        <orm-attributes>
+          <attribute name="column">id</attribute>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="relation" type="string" size="100" required="true" uuid="729f4369-bc74-4d6c-96e1-a0b73c6e1540">
+        <orm-attributes>
+          <attribute name="column">relation</attribute>
+        </orm-attributes>
+      </field>
+      <field name="contentId" required="true" uuid="cdbc0bc1-cde8-49df-86c5-b411399cd115"/>
+      <field name="relatedContentId" required="true" uuid="8a7ddd6c-4f5a-4e15-91d3-8771cb9b4f9c"/>
+      <index name="ix_contentId_relation_relatedContentId" unique="true">
+        <index-field name="contentId"/>
+        <index-field name="relation"/>
+        <index-field name="relatedContentId"/>
+      </index>
+      <orm-attributes>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\ContentRelationRepository</attribute>
+        <attribute name="table">BWContentRelation</attribute>
+        <attribute name="export-file-name">ContentRelationEntity.php</attribute>
+        <attribute name="table">BWContentRelation</attribute>
+        <attribute name="export-file-name">ContentRelationEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="ContentRelationEntity" to="ContentEntity" owner-alias="relation" inverse-alias="content" many-owner="true" many-inverse="false" parent-required="true" uuid="25684e0c-d07e-4a8e-9030-0119d23f830d">
+      <association-field from="contentId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <association from="ContentRelationEntity" to="ContentEntity" owner-alias="" inverse-alias="relatedContent" many-owner="true" many-inverse="false" parent-required="true" uuid="05042ca9-0576-4fd3-9c7b-74c14419a94e">
+      <association-field from="relatedContentId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <entity name="GuidReferenceEntity" uuid="510b29f1-87b5-4be0-ab76-420687163f70">
+      <field name="id" type="guid" required="true" primary="true" uuid="bcdda2b5-c792-4e1c-9f79-c77fde4a37c6">
+        <orm-attributes>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="type" type="string" size="255" required="true" uuid="f8a34eb8-9073-4110-be7b-a18085084d84"/>
+      <field name="sourceSiteGUID" type="string" size="255" required="true" uuid="9a8db2f4-61f7-4764-afe5-a5f0c4500442"/>
+      <field name="targetSiteGUID" type="string" size="255" required="true" uuid="8876c722-cda5-4b4e-862a-a0b4ac62659d"/>
+      <field name="sourceGUID" type="string" size="255" required="true" uuid="6eeac4ee-27fd-43d7-a163-736ecc841dc0"/>
+      <field name="targetGUID" type="string" size="255" required="true" uuid="89a4b95e-38c2-4df7-bae1-eaf121f523e9"/>
+      <field name="createdDate" type="datetime" required="true" uuid="4de2cdb6-de8b-48fb-9d55-6e9a27fe5193"/>
+      <orm-attributes>
+        <attribute name="table">BWGuidReference</attribute>
+        <attribute name="export-file-name">GuidReferenceEntity.php</attribute>
+        <attribute name="export-file-name">GuidReferenceEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <entity name="LocaleEntity" uuid="72a7a9e8-9f7b-44f3-b326-e94969d1ea42">
+      <field name="id" type="guid" required="true" primary="true" uuid="61cebc02-868f-4d6d-bc06-e3c90f4cfc1a">
+        <orm-attributes>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="hash" type="string" size="50" required="true" uuid="4398a612-d109-4539-9b27-64f7290e038a"/>
+      <field name="text" type="text" required="true" uuid="f0ab96c0-3b80-4451-8084-cc29a0ba1035">
+        <orm-attributes>
+          <attribute name="column">sourceText</attribute>
+        </orm-attributes>
+      </field>
+      <field name="value" type="text" uuid="e57d10a0-8d05-4221-a2bc-07041a32e6eb"/>
+      <field name="siteId" required="true" uuid="082a6bb9-1be2-4dc0-bfb1-13bd61047ee0"/>
+      <orm-attributes>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\LocaleRepository</attribute>
+        <attribute name="table">BWLocale</attribute>
+        <attribute name="export-file-name">LocaleEntity.php</attribute>
+        <attribute name="table">BWLocale</attribute>
+        <attribute name="export-file-name">LocaleEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="LocaleEntity" to="SiteEntity" owner-alias="" inverse-alias="site" many-owner="true" many-inverse="false" parent-required="true" uuid="674f4778-5d94-4de7-92b5-77dd8835b510">
+      <association-field from="siteId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <entity name="PreferenceEntity" uuid="0371757c-a1fa-4dde-b8ab-eb0b4fcf705a">
+      <field name="id" type="guid" required="true" primary="true" uuid="689b1947-d329-4174-b128-71457c74fcf8">
+        <orm-attributes>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="type" type="string" size="100" uuid="0aa4f06c-9ae5-45b5-ac35-895cec98c4d3"/>
+      <field name="fieldType" type="string" size="100" uuid="5c88ddd3-e78c-401d-a173-f94aa4a30640"/>
+      <field name="field" type="string" size="100" uuid="e010b113-2a3c-42f8-a983-4a762881c854"/>
+      <field name="value" type="text" uuid="9428439d-af2f-4552-881e-63e97318ec08"/>
+      <field name="siteId" uuid="7ce2eebd-204a-42ef-a4bc-7b728c18529d"/>
+      <orm-attributes>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\PreferenceRepository</attribute>
+        <attribute name="table">BWPreference</attribute>
+        <attribute name="export-file-name">PreferenceEntity.php</attribute>
+        <attribute name="table">BWPreference</attribute>
+        <attribute name="export-file-name">PreferenceEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="PreferenceEntity" to="SiteEntity" owner-alias="" inverse-alias="site" many-owner="true" many-inverse="false" uuid="430e3ae3-6ee9-494d-af94-6bc9235ad1aa">
+      <association-field from="siteId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <entity name="S3QueueEntity" uuid="db954767-1b30-4a6b-925a-c1c3430facfc">
+      <field name="id" type="guid" required="true" primary="true" uuid="78a5f1e3-4921-45d1-84c6-1fba0c042c81">
+        <orm-attributes>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="siteId" required="true" uuid="164b6fa7-4319-4726-a258-d1c3f9974e65"/>
+      <field name="contentId" required="true" uuid="da9c2b51-cb99-4aee-b8fa-6e4e3edbdf68"/>
+      <field name="thumbStyleId" uuid="38e12e98-02f1-49a7-8d20-93e898881157"/>
+      <field name="prefix" type="string" size="50" uuid="c7e5b1a9-7782-4d66-b219-b1c9c92ca6f1"/>
+      <field name="path" type="string" size="200" uuid="17f34cd5-175f-4c35-aa83-33f16eeb74f6"/>
+      <field name="status" type="string" size="50" uuid="010e6b67-9b0c-42ec-bb28-1459b2159779"/>
+      <field name="createdDate" type="datetime" uuid="055f1915-4f27-4e90-9b4a-33609342c5a7"/>
+      <field name="uploadedDate" type="datetime" uuid="7adc53b1-593f-4868-8abd-e10fede5a52c"/>
+      <orm-attributes>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\S3QueueRepository</attribute>
+        <attribute name="table">BWS3Queue</attribute>
+        <attribute name="export-file-name">S3QueueEntity.php</attribute>
+        <attribute name="table">BWS3Queue</attribute>
+        <attribute name="export-file-name">S3QueueEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="S3QueueEntity" to="SiteEntity" owner-alias="" inverse-alias="site" many-owner="true" many-inverse="false" parent-required="true" uuid="b020fa37-7717-44bc-8ca2-1e6397eb4bae">
+      <association-field from="siteId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <association from="S3QueueEntity" to="ContentEntity" owner-alias="" inverse-alias="content" many-owner="true" many-inverse="false" parent-required="true" uuid="4575cd91-1ba5-49cd-b6a1-e73515a2d63f">
+      <association-field from="contentId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <association from="S3QueueEntity" to="ThumbStyleEntity" owner-alias="" inverse-alias="thumStyle" many-owner="true" many-inverse="false" uuid="0d8b86df-e13c-4ed9-919b-3b7aae7cf0d2">
+      <association-field from="thumbStyleId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <entity name="SearchEntity" uuid="bfeacb0e-9cfc-44f9-af59-fa99c430b935">
+      <field name="id" type="guid" required="true" primary="true" uuid="e2722f74-3f84-4a90-8bcd-777713d5f56b">
+        <orm-attributes>
+          <attribute name="column">id</attribute>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="keywords" type="text" uuid="f5a82851-f9d0-47a6-a0cf-d323f32a2fde"/>
+      <field name="indexedDate" type="datetime" uuid="b4438e79-d1ea-48cd-a72f-bcaf4117e284"/>
+      <field name="siteId" required="true" uuid="1a075841-06a8-4564-aa39-d2bfc42289d7"/>
+      <field name="contentId" required="true" uuid="f269fc13-b408-4ab0-8f99-a60166b2cb28"/>
+      <orm-attributes>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\SearchRepository</attribute>
+        <attribute name="table">BWSearch</attribute>
+        <attribute name="export-file-name">SearchEntity.php</attribute>
+        <attribute name="table">BWSearch</attribute>
+        <attribute name="export-file-name">SearchEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="SearchEntity" to="SiteEntity" owner-alias="" inverse-alias="site" many-owner="true" many-inverse="false" parent-required="true" uuid="d4e689e2-e8b0-4e84-aa9a-547aa2f4e759">
+      <association-field from="siteId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <association from="SearchEntity" to="ContentEntity" owner-alias="" inverse-alias="content" many-owner="true" many-inverse="false" parent-required="true" uuid="6a5f4740-6b00-4937-ae81-b93f311695fd">
+      <association-field from="contentId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <entity name="SiteEntity" uuid="78e1840c-09af-41d8-9273-7c95e5044f9f">
+      <field name="id" type="guid" required="true" primary="true" uuid="8cc9ddef-c537-4a9d-b92a-ff4c9c9756f7">
+        <orm-attributes>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="name" type="string" size="100" required="true" uuid="172e6809-63e9-442e-863e-ddbd04ab98f3"/>
+      <field name="locale" type="string" size="10" required="true" uuid="831c0196-4ed1-4d4f-903b-78bd19bb8c91"/>
+      <field name="direction" type="string" size="10" required="true" uuid="fad0fcbd-aea1-42b8-a20b-afd0a426350a"/>
+      <field name="slug" type="string" size="10" required="true" unique="true" uuid="8a12269e-d9e3-4abd-bbfc-2d67674e29d2"/>
+      <field name="domain" type="string" size="100" unique="true" uuid="a0aaf811-ae43-4f63-8d06-6578dcbccd17"/>
+      <field name="skinFolderName" type="string" size="100" required="true" uuid="601b169c-846b-4a26-aa26-9421adb0ce5f"/>
+      <field name="adminColorThemeName" type="string" size="50" uuid="0978a651-d9d3-4360-9aad-fc34d2cb032d"/>
+      <field name="isDefault" type="boolean" uuid="f1d46bfd-d8da-4d05-bed6-f473b8917638"/>
+      <orm-attributes>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\SiteRepository</attribute>
+        <attribute name="table">BWSite</attribute>
+        <attribute name="export-file-name">SiteEntity.php</attribute>
+        <attribute name="table">BWSite</attribute>
+        <attribute name="export-file-name">SiteEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <entity name="ThumbStyleEntity" uuid="ccf71965-f28d-439c-9675-c9c198927eec">
+      <field name="id" type="guid" required="true" primary="true" uuid="690b8dae-faa8-4af8-955a-096b67a55759">
+        <orm-attributes>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="name" type="string" size="100" uuid="1bd368d2-a0b6-481a-97ac-9c59a2e91d15"/>
+      <field name="slug" type="string" size="100" uuid="899107e3-8626-4fe4-ad4b-c867918d02ff"/>
+      <field name="mode" type="string" size="100" uuid="9199ea2a-6402-4aaa-9ab0-db962cb6b19d"/>
+      <field name="width" type="integer" uuid="2ef462e7-6c49-4490-a834-2e81b1e9fac2"/>
+      <field name="height" type="integer" uuid="4ae37087-7a95-437d-97a9-bde4161f6efe"/>
+      <field name="background" type="string" size="10" uuid="9cf4c030-8b78-4727-a9c3-72071ab4eff7"/>
+      <field name="options" type="text" uuid="e5bf964c-001e-4e70-98c8-014785dc95e5"/>
+      <field name="quality" type="integer" uuid="dd3d5f65-f04e-436b-bab6-685d0b60481e"/>
+      <field name="siteId" uuid="0c51846d-885c-456b-8e37-3d27d5794707"/>
+      <orm-attributes>
+        <attribute name="repository-class">Bellwether\BWCMSBundle\Entity\ThumbStyleRepository</attribute>
+        <attribute name="table">BWThumbStyle</attribute>
+        <attribute name="export-file-name">ThumbStyleEntity.php</attribute>
+        <attribute name="table">BWThumbStyle</attribute>
+        <attribute name="export-file-name">ThumbStyleEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="ThumbStyleEntity" to="SiteEntity" owner-alias="" inverse-alias="site" many-owner="true" many-inverse="false" uuid="7ed3e8fe-32f4-4496-bfd9-079ffbd5777f">
+      <association-field from="siteId" to="id"/>
+      <orm-attributes>
+        <attribute name="side-owning"/>
+        <attribute name="side-inverse"/>
+        <attribute name="side-inverse"/>
+      </orm-attributes>
+    </association>
+    <entity name="UserEntity" uuid="e08af519-ee3c-40d6-a6cb-419471dd19a6">
+      <field name="id" type="guid" required="true" primary="true" uuid="4e0676ad-1fb6-491a-aa7a-c4bf44f59a6b">
+        <orm-attributes>
+          <attribute name="generator">
+            <attribute name="strategy">UUID</attribute>
+          </attribute>
+        </orm-attributes>
+      </field>
+      <field name="firstName" type="string" size="100" uuid="bd29cf27-f5e6-47c8-a907-b8dee1ecee57">
+        <orm-attributes>
+          <attribute name="column">firstname</attribute>
+        </orm-attributes>
+      </field>
+      <field name="lastName" type="string" size="100" uuid="7137f638-090b-495f-b83e-a9471af1bb3f">
+        <orm-attributes>
+          <attribute name="column">lastname</attribute>
+        </orm-attributes>
+      </field>
+      <field name="mobile" type="string" size="20" uuid="a62f9af8-43a4-4f17-ba75-c5d0bd465745">
+        <orm-attributes>
+          <attribute name="column">mobile</attribute>
+        </orm-attributes>
+      </field>
+      <field name="company" type="string" size="100" uuid="084c8df4-2232-471f-bd43-da558e5f36a7">
+        <orm-attributes>
+          <attribute name="column">company</attribute>
+        </orm-attributes>
+      </field>
+      <orm-attributes>
+        <attribute name="table">BWUser</attribute>
+        <attribute name="export-file-name">UserEntity.php</attribute>
+        <attribute name="export-file-name">UserEntity.php</attribute>
+      </orm-attributes>
+    </entity>
+    <orm-attributes>
+      <attribute name="namespace">Bellwether\BWCMSBundle\Entity</attribute>
+    </orm-attributes>
+  </module>
+  <visual-data>
+    <entity uuid="0371757c-a1fa-4dde-b8ab-eb0b4fcf705a" bg-color="4294967295" hdr-color="4292006610" position-x="464" position-y="545" size-x="0" size-x2="111" size-y="0" size-y2="101"/>
+    <association uuid="05042ca9-0576-4fd3-9c7b-74c14419a94e" color="4281230255"/>
+    <association uuid="0d8b86df-e13c-4ed9-919b-3b7aae7cf0d2" color="4291261615"/>
+    <association uuid="25684e0c-d07e-4a8e-9030-0119d23f830d" color="4287255714"/>
+    <association uuid="2ca98786-f5a4-4c3e-a9ec-71d8fe6c4603" color="4291674923"/>
+    <entity uuid="3063be1e-9241-4053-b0b9-535bacccc8a4" bg-color="4294967295" hdr-color="4292006610" position-x="248" position-y="40" size-x="0" size-x2="127" size-y="0" size-y2="465"/>
+    <association uuid="430e3ae3-6ee9-494d-af94-6bc9235ad1aa" color="4289243304"/>
+    <association uuid="4575cd91-1ba5-49cd-b6a1-e73515a2d63f" color="4289928996"/>
+    <entity uuid="4677d1f8-301f-4133-831a-800a6cce2b6e" bg-color="4294967295" hdr-color="4292006610" position-x="883" position-y="40" size-x="0" size-x2="105" size-y="0" size-y2="73"/>
+    <association uuid="47ffb15e-5083-46f3-92a7-4e7a05effa01" color="4291261615"/>
+    <association uuid="48235569-7585-4e05-89f1-7856f1f5316b" color="4278876221"/>
+    <project uuid="48bd3de1-3535-447e-a07d-65770234c2d3" size-x="0" size-x2="1140" size-y="0" size-y2="1635"/>
+    <entity uuid="510b29f1-87b5-4be0-ab76-420687163f70" bg-color="4294967295" hdr-color="4292006610" position-x="34" position-y="545" size-x="0" size-x2="140" size-y="0" size-y2="115"/>
+    <association uuid="667198eb-0d4e-4018-abb7-b499ca9168f1" color="4294218527"/>
+    <association uuid="674f4778-5d94-4de7-92b5-77dd8835b510" color="4278236368"/>
+    <association uuid="6a5f4740-6b00-4937-ae81-b93f311695fd" color="4284601169"/>
+    <entity uuid="72a7a9e8-9f7b-44f3-b326-e94969d1ea42" bg-color="4294967295" hdr-color="4292006610" position-x="267" position-y="545" size-x="0" size-x2="90" size-y="0" size-y2="87"/>
+    <entity uuid="78e1840c-09af-41d8-9273-7c95e5044f9f" bg-color="4294967295" hdr-color="4292006610" position-x="20" position-y="1050" size-x="0" size-x2="168" size-y="0" size-y2="143"/>
+    <association uuid="7ed3e8fe-32f4-4496-bfd9-079ffbd5777f" color="4291674923"/>
+    <association uuid="86c643d4-e8cc-4ff1-bde1-8a628c1c3edf" color="4284601169"/>
+    <association uuid="96c757b8-346a-440f-a3c9-eeaef728a3c7" color="4289928996"/>
+    <association uuid="b020fa37-7717-44bc-8ca2-1e6397eb4bae" color="4294218527"/>
+    <entity uuid="bfeacb0e-9cfc-44f9-af59-fa99c430b935" bg-color="4294967295" hdr-color="4292006610" position-x="877" position-y="545" size-x="0" size-x2="117" size-y="0" size-y2="87"/>
+    <association uuid="c0cb25d1-b20f-4342-b5df-61bef2cfa46d" color="4289243304"/>
+    <entity uuid="ccf71965-f28d-439c-9675-c9c198927eec" bg-color="4294967295" hdr-color="4292006610" position-x="253" position-y="1050" size-x="0" size-x2="117" size-y="0" size-y2="157"/>
+    <association uuid="d4e689e2-e8b0-4e84-aa9a-547aa2f4e759" color="4278876221"/>
+    <entity uuid="db954767-1b30-4a6b-925a-c1c3430facfc" bg-color="4294967295" hdr-color="4292006610" position-x="714" position-y="258" size-x="0" size-x2="77" size-y="0" size-y2="73"/>
+    <module uuid="dd2c2934-fd71-48c2-834a-ff5a52347e16" bg-color="4294831087" position-x="50" position-y="50" size-x="0" size-x2="1040" size-y="0" size-y2="1535"/>
+    <entity uuid="e08af519-ee3c-40d6-a6cb-419471dd19a6" bg-color="4294967295" hdr-color="4292006610" position-x="463" position-y="1050" size-x="0" size-x2="114" size-y="0" size-y2="87"/>
+    <entity uuid="e9e80b7b-98d2-4def-891d-98d137256c25" bg-color="4294967295" hdr-color="4292006610" position-x="672" position-y="40" size-x="0" size-x2="111" size-y="0" size-y2="87"/>
+    <entity uuid="ea15c496-f466-4547-a953-ade4947d8510" bg-color="4294967295" hdr-color="4292006610" position-x="463" position-y="40" size-x="0" size-x2="114" size-y="0" size-y2="143"/>
+    <entity uuid="fab34f86-fe94-4177-b157-10ebcfebdd5f" bg-color="4294967295" hdr-color="4292006610" position-x="36" position-y="40" size-x="0" size-x2="136" size-y="0" size-y2="143"/>
+  </visual-data>
+</skipper>
