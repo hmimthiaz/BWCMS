@@ -27,6 +27,10 @@ class BWCMSExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('media.maxUploadSize', $config['media']['maxUploadSize']);
         $container->setParameter('media.blockedExtension', $config['media']['blockedExtension']);
 
+        $container->setParameter('media.s3Enabled', $config['media']['s3Enabled']);
+        $container->setParameter('media.s3Bucket', $config['media']['s3Bucket']);
+        $container->setParameter('media.s3Domain', $config['media']['s3Domain']);
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 

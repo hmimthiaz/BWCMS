@@ -43,6 +43,9 @@ services:
     arguments: [@service_container,@request_stack]
     tags:
       - { name: routing.loader }
+  BWCMS.S3:
+     class: Bellwether\BWCMSBundle\Classes\Service\S3Service
+     arguments: [@service_container,@request_stack]
   BWCMS.Twig.Extension:
     class: Bellwether\BWCMSBundle\Classes\Service\TwigService
     arguments: ["@knp_menu.factory",@service_container,@request_stack]

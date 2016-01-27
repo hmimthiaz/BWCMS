@@ -50,8 +50,9 @@ class DashboardController extends BaseController implements BackEndControllerInt
     public function s3Action()
     {
 
+        dump($this->s3Service());
+        exit;
         $s3client = $this->s3();
-        dump($s3client);
 
         try {
             $result = $s3client->putObject([

@@ -27,11 +27,12 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('path')->defaultValue('media')->end()
                     ->integerNode('maxUploadSize')->defaultValue(1000)->end()
                     ->scalarNode('blockedExtension')->defaultValue('dll,exe,sh,php')->end()
+                    ->booleanNode('s3Enabled')->defaultValue(false)->end()
+                    ->scalarNode('s3Bucket')->defaultValue(null)->end()
+                    ->scalarNode('s3Domain')->defaultValue('s3.amazonaws.com')->end()
                 ->end()
             ->end()
         ->end();
-
-
 
         return $treeBuilder;
     }
