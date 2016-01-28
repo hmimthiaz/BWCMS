@@ -193,29 +193,6 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         return $returnValue;
     }
 
-    /**
-     * @param ContentEntity $contentEntity
-     * @return null|string
-     */
-    public function getContentLink($contentEntity)
-    {
-        return $this->cq()->getPublicURL($contentEntity);
-    }
-
-    /**
-     * @param ContentEntity $contentEntity
-     * @return string
-     */
-    public function getContentDownloadLink($contentEntity)
-    {
-        $url = $this->generateUrl('media_download_link', array(
-            'siteSlug' => $this->sm()->getCurrentSite()->getSlug(),
-            'contentId' => $contentEntity->getId()
-        ));
-
-        return $url;
-    }
-
     function getEllipse($text, $limit = 300, $end = '...')
     {
         if (strlen($text) <= $limit) {
@@ -318,11 +295,56 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
 
     /**
      * @param ContentEntity $contentEntity
+     * @return null|string
+     */
+    public function getContentLink($contentEntity)
+    {
+        if (empty($contentEntity)) {
+            return null;
+        }
+
+        return $this->cq()->getPublicURL($contentEntity);
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return string
+     */
+    public function getContentDownloadLink($contentEntity)
+    {
+        if (empty($contentEntity)) {
+            return null;
+        }
+
+        $url = $this->s3Service()->getContentDownloadLink($contentEntity);
+        if (!is_null($url)) {
+            return $url;
+        }
+
+        $url = $this->generateUrl('media_download_link', array(
+            'siteSlug' => $this->sm()->getCurrentSite()->getSlug(),
+            'contentId' => $contentEntity->getId()
+        ));
+
+        return $url;
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
      * @param bool $default
      * @return bool|string
      */
     public function getImage($contentEntity, $default = false)
     {
+        if (empty($contentEntity)) {
+            return $default;
+        }
+
+        $url = $this->s3Service()->getImage($contentEntity);
+        if (!is_null($url)) {
+            return $url;
+        }
+
         $url = $this->generateUrl('media_image_view', array(
             'siteSlug' => $this->sm()->getCurrentSite()->getSlug(),
             'contentId' => $contentEntity->getId()
@@ -340,6 +362,11 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     {
         if (empty($contentEntity)) {
             return null;
+        }
+
+        $url = $this->s3Service()->getThumbImage($contentEntity, $thumbSlug, $scaleFactor);
+        if (!is_null($url)) {
+            return $url;
         }
 
         $thumbEntity = $this->cache()->fetch('thumbStyle_' . $thumbSlug);

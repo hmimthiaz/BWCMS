@@ -2,8 +2,6 @@
 namespace Bellwether\BWCMSBundle\Entity;
 
 use Doctrine\ORM\Mapping AS ORM;
-use Proxies\__CG__\Bellwether\BWCMSBundle\Entity\ThumbStyleEntity;
-use Proxies\__CG__\BWDigital\BWSerkalBundle\Entity\ContactEntity;
 
 /**
  * @ORM\Entity(repositoryClass="Bellwether\BWCMSBundle\Entity\S3QueueRepository")
@@ -34,12 +32,12 @@ class S3QueueEntity
     private $thumbScale;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=false)
      */
     private $status;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetime", nullable=false)
      */
     private $createdDate;
 
@@ -62,7 +60,7 @@ class S3QueueEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\ThumbStyleEntity")
-     * @ORM\JoinColumn(name="thumbStyleId", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="thumbStyleId", referencedColumnName="id", nullable=true)
      */
     private $thumStyle;
 
@@ -195,7 +193,7 @@ class S3QueueEntity
     }
 
     /**
-     * @return ContactEntity
+     * @return ContentEntity
      */
     public function getContent()
     {
@@ -203,7 +201,7 @@ class S3QueueEntity
     }
 
     /**
-     * @param ContactEntity $content
+     * @param ContentEntity $content
      */
     public function setContent($content)
     {

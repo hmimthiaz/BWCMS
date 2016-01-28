@@ -50,7 +50,15 @@ class DashboardController extends BaseController implements BackEndControllerInt
     public function s3Action()
     {
 
-        dump($this->s3Service());
+        $nextDate = new \DateTime('Next Sunday');
+        dump($nextDate);
+
+
+
+
+
+
+//        dump($this->s3Service());
         exit;
         $s3client = $this->s3();
 
