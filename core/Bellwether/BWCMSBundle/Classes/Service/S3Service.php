@@ -197,6 +197,8 @@ class S3Service extends BaseService
                 'Bucket' => $this->bucketName,
                 'Key' => $s3Key,
                 'SourceFile' => $cacheFilename,
+                'CacheControl'  => 'max-age=172800',
+                "Expires"       => gmdate("D, d M Y H:i:s T", strtotime("+5 years")),
                 'ContentType' => $contentMediaEntity->getMime(),
                 'ACL' => 'public-read'
             ]);
@@ -274,6 +276,8 @@ class S3Service extends BaseService
                 'Bucket' => $this->bucketName,
                 'Key' => $s3Key,
                 'SourceFile' => $thumbCacheFile,
+                'CacheControl'  => 'max-age=172800',
+                "Expires"       => gmdate("D, d M Y H:i:s T", strtotime("+5 years")),
                 'ContentType' => $contentMediaEntity->getMime(),
                 'ACL' => 'public-read'
             ]);

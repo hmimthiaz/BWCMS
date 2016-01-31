@@ -27,13 +27,20 @@ class S3UploadCommand extends ContainerAwareCommand
     {
         $this
             ->setName('BWCMS:S3Upload')
-            ->setDescription('Command to work with search index.');
+            ->setDescription('Command to work with search index.')
+            ->addOption('drop', null, InputOption::VALUE_NONE, 'Reset the S3 Upload Queue');
+
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
         $this->getContainer()->get('BWCMS.KernelEventListener')->init();
+        if ($input->getOption('drop')) {
+            $query = $this->em()->createQuery('DELETE BWCMSBundle:S3QueueEntity');
+            $query->execute();
+            return;
+        }
 
         $s3Repo = $this->em()->getRepository('BWCMSBundle:S3QueueEntity');
         $qb = $s3Repo->createQueryBuilder('s');
