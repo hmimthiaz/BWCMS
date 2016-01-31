@@ -19,7 +19,8 @@ class S3Service extends BaseService
 
     private $enabled;
     private $bucketName;
-    private $domain;
+    private $pathPrefix;
+    private $domainURLPrefix;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -43,7 +44,8 @@ class S3Service extends BaseService
         if (!$this->loaded) {
             $this->enabled = (bool)$this->container->getParameter('media.s3Enabled');
             $this->bucketName = $this->container->getParameter('media.s3Bucket');
-            $this->domain = $this->container->getParameter('media.s3Domain');
+            $this->pathPrefix = $this->container->getParameter('media.s3Prefix');
+            $this->domainURLPrefix = $this->container->getParameter('media.s3DomainURLPrefix');
         }
         $this->loaded = true;
     }
@@ -59,8 +61,11 @@ class S3Service extends BaseService
         }
 
         $s3QueueEntity = $this->getS3QueueItem($contentEntity);
-
-        return null;
+        if ($s3QueueEntity->getStatus() != 'Done') {
+            return null;
+        }
+        $cdnURL = $this->domainURLPrefix . '/' . $s3QueueEntity->getPath();
+        return $cdnURL;
     }
 
     /**
@@ -76,8 +81,11 @@ class S3Service extends BaseService
         }
 
         $s3QueueEntity = $this->getS3QueueItem($contentEntity, $thumbSlug, $scaleFactor);
-
-        return null;
+        if ($s3QueueEntity->getStatus() != 'Done') {
+            return null;
+        }
+        $cdnURL = $this->domainURLPrefix . '/' . $s3QueueEntity->getPath();
+        return $cdnURL;
     }
 
     /**
@@ -91,8 +99,11 @@ class S3Service extends BaseService
         }
 
         $s3QueueEntity = $this->getS3QueueItem($contentEntity);
-
-        return null;
+        if ($s3QueueEntity->getStatus() != 'Done') {
+            return null;
+        }
+        $cdnURL = $this->domainURLPrefix . '/' . $s3QueueEntity->getPath();
+        return $cdnURL;
     }
 
     /**
@@ -123,7 +134,7 @@ class S3Service extends BaseService
         if (!empty($thumbSlug)) {
             $thumbEntity = $this->mm()->getThumbStyle($thumbSlug, $this->sm()->getCurrentSite());
             $qb->andWhere(" s.thumStyle ='" . $thumbEntity->getId() . "' ");
-        }else{
+        } else {
             $qb->andWhere(" s.thumStyle is NULL ");
         }
 
@@ -147,6 +158,141 @@ class S3Service extends BaseService
         return $s3QueueEntity;
     }
 
+    /**
+     * @param S3QueueEntity $s3QueueEntity
+     */
+    public function processQueueItem($s3QueueEntity)
+    {
+        if (is_null($s3QueueEntity->getThumStyle())) {
+            $this->processContentItem($s3QueueEntity);
+        } else {
+            $this->processThumbItem($s3QueueEntity);
+        }
+    }
+
+    /**
+     * @param S3QueueEntity $s3QueueEntity
+     */
+    private function processContentItem($s3QueueEntity)
+    {
+        $contentEntity = $s3QueueEntity->getContent();
+        $siteEntity = $s3QueueEntity->getSite();
+        $contentMediaEntity = $contentEntity->getMedia()->first();
+        if (empty($contentMediaEntity)) {
+            $s3QueueEntity->setStatus('Error');
+            $this->em()->persist($s3QueueEntity);
+            $this->em()->flush();
+            return;
+        }
+        $cacheFilename = $this->mm()->checkAndCreateMediaCacheFile($contentMediaEntity);
+        $uploadDateTime = new \DateTime();
+        $filename = $contentMediaEntity->getFile() . '.' . $contentMediaEntity->getExtension();
+        $md5string = md5($uploadDateTime->format('Y-m-d H:i:s') . '(' . $contentMediaEntity->getId() . ')');
+        $path = '/' . $siteEntity->getSlug() . '/media/' . $md5string . '/' . $filename;
+        $s3Key = strtolower($this->pathPrefix . $path);
+
+        $s3client = $this->s3();
+        try {
+            $result = $s3client->putObject([
+                'Bucket' => $this->bucketName,
+                'Key' => $s3Key,
+                'SourceFile' => $cacheFilename,
+                'ContentType' => $contentMediaEntity->getMime(),
+                'ACL' => 'public-read'
+            ]);
+
+            $s3QueueEntity->setPrefix($this->pathPrefix);
+            $s3QueueEntity->setPath($s3Key);
+            $s3QueueEntity->setUploadedDate($uploadDateTime);
+            $s3QueueEntity->setStatus('Done');
+            $this->em()->persist($s3QueueEntity);
+            $this->em()->flush();
+            return;
+        } catch (\Aws\Exception\AwsException $e) {
+            $s3QueueEntity->setStatus('Error');
+            $this->em()->persist($s3QueueEntity);
+            $this->em()->flush();
+            return;
+        }
+    }
+
+    /**
+     * @param S3QueueEntity $s3QueueEntity
+     */
+    private function processThumbItem($s3QueueEntity)
+    {
+        $contentEntity = $s3QueueEntity->getContent();
+        $siteEntity = $s3QueueEntity->getSite();
+        $thumbEntity = $s3QueueEntity->getThumStyle();
+        $contentMediaEntity = $contentEntity->getMedia()->first();
+        if (empty($contentMediaEntity)) {
+            $s3QueueEntity->setStatus('Error');
+            $this->em()->persist($s3QueueEntity);
+            $this->em()->flush();
+            return;
+        }
+        if (!$this->mm()->isImage($contentEntity)) {
+            $s3QueueEntity->setStatus('Error');
+            $this->em()->persist($s3QueueEntity);
+            $this->em()->flush();
+            return;
+        }
+        $cacheFilename = $this->mm()->checkAndCreateMediaCacheFile($contentMediaEntity);
+        $scale = $s3QueueEntity->getThumbScale();
+        $thumb = $this->getThumbService()->open($cacheFilename);
+        $width = $thumbEntity->getWidth() * $scale;
+        $height = $thumbEntity->getHeight() * $scale;
+        switch ($thumbEntity->getMode()) {
+            case 'resize':
+                $thumb = $thumb->resize($width, $height);
+                break;
+            case 'scaleResize':
+                $thumb = $thumb->scaleResize($width, $height);
+                break;
+            case 'forceResize':
+                $thumb = $thumb->forceResize($width, $height);
+                break;
+            case 'cropResize':
+                $thumb = $thumb->cropResize($width, $height);
+                break;
+            case 'zoomCrop':
+                $thumb = $thumb->zoomCrop($width, $height);
+                break;
+        }
+
+        $thumbCacheFile = $thumb->cacheFile('guess', 80, true);
+
+        $uploadDateTime = new \DateTime();
+        $filename = $contentMediaEntity->getId() . '.' . $contentMediaEntity->getExtension();
+        $md5string = md5($uploadDateTime->format('Y-m-d H:i:s') . '(' . $thumbEntity->getId() . ')(' . $scale . ')(' . $thumbEntity->getMode() . ')(' . $thumbEntity->getWidth() . ')(' . $thumbEntity->getHeight() . ')');
+        $path = '/' . $siteEntity->getSlug() . '/thumb/' . $md5string . '/' . $filename;
+        $s3Key = strtolower($this->pathPrefix . $path);
+
+        $s3client = $this->s3();
+        try {
+            $result = $s3client->putObject([
+                'Bucket' => $this->bucketName,
+                'Key' => $s3Key,
+                'SourceFile' => $thumbCacheFile,
+                'ContentType' => $contentMediaEntity->getMime(),
+                'ACL' => 'public-read'
+            ]);
+
+            $s3QueueEntity->setPrefix($this->pathPrefix);
+            $s3QueueEntity->setPath($s3Key);
+            $s3QueueEntity->setUploadedDate($uploadDateTime);
+            $s3QueueEntity->setStatus('Done');
+            $this->em()->persist($s3QueueEntity);
+            $this->em()->flush();
+            return;
+        } catch (\Aws\Exception\AwsException $e) {
+            $s3QueueEntity->setStatus('Error');
+            $this->em()->persist($s3QueueEntity);
+            $this->em()->flush();
+            return;
+        }
+    }
+
 
     /**
      * @return S3QueueRepository
@@ -155,4 +301,14 @@ class S3Service extends BaseService
     {
         return $this->em()->getRepository('BWCMSBundle:S3QueueEntity');
     }
+
+
+    /**
+     * @return \Aws\S3\S3Client
+     */
+    public function s3()
+    {
+        return $this->container->get('aws.s3');
+    }
+
 }

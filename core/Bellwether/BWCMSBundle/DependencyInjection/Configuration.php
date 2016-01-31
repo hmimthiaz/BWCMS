@@ -28,8 +28,9 @@ class Configuration implements ConfigurationInterface
                     ->integerNode('maxUploadSize')->defaultValue(1000)->end()
                     ->scalarNode('blockedExtension')->defaultValue('dll,exe,sh,php')->end()
                     ->booleanNode('s3Enabled')->defaultValue(false)->end()
+                    ->scalarNode('s3Prefix')->defaultValue('a1b2c3d4e6')->end()
                     ->scalarNode('s3Bucket')->defaultValue(null)->end()
-                    ->scalarNode('s3Domain')->defaultValue('s3.amazonaws.com')->end()
+                    ->scalarNode('s3DomainURLPrefix')->defaultValue('s3.amazonaws.com')->end()
                 ->end()
             ->end()
         ->end();

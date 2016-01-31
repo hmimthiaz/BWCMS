@@ -9,11 +9,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
 
-
-use Bellwether\BWCMSBundle\Entity\Site;
-use Bellwether\BWCMSBundle\Classes\Content\ContentType;
-use Bellwether\BWCMSBundle\Entity\ContentEntity;
-use Symfony\Component\Form\Form;
 use AppKernel;
 
 /**
@@ -42,51 +37,6 @@ class DashboardController extends BaseController implements BackEndControllerInt
     {
         return array();
     }
-
-    /**
-     * @Route("/dashboard/s3.php",name="_bwcms_admin_s3_home")
-     * @Template()
-     */
-    public function s3Action()
-    {
-
-        $nextDate = new \DateTime('Next Sunday');
-        dump($nextDate);
-
-
-
-
-
-
-//        dump($this->s3Service());
-        exit;
-        $s3client = $this->s3();
-
-        try {
-            $result = $s3client->putObject([
-                'Bucket' => 'bwcmstest',
-                'Key' => 'hello/bugger/LICENSE.txt',
-                'Body' => fopen('/Users/irafiq/Web/kal.imthi.net/LICENSE', 'r'),
-                'ACL' => 'public-read',
-            ]);
-            dump($result);
-        } catch (\Aws\Exception\AwsException $e) {
-            dump($e);
-        }
-
-        exit;
-        return array();
-    }
-
-
-    /**
-     * @return \Aws\S3\S3Client
-     */
-    public function s3()
-    {
-        return $this->container->get('aws.s3');
-    }
-
 
     /**
      * @Route("/dashboard/email.php",name="_bwcms_admin_dashboard_email")
