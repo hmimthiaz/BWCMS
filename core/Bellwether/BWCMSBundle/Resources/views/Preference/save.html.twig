@@ -27,13 +27,16 @@
                 $('#BWCF_template').val(this.value);
             });
             $('.contentDateTime').datetimepicker({
-                'format': 'YYYY-MM-DD HH:mm'
+                'format': 'YYYY-MM-DD HH:mm',
+                'showClear': true
             });
             $('.contentDate').datetimepicker({
-                'format': 'YYYY-MM-DD'
+                'format': 'YYYY-MM-DD',
+                'showClear': true
             });
             $('.contentTime').datetimepicker({
-                'format': 'HH:mm'
+                'format': 'HH:mm',
+                'showClear': true
             });
             $('.contentColor').colorpicker({format: 'hex',align: 'left'});
         });
