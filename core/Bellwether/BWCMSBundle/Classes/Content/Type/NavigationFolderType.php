@@ -136,6 +136,11 @@ class NavigationFolderType Extends ContentType
          * @var ContentEntity $content
          */
         foreach ($contentMenuItems as $content) {
+            $parentMenuId = $content->getTreeParent()->getId();
+            if (!isset($menu[$parentMenuId])) {
+                continue;
+            }
+
             $menu[$content->getId()] = $menu[$content->getTreeParent()->getId()]->addChild($content->getSlug(), array('uri' => '#'));
             if (isset($options['emptyTitle']) && $options['emptyTitle'] === true) {
                 $menu[$content->getId()]->setLabel('');
