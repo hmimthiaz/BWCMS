@@ -25,6 +25,7 @@ class BWCMSExtension extends Extension implements PrependExtensionInterface
 
         $container->setParameter('media.path', $config['media']['path']);
         $container->setParameter('media.maxUploadSize', $config['media']['maxUploadSize']);
+        $container->setParameter('media.maxUploadImageSize', $config['media']['maxUploadImageSize']);
         $container->setParameter('media.blockedExtension', $config['media']['blockedExtension']);
 
         $container->setParameter('media.s3Enabled', $config['media']['s3Enabled']);

@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Gregwar\Image\Image;
@@ -22,6 +23,9 @@ class MediaService extends BaseService
     private $uploadFolder;
     private $webRoot;
     private $webPath;
+    private $blockedExtension;
+    private $maxUploadSize;
+    private $maxUploadImageSize;
     private $extensionMimeIcons = null;
     /**
      * @var \Symfony\Component\Filesystem\Filesystem $fs
@@ -48,8 +52,17 @@ class MediaService extends BaseService
         if (!$this->loaded) {
             $rootDirectory = $this->getKernel()->getRootDir();
             $this->webRoot = realpath($rootDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'web');
-
             $this->webPath = $this->container->getParameter('media.path');
+            $this->blockedExtension = $this->container->getParameter('media.blockedExtension');
+            if (!empty($this->blockedExtension)) {
+                $this->blockedExtension = explode(',', strtolower($this->blockedExtension));
+                array_filter($this->blockedExtension, function ($var) {
+                    return !is_null($var);
+                });
+            }
+            $this->blockedExtension = array_unique($this->blockedExtension);
+            $this->maxUploadSize = $this->container->getParameter('media.maxUploadSize');
+            $this->maxUploadImageSize = $this->container->getParameter('media.maxUploadImageSize');
             $this->uploadFolder = $this->webRoot . DIRECTORY_SEPARATOR . $this->webPath;
             $this->mediaFolder = $rootDirectory . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . $this->getKernel()->getEnvironment() . DIRECTORY_SEPARATOR . 'media';
             $this->fs = new Filesystem();
@@ -88,6 +101,29 @@ class MediaService extends BaseService
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return string
+     */
+    public function fileSize(ContentEntity $contentEntity)
+    {
+        /**
+         * @var ContentMediaEntity $media
+         */
+        if (!$this->isMedia($contentEntity)) {
+            return false;
+        }
+        $media = $contentEntity->getMedia()->first();
+        return $this->humanReadableFileSize($media->getSize());
+    }
+
+    private function humanReadableFileSize($bytes, $decimals = 1)
+    {
+        $size = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+        $factor = floor((strlen($bytes) - 1) / 3);
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$size[$factor];
     }
 
     /**
@@ -170,8 +206,17 @@ class MediaService extends BaseService
             $filenameWithoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $uploadedFile->getClientOriginalName());
             $data['filename'] = $this->sanitizeFilename($filenameWithoutExt);
             $data['mimeType'] = $uploadedFile->getClientMimeType();
+
+            if ($uploadedFile->getClientSize() > $this->maxUploadSize) {
+                throw new FileException('File size is too big. Allowed size: ' . $this->humanReadableFileSize($this->maxUploadSize));
+            }
             $data['size'] = $uploadedFile->getClientSize();
+
+            if (in_array($uploadedFile->getClientOriginalExtension(), $this->blockedExtension)) {
+                throw new FileException('File extension not allowed');
+            }
             $data['extension'] = $uploadedFile->getClientOriginalExtension();
+
             if (empty($data['extension'])) {
                 $data['extension'] = $uploadedFile->guessClientExtension();
             }
@@ -182,6 +227,9 @@ class MediaService extends BaseService
                 if (!empty($imageInfo)) {
                     $data['width'] = $imageInfo[0];
                     $data['height'] = $imageInfo[1];
+                }
+                if ($uploadedFile->getClientSize() > $this->maxUploadImageSize) {
+                    throw new FileException('Image size is too big. Allowed size: ' . $this->humanReadableFileSize($this->maxUploadImageSize));
                 }
             }
             $data['binary'] = null;

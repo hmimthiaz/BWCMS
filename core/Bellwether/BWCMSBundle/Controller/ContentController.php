@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ContentMediaEntity;
 use Bellwether\BWCMSBundle\Classes\Content\ContentType;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Form\FormError;
 
 /**
  * Page controller.
@@ -231,28 +233,36 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $editingContent->setSite($this->getSite());
             }
 
-            $editingContent = $this->cm()->prepareEntity($editingContent, $form, $class);
-            $this->cm()->save($editingContent);
+            try {
+                $editingContent = $this->cm()->prepareEntity($editingContent, $form, $class);
+                $this->cm()->save($editingContent);
 
-            if ($editingContent->getScope() == ContentScopeType::CPageBuilder) {
-                $parents = $this->cm()->getContentRepository()->getPath($editingContent);
-                $parents = array_reverse($parents);
-                foreach ($parents as $parent) {
-                    if ($parent->getScope() == ContentScopeType::CPublic) {
-                        return $this->redirect($this->generateUrl('_bwcms_admin_content_pb', array('contentId' => $parent->getId())));
+                if ($editingContent->getScope() == ContentScopeType::CPageBuilder) {
+                    $parents = $this->cm()->getContentRepository()->getPath($editingContent);
+                    $parents = array_reverse($parents);
+                    foreach ($parents as $parent) {
+                        if ($parent->getScope() == ContentScopeType::CPublic) {
+                            return $this->redirect($this->generateUrl('_bwcms_admin_content_pb', array('contentId' => $parent->getId())));
+                        }
                     }
+                    return $this->returnErrorResponse();
                 }
-                return $this->returnErrorResponse();
-            }
 
-            $parentId = 'Root';
-            if ($editingContent->getTreeParent() != null) {
-                $parentId = $editingContent->getTreeParent()->getId();
+                $parentId = 'Root';
+                if ($editingContent->getTreeParent() != null) {
+                    $parentId = $editingContent->getTreeParent()->getId();
+                }
+                if ($class->isTaxonomy()) {
+                    return $this->redirect($this->generateUrl('_bwcms_admin_taxonomy_home', array('schema' => $contentSchema, 'parent' => $parentId)));
+                }
+                return $this->redirect($this->generateUrl('_bwcms_admin_content_home', array('type' => $contentType, 'parent' => $parentId)));
+            } catch (\Exception $e) {
+                if ($e instanceof FileException) {
+                    $form->get('attachment')->addError(new FormError($e->getMessage()));
+                } else {
+                    $form->addError(new FormError($e->getMessage()));
+                }
             }
-            if ($class->isTaxonomy()) {
-                return $this->redirect($this->generateUrl('_bwcms_admin_taxonomy_home', array('schema' => $contentSchema, 'parent' => $parentId)));
-            }
-            return $this->redirect($this->generateUrl('_bwcms_admin_content_home', array('type' => $contentType, 'parent' => $parentId)));
         }
 
         return array(
@@ -680,6 +690,7 @@ class ContentController extends BaseController implements BackEndControllerInter
                 }
                 $ca['download'] = '';
                 if ($this->mm()->isMedia($content)) {
+                    $ca['type'] = $contentClass->getName() . ' (' . $this->mm()->fileSize($content) . ')';
                     $ca['imageURL'] = $this->generateUrl('media_image_view', array('contentId' => $content->getId(), 'siteSlug' => $currentSite->getSlug()));
                     $ca['imageURL'] = str_ireplace('/app_dev.php', '', $ca['imageURL']);
 //                    $ca['download'] = $this->generateUrl('_bwcms_admin_content_media_download', array('contentId' => $content->getId()));
