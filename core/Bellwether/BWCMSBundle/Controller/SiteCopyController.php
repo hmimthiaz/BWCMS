@@ -351,7 +351,7 @@ class SiteCopyController extends BaseController implements BackEndControllerInte
                 $this->em()->flush();
             }
         }
-        dump('done');
+        print 'done';
         exit;
     }
 
