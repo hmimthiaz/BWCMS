@@ -20,7 +20,7 @@
     <script src="{{ asset('bundles/bwcms/js/datetimepicker/moment.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/js/datetimepicker/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('bundles/bwcms/js/tinymce/tinymce.min.js') }}"></script>
-    <script src="{{ asset('bundles/bwcms/js/colorpicker/js/bootstrap-colorpicker.min.js') }}"></script>
+    <script src="{{ asset('bundles/bwcms/js/jscolor/jscolor.min.js') }}"></script>
     <script src="{{ url('_bwcms_admin_editor_init') }}"></script>
     <script language="javascript">
         $(document).ready(function () {
@@ -39,7 +39,6 @@
                 'format': 'HH:mm',
                 'showClear': true
             });
-            $('.contentColor').colorpicker({format: 'hex',align: 'left'});
         });
     </script>
 {% endblock %}
