@@ -56,7 +56,7 @@ class ContentQueryService extends BaseService
      * @param string $type
      * @return Pagination
      */
-    public function getFolderItems($contentEntity = null, Pagination $pager, $type = 'Content', $schema = null)
+    public function getFolderItems($contentEntity = null, Pagination $pager, $type = 'Content', $schema = null, $onlyImage = false)
     {
         $start = $pager->getStart();
         $limit = $pager->getLimit();
@@ -94,6 +94,11 @@ class ContentQueryService extends BaseService
         }
         $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
         $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+
+        if ($onlyImage == 'yes') {
+            $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentMediaEntity', 'media', \Doctrine\ORM\Query\Expr\Join::WITH, ' node.id = media.content ');
+            $qb->andWhere(" ( media.height > 0 AND media.width > 0 ) ");
+        }
 
         $qb->setFirstResult($start);
         $qb->setMaxResults($limit);
