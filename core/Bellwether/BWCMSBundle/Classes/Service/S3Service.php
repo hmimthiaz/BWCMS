@@ -110,6 +110,8 @@ class S3Service extends BaseService
      * @param ContentEntity $contentEntity
      * @param string $thumbSlug
      * @param float $scaleFactor
+     * @return S3QueueEntity|bool|mixed|string
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getS3QueueItem($contentEntity, $thumbSlug = null, $scaleFactor = 1.0)
     {
@@ -133,6 +135,26 @@ class S3Service extends BaseService
         $thumbEntity = null;
         if (!empty($thumbSlug)) {
             $thumbEntity = $this->mm()->getThumbStyle($thumbSlug, $this->sm()->getCurrentSite());
+            if (empty($thumbEntity)) {
+                $thumbEntity = new ThumbStyleEntity();
+                $thumbEntity->setSite($this->sm()->getCurrentSite());
+                $thumbInfo = $this->tp()->getCurrentSkin()->getThumbStyleDefault($thumbSlug);
+                if (!is_null($thumbInfo)) {
+                    $thumbEntity->setName($thumbInfo['name']);
+                    $thumbEntity->setSlug($thumbSlug);
+                    $thumbEntity->setMode($thumbInfo['mode']);
+                    $thumbEntity->setWidth($thumbInfo['width']);
+                    $thumbEntity->setHeight($thumbInfo['height']);
+                } else {
+                    $thumbEntity->setName($thumbSlug);
+                    $thumbEntity->setSlug($thumbSlug);
+                    $thumbEntity->setMode('scaleResize');
+                    $thumbEntity->setWidth(100);
+                    $thumbEntity->setHeight(100);
+                }
+                $this->em()->persist($thumbEntity);
+                $this->em()->flush();
+            }
             $qb->andWhere(" s.thumStyle ='" . $thumbEntity->getId() . "' ");
         } else {
             $qb->andWhere(" s.thumStyle is NULL ");
@@ -197,8 +219,8 @@ class S3Service extends BaseService
                 'Bucket' => $this->bucketName,
                 'Key' => $s3Key,
                 'SourceFile' => $cacheFilename,
-                'CacheControl'  => 'max-age=172800',
-                "Expires"       => gmdate("D, d M Y H:i:s T", strtotime("+5 years")),
+                'CacheControl' => 'max-age=172800',
+                "Expires" => gmdate("D, d M Y H:i:s T", strtotime("+5 years")),
                 'ContentType' => $contentMediaEntity->getMime(),
                 'ACL' => 'public-read'
             ]);
@@ -276,8 +298,8 @@ class S3Service extends BaseService
                 'Bucket' => $this->bucketName,
                 'Key' => $s3Key,
                 'SourceFile' => $thumbCacheFile,
-                'CacheControl'  => 'max-age=172800',
-                "Expires"       => gmdate("D, d M Y H:i:s T", strtotime("+5 years")),
+                'CacheControl' => 'max-age=172800',
+                "Expires" => gmdate("D, d M Y H:i:s T", strtotime("+5 years")),
                 'ContentType' => $contentMediaEntity->getMime(),
                 'ACL' => 'public-read'
             ]);
