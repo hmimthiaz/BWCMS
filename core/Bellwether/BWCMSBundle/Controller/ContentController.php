@@ -237,6 +237,19 @@ class ContentController extends BaseController implements BackEndControllerInter
                 $editingContent = $this->cm()->prepareEntity($editingContent, $form, $class);
                 $this->cm()->save($editingContent);
 
+                $qb = $this->em()->createQueryBuilder();
+                $queryResult = $qb->select(array('s3'))
+                    ->from('BWCMSBundle:S3QueueEntity', 's3')
+                    ->andWhere($qb->expr()->eq('s3.content', $qb->expr()->literal($editingContent->getId())))
+                    ->getQuery()
+                    ->getResult();
+                if (!empty($queryResult)) {
+                    foreach ($queryResult as $deleteItem) {
+                        $this->em()->remove($deleteItem);
+                    }
+                    $this->em()->flush();
+                }
+
                 if ($editingContent->getScope() == ContentScopeType::CPageBuilder) {
                     $parents = $this->cm()->getContentRepository()->getPath($editingContent);
                     $parents = array_reverse($parents);

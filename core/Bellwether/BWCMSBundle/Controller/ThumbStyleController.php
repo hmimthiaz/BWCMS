@@ -225,7 +225,6 @@ class ThumbStyleController extends BaseController implements BackEndControllerIn
         $form = $this->createEditForm($entity);
         $form->handleRequest($request);
 
-
         if ($request->getMethod() == 'POST') {
 
             if (strlen($entity->getName()) < 3) {
@@ -254,6 +253,20 @@ class ThumbStyleController extends BaseController implements BackEndControllerIn
                 $entity->setSite($this->sm()->getAdminCurrentSite());
                 $em->persist($entity);
                 $em->flush();
+
+                $qb = $em->createQueryBuilder();
+                $queryResult = $qb->select(array('s3'))
+                    ->from('BWCMSBundle:S3QueueEntity', 's3')
+                    ->andWhere($qb->expr()->eq('s3.thumStyle', $qb->expr()->literal($entity->getId())))
+                    ->getQuery()
+                    ->getResult();
+                if (!empty($queryResult)) {
+                    foreach ($queryResult as $deleteItem) {
+                        $this->em()->remove($deleteItem);
+                    }
+                    $this->em()->flush();
+                }
+
                 return $this->redirect($this->generateUrl('_bwcms_admin_thumbstyle_home'));
             }
         }
