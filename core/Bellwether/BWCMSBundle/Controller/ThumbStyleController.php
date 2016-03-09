@@ -15,6 +15,9 @@ use Symfony\Component\Form\FormError;
 use Bellwether\Common\StringUtility;
 use Doctrine\ORM\QueryBuilder;
 
+use Bellwether\Common\Pagination;
+
+
 /**
  * Site controller.
  *
@@ -30,17 +33,46 @@ class ThumbStyleController extends BaseController implements BackEndControllerIn
      * @Method("GET")
      * @Template()
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
-        $em = $this->em();
 
-        $criteria = array(
-            'site' => $this->sm()->getAdminCurrentSite()->getId()
-        );
-        $entities = $em->getRepository('BWCMSBundle:ThumbStyleEntity')->findBy($criteria);
+
+        $pager = new Pagination($request, 10);
+        $start = $pager->getStart();
+        $limit = $pager->getLimit();
+
+        $thumbRepository = $this->em()->getRepository('BWCMSBundle:ThumbStyleEntity');
+        $qb = $thumbRepository->createQueryBuilder('t');
+        $qb->andWhere(" t.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+
+        $query = $request->get('query');
+        $query = filter_var($query, FILTER_SANITIZE_STRING);
+        if (!empty($query)) {
+            $qb->andWhere(" ( t.name LIKE :query1 OR t.slug LIKE :query2  ) ");
+            $qb->setParameter('query1', '%' . $query . '%');
+            $qb->setParameter('query2', '%' . $query . '%');
+        }
+
+        $qb->add('orderBy', 't.name ASC');
+        $qb->setFirstResult($start);
+        $qb->setMaxResults($limit);
+
+        $result = $qb->getQuery()->getResult();
+        $pager->setItems($result);
+
+        $qb2 = clone $qb; // don't modify existing query
+        $qb2->resetDQLPart('orderBy');
+        $qb2->resetDQLPart('having');
+        $qb2->select('COUNT(t) AS cnt');
+        $countResult = $qb2->getQuery()->setFirstResult(0)->getScalarResult();
+        $totalCount = $countResult[0]['cnt'];
+
+        $pager->setTotalItems($totalCount);
 
         return array(
-            'entities' => $entities,
+            'pager' => $pager,
+            'dir' => $this->sm()->getAdminCurrentSite()->getDirection(),
+            'title' => 'Thumb Styles',
         );
     }
 
