@@ -33,6 +33,10 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
 
     private $skinAssetPrefix = null;
 
+    private $s3SkinEnabled = null;
+
+    private $s3SkinURLPrefix = null;
+
     /**
      * @var \Twig_Environment
      */
@@ -190,6 +194,9 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             $returnValue .= $this->skinAssetPrefix . '/';
         }
         $returnValue .= $template;
+        if ($this->getS3SkinEnabled()) {
+            $returnValue = $this->getS3SkinURLPrefix() . $returnValue;
+        }
         return $returnValue;
     }
 
@@ -510,6 +517,22 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             $this->currentSkinFolder = $this->sm()->getCurrentSite()->getSkinFolderName();
         }
         return $this->currentSkinFolder;
+    }
+
+    public function getS3SkinEnabled()
+    {
+        if (is_null($this->s3SkinEnabled)) {
+            $this->s3SkinEnabled = $this->container->getParameter('media.s3SkinEnabled');
+        }
+        return $this->s3SkinEnabled;
+    }
+
+    public function getS3SkinURLPrefix()
+    {
+        if (is_null($this->s3SkinURLPrefix)) {
+            $this->s3SkinURLPrefix = $this->container->getParameter('media.s3SkinURLPrefix');
+        }
+        return $this->s3SkinURLPrefix;
     }
 
     /**

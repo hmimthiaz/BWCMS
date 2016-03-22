@@ -33,6 +33,9 @@ class BWCMSExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('media.s3Bucket', $config['media']['s3Bucket']);
         $container->setParameter('media.s3DomainURLPrefix', $config['media']['s3DomainURLPrefix']);
 
+        $container->setParameter('media.s3SkinEnabled', $config['media']['s3SkinEnabled']);
+        $container->setParameter('media.s3SkinURLPrefix', $config['media']['s3SkinURLPrefix']);
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 

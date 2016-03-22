@@ -32,6 +32,8 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('s3Prefix')->defaultValue('a1b2c3d4e6')->end()
                     ->scalarNode('s3Bucket')->defaultValue(null)->end()
                     ->scalarNode('s3DomainURLPrefix')->defaultValue('s3.amazonaws.com')->end()
+                    ->booleanNode('s3SkinEnabled')->defaultValue(false)->end()
+                    ->scalarNode('s3SkinURLPrefix')->defaultValue('s3.amazonaws.com')->end()
                 ->end()
             ->end()
         ->end();
