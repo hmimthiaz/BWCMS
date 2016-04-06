@@ -6,6 +6,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseController;
 use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Form;
@@ -25,6 +26,7 @@ use Bellwether\Common\Pagination;
  * User controller.
  *
  * @Route("/admin/user")
+ * @Security("has_role('ROLE_ADMIN')")
  */
 class UserController extends BaseController implements BackEndControllerInterface
 {

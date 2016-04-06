@@ -106,6 +106,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     {
         return array(
             new \Twig_SimpleFilter('ellipse', array($this, 'getEllipse')),
+            new \Twig_SimpleFilter('rgb', array($this, 'getRGB')),
         );
     }
 
@@ -216,6 +217,21 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         }
         $newText = $newText . $end;
         return $newText;
+    }
+
+    function getRGB($hexColor, $alpha = 1.0)
+    {
+        $hex = str_replace("#", "", $hexColor);
+        if (strlen($hex) == 3) {
+            $r = hexdec(substr($hex, 0, 1) . substr($hex, 0, 1));
+            $g = hexdec(substr($hex, 1, 1) . substr($hex, 1, 1));
+            $b = hexdec(substr($hex, 2, 1) . substr($hex, 2, 1));
+        } else {
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+        }
+        return "rgba({$r},{$g},{$b},{$alpha})";
     }
 
     /**

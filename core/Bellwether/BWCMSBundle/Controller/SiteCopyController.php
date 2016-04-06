@@ -7,6 +7,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -22,6 +23,7 @@ use AppKernel;
  * Dashboard controller.
  *
  * @Route("/admin")
+ * @Security("has_role('ROLE_SUPER_ADMIN')")
  */
 class SiteCopyController extends BaseController implements BackEndControllerInterface
 {

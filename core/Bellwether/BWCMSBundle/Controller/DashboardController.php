@@ -7,6 +7,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 
 use AppKernel;
@@ -15,6 +16,7 @@ use AppKernel;
  * Dashboard controller.
  *
  * @Route("/admin")
+ * @Security("has_role('ROLE_BACKEND')")
  */
 class DashboardController extends BaseController implements BackEndControllerInterface
 {

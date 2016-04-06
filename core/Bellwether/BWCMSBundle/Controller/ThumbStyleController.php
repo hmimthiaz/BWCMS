@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Bellwether\BWCMSBundle\Entity\ThumbStyleEntity;
 use Bellwether\BWCMSBundle\Form\ThumbStyleType;
 use Symfony\Component\Form\FormError;
@@ -22,6 +23,7 @@ use Bellwether\Common\Pagination;
  * Site controller.
  *
  * @Route("/admin/thumbstyle")
+ * @Security("has_role('ROLE_AUTHOR')")
  */
 class ThumbStyleController extends BaseController implements BackEndControllerInterface
 {
