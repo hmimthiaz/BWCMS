@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  * Audit controller.
  *
  * @Route("/admin/audit")
- * @Security("has_role('ROLE_ADMIN')")
+ * @Security("has_role('ROLE_SUPER_ADMIN')")
  */
 class AuditController extends BaseController implements BackEndControllerInterface
 {
