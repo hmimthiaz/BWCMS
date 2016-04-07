@@ -67,7 +67,7 @@ class MediaFrontEndController extends BaseController implements CachedSiteFrontE
                 break;
         }
 
-        $thumbCache = $thumb->cacheFile('guess', 80, true);
+        $thumbCache = $thumb->cacheFile('guess', $thumbEntity->getQuality(), true);
         $response = new BinaryFileResponse($thumbCache);
         $response->trustXSendfileTypeHeader();
         $response->setContentDisposition(
