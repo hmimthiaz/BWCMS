@@ -284,7 +284,7 @@ class S3Service extends BaseService
                 break;
         }
 
-        $thumbCacheFile = $thumb->cacheFile('guess', 80, true);
+        $thumbCacheFile = $thumb->cacheFile('guess', $thumbEntity->getQuality(), true);
 
         $uploadDateTime = new \DateTime();
         $filename = $contentMediaEntity->getId() . '.' . $contentMediaEntity->getExtension();
