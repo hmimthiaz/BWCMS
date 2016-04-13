@@ -128,22 +128,27 @@ class UserController extends BaseController implements BackEndControllerInterfac
                 $this->em()->flush();
 
                 $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
-                if (isset($emailSettings['host']) && !empty($emailSettings['host'])) {
+                if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
                     $message = \Swift_Message::newInstance()
                         ->setSubject('Welcome Email')
                         ->setFrom($emailSettings['sender_address'])
-                        ->setTo($formData['email'], $formData['firstName'])
-                        ->setBody(
-                            $this->renderView(
-                                'BWCMSBundle:User:welcome.email.txt.twig',
-                                array(
-                                    'firstName' => $formData['firstName'],
-                                    'username' => $formData['email'],
-                                    'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
-                                    'password' => $formData['password'],
-                                )
-                            )
-                        );
+                        ->setTo($formData['email'], $formData['firstName']);
+                    $userResetEmailTemplate = $this->tp()->getCurrentSkin()->getUserNewEmailTemplate();
+                    if (is_null($userResetEmailTemplate)) {
+                        $userResetEmailTemplate = 'BWCMSBundle:User:welcome.email.txt.twig';
+                    }
+                    $emailVars = array(
+                        'firstName' => $formData['firstName'],
+                        'username' => $formData['email'],
+                        'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
+                        'password' => $formData['password'],
+                    );
+                    $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
+                    if (strtolower(strpos($userResetEmailTemplate, '.html.')) === false) {
+                        $message->setBody($bodyText);
+                    } else {
+                        $message->setBody($bodyText, 'text/html');
+                    }
                     $this->mailer()->getMailer()->send($message);
                 }
                 $this->addSuccessFlash('Added new user!');
@@ -273,25 +278,27 @@ class UserController extends BaseController implements BackEndControllerInterfac
 
                 $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
                 if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
-
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject('Reset Password')
+                        ->setFrom($emailSettings['sender_address'])
+                        ->setTo($formData['email'], $formData['firstName']);
                     $userResetEmailTemplate = $this->tp()->getCurrentSkin()->getUserResetEmailTemplate();
                     if (is_null($userResetEmailTemplate)) {
                         $userResetEmailTemplate = 'BWCMSBundle:User:reset-password.email.txt.twig';
                     }
-
                     $emailVars = array(
                         'firstName' => $existingUser->getFirstName(),
                         'username' => $existingUser->getEmail(),
                         'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
                         'password' => $newPassword,
                     );
-
                     $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
-                    $message = \Swift_Message::newInstance()
-                        ->setSubject('Reset Password')
-                        ->setFrom($emailSettings['sender_address'])
-                        ->setTo($formData['email'], $formData['firstName'])
-                        ->setBody($bodyText);
+
+                    if (strtolower(strpos($userResetEmailTemplate, '.html.')) === false) {
+                        $message->setBody($bodyText);
+                    } else {
+                        $message->setBody($bodyText, 'text/html');
+                    }
                     $this->mailer()->getMailer()->send($message);
                 }
                 $this->addSuccessFlash('Updated user password!');
