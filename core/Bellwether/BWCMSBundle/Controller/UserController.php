@@ -70,7 +70,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
         $qb2->resetDQLPart('having');
         $qb2->select('COUNT(u) AS cnt');
         $countResult = $qb2->getQuery()->setFirstResult(0)->getScalarResult();
-        $totalCount= $countResult[0]['cnt'];
+        $totalCount = $countResult[0]['cnt'];
         $pager->setTotalItems($totalCount);
 
         return array(
@@ -273,21 +273,25 @@ class UserController extends BaseController implements BackEndControllerInterfac
 
                 $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
                 if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
+
+                    $userResetEmailTemplate = $this->tp()->getCurrentSkin()->getUserResetEmailTemplate();
+                    if (is_null($userResetEmailTemplate)) {
+                        $userResetEmailTemplate = 'BWCMSBundle:User:reset-password.email.txt.twig';
+                    }
+
+                    $emailVars = array(
+                        'firstName' => $existingUser->getFirstName(),
+                        'username' => $existingUser->getEmail(),
+                        'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
+                        'password' => $newPassword,
+                    );
+
+                    $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
                     $message = \Swift_Message::newInstance()
                         ->setSubject('Reset Password')
                         ->setFrom($emailSettings['sender_address'])
                         ->setTo($formData['email'], $formData['firstName'])
-                        ->setBody(
-                            $this->renderView(
-                                'BWCMSBundle:User:reset-password.email.txt.twig',
-                                array(
-                                    'firstName' => $existingUser->getFirstName(),
-                                    'username' => $existingUser->getEmail(),
-                                    'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
-                                    'password' => $newPassword,
-                                )
-                            )
-                        );
+                        ->setBody($bodyText);
                     $this->mailer()->getMailer()->send($message);
                 }
                 $this->addSuccessFlash('Updated user password!');

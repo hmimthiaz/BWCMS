@@ -67,6 +67,11 @@ abstract class BaseSkin extends ContainerAware
     }
 
 
+    public function getUserResetEmailTemplate()
+    {
+        return null;
+    }
+
     abstract public function getName();
 
     abstract public function initDefaultThumbStyles();

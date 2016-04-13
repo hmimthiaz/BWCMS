@@ -25,7 +25,7 @@ class Configuration implements ConfigurationInterface
                 ->addDefaultsIfNotSet()
                 ->children()
                     ->scalarNode('path')->defaultValue('media')->end()
-                    ->integerNode('maxUploadSize')->defaultValue(1048576 * 10)->end()
+                    ->integerNode('maxUploadSize')->defaultValue(1048576 * 3)->end()
                     ->integerNode('maxUploadImageSize')->defaultValue(1048576 * 3)->end()
                     ->scalarNode('blockedExtension')->defaultValue('dll,bat,pl,bin,exe,sh,php')->end()
                     ->booleanNode('s3Enabled')->defaultValue(false)->end()
