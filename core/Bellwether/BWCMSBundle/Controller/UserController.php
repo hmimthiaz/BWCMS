@@ -26,7 +26,7 @@ use Bellwether\Common\Pagination;
  * User controller.
  *
  * @Route("/admin/user")
- * @Security("has_role('ROLE_ADMIN')")
+ * @Security("has_role('ROLE_BACKEND')")
  */
 class UserController extends BaseController implements BackEndControllerInterface
 {
@@ -34,6 +34,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
 
     /**
      * @Route("/",name="_bwcms_admin_user_home")
+     * @Security("has_role('ROLE_ADMIN')")
      * @Template()
      */
     public function indexAction(Request $request)
@@ -82,6 +83,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
      * Creates a new UserEntity entity.
      *
      * @Route("/create.php", name="_bwcms_admin_user_create")
+     * @Security("has_role('ROLE_ADMIN')")
      * @Template("BWCMSBundle:User:edit.html.twig")
      */
     public function createAction(Request $request)
@@ -166,6 +168,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
      * Creates a new UserEntity entity.
      *
      * @Route("/edit.php", name="_bwcms_admin_user_edit")
+     * @Security("has_role('ROLE_ADMIN')")
      * @Template("BWCMSBundle:User:edit.html.twig")
      */
     public function editAction(Request $request)
