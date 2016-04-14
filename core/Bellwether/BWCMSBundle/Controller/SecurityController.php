@@ -102,22 +102,35 @@ class SecurityController extends BaseController implements BackEndControllerInte
                 $userEntity->setPasswordRequestedAt(new \DateTime());
                 $this->container->get('fos_user.user_manager')->updateUser($userEntity);
 
-                $formSubject = 'Password Request';
                 $resetURL = $this->generateUrl('user_forgot_reset', array('token' => $userEntity->getConfirmationToken()), true);
-                $emailData = array(
-                    'resetURL' => $resetURL,
-                    'user' => $userEntity
-                );
-                $emailText = $this->renderView('@Generic/Extras/Forgot.Email.txt.twig', $emailData);
+
+
                 $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
                 if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
                     $message = \Swift_Message::newInstance()
-                        ->setSubject($formSubject)
+                        ->setSubject('Password Request')
                         ->setFrom($emailSettings['sender_address'])
                         ->addTo($userEntity->getEmail(), $userEntity->getFirstName());
-                    $message->setBody($emailText);
+                    $userResetEmailTemplate = $this->tp()->getCurrentSkin()->getUserForgotEmailTemplate();
+                    if (is_null($userResetEmailTemplate)) {
+                        $userResetEmailTemplate = '@Generic/Extras/Forgot.Email.txt.twig';
+                    }
+                    $emailVars = array(
+                        'firstName' => $userEntity->getFirstName(),
+                        'username' => $userEntity->getEmail(),
+                        'resetURL' => $resetURL,
+                        'user' => $userEntity
+                    );
+                    $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
+                    if (strpos(strtolower($userResetEmailTemplate), '.html.') === false) {
+                        $message->setBody($bodyText);
+                    } else {
+                        $message->setBody($bodyText, 'text/html');
+                    }
                     $this->mailer()->getMailer()->send($message);
                 }
+
+
                 $returnArray['Sent'] = 'True';
             }
         }
@@ -159,22 +172,29 @@ class SecurityController extends BaseController implements BackEndControllerInte
         $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
         if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
             $message = \Swift_Message::newInstance()
-                ->setSubject('Reset Password Successfully')
+                ->setSubject('Your new Password')
                 ->setFrom($emailSettings['sender_address'])
-                ->setTo($userEntity->getEmail(), $userEntity->getFirstName())
-                ->setBody(
-                    $this->renderView(
-                        'BWCMSBundle:User:reset-password.email.txt.twig',
-                        array(
-                            'firstName' => $userEntity->getFirstName(),
-                            'username' => $userEntity->getEmail(),
-                            'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
-                            'password' => $newPassword,
-                        )
-                    )
-                );
+                ->addTo($userEntity->getEmail(), $userEntity->getFirstName());
+            $userResetEmailTemplate = $this->tp()->getCurrentSkin()->getUserResetAccessEmailTemplate();
+            if (is_null($userResetEmailTemplate)) {
+                $userResetEmailTemplate = 'BWCMSBundle:User:reset-password.email.txt.twig';
+            }
+            $emailVars = array(
+                'firstName' => $userEntity->getFirstName(),
+                'username' => $userEntity->getEmail(),
+                'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
+                'password' => $newPassword,
+                'user' => $userEntity
+            );
+            $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
+            if (strpos(strtolower($userResetEmailTemplate), '.html.') === false) {
+                $message->setBody($bodyText);
+            } else {
+                $message->setBody($bodyText, 'text/html');
+            }
             $this->mailer()->getMailer()->send($message);
         }
+
         $template = "@Generic/Extras/Forgot-Success.html.twig";
         return $this->render($template, array());
     }

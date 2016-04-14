@@ -71,7 +71,17 @@ abstract class BaseSkin extends ContainerAware
         return null;
     }
 
+    public function getUserForgotEmailTemplate()
+    {
+        return null;
+    }
+
     public function getUserResetEmailTemplate()
+    {
+        return null;
+    }
+
+    public function getUserResetAccessEmailTemplate()
     {
         return null;
     }

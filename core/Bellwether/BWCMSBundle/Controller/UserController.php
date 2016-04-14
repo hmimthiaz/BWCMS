@@ -144,7 +144,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
                         'password' => $formData['password'],
                     );
                     $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
-                    if (strtolower(strpos($userResetEmailTemplate, '.html.')) === false) {
+                    if (strpos(strtolower($userResetEmailTemplate), '.html.') === false) {
                         $message->setBody($bodyText);
                     } else {
                         $message->setBody($bodyText, 'text/html');
@@ -294,7 +294,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
                     );
                     $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
 
-                    if (strtolower(strpos($userResetEmailTemplate, '.html.')) === false) {
+                    if (strpos(strtolower($userResetEmailTemplate), '.html.') === false) {
                         $message->setBody($bodyText);
                     } else {
                         $message->setBody($bodyText, 'text/html');
