@@ -22,6 +22,7 @@ use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
 use Bellwether\BWCMSBundle\Classes\Service\ThumbService;
+use Bellwether\BWCMSBundle\Classes\Service\S3Service;
 
 use Bellwether\BWCMSBundle\Entity\ContentEntity;
 
@@ -158,6 +159,14 @@ abstract class BaseController extends Controller
     public function locale()
     {
         return $this->container->get('BWCMS.Locale')->getManager();
+    }
+
+    /**
+     * @return S3Service
+     */
+    public function s3Service()
+    {
+        return $this->container->get('BWCMS.S3')->getManager();
     }
 
     /**

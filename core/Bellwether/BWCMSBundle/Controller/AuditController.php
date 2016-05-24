@@ -8,6 +8,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Bellwether\BWCMSBundle\Entity\AuditEntity;
 
 use Bellwether\Common\Pagination;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  * Audit controller.
  *
  * @Route("/admin/audit")
+ * @Security("has_role('ROLE_SUPER_ADMIN')")
  */
 class AuditController extends BaseController implements BackEndControllerInterface
 {

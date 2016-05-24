@@ -22,6 +22,7 @@ use Bellwether\BWCMSBundle\Classes\Service\MailService;
 use Bellwether\BWCMSBundle\Classes\Service\PreferenceService;
 use Bellwether\BWCMSBundle\Classes\Service\TemplateService;
 use Bellwether\BWCMSBundle\Classes\Service\ThumbService;
+use Bellwether\BWCMSBundle\Classes\Service\S3Service;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -186,6 +187,14 @@ abstract class BaseService  extends ContainerAware
     public function getThumbService()
     {
         return $this->container->get('BWCMS.Thumb');
+    }
+
+    /**
+     * @return S3Service
+     */
+    public function s3Service()
+    {
+        return $this->container->get('BWCMS.S3')->getManager();
     }
 
     /**

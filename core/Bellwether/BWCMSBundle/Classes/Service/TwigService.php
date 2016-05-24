@@ -33,6 +33,10 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
 
     private $skinAssetPrefix = null;
 
+    private $s3SkinEnabled = null;
+
+    private $s3SkinURLPrefix = null;
+
     /**
      * @var \Twig_Environment
      */
@@ -102,6 +106,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     {
         return array(
             new \Twig_SimpleFilter('ellipse', array($this, 'getEllipse')),
+            new \Twig_SimpleFilter('rgb', array($this, 'getRGB')),
         );
     }
 
@@ -191,30 +196,10 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             $returnValue .= $this->skinAssetPrefix . '/';
         }
         $returnValue .= $template;
+        if ($this->getS3SkinEnabled()) {
+            $returnValue = $this->getS3SkinURLPrefix() . $returnValue;
+        }
         return $returnValue;
-    }
-
-    /**
-     * @param ContentEntity $contentEntity
-     * @return null|string
-     */
-    public function getContentLink($contentEntity)
-    {
-        return $this->cq()->getPublicURL($contentEntity);
-    }
-
-    /**
-     * @param ContentEntity $contentEntity
-     * @return string
-     */
-    public function getContentDownloadLink($contentEntity)
-    {
-        $url = $this->generateUrl('media_download_link', array(
-            'siteSlug' => $this->sm()->getCurrentSite()->getSlug(),
-            'contentId' => $contentEntity->getId()
-        ));
-
-        return $url;
     }
 
     function getEllipse($text, $limit = 300, $end = '...')
@@ -233,6 +218,21 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         }
         $newText = $newText . $end;
         return $newText;
+    }
+
+    function getRGB($hexColor, $alpha = 1.0)
+    {
+        $hex = str_replace("#", "", $hexColor);
+        if (strlen($hex) == 3) {
+            $r = hexdec(substr($hex, 0, 1) . substr($hex, 0, 1));
+            $g = hexdec(substr($hex, 1, 1) . substr($hex, 1, 1));
+            $b = hexdec(substr($hex, 2, 1) . substr($hex, 2, 1));
+        } else {
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+        }
+        return "rgba({$r},{$g},{$b},{$alpha})";
     }
 
     /**
@@ -319,11 +319,56 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
 
     /**
      * @param ContentEntity $contentEntity
+     * @return null|string
+     */
+    public function getContentLink($contentEntity)
+    {
+        if (empty($contentEntity)) {
+            return null;
+        }
+
+        return $this->cq()->getPublicURL($contentEntity);
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
+     * @return string
+     */
+    public function getContentDownloadLink($contentEntity)
+    {
+        if (empty($contentEntity)) {
+            return null;
+        }
+
+        $url = $this->s3Service()->getContentDownloadLink($contentEntity);
+        if (!is_null($url)) {
+            return $url;
+        }
+
+        $url = $this->generateUrl('media_download_link', array(
+            'siteSlug' => $this->sm()->getCurrentSite()->getSlug(),
+            'contentId' => $contentEntity->getId()
+        ));
+
+        return $url;
+    }
+
+    /**
+     * @param ContentEntity $contentEntity
      * @param bool $default
      * @return bool|string
      */
     public function getImage($contentEntity, $default = false)
     {
+        if (empty($contentEntity)) {
+            return $default;
+        }
+
+        $url = $this->s3Service()->getImage($contentEntity);
+        if (!is_null($url)) {
+            return $url;
+        }
+
         $url = $this->generateUrl('media_image_view', array(
             'siteSlug' => $this->sm()->getCurrentSite()->getSlug(),
             'contentId' => $contentEntity->getId()
@@ -341,6 +386,11 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     {
         if (empty($contentEntity)) {
             return null;
+        }
+
+        $url = $this->s3Service()->getThumbImage($contentEntity, $thumbSlug, $scaleFactor);
+        if (!is_null($url)) {
+            return $url;
         }
 
         $thumbEntity = $this->cache()->fetch('thumbStyle_' . $thumbSlug);
@@ -492,6 +542,22 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             $this->currentSkinFolder = $this->sm()->getCurrentSite()->getSkinFolderName();
         }
         return $this->currentSkinFolder;
+    }
+
+    public function getS3SkinEnabled()
+    {
+        if (is_null($this->s3SkinEnabled)) {
+            $this->s3SkinEnabled = $this->container->getParameter('media.s3SkinEnabled');
+        }
+        return $this->s3SkinEnabled;
+    }
+
+    public function getS3SkinURLPrefix()
+    {
+        if (is_null($this->s3SkinURLPrefix)) {
+            $this->s3SkinURLPrefix = $this->container->getParameter('media.s3SkinURLPrefix');
+        }
+        return $this->s3SkinURLPrefix;
     }
 
     /**

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
 use Bellwether\BWCMSBundle\Form\SiteEntityType;
 
@@ -17,6 +18,7 @@ use Bellwether\BWCMSBundle\Form\SiteEntityType;
  * Site controller.
  *
  * @Route("/admin/site")
+ * @Security("has_role('ROLE_SUPER_ADMIN')")
  */
 class SiteController extends BaseController implements BackEndControllerInterface
 {

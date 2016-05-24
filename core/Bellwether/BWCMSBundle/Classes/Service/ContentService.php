@@ -812,6 +812,21 @@ class ContentService extends BaseService
         if (!empty($searchEntity)) {
             $this->em()->remove($searchEntity);
         }
+
+        $qb = $this->em()->createQueryBuilder();
+        $queryResult = $qb->select(array('s3'))
+            ->from('BWCMSBundle:S3QueueEntity', 's3')
+            ->andWhere($qb->expr()->eq('s3.content', $qb->expr()->literal($content->getId())))
+            ->getQuery()
+            ->getResult();
+        if (!empty($queryResult)) {
+            foreach ($queryResult as $deleteItem) {
+                $this->em()->remove($deleteItem);
+            }
+            $this->em()->flush();
+        }
+
+
         $contentClass = $this->getContentClass($content->getType(), $content->getSchema());
         if ($contentClass->isTaxonomy()) {
             $taxonomyRelations = $this->em()->getRepository('BWCMSBundle:ContentRelationEntity')->findBy(array("relatedContent" => $content));

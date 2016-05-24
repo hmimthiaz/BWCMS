@@ -7,7 +7,20 @@
 
 {% block body -%}
     <div class="col-md-12">
-        <table class="table table-striped table-hover table-bordered records_list">
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <form class="form-inline" action="{{ url('_bwcms_admin_thumbstyle_home') }}" method="get">
+                    <div class="form-group">
+                        <input name="query" value="{{ app.request.get('query') | escape }}" type="text" class="form-control" style="width: 300px;">
+                    </div>
+                    <button type="submit" class="btn btn-default">Search</button>
+                    <a href="{{ path('_bwcms_admin_thumbstyle_new') }}" class="btn btn-primary">Add</a>
+                </form>
+            </div>
+        </div>
+
+        <table class="table table-striped table-bordered table-hover">
             <thead>
             <tr>
                 <th>Name</th>
@@ -19,7 +32,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for entity in entities %}
+            {% for entity in pager.items %}
                 <tr>
                     <td>{{ entity.name }}</td>
                     <td>{{ entity.slug }}</td>
@@ -37,6 +50,8 @@
             {% endfor %}
             </tbody>
         </table>
+
+        {% include 'BWCMSBundle:Common:pagination.html.twig' with {'pager': pager } %}
 
         <ul>
             <li>

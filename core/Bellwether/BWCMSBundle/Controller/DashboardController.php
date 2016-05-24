@@ -7,19 +7,16 @@ use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 
-
-use Bellwether\BWCMSBundle\Entity\Site;
-use Bellwether\BWCMSBundle\Classes\Content\ContentType;
-use Bellwether\BWCMSBundle\Entity\ContentEntity;
-use Symfony\Component\Form\Form;
 use AppKernel;
 
 /**
  * Dashboard controller.
  *
  * @Route("/admin")
+ * @Security("has_role('ROLE_BACKEND')")
  */
 class DashboardController extends BaseController implements BackEndControllerInterface
 {
@@ -43,7 +40,6 @@ class DashboardController extends BaseController implements BackEndControllerInt
         return array();
     }
 
-
     /**
      * @Route("/dashboard/email.php",name="_bwcms_admin_dashboard_email")
      * @Template()
@@ -64,7 +60,7 @@ class DashboardController extends BaseController implements BackEndControllerInt
             ->setSubject('Email Test')
             ->setFrom($emailSettings['sender_address'])
             ->addTo($adminSettings['adminEmail']);
-        $message->setBody('This is a test email! <br><br>- <strong>Admin</strong>','text/html');
+        $message->setBody('This is a test email! <br><br>- <strong>Admin</strong>', 'text/html');
 
         try {
             $mailer->getMailer()->send($message);

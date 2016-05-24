@@ -141,87 +141,91 @@ class AdminService extends BaseService
         $menu = $this->factory->createItem('root');
         $menu->addChild('Dashboard', array('route' => '_bwcms_admin_dashboard_home'));
 
-        $menu->addChild('Manage', array('uri' => '#', 'label' => 'Manage'))->setAttribute('dropdown', true);
+        if ($this->isGranted('ROLE_AUTHOR')) {
 
-        if (count($this->cm()->getRegisteredContentTypes('Content')) > 0) {
-            $menu['Manage']->addChild('Content', array(
-                'route' => '_bwcms_admin_content_home',
-                'routeParameters' => array(
-                    'type' => 'content'
-                )
-            ));
-        }
+            $menu->addChild('Manage', array('uri' => '#', 'label' => 'Manage'))->setAttribute('dropdown', true);
 
-        if (count($this->cm()->getRegisteredContentTypes('Media')) > 0) {
-            $menu['Manage']->addChild('Media', array(
-                'route' => '_bwcms_admin_content_home',
-                'routeParameters' => array(
-                    'type' => 'media'
-                )
-            ));
-        }
-
-        if (count($this->cm()->getRegisteredContentTypes('Navigation')) > 0) {
-            $menu['Manage']->addChild('Navigation', array(
-                'route' => '_bwcms_admin_content_home',
-                'routeParameters' => array(
-                    'type' => 'navigation'
-                )
-            ));
-        }
-
-        if (count($this->cm()->getRegisteredContentTypes('Widget')) > 0) {
-            $menu['Manage']->addChild('Widget', array(
-                'route' => '_bwcms_admin_content_home',
-                'routeParameters' => array(
-                    'type' => 'widget'
-                )
-            ));
-        }
-
-        $menu['Manage']->addChild('-ctc-', array('uri' => '#'))->setAttribute('divider', true);
-
-
-        $registeredOptionTypes = $this->pref()->getRegisteredOptionTypes();
-        $addedPagePreference = false;
-        foreach ($registeredOptionTypes as $optionType) {
-            $classInstance = $optionType['class'];
-            if ($classInstance->isPagePreference()) {
-                $menu['Manage']->addChild($optionType['name'], array(
-                    'route' => '_bwcms_admin_preference_page',
+            if (count($this->cm()->getRegisteredContentTypes('Content')) > 0) {
+                $menu['Manage']->addChild('Content', array(
+                    'route' => '_bwcms_admin_content_home',
                     'routeParameters' => array(
-                        'type' => $optionType['type']
-                    )
-                ));
-                $addedPagePreference = true;
-            }
-        }
-        if ($addedPagePreference) {
-            $menu['Manage']->addChild('-pf-', array('uri' => '#'))->setAttribute('divider', true);
-        }
-
-
-        $taxonomyContentTypes = $this->cm()->getTaxonomyContentTypes();
-        if (!empty($taxonomyContentTypes)) {
-            foreach ($taxonomyContentTypes as $cType) {
-                $class = $cType['class'];
-                $menu['Manage']->addChild($class->getName(), array(
-                    'route' => '_bwcms_admin_taxonomy_home',
-                    'routeParameters' => array(
-                        'schema' => $class->getSchema()
+                        'type' => 'content'
                     )
                 ));
             }
-            $menu['Manage']->addChild('-ct-', array('uri' => '#'))->setAttribute('divider', true);
+
+            if (count($this->cm()->getRegisteredContentTypes('Media')) > 0) {
+                $menu['Manage']->addChild('Media', array(
+                    'route' => '_bwcms_admin_content_home',
+                    'routeParameters' => array(
+                        'type' => 'media'
+                    )
+                ));
+            }
+
+            if (count($this->cm()->getRegisteredContentTypes('Navigation')) > 0) {
+                $menu['Manage']->addChild('Navigation', array(
+                    'route' => '_bwcms_admin_content_home',
+                    'routeParameters' => array(
+                        'type' => 'navigation'
+                    )
+                ));
+            }
+
+            if (count($this->cm()->getRegisteredContentTypes('Widget')) > 0) {
+                $menu['Manage']->addChild('Widget', array(
+                    'route' => '_bwcms_admin_content_home',
+                    'routeParameters' => array(
+                        'type' => 'widget'
+                    )
+                ));
+            }
+
+            $menu['Manage']->addChild('-ctc-', array('uri' => '#'))->setAttribute('divider', true);
+
+
+            $registeredOptionTypes = $this->pref()->getRegisteredOptionTypes();
+            $addedPagePreference = false;
+            foreach ($registeredOptionTypes as $optionType) {
+                $classInstance = $optionType['class'];
+                if ($classInstance->isPagePreference()) {
+                    $menu['Manage']->addChild($optionType['name'], array(
+                        'route' => '_bwcms_admin_preference_page',
+                        'routeParameters' => array(
+                            'type' => $optionType['type']
+                        )
+                    ));
+                    $addedPagePreference = true;
+                }
+            }
+            if ($addedPagePreference) {
+                $menu['Manage']->addChild('-pf-', array('uri' => '#'))->setAttribute('divider', true);
+            }
+
+
+            $taxonomyContentTypes = $this->cm()->getTaxonomyContentTypes();
+            if (!empty($taxonomyContentTypes)) {
+                foreach ($taxonomyContentTypes as $cType) {
+                    $class = $cType['class'];
+                    $menu['Manage']->addChild($class->getName(), array(
+                        'route' => '_bwcms_admin_taxonomy_home',
+                        'routeParameters' => array(
+                            'schema' => $class->getSchema()
+                        )
+                    ));
+                }
+                $menu['Manage']->addChild('-ct-', array('uri' => '#'))->setAttribute('divider', true);
+            }
+
+            $menu['Manage']->addChild('Locale', array(
+                'route' => '_bwcms_admin_locale_home'
+            ));
+
+            $menu['Manage']->addChild('Thumb Styles', array(
+                'route' => '_bwcms_admin_thumbstyle_home'
+            ));
+
         }
-
-        $menu['Manage']->addChild('Locale', array(
-            'route' => '_bwcms_admin_locale_home'
-        ));
-
-        $menu['Manage']->addChild('Thumb Styles', array(
-            'route' => '_bwcms_admin_thumbstyle_home'
-        ));
 
         if ($this->isGranted('ROLE_PREFERENCE')) {
             foreach ($registeredOptionTypes as $optionType) {

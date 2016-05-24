@@ -49,3 +49,4 @@ composer.json
 .project
 .buildpath
 .settings
+app/lucene

@@ -7,8 +7,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Bellwether\BWCMSBundle\Classes\Base\BaseService;
 use Bellwether\BWCMSBundle\Classes\Preference\PreferenceType;
 use Bellwether\BWCMSBundle\Classes\Base\PreferenceTypeInterface;
-use Bellwether\BWCMSBundle\Classes\Preference\Type\GeneralType;
-use Bellwether\BWCMSBundle\Classes\Preference\Type\EmailSMTPType;
+
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Bellwether\BWCMSBundle\Entity\SiteEntity;
@@ -18,6 +17,9 @@ use Bellwether\BWCMSBundle\Classes\Constants\PreferenceFieldType;
 use Bellwether\BWCMSBundle\Classes\Constants\AuditLevelType;
 use Bellwether\BWCMSBundle\Classes\Constants\AuditActionType;
 
+use Bellwether\BWCMSBundle\Classes\Preference\Type\GeneralType;
+use Bellwether\BWCMSBundle\Classes\Preference\Type\EmailSMTPType;
+use Bellwether\BWCMSBundle\Classes\Preference\Type\AmazonS3Type;
 
 class PreferenceService extends BaseService
 {
@@ -54,6 +56,7 @@ class PreferenceService extends BaseService
     {
         $this->registerOptionType(new GeneralType($this->container, $this->requestStack));
         $this->registerOptionType(new EmailSMTPType($this->container, $this->requestStack));
+//        $this->registerOptionType(new AmazonS3Type($this->container, $this->requestStack));
 
         //Call other Preference Types
         $this->getEventDispatcher()->dispatch('BWCMS.Preference.Register');

@@ -7,6 +7,7 @@
 
 {% block header %}
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/js/jstree/themes/default/style.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/bwcms/js/colorpicker/css/bootstrap-colorpicker.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('bundles/bwcms/js/datetimepicker/bootstrap-datetimepicker.min.css') }}"/>
 {% endblock %}
 
@@ -28,15 +29,19 @@
                 $('#BWCF_template').val(this.value);
             });
             $('.contentDateTime').datetimepicker({
-                'format': 'YYYY-MM-DD HH:mm'
+                'format': 'YYYY-MM-DD HH:mm',
+                'showClear': true
             });
             $('.contentDate').datetimepicker({
-                'format': 'YYYY-MM-DD'
+                'format': 'YYYY-MM-DD',
+                'showClear': true
             });
             $('.contentTime').datetimepicker({
-                'format': 'HH:mm'
+                'format': 'HH:mm',
+                'showClear': true
             });
             $('.contentColor').colorpicker({format: 'hex',align: 'left'});
+            $('#BWCF_title').focus();
         });
     </script>
 {% endblock %}

@@ -25,6 +25,7 @@ class AppKernel extends Kernel
             new Gregwar\ImageBundle\GregwarImageBundle(),
             new Gregwar\CaptchaBundle\GregwarCaptchaBundle(),
             new Liuggio\ExcelBundle\LiuggioExcelBundle(),
+            new \Aws\Symfony\AwsBundle(),
             new Bellwether\BWCMSBundle\BWCMSBundle(),
         );
 

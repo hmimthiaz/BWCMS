@@ -6,6 +6,7 @@ use Bellwether\BWCMSBundle\Classes\Base\BaseController;
 use Bellwether\BWCMSBundle\Classes\Base\BackEndControllerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Form;
@@ -25,6 +26,7 @@ use Bellwether\Common\Pagination;
  * User controller.
  *
  * @Route("/admin/user")
+ * @Security("has_role('ROLE_BACKEND')")
  */
 class UserController extends BaseController implements BackEndControllerInterface
 {
@@ -32,6 +34,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
 
     /**
      * @Route("/",name="_bwcms_admin_user_home")
+     * @Security("has_role('ROLE_ADMIN')")
      * @Template()
      */
     public function indexAction(Request $request)
@@ -68,7 +71,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
         $qb2->resetDQLPart('having');
         $qb2->select('COUNT(u) AS cnt');
         $countResult = $qb2->getQuery()->setFirstResult(0)->getScalarResult();
-        $totalCount= $countResult[0]['cnt'];
+        $totalCount = $countResult[0]['cnt'];
         $pager->setTotalItems($totalCount);
 
         return array(
@@ -80,6 +83,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
      * Creates a new UserEntity entity.
      *
      * @Route("/create.php", name="_bwcms_admin_user_create")
+     * @Security("has_role('ROLE_ADMIN')")
      * @Template("BWCMSBundle:User:edit.html.twig")
      */
     public function createAction(Request $request)
@@ -126,22 +130,27 @@ class UserController extends BaseController implements BackEndControllerInterfac
                 $this->em()->flush();
 
                 $emailSettings = $this->pref()->getAllPreferenceByType('Email.SMTP');
-                if (isset($emailSettings['host']) && !empty($emailSettings['host'])) {
+                if (!is_null($emailSettings['host']) && !empty($emailSettings['host'])) {
                     $message = \Swift_Message::newInstance()
                         ->setSubject('Welcome Email')
                         ->setFrom($emailSettings['sender_address'])
-                        ->setTo($formData['email'], $formData['firstName'])
-                        ->setBody(
-                            $this->renderView(
-                                'BWCMSBundle:User:welcome.email.txt.twig',
-                                array(
-                                    'firstName' => $formData['firstName'],
-                                    'username' => $formData['email'],
-                                    'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
-                                    'password' => $formData['password'],
-                                )
-                            )
-                        );
+                        ->setTo($formData['email'], $formData['firstName']);
+                    $userResetEmailTemplate = $this->tp()->getCurrentSkin()->getUserNewEmailTemplate();
+                    if (is_null($userResetEmailTemplate)) {
+                        $userResetEmailTemplate = 'BWCMSBundle:User:welcome.email.txt.twig';
+                    }
+                    $emailVars = array(
+                        'firstName' => $formData['firstName'],
+                        'username' => $formData['email'],
+                        'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
+                        'password' => $formData['password'],
+                    );
+                    $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
+                    if (strpos(strtolower($userResetEmailTemplate), '.html.') === false) {
+                        $message->setBody($bodyText);
+                    } else {
+                        $message->setBody($bodyText, 'text/html');
+                    }
                     $this->mailer()->getMailer()->send($message);
                 }
                 $this->addSuccessFlash('Added new user!');
@@ -159,6 +168,7 @@ class UserController extends BaseController implements BackEndControllerInterfac
      * Creates a new UserEntity entity.
      *
      * @Route("/edit.php", name="_bwcms_admin_user_edit")
+     * @Security("has_role('ROLE_ADMIN')")
      * @Template("BWCMSBundle:User:edit.html.twig")
      */
     public function editAction(Request $request)
@@ -274,18 +284,24 @@ class UserController extends BaseController implements BackEndControllerInterfac
                     $message = \Swift_Message::newInstance()
                         ->setSubject('Reset Password')
                         ->setFrom($emailSettings['sender_address'])
-                        ->setTo($formData['email'], $formData['firstName'])
-                        ->setBody(
-                            $this->renderView(
-                                'BWCMSBundle:User:reset-password.email.txt.twig',
-                                array(
-                                    'firstName' => $existingUser->getFirstName(),
-                                    'username' => $existingUser->getEmail(),
-                                    'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
-                                    'password' => $newPassword,
-                                )
-                            )
-                        );
+                        ->setTo($formData['email'], $formData['firstName']);
+                    $userResetEmailTemplate = $this->tp()->getCurrentSkin()->getUserResetEmailTemplate();
+                    if (is_null($userResetEmailTemplate)) {
+                        $userResetEmailTemplate = 'BWCMSBundle:User:reset-password.email.txt.twig';
+                    }
+                    $emailVars = array(
+                        'firstName' => $existingUser->getFirstName(),
+                        'username' => $existingUser->getEmail(),
+                        'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
+                        'password' => $newPassword,
+                    );
+                    $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
+
+                    if (strpos(strtolower($userResetEmailTemplate), '.html.') === false) {
+                        $message->setBody($bodyText);
+                    } else {
+                        $message->setBody($bodyText, 'text/html');
+                    }
                     $this->mailer()->getMailer()->send($message);
                 }
                 $this->addSuccessFlash('Updated user password!');

@@ -38,7 +38,7 @@ class PreferenceEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Bellwether\BWCMSBundle\Entity\SiteEntity")
-     * @ORM\JoinColumn(name="siteId", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="siteId", referencedColumnName="id")
      */
     private $site;
 
