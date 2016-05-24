@@ -139,6 +139,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             'loc' => new \Twig_Function_Method($this, 'getLocale', array('is_safe' => array('html'))),
             'emailLink' => new \Twig_Function_Method($this, 'getEmailLink', array('is_safe' => array('html'))),
             'navLink' => new \Twig_Function_Method($this, 'getNavLink'),
+            'lang' => new \Twig_Function_Method($this, 'getLanguages', array('is_safe' => array('html'))),
             'exit' => new \Twig_Function_Method($this, 'doExit', array('is_safe' => array('html'))),
         );
     }
@@ -467,6 +468,14 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         $script = "eval(\"" . str_replace(array("\\", '"'), array("\\\\", '\"'), $script) . "\")";
         $script = '<script type="text/javascript">/*<![CDATA[*/' . $script . '/*]]>*/</script>';
         return '<span id="' . $id . '">[javascript protected email address]</span>' . $script;
+    }
+
+    public function getLanguages($onlyCurrent = false)
+    {
+        if ($onlyCurrent) {
+            return $this->sm()->getCurrentSite();
+        }
+        return $this->sm()->getAllSites();
     }
 
     public function doExit()

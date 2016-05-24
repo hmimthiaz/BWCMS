@@ -91,6 +91,7 @@ class MailService extends BaseService
             }
             if (!is_null($emailSettings['encryption']) && !empty($emailSettings['encryption'])) {
                 $this->transport->setEncryption($emailSettings['encryption']);
+                $this->transport->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false)));
             }
             if (!is_null($emailSettings['auth_mode']) && !empty($emailSettings['auth_mode'])) {
                 $this->transport->setAuthMode($emailSettings['auth_mode']);
