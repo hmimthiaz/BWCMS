@@ -185,10 +185,11 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     }
 
     /**
-     * @param string $template
+     * @param $template
+     * @param null $prefixDomain
      * @return string
      */
-    public function getSkinAsset($template)
+    public function getSkinAsset($template, $prefixDomain = null)
     {
         $skinFolder = $this->getCurrentSkinFolder();
         $returnValue = '/skins/' . strtolower($skinFolder) . '/';
@@ -198,6 +199,10 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         $returnValue .= $template;
         if ($this->getS3SkinEnabled()) {
             $returnValue = $this->getS3SkinURLPrefix() . $returnValue;
+        } else {
+            if (!is_null($prefixDomain)) {
+                $returnValue = $prefixDomain . $returnValue;
+            }
         }
         return $returnValue;
     }
