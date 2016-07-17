@@ -321,13 +321,13 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      * @param ContentEntity $contentEntity
      * @return null|string
      */
-    public function getContentLink($contentEntity)
+    public function getContentLink($contentEntity, $full = false)
     {
         if (empty($contentEntity)) {
             return null;
         }
 
-        return $this->cq()->getPublicURL($contentEntity);
+        return $this->cq()->getPublicURL($contentEntity, $full);
     }
 
     /**
@@ -382,7 +382,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      * @param float $scaleFactor
      * @return mixed|null|string
      */
-    public function getThumbImage($contentEntity, $thumbSlug, $scaleFactor = 1.0)
+    public function getThumbImage($contentEntity, $thumbSlug, $scaleFactor = 1.0, $fullURL = false)
     {
         if (empty($contentEntity)) {
             return null;
@@ -424,7 +424,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             'contentId' => $contentEntity->getId(),
             'thumbSlug' => $thumbSlug,
             'scale' => $scaleFactor
-        ));
+        ), $fullURL);
 
         return $url;
     }

@@ -202,10 +202,10 @@ class ContentQueryService extends BaseService
      * @param ContentEntity $contentEntity
      * @return string|null
      */
-    public function getPublicURL($contentEntity)
+    public function getPublicURL($contentEntity, $full = false)
     {
         $contentClass = $this->cm()->getContentClass($contentEntity->getType(), $contentEntity->getSchema());
-        return $contentClass->getPublicURL($contentEntity);
+        return $contentClass->getPublicURL($contentEntity, $full);
     }
 
 
