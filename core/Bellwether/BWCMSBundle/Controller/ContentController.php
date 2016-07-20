@@ -778,6 +778,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             }
         }
 
+
         $thumb = $this->getThumbService()->open($imageFile)->resize($width, $height);
         $thumbCache = $thumb->cacheFile('guess', 80, true);
         $response = new BinaryFileResponse($thumbCache);
