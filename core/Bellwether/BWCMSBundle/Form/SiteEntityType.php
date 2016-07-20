@@ -43,6 +43,7 @@ class SiteEntityType extends AbstractType
                     'choices' => array(
                         'grey' => 'Grey',
                         'blue' => 'Blue',
+                        'brown' => 'Brown',
                     ),
                 )
             )

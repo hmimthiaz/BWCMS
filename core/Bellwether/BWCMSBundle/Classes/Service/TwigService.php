@@ -144,6 +144,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             'loc' => new \Twig_Function_Method($this, 'getLocale', array('is_safe' => array('html'))),
             'emailLink' => new \Twig_Function_Method($this, 'getEmailLink', array('is_safe' => array('html'))),
             'navLink' => new \Twig_Function_Method($this, 'getNavLink'),
+            'lang' => new \Twig_Function_Method($this, 'getLanguages', array('is_safe' => array('html'))),
             'exit' => new \Twig_Function_Method($this, 'doExit', array('is_safe' => array('html'))),
         );
     }
@@ -184,10 +185,11 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
     }
 
     /**
-     * @param string $template
+     * @param $template
+     * @param null $prefixDomain
      * @return string
      */
-    public function getSkinAsset($template)
+    public function getSkinAsset($template, $prefixDomain = null)
     {
         $skinFolder = $this->getCurrentSkinFolder();
         $returnValue = '/skins/' . strtolower($skinFolder) . '/';
@@ -197,6 +199,10 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         $returnValue .= $template;
         if ($this->getS3SkinEnabled()) {
             $returnValue = $this->getS3SkinURLPrefix() . $returnValue;
+        } else {
+            if (!is_null($prefixDomain)) {
+                $returnValue = $prefixDomain . $returnValue;
+            }
         }
         return $returnValue;
     }
@@ -320,13 +326,13 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      * @param ContentEntity $contentEntity
      * @return null|string
      */
-    public function getContentLink($contentEntity)
+    public function getContentLink($contentEntity, $full = false)
     {
         if (empty($contentEntity)) {
             return null;
         }
 
-        return $this->cq()->getPublicURL($contentEntity);
+        return $this->cq()->getPublicURL($contentEntity, $full);
     }
 
     /**
@@ -381,7 +387,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      * @param float $scaleFactor
      * @return mixed|null|string
      */
-    public function getThumbImage($contentEntity, $thumbSlug, $scaleFactor = 1.0)
+    public function getThumbImage($contentEntity, $thumbSlug, $scaleFactor = 1.0, $fullURL = false)
     {
         if (empty($contentEntity)) {
             return null;
@@ -423,7 +429,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
             'contentId' => $contentEntity->getId(),
             'thumbSlug' => $thumbSlug,
             'scale' => $scaleFactor
-        ));
+        ), $fullURL);
 
         return $url;
     }
@@ -517,6 +523,14 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
         $script = "eval(\"" . str_replace(array("\\", '"'), array("\\\\", '\"'), $script) . "\")";
         $script = '<script type="text/javascript">/*<![CDATA[*/' . $script . '/*]]>*/</script>';
         return '<span id="' . $id . '">[javascript protected email address]</span>' . $script;
+    }
+
+    public function getLanguages($onlyCurrent = false)
+    {
+        if ($onlyCurrent) {
+            return $this->sm()->getCurrentSite();
+        }
+        return $this->sm()->getAllSites();
     }
 
     public function doExit()
