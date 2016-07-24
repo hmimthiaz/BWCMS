@@ -88,7 +88,7 @@ class CacheService extends BaseService
             return;
         }
         $baseURL = $event->getRequest()->getBaseUrl();
-        $pathInfo = $event->getRequest()->getPathInfo();
+        $pathInfo = $event->getRequest()->getRequestUri();
         $pageCacheHash = md5($baseURL . $pathInfo);
         /**
          * @var Response $pageResponse
@@ -112,7 +112,7 @@ class CacheService extends BaseService
         }
         if ($this->cacheCurrentPage) {
             $baseURL = $event->getRequest()->getBaseUrl();
-            $pathInfo = $event->getRequest()->getPathInfo();
+            $pathInfo = $event->getRequest()->getRequestUri();
             $pageCacheHash = md5($baseURL . $pathInfo);
             $this->pageCache->save($pageCacheHash, $event->getResponse(), $this->cachePageLifetime);
             $this->cacheCurrentPage = false;
