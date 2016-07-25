@@ -151,11 +151,15 @@ class MediaFrontEndController extends BaseController implements CachedSiteFrontE
         if (!is_null($lastModified)) {
             $response->setLastModified($lastModified);
         }
+        $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT;
+        if ('image/svg+xml' == $contentMediaEntity->getMime()) {
+            $disposition = ResponseHeaderBag::DISPOSITION_INLINE;
+        }
         $expiresDate = new \DateTime();
         $expiresDate->add(new \DateInterval('P30D'));
         $response->setExpires($expiresDate);
         $response->setContentDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $disposition,
             $contentMediaEntity->getFile() . '.' . $contentMediaEntity->getExtension(),
             iconv('UTF-8', 'ASCII//TRANSLIT', $contentMediaEntity->getFile() . '.' . $contentMediaEntity->getExtension())
         );

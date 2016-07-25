@@ -97,7 +97,7 @@ class MediaService extends BaseService
         }
         $media = $contentEntity->getMedia()->first();
         $imageExtension = array('jpg', 'jpeg', 'jpe', 'gif', 'png');
-        if ('image/' == substr($media->getMime(), 0, 6) || in_array($media->getExtension(), $imageExtension)) {
+        if (('image/' == substr($media->getMime(), 0, 6) && ('image/svg+xml' != $media->getMime())) || in_array($media->getExtension(), $imageExtension)) {
             return true;
         }
         return false;
