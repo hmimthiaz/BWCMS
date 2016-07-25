@@ -617,11 +617,24 @@ class ContentController extends BaseController implements BackEndControllerInter
             }
         }
 
-        $registeredContents = $this->cm()->getRegisteredContentTypes($type, $schema);
         $condition = array();
-        foreach ($registeredContents as $cInfo) {
-            $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
+        if (strpos($schema, '::') !== false) {
+            $searchSchemas = explode('::', $schema);
+            if (!empty($searchSchemas)) {
+                foreach ($searchSchemas as $schemaItem) {
+                    $registeredContents = $this->cm()->getRegisteredContentTypes($type, $schemaItem);
+                    foreach ($registeredContents as $cInfo) {
+                        $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
+                    }
+                }
+            }
+        } else {
+            $registeredContents = $this->cm()->getRegisteredContentTypes($type, $schema);
+            foreach ($registeredContents as $cInfo) {
+                $condition[] = " (node.type = '" . $cInfo['type'] . "' AND node.schema = '" . $cInfo['schema'] . "' )";
+            }
         }
+
         if (!empty($condition)) {
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
