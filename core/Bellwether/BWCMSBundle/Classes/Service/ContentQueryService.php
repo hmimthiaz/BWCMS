@@ -93,7 +93,10 @@ class ContentQueryService extends BaseService
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
         $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
-        $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+        
+        if (!$this->isGranted('ROLE_AUTHOR')) {
+            $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+        }
 
         if ($onlyImage == 'yes') {
             $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentMediaEntity', 'media', \Doctrine\ORM\Query\Expr\Join::WITH, ' node.id = media.content ');
