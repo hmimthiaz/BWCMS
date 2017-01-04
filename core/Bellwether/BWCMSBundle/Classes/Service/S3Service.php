@@ -13,6 +13,7 @@ use Bellwether\BWCMSBundle\Entity\ThumbStyleEntity;
 use Bellwether\BWCMSBundle\Entity\S3QueueEntity;
 use Bellwether\BWCMSBundle\Entity\S3QueueRepository;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class S3Service extends BaseService
 {
@@ -193,6 +194,61 @@ class S3Service extends BaseService
     }
 
     /**
+     * @param string $contentEntity
+     * @return null
+     */
+    public function getUploadFileDownloadLink($filePath)
+    {
+        if (!$this->enabled) {
+            return null;
+        }
+
+        $cdnURL = $this->domainURLPrefix . '/' . $filePath;
+        return $cdnURL;
+    }
+
+    public function uploadFile(UploadedFile $uploadedFile)
+    {
+        $uploadedTempFile = $uploadedFile->getPathname();
+        $originalName = $uploadedFile->getClientOriginalName();
+        $filenameWithoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $originalName);
+        $fileExtension = $uploadedFile->getClientOriginalExtension();
+        $filename = $this->sanitizeFilename($filenameWithoutExt) . '.' . $fileExtension;
+        $mimeType = $uploadedFile->getClientMimeType();
+        $fileSize = $uploadedFile->getSize();
+
+        $uploadDateTime = new \DateTime();
+        $md5string = md5($uploadDateTime->format('Y-m-d H:i:s') . $filename);
+        $s3Key = strtolower('uploads/' . $uploadDateTime->format('Y/m') . '/' . $md5string . '/' . $filename);
+
+
+        $s3client = $this->s3();
+        try {
+            $result = $s3client->putObject([
+                'Bucket' => $this->bucketName,
+                'Key' => $s3Key,
+                'SourceFile' => $uploadedTempFile,
+                'CacheControl' => 'max-age=172800',
+                "Expires" => gmdate("D, d M Y H:i:s T", strtotime("+5 years")),
+                'ContentType' => $mimeType,
+                'ACL' => 'public-read'
+            ]);
+
+            $returnData = array();
+            $returnData['path'] = $s3Key;
+            $returnData['filename'] = $filename;
+            $returnData['mime'] = $mimeType;
+            $returnData['size'] = $fileSize;
+            $returnData['extension'] = $fileExtension;
+            $returnData['dateTime'] = $uploadDateTime;
+
+            return $returnData;
+        } catch (\Aws\Exception\AwsException $e) {
+            return $e;
+        }
+    }
+
+    /**
      * @param S3QueueEntity $s3QueueEntity
      */
     private function processContentItem($s3QueueEntity)
@@ -319,6 +375,59 @@ class S3Service extends BaseService
         }
     }
 
+    private function sanitizeFilename($filename)
+    {
+        $mbStrLen = mb_strlen($filename, 'utf-8');
+        $strLen = strlen($filename);
+        if ($mbStrLen == $strLen) {
+            $cleaned = strtolower($filename);
+        } else {
+            $cleaned = urlencode(mb_strtolower($filename));
+        }
+        $cleaned = preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '', $cleaned);
+        $cleaned = preg_replace("([\.]{2,})", '', $cleaned);
+        $cleaned = preg_replace('/&.+?;/', '', $cleaned);
+        $cleaned = preg_replace('/_/', '-', $cleaned);
+        $cleaned = preg_replace('/\./', '-', $cleaned);
+        $cleaned = preg_replace('/[^a-z0-9\s-.]/i', '', $cleaned);
+        $cleaned = preg_replace('/\s+/', '-', $cleaned);
+        $cleaned = preg_replace('|-+|', '-', $cleaned);
+        $cleaned = trim($cleaned, '-');
+        return $cleaned;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBucketName()
+    {
+        return $this->bucketName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPathPrefix()
+    {
+        return $this->pathPrefix;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDomainURLPrefix()
+    {
+        return $this->domainURLPrefix;
+    }
 
     /**
      * @return S3QueueRepository
