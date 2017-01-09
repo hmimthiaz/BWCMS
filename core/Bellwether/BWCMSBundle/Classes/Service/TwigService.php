@@ -24,7 +24,7 @@ use Bellwether\Common\Pagination;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
-class TwigService extends BaseService implements \Twig_ExtensionInterface
+class TwigService extends BaseService implements \Twig_Extension_InitRuntimeInterface, \Twig_ExtensionInterface, \Twig_Extension_GlobalsInterface
 {
 
     private $factory;
@@ -58,7 +58,7 @@ class TwigService extends BaseService implements \Twig_ExtensionInterface
      */
     public function initRuntime(\Twig_Environment $environment)
     {
-        $this->setEnvironment($environment);
+//        $this->setEnvironment($environment);
     }
 
     /**
