@@ -3,7 +3,8 @@
 namespace Bellwether\BWCMSBundle\Classes\Base;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
@@ -28,8 +29,10 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
-abstract class BaseSkin extends ContainerAware
+abstract class BaseSkin implements ContainerAwareInterface
 {
+
+    use ContainerAwareTrait;
 
     private $thumbStyles = null;
 

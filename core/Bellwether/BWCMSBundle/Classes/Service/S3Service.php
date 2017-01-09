@@ -210,11 +210,11 @@ class S3Service extends BaseService
     public function uploadFile(UploadedFile $uploadedFile)
     {
         $uploadedTempFile = $uploadedFile->getPathname();
-        $originalName = $uploadedFile->getClientOriginalName();
+        $originalName = $uploadedFile->getFilename();
         $filenameWithoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $originalName);
-        $fileExtension = $uploadedFile->getClientOriginalExtension();
+        $fileExtension = $uploadedFile->getExtension();
         $filename = $this->sanitizeFilename($filenameWithoutExt) . '.' . $fileExtension;
-        $mimeType = $uploadedFile->getClientMimeType();
+        $mimeType = $uploadedFile->getMimeType();
         $fileSize = $uploadedFile->getSize();
 
         $uploadDateTime = new \DateTime();

@@ -2,7 +2,8 @@
 
 namespace Bellwether\BWCMSBundle\Classes\Base;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
@@ -28,8 +29,10 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
-abstract class BaseService  extends ContainerAware
+abstract class BaseService  implements ContainerAwareInterface
 {
+
+    use ContainerAwareTrait;
 
     private $path;
 
