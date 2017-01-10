@@ -58,7 +58,7 @@ class TwigService extends BaseService implements \Twig_Extension_InitRuntimeInte
      */
     public function initRuntime(\Twig_Environment $environment)
     {
-//        $this->setEnvironment($environment);
+        $this->setEnvironment($environment);
     }
 
     /**
