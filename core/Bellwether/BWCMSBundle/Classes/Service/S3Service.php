@@ -212,7 +212,7 @@ class S3Service extends BaseService
         $uploadedTempFile = $uploadedFile->getPathname();
         $originalName = $uploadedFile->getClientOriginalName();
         $filenameWithoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $originalName);
-        $fileExtension = $uploadedFile->getExtension();
+        $fileExtension = $uploadedFile->getClientOriginalExtension();
         $filename = $this->sanitizeFilename($filenameWithoutExt) . '.' . $fileExtension;
         $mimeType = $uploadedFile->getClientMimeType();
         $fileSize = $uploadedFile->getSize();
