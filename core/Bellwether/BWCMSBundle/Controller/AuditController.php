@@ -57,6 +57,9 @@ class AuditController extends BaseController implements BackEndControllerInterfa
 //            }
 //        }
 
+        $qb->andWhere($qb->expr()->gte('a.logDate', ':date_until_from'));
+        $qb->setParameter(':date_until_from', date("Y-m-d", strtotime("-2 month")) . ' 00:00:00');
+
         $qb->add('orderBy', 'a.logDate DESC');
         $qb->setFirstResult($start);
         $qb->setMaxResults($limit);
