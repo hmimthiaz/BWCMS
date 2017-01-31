@@ -42,7 +42,9 @@ class ACLService extends BaseService
             foreach ($roles as $role) {
                 $roleName = str_replace('_', ' ', $role);
                 $roleName = ucwords(strtolower($roleName));
-                $this->roles[$role] = $roleName;
+                if ($this->container->get('security.context')->isGranted($role)) {
+                    $this->roles[$role] = $roleName;
+                }
             }
         }
         return $this->roles;

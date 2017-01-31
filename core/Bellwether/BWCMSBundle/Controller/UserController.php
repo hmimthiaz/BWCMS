@@ -186,6 +186,14 @@ class UserController extends BaseController implements BackEndControllerInterfac
         if (empty($existingUser)) {
             throw $this->createNotFoundException('Unable to find user entity.');
         }
+
+        $existingUserRoles = $existingUser->getRoles();
+        foreach ($existingUserRoles as $eRole) {
+            if (!$this->container->get('security.context')->isGranted($eRole)) {
+                throw $this->createAccessDeniedException('You cannot edit user with more privileges.');
+            }
+        }
+
         $roles = $this->acl()->getRoles();
         $form = $this->createForm(new EditType($roles, $existingUser), null, array(
             'action' => $this->generateUrl('_bwcms_admin_user_edit', array('id' => $userId)),
@@ -260,6 +268,13 @@ class UserController extends BaseController implements BackEndControllerInterfac
         $existingUser = $userRepo->find($userId);
         if (empty($existingUser)) {
             throw $this->createNotFoundException('Unable to find user entity.');
+        }
+
+        $existingUserRoles = $existingUser->getRoles();
+        foreach ($existingUserRoles as $eRole) {
+            if (!$this->container->get('security.context')->isGranted($eRole)) {
+                throw $this->createAccessDeniedException('You cannot edit user with more privileges.');
+            }
         }
 
         $tokenGenerator = $this->container->get('fos_user.util.token_generator');
