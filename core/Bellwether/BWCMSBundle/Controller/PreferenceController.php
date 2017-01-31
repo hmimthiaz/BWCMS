@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @Route("/admin/preference")
  * @Security("has_role('ROLE_AUTHOR')")
  */
-class PreferenceController extends BaseController  implements BackEndControllerInterface
+class PreferenceController extends BaseController implements BackEndControllerInterface
 {
     /**
      * @Route("/{type}/index.php",name="_bwcms_admin_preference_page")
@@ -56,6 +56,7 @@ class PreferenceController extends BaseController  implements BackEndControllerI
         $form->handleRequest($request);
         if ($form->isValid()) {
             $this->pref()->saveFormData($form, $preferenceClass);
+            $this->addSuccessFlash("Updated: ". $preferenceClass->getName());
             return $this->redirect($this->generateUrl('_bwcms_admin_preference_page', array('type' => $type)));
         }
 

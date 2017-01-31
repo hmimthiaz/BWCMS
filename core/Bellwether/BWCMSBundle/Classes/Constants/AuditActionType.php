@@ -34,6 +34,8 @@ class AuditActionType
 
     const Verify = 'AA.Verify';
 
+    const Upload = 'AA.Upload';
+
 
     public static function getList()
     {
@@ -52,7 +54,8 @@ class AuditActionType
                 self::Reject,
                 self::Send,
                 self::Sync,
-                self::Verify
+                self::Verify,
+                self::Upload
             );
         }
         return $list;
