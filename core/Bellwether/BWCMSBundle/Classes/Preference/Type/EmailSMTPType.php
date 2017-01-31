@@ -90,6 +90,12 @@ class EmailSMTPType Extends PreferenceType
         );
     }
 
+    public function getAccessLevel()
+    {
+        return 'ROLE_ADMIN';
+    }
+
+
     function validateForm(FormEvent $event)
     {
 
