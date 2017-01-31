@@ -313,6 +313,8 @@ class PreferenceService extends BaseService
                     continue;
                 }
 
+                $oldValue = $preferenceEntity->getValue();
+
                 if ($fieldType == PreferenceFieldType::String || $fieldType == PreferenceFieldType::Number) {
                     $preferenceEntity->setValue($fieldValue);
                 }
@@ -336,13 +338,18 @@ class PreferenceService extends BaseService
                     $serializedString = $this->getSerializer()->serialize($cleanedData, 'json');
                     $preferenceEntity->setValue($serializedString);
                 }
+
+                $newValue = $preferenceEntity->getValue();
+
                 $this->em()->persist($preferenceEntity);
                 $this->em()->flush();
 
                 if ($action == 'NEW') {
                     $this->admin()->addAudit(AuditLevelType::Normal, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Add, $preferenceEntity->getId(), 'Added: ' . $preferenceEntity->getField());
                 } else if ($action == 'UPDATE') {
-                    $this->admin()->addAudit(AuditLevelType::Normal, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Edit, $preferenceEntity->getId(), 'Edited: ' . $preferenceEntity->getField());
+                    if ($oldValue != $newValue) {
+                        $this->admin()->addAudit(AuditLevelType::Normal, 'Pref::' . $classInstance->getType() . '::' . $preferenceEntity->getField(), AuditActionType::Edit, $preferenceEntity->getId(), 'Edited: ' . $preferenceEntity->getField());
+                    }
                 }
             }
         }
