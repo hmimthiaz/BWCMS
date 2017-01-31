@@ -26,6 +26,10 @@ class PreferenceController extends BaseController  implements BackEndControllerI
     public function loadAction($type)
     {
         $preferenceClass = $this->pref()->getPreferenceClass($type);
+
+        $accessLevel = $preferenceClass->getAccessLevel();
+        $this->denyAccessUnlessGranted($accessLevel);
+
         $form = $preferenceClass->getForm();
         $form = $this->pref()->loadFormData($form, $preferenceClass);
 
@@ -44,6 +48,10 @@ class PreferenceController extends BaseController  implements BackEndControllerI
     {
 
         $preferenceClass = $this->pref()->getPreferenceClass($type);
+
+        $accessLevel = $preferenceClass->getAccessLevel();
+        $this->denyAccessUnlessGranted($accessLevel);
+
         $form = $preferenceClass->getForm();
         $form->handleRequest($request);
         if ($form->isValid()) {

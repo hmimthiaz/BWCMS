@@ -227,10 +227,10 @@ class AdminService extends BaseService
 
         }
 
-        if ($this->isGranted('ROLE_PREFERENCE')) {
+        if ($this->isGranted('ROLE_AUTHOR')) {
             foreach ($registeredOptionTypes as $optionType) {
                 $classInstance = $optionType['class'];
-                if (!$classInstance->isPagePreference()) {
+                if (!$classInstance->isPagePreference() && $this->isGranted($classInstance->getAccessLevel())) {
                     if (!isset($menu['Preference'])) {
                         $menu->addChild('Preference', array('uri' => '#', 'label' => 'Preference'))->setAttribute('dropdown', true);
                     }

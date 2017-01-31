@@ -171,6 +171,11 @@ abstract class PreferenceType implements PreferenceTypeInterface
         ));
     }
 
+    public function getAccessLevel()
+    {
+        return 'ROLE_AUTHOR';
+    }
+
     /**
      * @return boolean
      */
