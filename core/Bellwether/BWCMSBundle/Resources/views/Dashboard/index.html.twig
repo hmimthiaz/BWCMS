@@ -2,9 +2,55 @@
 
 {% block title %}Dashboard{% endblock %}
 {% block pageTitle %}
-    <h1>Dashboard</h1>
-    {% endblock %}
+    <h1>Welcome {{ user.firstname }}</h1>
+{% endblock %}
 
 {% block body %}
+
+    <div class="row">
+
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Info</div>
+                <div class="panel-body">
+                    <strong>Date:</strong> {{ "now" |date("F jS,  g:ia") }} <br />
+                    <strong>IP:</strong> {{ app.request.server.get('REMOTE_ADDR') }}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-8">
+
+            <div id="quoteSection" style="display: none;">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Quote of the day</div>
+                    <div class="panel-body" id="quoteSectionContent">Panel content</div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <script language="JavaScript">
+        $(document).ready(function () {
+            $.ajax({
+                url: "http://api.forismatic.com/api/1.0/",
+                jsonp: "jsonp",
+                dataType: "jsonp",
+                data: {
+                    method: "getQuote",
+                    lang: "en",
+                    format: "jsonp"
+                }
+            }).done(function(response){
+                $('#quoteSectionContent').text(response.quoteText + ' - ' + response.quoteAuthor);
+                $('#quoteSection').fadeIn();
+            }).fail(function(jqxhr, textStatus, err){
+                console.log("Request Failed: " + textStatus + ", " + err);
+            });
+        });
+
+    </script>
 
 {% endblock %}
