@@ -14,7 +14,6 @@ use Bellwether\BWCMSBundle\Classes\Constants\ContentPublishType;
 
 
 use AppKernel;
-use Symfony\Component\Validator\Constraints\True;
 
 /**
  * Dashboard controller.

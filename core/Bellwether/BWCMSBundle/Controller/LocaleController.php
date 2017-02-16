@@ -18,7 +18,6 @@ use Bellwether\BWCMSBundle\Entity\LocaleEntity;
 
 use Bellwether\Common\Pagination;
 use Liuggio\ExcelBundle\Factory;
-use Symfony\Component\Validator\Constraints\True;
 
 /**
  * LocaleEntity controller.
