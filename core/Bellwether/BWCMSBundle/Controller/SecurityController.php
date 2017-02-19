@@ -47,7 +47,7 @@ class SecurityController extends BaseController implements BackEndControllerInte
         // last username entered by the user
         $lastUsername = (null === $session) ? '' : $session->get(Security::LAST_USERNAME);
 
-        $csrfToken = $this->container->get('security.csrf.token_manager')->generateCsrfToken('authenticate');
+        $csrfToken = $this->container->get('form.csrf_provider')->generateCsrfToken('authenticate');
 
         $template = $this->tp()->getCurrentSkin()->getLoginTemplate();
 
