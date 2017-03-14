@@ -28,6 +28,7 @@ class Configuration implements ConfigurationInterface
                     ->integerNode('maxUploadSize')->defaultValue(1048576 * 3)->end()
                     ->integerNode('maxUploadImageSize')->defaultValue(1048576 * 3)->end()
                     ->scalarNode('blockedExtension')->defaultValue('dll,bat,pl,bin,exe,sh,php')->end()
+                    ->scalarNode('transport')->defaultValue('s3')->end()
                     ->booleanNode('s3Enabled')->defaultValue(false)->end()
                     ->scalarNode('s3Prefix')->defaultValue('a1b2c3d4e6')->end()
                     ->scalarNode('s3Bucket')->defaultValue(null)->end()

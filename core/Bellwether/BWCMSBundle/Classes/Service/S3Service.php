@@ -22,6 +22,7 @@ class S3Service extends BaseService
     private $bucketName;
     private $pathPrefix;
     private $domainURLPrefix;
+    private $transport;
 
     function __construct(ContainerInterface $container = null, RequestStack $request_stack = null)
     {
@@ -47,6 +48,7 @@ class S3Service extends BaseService
             $this->bucketName = $this->container->getParameter('media.s3Bucket');
             $this->pathPrefix = $this->container->getParameter('media.s3Prefix');
             $this->domainURLPrefix = $this->container->getParameter('media.s3DomainURLPrefix');
+            $this->transport = $this->container->getParameter('media.transport');
         }
         $this->loaded = true;
     }
