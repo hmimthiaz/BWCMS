@@ -12,6 +12,7 @@ use Bellwether\BWCMSBundle\Entity\ContentEntity;
 use Bellwether\BWCMSBundle\Entity\ThumbStyleEntity;
 use Bellwether\BWCMSBundle\Entity\S3QueueEntity;
 use Bellwether\BWCMSBundle\Entity\S3QueueRepository;
+use Bellwether\BWCMSBundle\Classes\Service\MediaService;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -45,10 +46,15 @@ class S3Service extends BaseService
     {
         if (!$this->loaded) {
             $this->enabled = (bool)$this->container->getParameter('media.s3Enabled');
+            $this->transport = strtolower($this->container->getParameter('media.transport'));
             $this->bucketName = $this->container->getParameter('media.s3Bucket');
-            $this->pathPrefix = $this->container->getParameter('media.s3Prefix');
+            if ('local' == $this->transport) {
+                $this->pathPrefix = $this->mm()->getWebPath();
+            }
+            if ('s3' == $this->transport) {
+                $this->pathPrefix = $this->container->getParameter('media.s3Prefix');
+            }
             $this->domainURLPrefix = $this->container->getParameter('media.s3DomainURLPrefix');
-            $this->transport = $this->container->getParameter('media.transport');
         }
         $this->loaded = true;
     }
@@ -223,7 +229,6 @@ class S3Service extends BaseService
         $md5string = md5($uploadDateTime->format('Y-m-d H:i:s') . $filename);
         $s3Key = strtolower('uploads/' . $uploadDateTime->format('Y/m') . '/' . $md5string . '/' . $filename);
 
-
         $s3client = $this->s3();
         try {
             $result = $s3client->putObject([
@@ -268,33 +273,61 @@ class S3Service extends BaseService
         $uploadDateTime = new \DateTime();
         $filename = $contentMediaEntity->getFile() . '.' . $contentMediaEntity->getExtension();
         $md5string = md5($uploadDateTime->format('Y-m-d H:i:s') . '(' . $contentMediaEntity->getId() . ')');
+        $md5string = $this->getHashPath($md5string);
         $path = '/' . $siteEntity->getSlug() . '/media/' . $md5string . '/' . $filename;
         $s3Key = strtolower($this->pathPrefix . $path);
 
-        $s3client = $this->s3();
-        try {
-            $result = $s3client->putObject([
-                'Bucket' => $this->bucketName,
-                'Key' => $s3Key,
-                'SourceFile' => $cacheFilename,
-                'CacheControl' => 'max-age=172800',
-                "Expires" => gmdate("D, d M Y H:i:s T", strtotime("+5 years")),
-                'ContentType' => $contentMediaEntity->getMime(),
-                'ACL' => 'public-read'
-            ]);
+        if ('local' == $this->transport) {
 
-            $s3QueueEntity->setPrefix($this->pathPrefix);
-            $s3QueueEntity->setPath($s3Key);
-            $s3QueueEntity->setUploadedDate($uploadDateTime);
-            $s3QueueEntity->setStatus('Done');
-            $this->em()->persist($s3QueueEntity);
-            $this->em()->flush();
-            return;
-        } catch (\Aws\Exception\AwsException $e) {
-            $s3QueueEntity->setStatus('Error');
-            $this->em()->persist($s3QueueEntity);
-            $this->em()->flush();
-            return;
+            $localClient = $this->mm()->getFs();
+            try {
+                $mediaRoot = $this->mm()->getWebRoot();
+                $destinationFile = $mediaRoot . DIRECTORY_SEPARATOR . $s3Key;
+                $destinationDir = dirname($destinationFile);
+                $localClient->mkdir($destinationDir, 0755);
+                $localClient->copy($cacheFilename, $destinationFile);
+
+                $s3QueueEntity->setPrefix($this->pathPrefix);
+                $s3QueueEntity->setPath($s3Key);
+                $s3QueueEntity->setUploadedDate($uploadDateTime);
+                $s3QueueEntity->setStatus('Done');
+                $this->em()->persist($s3QueueEntity);
+                $this->em()->flush();
+                return;
+            } catch (\Symfony\Component\Filesystem\Exception\IOException $e) {
+                $s3QueueEntity->setStatus('Error');
+                $this->em()->persist($s3QueueEntity);
+                $this->em()->flush();
+                return;
+            }
+        }
+
+        if ('s3' == $this->transport) {
+            $s3client = $this->s3();
+            try {
+                $result = $s3client->putObject([
+                    'Bucket' => $this->bucketName,
+                    'Key' => $s3Key,
+                    'SourceFile' => $cacheFilename,
+                    'CacheControl' => 'max-age=172800',
+                    "Expires" => gmdate("D, d M Y H:i:s T", strtotime("+5 years")),
+                    'ContentType' => $contentMediaEntity->getMime(),
+                    'ACL' => 'public-read'
+                ]);
+
+                $s3QueueEntity->setPrefix($this->pathPrefix);
+                $s3QueueEntity->setPath($s3Key);
+                $s3QueueEntity->setUploadedDate($uploadDateTime);
+                $s3QueueEntity->setStatus('Done');
+                $this->em()->persist($s3QueueEntity);
+                $this->em()->flush();
+                return;
+            } catch (\Aws\Exception\AwsException $e) {
+                $s3QueueEntity->setStatus('Error');
+                $this->em()->persist($s3QueueEntity);
+                $this->em()->flush();
+                return;
+            }
         }
     }
 
@@ -343,37 +376,64 @@ class S3Service extends BaseService
         }
 
         $thumbCacheFile = $thumb->cacheFile('guess', $thumbEntity->getQuality(), true);
-
         $uploadDateTime = new \DateTime();
         $filename = $contentMediaEntity->getId() . '.' . $contentMediaEntity->getExtension();
         $md5string = md5($uploadDateTime->format('Y-m-d H:i:s') . '(' . $thumbEntity->getId() . ')(' . $scale . ')(' . $thumbEntity->getMode() . ')(' . $thumbEntity->getWidth() . ')(' . $thumbEntity->getHeight() . ')');
+        $md5string = $this->getHashPath($md5string);
         $path = '/' . $siteEntity->getSlug() . '/thumb/' . $md5string . '/' . $filename;
         $s3Key = strtolower($this->pathPrefix . $path);
 
-        $s3client = $this->s3();
-        try {
-            $result = $s3client->putObject([
-                'Bucket' => $this->bucketName,
-                'Key' => $s3Key,
-                'SourceFile' => $thumbCacheFile,
-                'CacheControl' => 'max-age=172800',
-                "Expires" => gmdate("D, d M Y H:i:s T", strtotime("+5 years")),
-                'ContentType' => $contentMediaEntity->getMime(),
-                'ACL' => 'public-read'
-            ]);
+        if ('local' == $this->transport) {
 
-            $s3QueueEntity->setPrefix($this->pathPrefix);
-            $s3QueueEntity->setPath($s3Key);
-            $s3QueueEntity->setUploadedDate($uploadDateTime);
-            $s3QueueEntity->setStatus('Done');
-            $this->em()->persist($s3QueueEntity);
-            $this->em()->flush();
-            return;
-        } catch (\Aws\Exception\AwsException $e) {
-            $s3QueueEntity->setStatus('Error');
-            $this->em()->persist($s3QueueEntity);
-            $this->em()->flush();
-            return;
+            $localClient = $this->mm()->getFs();
+            try {
+                $mediaRoot = $this->mm()->getWebRoot();
+                $destinationFile = $mediaRoot . DIRECTORY_SEPARATOR . $s3Key;
+                $destinationDir = dirname($destinationFile);
+                $localClient->mkdir($destinationDir, 0755);
+                $localClient->copy($thumbCacheFile, $destinationFile);
+
+                $s3QueueEntity->setPrefix($this->pathPrefix);
+                $s3QueueEntity->setPath($s3Key);
+                $s3QueueEntity->setUploadedDate($uploadDateTime);
+                $s3QueueEntity->setStatus('Done');
+                $this->em()->persist($s3QueueEntity);
+                $this->em()->flush();
+                return;
+            } catch (\Symfony\Component\Filesystem\Exception\IOException $e) {
+                $s3QueueEntity->setStatus('Error');
+                $this->em()->persist($s3QueueEntity);
+                $this->em()->flush();
+                return;
+            }
+        }
+
+        if ('s3' == $this->transport) {
+            $s3client = $this->s3();
+            try {
+                $result = $s3client->putObject([
+                    'Bucket' => $this->bucketName,
+                    'Key' => $s3Key,
+                    'SourceFile' => $thumbCacheFile,
+                    'CacheControl' => 'max-age=172800',
+                    "Expires" => gmdate("D, d M Y H:i:s T", strtotime("+5 years")),
+                    'ContentType' => $contentMediaEntity->getMime(),
+                    'ACL' => 'public-read'
+                ]);
+
+                $s3QueueEntity->setPrefix($this->pathPrefix);
+                $s3QueueEntity->setPath($s3Key);
+                $s3QueueEntity->setUploadedDate($uploadDateTime);
+                $s3QueueEntity->setStatus('Done');
+                $this->em()->persist($s3QueueEntity);
+                $this->em()->flush();
+                return;
+            } catch (\Aws\Exception\AwsException $e) {
+                $s3QueueEntity->setStatus('Error');
+                $this->em()->persist($s3QueueEntity);
+                $this->em()->flush();
+                return;
+            }
         }
     }
 
@@ -398,6 +458,14 @@ class S3Service extends BaseService
         return $cleaned;
     }
 
+    public function getHashPath($folderHash)
+    {
+        $folderName = array();
+        for ($index = 2; $index <= 4; $index++) {
+            $folderName[] = substr($folderHash, $index, $index);
+        }
+        return implode(DIRECTORY_SEPARATOR, $folderName);
+    }
 
     /**
      * @return mixed
@@ -447,5 +515,14 @@ class S3Service extends BaseService
     {
         return $this->container->get('aws.s3');
     }
+
+    /**
+     * @return MediaService
+     */
+    public function mm()
+    {
+        return $this->container->get('BWCMS.Media')->getManager();
+    }
+
 
 }

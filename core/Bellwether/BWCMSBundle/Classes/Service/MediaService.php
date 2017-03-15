@@ -416,5 +416,20 @@ class MediaService extends BaseService
         return $this->webRoot;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getWebPath()
+    {
+        return $this->webPath;
+    }
+
+    /**
+     * @return Filesystem
+     */
+    public function getFs()
+    {
+        return $this->fs;
+    }
 
 }
