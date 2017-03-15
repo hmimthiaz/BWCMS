@@ -526,3 +526,35 @@ class S3Service extends BaseService
 
 
 }
+
+
+/*
+ *
+ *
+ *         $content = $pageEntity->getContent();
+
+
+        preg_match_all("%(?<=src=\")([^\"])+(php)%i", $content, $matches);
+
+        $imageURLS = array();
+        if (isset($matches[0])) {
+            $imageURLS = $matches[0];
+
+            foreach ($imageURLS as $imageURL) {
+
+                $segments = explode('/', ltrim($imageURL, '/'));
+                if (count($segments) == 4) {
+                    list($lang, $slug, $contentId, $tail) = $segments;
+                    $contentEntity = $this->cm()->getContentRepository()->find($contentId);
+                    $url = $this->s3Service()->getImage($contentEntity);
+                }
+            }
+        }
+
+
+        exit;
+
+ *
+ *
+ *
+ */
