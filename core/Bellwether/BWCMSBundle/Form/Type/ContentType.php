@@ -54,6 +54,9 @@ class ContentType extends AbstractType
         if (isset($options['onlyImage']) && $options['onlyImage'] === true) {
             $browserURLOptions['onlyImage'] = 'true';
         }
+        if (isset($options['extension']) && !empty($options['extension'])) {
+            $browserURLOptions['extension'] = $options['extension'];
+        }
         $view->vars['browserURL'] = $this->generateUrl('_bwcms_admin_content_browser', $browserURLOptions, true);
     }
 
@@ -64,6 +67,7 @@ class ContentType extends AbstractType
             'schema' => false,
             'onlyImage' => false,
             'required' => false,
+            'extension' => false,
             'compound' => false,
         ));
     }

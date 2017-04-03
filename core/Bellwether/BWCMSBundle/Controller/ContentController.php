@@ -420,6 +420,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         $parentId = $request->get('parent', 'Root');
         $holder = $request->get('holder', '');
         $schema = $request->get('schema', '');
+        $extension = $request->get('extension', '');
         $onlyImage = $request->get('onlyImage');
         $selectedContentId = $request->get('selectedContentId', null);
 
@@ -454,6 +455,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
         $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");
+        $qb->add('orderBy', 'node.title ASC');
 
         $rootFolders = $qb->getQuery()->getResult();
 
@@ -496,6 +498,7 @@ class ContentController extends BaseController implements BackEndControllerInter
             'holder' => $holder,
             'type' => $type,
             'onlyImage' => $onlyImage,
+            'extension' => $extension,
             'schema' => $schema,
             'selectContentPath' => $selectContentPath,
             'contentTypes' => $this->cm()->getRegisteredContentTypes(),
@@ -578,6 +581,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         $onlyImage = strtolower($request->get('onlyImage', 'no'));
         $imageURL = $request->get('imageURL', false);
         $isEditor = $request->get('editor', false);
+        $extension = $request->get('extension', '');
 
 
         $search = $request->get('search');
@@ -660,6 +664,14 @@ class ContentController extends BaseController implements BackEndControllerInter
             $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentMediaEntity', 'media', \Doctrine\ORM\Query\Expr\Join::WITH, ' node.id = media.content ');
             $qb->andWhere(" ( media.height > 0 AND media.width > 0 ) ");
         }
+
+        if (!empty($extension)) {
+            if ($onlyImage != 'yes') {
+                $qb->leftJoin('Bellwether\BWCMSBundle\Entity\ContentMediaEntity', 'media', \Doctrine\ORM\Query\Expr\Join::WITH, ' node.id = media.content ');
+            }
+            $qb->andWhere(" ( media.extension = '" . strtolower($extension) . "' ) ");
+        }
+
 
         $result = $qb->getQuery()->getResult();
 
