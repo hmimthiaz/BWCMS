@@ -112,6 +112,20 @@ class AdminService extends BaseService
             }
         }
 
+        $currentSkinClass = $this->tp()->getCurrentSkin();
+        if (!is_null($currentSkinClass)) {
+            $landingPages = $currentSkinClass->getNavigationRoutes();
+            if (count($landingPages) > 0) {
+                $menu['Site']->addChild('-', array('uri' => '#'))->setAttribute('divider', true);
+                foreach ($landingPages as $landingPageRoute => $landingPageText) {
+                    $menu['Site']->addChild($landingPageText, array(
+                        'route' => $landingPageRoute,
+                        'routeParameters' => array('siteSlug' => $currentSite->getSlug())
+                    ))->setLinkAttributes(array('target' => '_blank'));
+                }
+            }
+        }
+
         $displayName = $this->getUser()->getFirstName();
         if (empty($displayName)) {
             $displayName = $this->getUser()->getEmail();
