@@ -583,6 +583,7 @@ class ContentController extends BaseController implements BackEndControllerInter
         $isEditor = $request->get('editor', false);
         $extension = $request->get('extension', '');
 
+        set_time_limit(0);
 
         $search = $request->get('search');
         $searchString = null;
