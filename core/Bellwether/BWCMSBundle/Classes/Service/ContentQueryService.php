@@ -93,7 +93,7 @@ class ContentQueryService extends BaseService
             $qb->andWhere(' ( ' . implode(' OR ', $condition) . ' ) ');
         }
         $qb->andWhere(" node.site ='" . $this->sm()->getCurrentSite()->getId() . "' ");
-        
+
         if (!$this->isGranted('ROLE_AUTHOR')) {
             $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
         }
@@ -167,11 +167,13 @@ class ContentQueryService extends BaseService
      * @param ContentEntity $contentEntity
      * @return array
      */
-    public function getContentMenuItems($contentEntity)
+    public function getContentMenuItems($contentEntity, $onlyPublished = true)
     {
         $contentRepository = $this->cm()->getContentRepository();
         $qb = $contentRepository->getChildrenQueryBuilder($contentEntity, false);
-        $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+        if ($onlyPublished) {
+            $qb->andWhere(" node.status ='" . ContentPublishType::Published . "' ");
+        }
         $result = $qb->getQuery()->getResult();
         return $result;
     }
