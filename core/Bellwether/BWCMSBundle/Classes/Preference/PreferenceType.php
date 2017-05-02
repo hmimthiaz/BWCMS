@@ -93,6 +93,7 @@ abstract class PreferenceType implements PreferenceTypeInterface
                 $this->addField('pageTitle', PreferenceFieldType::String);
                 $this->addField('pageDescription', PreferenceFieldType::String);
                 $this->addField('pageKeywords', PreferenceFieldType::String);
+                $this->addField('openGraphImage', PreferenceFieldType::Content);
             }
         }
         return $this->fields;
@@ -162,6 +163,17 @@ abstract class PreferenceType implements PreferenceTypeInterface
                     'attr' => array(
                         'dir' => $this->sm()->getAdminCurrentSite()->getDirection()
                     )
+                )
+            );
+
+            $this->fb()->add('openGraphImage', 'bwcms_content',
+                array(
+                    'label' => 'Open Graph Image',
+                    'contentType' => 'Media',
+                    'schema' => 'File',
+                    'onlyImage' => true,
+                    'required' => false,
+                    'constraints' => array()
                 )
             );
         }

@@ -323,6 +323,7 @@ abstract class ContentType implements ContentTypeInterface
                 $this->addField('pageTitle', ContentFieldType::String, $this->isIndexed());
                 $this->addField('pageDescription', ContentFieldType::String, $this->isIndexed());
                 $this->addField('pageKeywords', ContentFieldType::String, $this->isIndexed());
+                $this->addField('openGraphImage', ContentFieldType::Content, false);
             }
             $this->buildFields();
         }
@@ -637,6 +638,19 @@ abstract class ContentType implements ContentTypeInterface
                     )
                 )
             );
+
+            $this->fb()->add('openGraphImage', 'bwcms_content',
+                array(
+                    'label' => 'Open Graph Image',
+                    'contentType' => 'Media',
+                    'schema' => 'File',
+                    'onlyImage' => true,
+                    'required' => false,
+                    'constraints' => array()
+                )
+            );
+
+
         }
 
         if ($isEditMode && $this->isHierarchy() && $this->isSortEnabled()) {
