@@ -100,6 +100,7 @@ abstract class BaseSkin implements ContainerAwareInterface
     public function getThumbStyleDefault($thumbSlug)
     {
         if (is_null($this->thumbStyles)) {
+            $this->addThumbStyleDefault('openGraphImageThumb', 'openGraphImageThumb', 'zoomCrop', 1200, 630);
             $this->initDefaultThumbStyles();
         }
         if (!isset($this->thumbStyles[$thumbSlug])) {
