@@ -641,7 +641,7 @@ abstract class ContentType implements ContentTypeInterface
 
             $this->fb()->add('openGraphImage', 'bwcms_content',
                 array(
-                    'label' => 'Open Graph Image',
+                    'label' => 'Social Share Image',
                     'contentType' => 'Media',
                     'schema' => 'File',
                     'onlyImage' => true,
