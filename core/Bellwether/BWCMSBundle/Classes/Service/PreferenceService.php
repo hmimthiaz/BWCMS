@@ -87,6 +87,20 @@ class PreferenceService extends BaseService
         return $retVal;
     }
 
+    public function getIndexedPreferenceTypes()
+    {
+        $returnValue = array();
+        $prefTypes = $this->getRegisteredOptionTypes();
+        if (!empty($prefTypes)) {
+            foreach ($prefTypes as $key => $type) {
+                if ($type['class']->isIndexed()) {
+                    $returnValue[$key] = $type;
+                }
+            }
+        }
+        return $returnValue;
+    }
+
     /**
      * @param string $type
      * @return PreferenceType

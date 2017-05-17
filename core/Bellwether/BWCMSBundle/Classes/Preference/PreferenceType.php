@@ -1,4 +1,5 @@
 <?php
+
 namespace Bellwether\BWCMSBundle\Classes\Preference;
 
 use Bellwether\BWCMSBundle\Classes\Base\PreferenceTypeInterface;
@@ -61,6 +62,10 @@ abstract class PreferenceType implements PreferenceTypeInterface
      */
     private $isSeoFieldsEnabled = false;
 
+    /**
+     * @var bool
+     */
+    private $isIndexed = false;
 
     /**
      * @return FormBuilder
@@ -75,12 +80,13 @@ abstract class PreferenceType implements PreferenceTypeInterface
         return $this->formBuilder;
     }
 
-    final public function addField($fieldName, $type, $global = false)
+    final public function addField($fieldName, $type, $global = false, $isIndex = false)
     {
         $this->fields[$fieldName] = array(
             'name' => $fieldName,
             'type' => $type,
-            'global' => $global
+            'global' => $global,
+            'isIndex' => $isIndex
         );
     }
 
@@ -90,9 +96,9 @@ abstract class PreferenceType implements PreferenceTypeInterface
             $this->fields = array();
             $this->buildFields();
             if ($this->isSeoFieldsEnabled()) {
-                $this->addField('pageTitle', PreferenceFieldType::String);
-                $this->addField('pageDescription', PreferenceFieldType::String);
-                $this->addField('pageKeywords', PreferenceFieldType::String);
+                $this->addField('pageTitle', PreferenceFieldType::String, false, $this->isIndexed);
+                $this->addField('pageDescription', PreferenceFieldType::String, false, $this->isIndexed);
+                $this->addField('pageKeywords', PreferenceFieldType::String, false, $this->isIndexed);
                 $this->addField('openGraphImage', PreferenceFieldType::Content);
             }
         }
@@ -131,6 +137,10 @@ abstract class PreferenceType implements PreferenceTypeInterface
     public function loadCustomField($fieldName, $fieldValue)
     {
         return $fieldValue;
+    }
+
+    public function getPublicURL($full = false){
+        return null;
     }
 
     private function setDefaultHiddenFormFields()
@@ -186,6 +196,20 @@ abstract class PreferenceType implements PreferenceTypeInterface
     public function getAccessLevel()
     {
         return 'ROLE_AUTHOR';
+    }
+
+    public function getAllStringFields()
+    {
+        $returnValues = array();
+        $fields = $this->getFields();
+        if (!empty($fields)) {
+            foreach ($fields as $field) {
+                if ($field['type'] == PreferenceFieldType::String) {
+                    $returnValues[$field['name']] = $field;
+                }
+            }
+        }
+        return $returnValues;
     }
 
     /**
@@ -266,6 +290,22 @@ abstract class PreferenceType implements PreferenceTypeInterface
     public function setIsSeoFieldsEnabled($isSeoFieldsEnabled)
     {
         $this->isSeoFieldsEnabled = $isSeoFieldsEnabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIndexed()
+    {
+        return $this->isIndexed;
+    }
+
+    /**
+     * @param bool $isIndexed
+     */
+    public function setIsIndexed($isIndexed)
+    {
+        $this->isIndexed = $isIndexed;
     }
 
     /**
