@@ -50,7 +50,7 @@ class GenericSkin extends BaseSkin
     public function getNavigationRoutes()
     {
         $routes = array();
-        $routes['home'] = 'Language Home';
+        //$routes['home'] = 'Language Home';
         return $routes;
     }
 
