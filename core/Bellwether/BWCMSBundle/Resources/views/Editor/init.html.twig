@@ -9,8 +9,10 @@ tinymce.init({
         "advlist link image lists hr anchor charmap autoresize",
         "wordcount visualblocks visualchars code ",
         "table  directionality template paste media fullscreen",
+{% if is_granted('ROLE_JSPLUS') == true %}
         "jsplus_bootstrap_include, jsplus_show_blocks jsplus_bootstrap_row_add_up jsplus_bootstrap_row_add_down jsplus_bootstrap_block_conf jsplus_bootstrap_col_move_left jsplus_bootstrap_col_move_right",
         "jsplus_bootstrap_delete_row jsplus_bootstrap_row_move_up jsplus_bootstrap_row_move_down jsplus_bootstrap_delete_col jsplus_bootstrap_templates jsplus_bootstrap_editor"
+{% endif %}
     ],
     directionality : '{{ direction }}',
     autoresize_on_init: false,
@@ -26,7 +28,9 @@ tinymce.init({
     {#content_css: "css/content.css",#}
     toolbar: [
         "bold italic | styleselect charmap | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table hr | visualblocks code fullscreen ",
+{% if is_granted('ROLE_JSPLUS') == true %}
         "jsplus_show_blocks jsplus_bootstrap_block_conf jsplus_bootstrap_editor | jsplus_bootstrap_templates jsplus_bootstrap_row_add_up jsplus_bootstrap_row_add_down | jsplus_bootstrap_row_move_up jsplus_bootstrap_row_move_down | jsplus_bootstrap_col_move_left jsplus_bootstrap_col_move_right | jsplus_bootstrap_delete_col jsplus_bootstrap_delete_row"
+{% endif %}
     ],
 {% if is_granted('ROLE_AUTHOR') == true %}
     file_browser_callback_types: 'image',
