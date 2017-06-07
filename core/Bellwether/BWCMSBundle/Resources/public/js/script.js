@@ -20,10 +20,22 @@ $(document).ready(function () {
         $(this).parent().find('ul.FCList').first().append('<li>' + fData + '</li>');
         $(this).parent().find('button.FCRemove').last().click(function (e) {
             e.preventDefault();
-            $(this).parents('li').first().remove()
+            $(this).parents('li').first().remove();
         });
     });
     $('ul.FCList').sortable();
+    // $('ul.FCList').sortable({
+    //     start: function( event, ui ) {
+    //         console.log($(this).find('textarea.editor').first().attr('id'));
+    //         tinyMCE.execCommand('mceRemoveEditor', false, 'BWCF_sections_0_sectionContent');
+    //         console.log('Hellooooo');
+    //     },
+    //     stop: function( event, ui ) {
+    //
+    //         tinyMCE.execCommand('mceAddEditor', true, 'BWCF_sections_0_sectionContent');
+    //         console.log('Hellooooo');
+    //     }
+    // });
 });
 
 function showContentBrowser(ele) {
