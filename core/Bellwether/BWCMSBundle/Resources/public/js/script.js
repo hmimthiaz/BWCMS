@@ -18,6 +18,11 @@ $(document).ready(function () {
         fData = fData.replace(/__name__label__/g, totalItems);
         fData = fData.replace(/__name__/g, totalItems);
         $(this).parent().find('ul.FCList').first().append('<li>' + fData + '</li>');
+
+        var getTinyMCEId = $(this).parent().find('ul.FCList').first().find('textarea.editor').last().attr('id');
+        if (typeof getTinyMCEId != 'undefined'){
+            tinyMCE.execCommand('mceAddEditor', true, getTinyMCEId);
+        }
         $(this).parent().find('button.FCRemove').last().click(function (e) {
             e.preventDefault();
             $(this).parents('li').first().remove();
