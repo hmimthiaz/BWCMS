@@ -21,6 +21,7 @@ use Bellwether\BWCMSBundle\Classes\Constants\ContentSortOrderType;
 use Knp\Menu\FactoryInterface;
 use Gregwar\Image\Image;
 use Bellwether\Common\Pagination;
+use Bellwether\Common\StringUtility;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
@@ -107,6 +108,7 @@ class TwigService extends BaseService implements \Twig_Extension_InitRuntimeInte
         return array(
             new \Twig_SimpleFilter('ellipse', array($this, 'getEllipse')),
             new \Twig_SimpleFilter('rgb', array($this, 'getRGB')),
+            new \Twig_SimpleFilter('slug', array($this, 'getSlug')),
         );
     }
 
@@ -138,6 +140,7 @@ class TwigService extends BaseService implements \Twig_Extension_InitRuntimeInte
             new \Twig_SimpleFunction('meta', array($this, 'getContentMeta'), array('is_safe' => array('html'))),
             new \Twig_SimpleFunction('pref', array($this, 'getPreference'), array('is_safe' => array('html'))),
             new \Twig_SimpleFunction('image', array($this, 'getImage')),
+            new \Twig_SimpleFunction('slug', array($this, 'getSlug')),
             new \Twig_SimpleFunction('thumb', array($this, 'getThumbImage')),
             new \Twig_SimpleFunction('taxonomy', array($this, 'getContentTaxonomy')),
             new \Twig_SimpleFunction('pagination', array($this, 'getPagination'), array('is_safe' => array('html'))),
@@ -563,6 +566,11 @@ class TwigService extends BaseService implements \Twig_Extension_InitRuntimeInte
             $this->s3SkinURLPrefix = $this->container->getParameter('media.s3SkinURLPrefix');
         }
         return $this->s3SkinURLPrefix;
+    }
+
+    public function getSlug($slug)
+    {
+        return StringUtility::sanitizeTitle($slug);
     }
 
     /**

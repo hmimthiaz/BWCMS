@@ -136,3 +136,7 @@ div.taxonomyTree::-webkit-scrollbar-track {
     background-color: #fff;
     border-radius: 8px;
 }
+
+div.mce-fullscreen {
+    z-index: 1050;
+}
