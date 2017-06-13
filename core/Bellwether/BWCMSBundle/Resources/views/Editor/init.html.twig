@@ -19,13 +19,14 @@ tinymce.init({
     autoresize_min_height: 350,
     autoresize_max_height: 500,
     extended_valid_elements : "div[*],span[*],i[*]",
+{% if is_granted('ROLE_JSPLUS') == true %}
     jsplus_bootstrap_include: {
         inContainer: true,
         includeTheme: false,
         includeJQuery: true,
         version: 3
     },
-    {#content_css: "css/content.css",#}
+{% endif %}
     toolbar: [
         "bold italic | styleselect charmap | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table hr | visualblocks code fullscreen ",
 {% if is_granted('ROLE_JSPLUS') == true %}

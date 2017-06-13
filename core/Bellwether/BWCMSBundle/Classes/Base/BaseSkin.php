@@ -89,6 +89,12 @@ abstract class BaseSkin implements ContainerAwareInterface
         return null;
     }
 
+    public function getTinyMCEInitScriptTemplate()
+    {
+        return null;
+    }
+
+
     abstract public function getName();
 
     abstract public function initDefaultThumbStyles();
