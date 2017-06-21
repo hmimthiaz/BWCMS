@@ -574,7 +574,7 @@ class ContentService extends BaseService
             if ($content->getTreeParent() != null) {
                 $parentId = $content->getTreeParent()->getId();
             }
-            $content->setSlug($this->generateSlug($content->getTitle(), $content->getType(), $parentId, $content->getId()));
+            $content->setSlug($this->generateSlug($content->getTitle(), $content->getType(), $parentId, $content->getId(), $content->getSchema()));
         } else {
             $content->setSlug(StringUtility::sanitizeTitle($content->getSlug()));
         }
@@ -841,10 +841,10 @@ class ContentService extends BaseService
         $this->em()->flush();
     }
 
-    public function generateSlug($title, $type = 'Page', $parentId = null, $contentId = null)
+    public function generateSlug($title, $type = 'Page', $parentId = null, $contentId = null, $schema = null)
     {
         $slug = StringUtility::sanitizeTitle($title);
-        while ($this->checkSlugExists($slug, $type, $parentId, $contentId)) {
+        while ($this->checkSlugExists($slug, $type, $parentId, $contentId, $schema)) {
             $slug = $slug . '-1';
         }
         return $slug;
@@ -914,18 +914,17 @@ class ContentService extends BaseService
     }
 
 
-    public function checkSlugExists($slug, $type = 'Page', $parentId = null, $contentId = null)
+    public function checkSlugExists($slug, $type = 'Page', $parentId = null, $contentId = null, $schema = null)
     {
+
         $contentRepository = $this->cm()->getContentRepository();
-        if (empty($parentId) || $parentId == 'Root') {
-            $qb = $contentRepository->getChildrenQueryBuilder(null, true);
-        } else {
-            $parentFolder = $contentRepository->find($parentId);
-            $qb = $contentRepository->getChildrenQueryBuilder($parentFolder, true);
-        }
+        $qb = $contentRepository->getChildrenQueryBuilder(null, false);
         $qb->andWhere(" node.type = '{$type}' ");
         if (!empty($contentId)) {
             $qb->andWhere(" node.id != '{$contentId}' ");
+        }
+        if (!empty($schema)) {
+            $qb->andWhere(" node.schema = '{$schema}' ");
         }
         $qb->andWhere(" node.slug = '{$slug}' ");
         $qb->andWhere(" node.site ='" . $this->sm()->getAdminCurrentSite()->getId() . "' ");

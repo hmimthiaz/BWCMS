@@ -375,7 +375,7 @@ abstract class ContentType implements ContentTypeInterface
 
         if ($this->isSlugEnabled) {
             if (!empty($data['slug'])) {
-                if ($this->cm()->checkSlugExists($data['slug'], $this->getType(), $data['parent'], $data['id'])) {
+                if ($this->cm()->checkSlugExists($data['slug'], $this->getType(), $data['parent'], $data['id'],$this->getSchema())) {
                     $form->get('slug')->addError(new FormError('Slug already exists!'));
                 }
             }
