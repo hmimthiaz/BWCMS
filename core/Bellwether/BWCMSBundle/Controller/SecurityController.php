@@ -15,6 +15,8 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Bellwether\BWCMSBundle\Classes\Constants\AuditLevelType;
+use Bellwether\BWCMSBundle\Classes\Constants\AuditActionType;
 
 class SecurityController extends BaseController implements BackEndControllerInterface
 {
@@ -119,7 +121,10 @@ class SecurityController extends BaseController implements BackEndControllerInte
                         'firstName' => $userEntity->getFirstName(),
                         'username' => $userEntity->getEmail(),
                         'resetURL' => $resetURL,
-                        'user' => $userEntity
+                        'user' => $userEntity,
+                        'home_page' => $this->generateUrl('home_page', array(
+                            'siteSlug' => $this->sm()->getCurrentSite()->getSlug()
+                        ), true)
                     );
                     $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
                     if (strpos(strtolower($userResetEmailTemplate), '.html.') === false) {
@@ -127,7 +132,12 @@ class SecurityController extends BaseController implements BackEndControllerInte
                     } else {
                         $message->setBody($bodyText, 'text/html');
                     }
-                    $this->mailer()->getMailer()->send($message);
+                    try {
+                        $this->mailer()->getMailer()->send($message);
+                    } catch (\Exception $e) {
+                        $this->admin()->addAudit(AuditLevelType::Critical, 'Email', AuditActionType::Send, 'NA', 'Error: ' . $e->getMessage());
+
+                    }
                 }
 
 
@@ -184,7 +194,10 @@ class SecurityController extends BaseController implements BackEndControllerInte
                 'username' => $userEntity->getEmail(),
                 'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
                 'password' => $newPassword,
-                'user' => $userEntity
+                'user' => $userEntity,
+                'home_page' => $this->generateUrl('home_page', array(
+                    'siteSlug' => $this->sm()->getCurrentSite()->getSlug()
+                ), true)
             );
             $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
             if (strpos(strtolower($userResetEmailTemplate), '.html.') === false) {
@@ -192,7 +205,12 @@ class SecurityController extends BaseController implements BackEndControllerInte
             } else {
                 $message->setBody($bodyText, 'text/html');
             }
-            $this->mailer()->getMailer()->send($message);
+            try {
+                $this->mailer()->getMailer()->send($message);
+            } catch (\Exception $e) {
+                $this->admin()->addAudit(AuditLevelType::Critical, 'Email', AuditActionType::Send, 'NA', 'Error: ' . $e->getMessage());
+
+            }
         }
 
         $template = "@Generic/Extras/Forgot-Success.html.twig";

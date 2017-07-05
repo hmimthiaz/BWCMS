@@ -18,6 +18,8 @@ use Bellwether\BWCMSBundle\Form\User\ResetPasswordType;
 use Bellwether\BWCMSBundle\Form\User\ChangePasswordType;
 use Bellwether\BWCMSBundle\Form\User\ProfileType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Bellwether\BWCMSBundle\Classes\Constants\AuditLevelType;
+use Bellwether\BWCMSBundle\Classes\Constants\AuditActionType;
 
 use Bellwether\Common\Pagination;
 
@@ -151,7 +153,12 @@ class UserController extends BaseController implements BackEndControllerInterfac
                     } else {
                         $message->setBody($bodyText, 'text/html');
                     }
-                    $this->mailer()->getMailer()->send($message);
+                    try {
+                        $this->mailer()->getMailer()->send($message);
+                    } catch (\Exception $e) {
+                        $this->admin()->addAudit(AuditLevelType::Critical, 'Email', AuditActionType::Send, 'NA', 'Error: ' . $e->getMessage());
+
+                    }
                 }
                 $this->addSuccessFlash('Added new user!');
                 return $this->redirect($this->generateUrl('_bwcms_admin_user_home'));
@@ -309,6 +316,9 @@ class UserController extends BaseController implements BackEndControllerInterfac
                         'username' => $existingUser->getEmail(),
                         'loginURL' => $this->generateUrl('user_login', array(), UrlGeneratorInterface::ABSOLUTE_URL),
                         'password' => $newPassword,
+                        'home_page' => $this->generateUrl('home_page', array(
+                            'siteSlug' => $this->sm()->getCurrentSite()->getSlug()
+                        ), true)
                     );
                     $bodyText = $this->renderView($userResetEmailTemplate, $emailVars);
 
@@ -317,7 +327,12 @@ class UserController extends BaseController implements BackEndControllerInterfac
                     } else {
                         $message->setBody($bodyText, 'text/html');
                     }
-                    $this->mailer()->getMailer()->send($message);
+                    try {
+                        $this->mailer()->getMailer()->send($message);
+                    } catch (\Exception $e) {
+                        $this->admin()->addAudit(AuditLevelType::Critical, 'Email', AuditActionType::Send, 'NA', 'Error: ' . $e->getMessage());
+
+                    }
                 }
                 $this->addSuccessFlash('Updated user password!');
                 return $this->redirect($this->generateUrl('_bwcms_admin_user_home'));
