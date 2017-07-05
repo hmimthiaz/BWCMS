@@ -213,7 +213,10 @@ class SecurityController extends BaseController implements BackEndControllerInte
             }
         }
 
-        $template = "@Generic/Extras/Forgot-Success.html.twig";
+        $template = $this->tp()->getCurrentSkin()->getForgotSuccessTemplate();
+        if (is_null($template)) {
+            $template = "@Generic/Extras/Forgot-Success.html.twig";
+        }
         return $this->render($template, array());
     }
 

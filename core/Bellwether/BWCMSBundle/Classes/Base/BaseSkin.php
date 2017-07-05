@@ -54,6 +54,11 @@ abstract class BaseSkin implements ContainerAwareInterface
         return null;
     }
 
+    public function getForgotSuccessTemplate()
+    {
+        return null;
+    }
+
     public function get404Template()
     {
         return null;
