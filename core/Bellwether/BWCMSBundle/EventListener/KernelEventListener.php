@@ -85,6 +85,8 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
                 $siteEntity = $this->sm()->getSiteBySlug($params['siteSlug']);
             }
             if (empty($siteEntity)) {
+                $siteEntity = $this->sm()->getDefaultSite();
+                $this->sm()->setCurrentSite($siteEntity);
                 throw new NotFoundHttpException("Language does not exists");
             }
             $this->sm()->setCurrentSite($siteEntity);
@@ -153,8 +155,9 @@ class KernelEventListener extends BaseService implements AccessDeniedHandlerInte
         if ($exception instanceof NotFoundHttpException) {
             //Check Skin
             if (is_null($this->tp()->getCurrentSkin())) {
-                $currentSite = $this->sm()->getAdminCurrentSite();
-                $this->tp()->setSkin($currentSite->getSkinFolderName());
+                $siteEntity = $this->sm()->getDefaultSite();
+                $this->sm()->setCurrentSite($siteEntity);
+                $this->tp()->setSkin($siteEntity->getSkinFolderName());
             }
             $displayTemplate = $this->tp()->getCurrentSkin()->get404Template();
             if (empty($displayTemplate)) {
