@@ -172,7 +172,7 @@ class S3Service extends BaseService
         try {
             $s3QueueEntity = $qb->getQuery()->getSingleResult();
             return $s3QueueEntity;
-        } catch (\Doctrine\ORM\NoResultException $e) {
+        } catch (\Exception $e) {
 
         }
 
